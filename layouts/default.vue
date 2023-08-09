@@ -61,10 +61,10 @@ onBeforeMount(async () => {
             // setTimeout(() => fnClear(), 1000)
           } else {
             // log.debug('REPLACE-STATE:', blen, backuri, JSON.stringify(history.state))
-            history.replaceState({}, '', backuri)
+            history.replaceState(history.state, '', backuri)
             // log.debug('PUSH-STATE:', blen, backuri, JSON.stringify(history.state))
             s.popstateHook = undefined
-            self.goPage(String(backuri))
+            self.goPage(String(backuri), history.state)
             if (callback && callback instanceof Function) { callback() }
             resolve()
           }
@@ -73,6 +73,18 @@ onBeforeMount(async () => {
         history.go(-1)
       }
       fnRemove()
+    })
+  }
+  s.saveHist = (data: any, callback?: Function) => {
+    return new Promise((resolve: any) => {
+      history.pushState({
+          histdata: JSON.stringify(data),
+          current: history.state.current
+        }, '',
+        history.state.current
+      )
+      if (callback && callback instanceof Function) { callback() }
+      resolve()
     })
   }
 })

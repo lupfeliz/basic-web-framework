@@ -55,7 +55,7 @@
         <template v-for="inx in range(paging.pnums(boardData.list))">
           <li :class="{ 'page-item': true, active: boardData.page == String(inx) }">
             <Button flat
-              @click="pageSearch({ page: inx })"
+              @click="search({ page: inx }, true)"
               class="page-link"
               >
               {{ inx }}
@@ -94,6 +94,7 @@ const paging = ref(new Paging())
 
 onBeforeMount(async () => {
   s.eventbus.on(C.EVT_POPSTATE, async (e: any) => {
+    log.debug('ONPOPSTATE:', JSON.stringify(e.state))
     let data = { page: 1 }
     if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
     await search(data)
@@ -103,12 +104,14 @@ onUnmounted(async () => {
   s.eventbus.off(C.EVT_POPSTATE)
 })
 onMounted(async () => {
-  if (!history.state?.histdata) {
-    await search({ page: 1 })
-  }
+  let data = { page: 1 }
+  if (history?.state?.histdata) { data = JSON.parse(history.state.histdata) }
+  log.debug('ONMOUNTED:', JSON.stringify(history.state))
+  await search(data)
 })
 
-const search = async (data: any) => {
+const search = async (data: any, save?: boolean) => {
+  if (save) { self.saveHist(data) }
   const res = await apiPost({
     act: 'board',
     data: data
@@ -117,11 +120,6 @@ const search = async (data: any) => {
     paging.value = new Paging(res.data.rows, res.data.pages, res.data.cnt)
     boardData.value = res.data
   }
-}
-
-const pageSearch = async (data: any) => {
-  history.pushState({histdata: JSON.stringify(data), current: history.state.current }, '', history.state.current)
-  await search(data)
 }
 
 const viewArticle = async (item: any) => {

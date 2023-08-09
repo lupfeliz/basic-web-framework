@@ -31,6 +31,7 @@ const sharedObj = {
   },
   popstateHook: undefined as any as Function | undefined,
   removeHist: undefined as any as Function,
+  saveHist: undefined as any as Function
 }
 
 const mixin  = {
@@ -55,6 +56,9 @@ const mixin  = {
     },
     async removeHist(blen?: number, backuri?: string, callback?: Function) {
       await shared.removeHist(blen, backuri, callback)
+    },
+    async saveHist(data: any, callback?: Function) {
+      await shared.saveHist(data, callback)
     },
     test() {
       log.debug('TEST!!!')

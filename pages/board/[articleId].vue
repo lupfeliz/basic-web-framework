@@ -47,6 +47,12 @@
           >
           삭제
         </Button>
+        <Button
+          class="btn-secondary mx-1"
+          @click="self.goPage('/board/list')"
+          >
+          목록보기
+        </Button>
       </div>
     </div>
   </div>
