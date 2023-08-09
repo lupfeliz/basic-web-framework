@@ -53,15 +53,14 @@ import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 
 import Button from '@/components/commons/button.vue'
+import { dialog } from '@/libs/commons/dialog'
 
 const self = inst(getCurrentInstance())
 
 const articleId = ref()
 
 const pageTitle = () => articleId.value ? '게시글 수정' : '게시글 작성'
-
 const article = ref({} as any)
-
 const editor = useEditor({
   content: '',
   extensions: [StarterKit],
@@ -75,15 +74,13 @@ onMounted(async() => {
 })
 
 const initContent = () => {
-  log.debug('', article.value?.contents, editor.value?.commands?.setContent)
   if (editor.value && article.value?.contents) {
-    editor.value.commands.setContent(article.value.contents);
+    editor.value.commands.setContent(article.value.contents)
   }
 }
 
 const getArticle = async () => {
   const id = Number(self.getParameter('articleId'))
-  log.debug('ARTICLE_ID:', id, isNaN(id))
   if (!isNaN(id)) {
     articleId.value = id
     const res = await apiGet({ act: `board/${id}` })
@@ -101,11 +98,17 @@ const putArticle = async () => {
     title: article.value?.title,
     contents: editor.value?.getHTML()
   }
-  await apiPut({
-    act: 'board',
-    data: data
-  })
-  log.debug('DATA:', data)
+  try {
+    await apiPut({
+      act: 'board',
+      data: data
+    })
+    /** 업데이트 이후 히스토리 삭제 */
+    await self.removeHist()
+    await dialog.alert('업데이트가 완료되었습니다')
+  } catch(e) {
+    await dialog.alert('오류가 발생했습니다')
+  }
 }
 
 const cancelEdit = async () => {

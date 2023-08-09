@@ -28,7 +28,9 @@ const sharedObj = {
     Modal: class {
       constructor(a: any) { }
     }
-  }
+  },
+  popstateHook: undefined as any as Function | undefined,
+  removeHist: undefined as any as Function,
 }
 
 const mixin  = {
@@ -51,8 +53,8 @@ const mixin  = {
         return route.params
       }
     },
-    clearHist() {
-      log.debug(history.state)
+    async removeHist(blen?: number, backuri?: string, callback?: Function) {
+      await shared.removeHist(blen, backuri, callback)
     },
     test() {
       log.debug('TEST!!!')

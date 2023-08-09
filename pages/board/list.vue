@@ -44,29 +44,41 @@
   <div class="mt-3 text-center pagination">
     <nav>
       <ul class="pagination">
-        <li class="page-item"><button class="page-link">&lt;&lt;</button></li>
-        <li class="page-item"><button class="page-link">&lt;</button></li>
+        <li class="page-item"
+          >
+          <Button flat class="page-link">&lt;&lt;</Button>
+        </li>
+        <li class="page-item"
+          >
+          <Button flat class="page-link">&lt;</Button>
+        </li>
         <template v-for="inx in range(paging.pnums(boardData.list))">
-          <li class="page-item">
-            <button
-              @click="search({ page: inx })"
+          <li :class="{ 'page-item': true, active: boardData.page == String(inx) }">
+            <Button flat
+              @click="pageSearch({ page: inx })"
               class="page-link"
               >
               {{ inx }}
-            </button>
+            </Button>
           </li>
         </template>
-
-        <li class="page-item"><button class="page-link">&gt;</button></li>
-        <li class="page-item"><button class="page-link">&gt;&gt;</button></li>
+        <li class="page-item"
+          >
+          <Button flat class="page-link">&gt;</Button>
+        </li>
+        <li class="page-item"
+          >
+          <Button flat class="page-link">&gt;&gt;</Button>
+        </li>
       </ul>
     </nav>
   </div>
 </template>
 <script setup lang="ts">
 
+import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
-import { inst } from '@/libs/commons/shared'
+import { inst, shared as s } from '@/libs/commons/shared'
 import { apiPost } from '@/libs/commons/api'
 import { $f } from '@/libs/commons/format'
 import { values } from '@/libs/commons/values'
@@ -80,10 +92,20 @@ const boardData = ref({ list: [] as any[] } as any)
 const { range } = values
 const paging = ref(new Paging())
 
-onMounted(async () => {
-  await search({
-    page: 1
+onBeforeMount(async () => {
+  s.eventbus.on(C.EVT_POPSTATE, async (e: any) => {
+    let data = { page: 1 }
+    if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
+    await search(data)
   })
+})
+onUnmounted(async () => {
+  s.eventbus.off(C.EVT_POPSTATE)
+})
+onMounted(async () => {
+  if (!history.state?.histdata) {
+    await search({ page: 1 })
+  }
 })
 
 const search = async (data: any) => {
@@ -97,12 +119,17 @@ const search = async (data: any) => {
   }
 }
 
+const pageSearch = async (data: any) => {
+  history.pushState({histdata: JSON.stringify(data), current: history.state.current }, '', history.state.current)
+  await search(data)
+}
+
 const viewArticle = async (item: any) => {
   self.goPage(`/board/${item?.id}`)
 }
 
 const newArticle = async () => {
-  self.goPage(`/board/editor/_`)
+  self.goPage(`/board/edit/_`)
 }
 
 defineExpose({ pageTitle })

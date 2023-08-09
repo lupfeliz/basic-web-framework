@@ -26,8 +26,60 @@ const libinit = ref(s.libinit)
 
 onBeforeMount(async () => {
   s.eventbus.on(C.EVT_PAGE_LOADED, onPageMount)
-})
+  // log.debug('REGISTER POPSTATE EVENT!')
+  /** history 이동 관련 */
+  window.addEventListener(C.POPSTATE, (e: any) => {
+    // log.debug('CANCEL POPSTATE', s.popstateHook ? true : false)
+    if (s.popstateHook && s.popstateHook instanceof Function) {
+      // log.debug('HOOK POPSTATE', e.cancelable)
+      const fnc = s.popstateHook;
+      s.popstateHook = undefined
+      nextTick(() => fnc(e))
+      // setTimeout(() => fnc(e), 1000)
+      e.cancelBubble = true
+      e.stopPropagation()
+      e.preventDefault()
+      return false
+    } else {
+      s.eventbus.emit(C.EVT_POPSTATE, e)
+    }
+  })
 
+  /** history 이동 관련 */
+  s.removeHist = (blen?: number, backuri?: string, callback?: Function) => {
+    return new Promise((resolve: any) => {
+      if (!blen) { blen = 1 }
+      if (blen < 1) { return }
+      if (!backuri && !history.state?.back) { return }
+      if (!backuri) { backuri = history.state?.back }
+      const fnRemove = () => {
+        s.popstateHook = (e: any) => {
+          // log.debug('BINX:', blen, backuri, JSON.stringify(history.state))
+          if (Number(blen) > 0 && history.state) {
+            blen = Number(blen) - 1
+            nextTick(() => fnRemove())
+            // setTimeout(() => fnClear(), 1000)
+          } else {
+            // log.debug('REPLACE-STATE:', blen, backuri, JSON.stringify(history.state))
+            history.replaceState({}, '', backuri)
+            // log.debug('PUSH-STATE:', blen, backuri, JSON.stringify(history.state))
+            s.popstateHook = undefined
+            self.goPage(String(backuri))
+            if (callback && callback instanceof Function) { callback() }
+            resolve()
+          }
+        }
+        // log.debug('HISTORY BACK!')
+        history.go(-1)
+      }
+      fnRemove()
+    })
+  }
+})
+onUnmounted(async () => {
+  s.eventbus.off(C.EVT_PAGE_LOADED)
+  window.removeEventListener(C.POPSTATE, () => { })
+})
 onMounted(async () => { 
   if (!s.libinit) {
     await bootstwrap.new()
@@ -37,5 +89,4 @@ onMounted(async () => {
 
 const onPageMount = () => {
 }
-
 </script>

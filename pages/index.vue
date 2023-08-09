@@ -18,7 +18,7 @@ const self = inst(getCurrentInstance())
 const pageTitle = ref('메인페이지')
 
 const onClickProc = async (e: any) => {
-  self.goPage('/board')
+  self.goPage('/board/list')
 }
 
 defineExpose({ pageTitle })

@@ -2,7 +2,7 @@
   <header class="t-5 p-5 center rounded row">
     <div class="text-center col-3">
       <Button
-          :class="[router.options.history.state.back ? 'btn-secondary' : 'hidden']"
+        :class="[router.options.history.state.back ? 'btn-secondary' : 'hidden']"
         @click="self.goPage(-1)"
         >
         &lt; 이전
@@ -33,9 +33,13 @@ const router = useRouter()
 
 watch(() => s?.pageInstance?.pageTitle, () => titleChanged())
 
-onMounted(async () => {
+onBeforeMount(async () => {
   s.eventbus.on(C.EVT_PAGE_LOADED, onPageMount)
   s.eventbus.on(C.EVT_TITLE_CHANGED, titleChanged)
+})
+onUnmounted(async () => {
+  s.eventbus.off(C.EVT_PAGE_LOADED)
+  s.eventbus.off(C.EVT_TITLE_CHANGED)
 })
 
 const onPageMount = () => {

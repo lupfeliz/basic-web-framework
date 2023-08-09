@@ -80,7 +80,7 @@ const getArticle = async () => {
 }
 
 const editArticle = async (id: string) => {
-  self.goPage(`/board/editor/${id}`)
+  self.goPage(`/board/edit/${id}`)
 }
 
 const deleteArticle = async (id: string) => {

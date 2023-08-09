@@ -23,6 +23,7 @@ export const CTYPE_TEXT = 'plain/text'
 export const CTYPE_CSS = 'text/css'
 export const CTYPE_OCTET = 'application/octet-stream'
 export const CTYPE_MULTIPART = 'multipart/form-data'
+export const POPSTATE = 'popstate'
 
 export const NUXT_ROOT = 'nuxt-root'
 
@@ -32,3 +33,4 @@ export const VNM_ROUTE_PROVIDER = 'RouteProvider'
 export const EVT_PAGE_LOADED = 'EVT_PAGE_LOADED'
 export const EVT_LAYOUT_LOADED = 'EVT_LAYOUT_LOADED'
 export const EVT_TITLE_CHANGED = 'EVT_TITLE_CHANGED'
+export const EVT_POPSTATE = 'EVT_POPSTATE'

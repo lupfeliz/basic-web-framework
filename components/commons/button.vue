@@ -1,7 +1,7 @@
 <template>
   <button
     type="button"
-    class="btn"
+    :class="{ 'btn': props.flat ? false : true }"
     v-bind="attrs"
     @click="emitClick"
     >
@@ -12,6 +12,11 @@
 import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
 
+const props = defineProps({
+  flat: {
+    type: Boolean
+  }
+})
 const attrs = useAttrs()
 const emit = defineEmits([C.CLICK])
 
