@@ -1,3 +1,5 @@
+import { log } from '@/libs/commons/log'
+
 const ROWS_DEF = 10
 const PAGES_DEF = 5
 class Paging {
@@ -32,9 +34,10 @@ class Paging {
     if (pn < 1) { pn = 1 }
     let mod = 0;
     const pnt = Math.ceil(this.tot / this.rows)
-    if (pn > this.pages) { mod = (pn - 1) %  this.pages }
+    // if (pn > this.pages) { mod = (pn - 1) %  this.pages }
+    mod = (pn - 1) %  this.pages
     let pns = pn - mod
-    let pne = pns + this.pages
+    let pne = pns + this.pages - 1
     if (pne > pnt) { pne = pnt }
     return [pns, pne]
   }

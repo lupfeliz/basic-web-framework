@@ -44,15 +44,27 @@
   <div class="mt-3 text-center pagination">
     <nav>
       <ul class="pagination">
-        <li class="page-item"
-          >
-          <Button flat class="page-link">&lt;&lt;</Button>
-        </li>
-        <li class="page-item"
-          >
-          <Button flat class="page-link">&lt;</Button>
-        </li>
-        <template v-for="inx in range(paging.pnums(boardData.list))">
+        <template v-if="Number(boardData.page) >= 5">
+          <li class="page-item">
+            <Button flat
+              class="page-link"
+              @click="search({ page: Number(boardData.page) - Number(boardData.pages) })"
+              >
+              &lt;&lt;
+            </Button>
+          </li>
+        </template>
+        <template v-if="Number(boardData.page) > 1">
+          <li class="page-item">
+            <Button flat
+              class="page-link"
+              @click="search({ page: Number(boardData.page) - 1 })"
+              >
+              &lt;
+            </Button>
+          </li>
+        </template>
+        <template v-for="inx in range(paging.pnums(boardData.page))">
           <li :class="{ 'page-item': true, active: boardData.page == String(inx) }">
             <Button flat
               @click="search({ page: inx }, true)"
@@ -62,14 +74,27 @@
             </Button>
           </li>
         </template>
-        <li class="page-item"
-          >
-          <Button flat class="page-link">&gt;</Button>
-        </li>
-        <li class="page-item"
-          >
-          <Button flat class="page-link">&gt;&gt;</Button>
-        </li>
+        <template v-if="Number(boardData.page) < Number(boardData.totp)">
+          <li class="page-item"
+            >
+            <Button flat
+              class="page-link"
+              @click="search({ page: Number(boardData.page) + 1 })"
+              >
+              &gt;
+            </Button>
+          </li>
+        </template>
+        <template v-if="Number(boardData.page) < (Number(boardData.totp) - Number(boardData.pages) + 1)">
+          <li class="page-item">
+            <Button flat
+              class="page-link"
+              @click="search({ page: Number(boardData.page) + Number(boardData.pages) })"
+              >
+              &gt;&gt;
+            </Button>
+          </li>
+        </template>
       </ul>
     </nav>
   </div>
@@ -94,10 +119,10 @@ const paging = ref(new Paging())
 
 onBeforeMount(async () => {
   s.eventbus.on(C.EVT_POPSTATE, async (e: any) => {
-    log.debug('ONPOPSTATE:', JSON.stringify(e.state))
+    // log.debug('ONPOPSTATE:', JSON.stringify(e.state))
     let data = { page: 1 }
     if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
-    await search(data)
+    search(data)
   })
 })
 onUnmounted(async () => {
@@ -106,18 +131,20 @@ onUnmounted(async () => {
 onMounted(async () => {
   let data = { page: 1 }
   if (history?.state?.histdata) { data = JSON.parse(history.state.histdata) }
-  log.debug('ONMOUNTED:', JSON.stringify(history.state))
-  await search(data)
+  log.debug('ONMOUNTED:', history.state)
+  search(data)
 })
 
 const search = async (data: any, save?: boolean) => {
-  if (save) { self.saveHist(data) }
+  // if (save) { self.saveHist(data) }
   const res = await apiPost({
     act: 'board',
     data: data
   })
   if (res?.data?.list) {
     paging.value = new Paging(res.data.rows, res.data.pages, res.data.cnt)
+    res.data.totp = Math.ceil(Number(res.data.cnt) / Number(res.data.rows))
+    // log.debug('DATA:', res.data)
     boardData.value = res.data
   }
 }

@@ -5,9 +5,10 @@
         :class="[router.options.history.state.back ? 'btn-secondary' : 'hidden']"
         @click="self.goPage(-1)"
         >
-        &lt; 이전
+        &lt; 이전 
       </Button>
     </div>
+
     <h1 class="text-center col-6" v-html="pageTitle"></h1>
     <div class="text-center col-3">
       <Button
