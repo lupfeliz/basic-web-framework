@@ -14,26 +14,26 @@
           <p v-html="ctx.msg"></p>
           <div class="text-center">
             <template v-if="ctx.type === 1">
-              <Button
+              <MyButton
                 class="btn btn-secondary"
                 @click="clicked(1)"
                 >
                 확인
-              </Button>
+              </MyButton>
             </template>
             <template v-if="ctx.type === 2">
-              <Button
+              <MyButton
                 class="btn btn-primary mx-1"
                 @click="clicked(1)"
                 >
                 확인
-              </Button>
-              <Button
+              </MyButton>
+              <MyButton
                 class="btn btn-secondary mx-1"
                 @click="clicked(2)"
                 >
                 취소
-              </Button>
+              </MyButton>
             </template>
 
           </div>
@@ -49,7 +49,7 @@ import { values } from '@/libs/commons/values'
 import { dialog } from '@/libs/commons/dialog'
 import { shared as s } from '@/libs/commons/shared'
 import { bindto } from '@/libs/commons/objbinder'
-import Button from '@/components/commons/button.vue'
+import MyButton from '@/components/commons/mybutton.vue'
 
 const modal = ref()
 

@@ -1,26 +1,31 @@
 <template>
-  <header class="t-5 p-5 center rounded row">
-    <div class="text-center col-3">
-      <Button
+  <header class="t-5 py-5 center rounded row">
+    <div class="text-left col-3">
+      <MyButton
         :class="[router.options.history.state.back ? 'btn-secondary' : 'hidden']"
         @click="self.goPage(-1)"
         >
         &lt; 이전 
-      </Button>
+      </MyButton>
     </div>
 
     <h1 class="text-center col-6" v-html="pageTitle"></h1>
-    <div class="text-center col-3">
-      <Button
-        class="btn-info"
+    <div class="text-right col-3">
+      <MyButton
+        class="btn-secondary mx-1"
         >
         로그인
-      </Button>
+      </MyButton>
+      <MyButton
+        class="btn-secondary mx-1"
+        >
+        회원가입
+      </MyButton>
     </div>
   </header>
 </template>
 <script setup lang="ts">
-import Button from '@/components/commons/button.vue';
+import MyButton from '@/components/commons/mybutton.vue';
 
 import * as C from '@/libs/commons/constants'
 import { shared as s, inst } from '@/libs/commons/shared'

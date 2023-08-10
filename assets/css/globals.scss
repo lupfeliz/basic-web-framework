@@ -34,7 +34,7 @@ html {
         }
       }
       .row > div > input[type='text'] {
-        width: inherit
+        width: 100%
       }
       .row.editor > div div[contenteditable] {
         padding: 0.5rem;
@@ -53,8 +53,12 @@ html {
   }
 }
 
+.text-right { text-align: right; }
+.text-left { text-align: left; }
 .cursor-pointer { cursor: pointer; }
 .hidden { display: none !important; }
+
+button[type="button"][disabled] { color: #ccc; }
 
 div.pagination {
   display: block !important;

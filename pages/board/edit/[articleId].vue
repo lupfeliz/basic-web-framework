@@ -5,10 +5,10 @@
         제목
       </div>
       <div class="col">
-        <input
+        <MyInput
           type="text"
           v-model="article.title"
-          >
+          />
       </div>
     </div>
     <div class="row content editor">
@@ -28,18 +28,18 @@
         {{ articleId ? '수정' : '작성' }}
       </div>
       <div class="col">
-        <Button
+        <MyButton
           class="btn-primary mx-1"
           @click="putArticle()"
           >
           {{ articleId ? '수정완료' : '작성완료' }}
-        </Button>
-        <Button
+        </MyButton>
+        <MyButton
           class="btn-warning mx-1"
           @click="cancelEdit()"
           >
           취소
-        </Button>
+        </MyButton>
       </div>
     </div>
   </div>
@@ -52,7 +52,8 @@ import { apiGet, apiPut } from '@/libs/commons/api'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 
-import Button from '@/components/commons/button.vue'
+import MyButton from '@/components/commons/mybutton.vue'
+import MyInput from '@/components/commons/myinput.vue'
 import { dialog } from '@/libs/commons/dialog'
 
 const self = inst(getCurrentInstance())

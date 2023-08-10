@@ -1,15 +1,15 @@
 <template>
 <div class="text-center">
-  <Button
+  <MyButton
     class="btn-primary mx-1"
     @click="onClickProc"
     >
     게시판으로 이동
-  </Button>
+  </MyButton>
 </div>
 </template>
 <script setup lang="ts">
-import Button from '@/components/commons/button.vue'
+import MyButton from '@/components/commons/mybutton.vue'
 import { dialog } from '@/libs/commons/dialog'
 import { log } from '@/libs/commons/log'
 import { inst } from '@/libs/commons/shared'

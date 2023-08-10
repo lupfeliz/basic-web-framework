@@ -78,7 +78,7 @@ onBeforeMount(async () => {
   s.saveHist = (data: any, callback?: Function) => {
     return new Promise((resolve: any) => {
       const pdata = history.state;
-      pdata.histdata = JSON.stringify(pdata)
+      pdata.histdata = JSON.stringify(data)
       history.pushState(pdata, '',
         history.state.current
       )

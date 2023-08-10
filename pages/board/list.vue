@@ -33,68 +33,63 @@
       </div>
     </template>
     <div class="mt-2">
-      <Button
+      <MyButton
         class="btn-primary"
         @click="newArticle()"
         >
         새글작성
-      </Button>
+      </MyButton>
     </div>
   </div>
   <div class="mt-3 text-center pagination">
     <nav>
       <ul class="pagination">
-        <template v-if="Number(boardData.page) >= 5">
-          <li class="page-item">
-            <Button flat
-              class="page-link"
-              @click="search({ page: Number(boardData.page) - Number(boardData.pages) })"
-              >
-              &lt;&lt;
-            </Button>
-          </li>
-        </template>
-        <template v-if="Number(boardData.page) > 1">
-          <li class="page-item">
-            <Button flat
-              class="page-link"
-              @click="search({ page: Number(boardData.page) - 1 })"
-              >
-              &lt;
-            </Button>
-          </li>
-        </template>
+        <li class="page-item">
+          <MyButton flat
+            class="page-link"
+            :disabled="Number(boardData.page) < 5"
+            @click="search({ page: Number(boardData.page) - Number(boardData.pages) }, true)"
+            >
+            &lt;&lt;
+          </MyButton>
+        </li>
+        <li class="page-item">
+          <MyButton flat
+            class="page-link"
+            :disabled="Number(boardData.page) <= 1"
+            @click="search({ page: Number(boardData.page) - 1 }, true)"
+            >
+            &lt;
+          </MyButton>
+        </li>
         <template v-for="inx in range(paging.pnums(boardData.page))">
           <li :class="{ 'page-item': true, active: boardData.page == String(inx) }">
-            <Button flat
+            <MyButton flat
               @click="search({ page: inx }, true)"
               class="page-link"
               >
               {{ inx }}
-            </Button>
+            </MyButton>
           </li>
         </template>
-        <template v-if="Number(boardData.page) < Number(boardData.totp)">
-          <li class="page-item"
+        <li class="page-item">
+          <MyButton flat
+            class="page-link"
+            :disabled="Number(boardData.page) >= Number(boardData.totp)"
+            @click="search({ page: Number(boardData.page) + 1 }, true)"
             >
-            <Button flat
-              class="page-link"
-              @click="search({ page: Number(boardData.page) + 1 })"
-              >
-              &gt;
-            </Button>
-          </li>
-        </template>
-        <template v-if="Number(boardData.page) < (Number(boardData.totp) - Number(boardData.pages) + 1)">
-          <li class="page-item">
-            <Button flat
-              class="page-link"
-              @click="search({ page: Number(boardData.page) + Number(boardData.pages) })"
-              >
-              &gt;&gt;
-            </Button>
-          </li>
-        </template>
+            &gt;
+          </MyButton>
+        </li>
+        <li class="page-item">
+          <MyButton flat
+            class="page-link"
+            :disabled="Number(boardData.page) >= (Number(boardData.totp) - Number(boardData.pages) + 1)"
+            @click="search({ page: Number(boardData.page) + Number(boardData.pages) }, true)"
+            >
+            &gt;&gt;
+          </MyButton>
+        </li>
       </ul>
     </nav>
   </div>
@@ -109,7 +104,7 @@ import { $f } from '@/libs/commons/format'
 import { values } from '@/libs/commons/values'
 import { Paging } from '@/libs/commons/paging'
 
-import Button from '@/components/commons/button.vue'
+import MyButton from '@/components/commons/mybutton.vue'
 
 const self = inst(getCurrentInstance())
 const pageTitle = '게시판'
@@ -119,7 +114,7 @@ const paging = ref(new Paging())
 
 onBeforeMount(async () => {
   s.eventbus.on(C.EVT_POPSTATE, async (e: any) => {
-    // log.debug('ONPOPSTATE:', JSON.stringify(e.state))
+    log.debug('ONPOPSTATE:', JSON.parse(e.state.histdata || '{}'))
     let data = { page: 1 }
     if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
     search(data)
@@ -136,7 +131,7 @@ onMounted(async () => {
 })
 
 const search = async (data: any, save?: boolean) => {
-  // if (save) { self.saveHist(data) }
+  if (save) { self.saveHist(data) }
   const res = await apiPost({
     act: 'board',
     data: data
