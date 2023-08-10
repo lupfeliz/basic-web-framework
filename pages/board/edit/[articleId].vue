@@ -1,6 +1,6 @@
 <template>
   <div class="container board-article">
-    <MyForm ref="form" :validation-schema="vschema">
+    <MyForm ref="form">
       <div class="row">
         <div class="col-2 head">
           제목
@@ -9,7 +9,9 @@
           <MyInput
             type="text"
             name="title"
+            label="제목"
             v-model="article.title"
+            validrules="required|len:2,255"
             />
         </div>
       </div>
@@ -24,6 +26,7 @@
             label="내용"
             name="contents"
             v-model="article.contents"
+            validrules="required|content-len:5,4000"
             />
         </div>
       </div>
@@ -68,15 +71,6 @@ const articleId = ref()
 const pageTitle = () => articleId.value ? '게시글 수정' : '게시글 작성'
 const article = ref({} as any)
 const form = ref()
-const vschema = {
-  // title(value: string) {
-  // },
-  // contents(value: string) {
-  // },
-  // password: 'required|min:8',
-  title: 'required|min:2|max:10',
-  contents: 'required|content-len:10,1000'
-}
 
 onMounted(async() => {
   await getArticle()
@@ -96,18 +90,20 @@ const getArticle = async () => {
 }
 
 const putArticle = async () => {
-  log.debug('CHECK:', form.value.validate())
-  // try {
-  //   await apiPut({
-  //     act: 'board',
-  //     data: article.value
-  //   })
-  //   /** 업데이트 이후 히스토리 삭제 */
-  //   await self.removeHist()
-  //   await dialog.alert('업데이트가 완료되었습니다')
-  // } catch(e) {
-  //   await dialog.alert('오류가 발생했습니다')
-  // }
+  try {
+    /** form-validate */
+    if (await form.value.validate()) {
+      await apiPut({
+        act: 'board',
+        data: article.value
+      })
+      /** 업데이트 이후 히스토리 삭제 */
+      await self.removeHist()
+      await dialog.alert('업데이트가 완료되었습니다')
+    }
+  } catch(e) {
+    await dialog.alert('오류가 발생했습니다')
+  }
 }
 
 const cancelEdit = async () => {

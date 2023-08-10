@@ -1,10 +1,11 @@
 <template>
   <editor-content
-    name="contents"
-    @keyup="emitUpdate"
+    :name="props.name"
+    v-bind="attrs"
+    @keydown="emitUpdate"
     :editor="editor"
     />
-  <span class="err-msg" v-if="errorMessage" v-html="errorMessage"></span>
+  <span class="err-msg" v-if="vmeta.validated && errorMessage" v-html="errorMessage"></span>
 </template>
 <script setup lang="ts">
 import * as C from '@/libs/commons/constants'
@@ -18,12 +19,14 @@ import lodash from 'lodash'
 const props = defineProps({
   label: String,
   name: String,
+  validrules: {} as any,
+  validopts: {} as any,
   modelValue: String
 })
 
 const attrs = useAttrs()
 const emit = defineEmits([C.UPDATE_MODEL_VALUE])
-const vfield = useField(() => props.name || '')
+const vfield = useField(() => props.name || '', props.validrules, props.validopts)
 const { value, errorMessage } = vfield
 const vmeta: any = vfield.meta
 const { debounce } = lodash
@@ -35,24 +38,13 @@ const editor = useEditor({
 
 onBeforeMount(async () => {
   vmeta.label = props.label
-  value.value = props.modelValue
 })
 
 watch(() => props.modelValue, (v: any) => {
-  value.value = v
-  initContent()
+  editor.value?.commands?.setContent(v)
 })
 
-watch(editor, _ => initContent())
-
-const initContent = () => {
-  if (editor.value && value.value) {
-    editor.value.commands.setContent(value.value)
-  }
-}
-
 const emitUpdate = debounce(async (e?: any) => {
-  log.debug('META:', vfield)
   value.value = editor.value?.getHTML()
   emit(C.UPDATE_MODEL_VALUE, value.value)
 }, 300)
