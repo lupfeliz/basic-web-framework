@@ -18,6 +18,7 @@
       </MyButton>
       <MyButton
         class="btn-secondary mx-1"
+        @click="self.goPage('/member/register')"
         >
         회원가입
       </MyButton>
@@ -25,7 +26,7 @@
   </header>
 </template>
 <script setup lang="ts">
-import MyButton from '@/components/commons/mybutton.vue';
+import MyButton from '@/components/commons/mybutton.vue'
 
 import * as C from '@/libs/commons/constants'
 import { shared as s, inst } from '@/libs/commons/shared'

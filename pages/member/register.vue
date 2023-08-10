@@ -84,6 +84,7 @@
 import * as C from '@/libs/commons/constants'
 import { shared as s, inst } from '@/libs/commons/shared'
 import { log } from '@/libs/commons/log'
+import { apiGet, apiPut } from '@/libs/commons/api'
 
 import MyButton from '@/components/commons/mybutton.vue'
 import MyInput from '@/components/commons/myinput.vue'
@@ -96,7 +97,10 @@ onMounted(async () => {
 
 })
 
-const doRegister = () => {
+const checkId = async () => {
+}
+
+const doRegister = async () => {
 
 }
 

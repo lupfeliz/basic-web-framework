@@ -137,10 +137,10 @@ const search = async (data: any, save?: boolean) => {
     data: data
   })
   if (res?.data?.list) {
-    paging.value = new Paging(res.data.rows, res.data.pages, res.data.cnt)
-    res.data.totp = Math.ceil(Number(res.data.cnt) / Number(res.data.rows))
-    // log.debug('DATA:', res.data)
-    boardData.value = res.data
+    const data = res.data
+    paging.value = new Paging(data.rows, data.pages, data.cnt)
+    data.totp = Math.ceil(Number(data.cnt) / Number(data.rows))
+    boardData.value = data
   }
 }
 
