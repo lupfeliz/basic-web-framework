@@ -2,7 +2,7 @@ import mitt from 'mitt'
 import { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
 import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
-import { navigateTo } from 'nuxt/app';
+import { navigateTo } from 'nuxt/app'
 
 /** [ 타입 및 인터페이스 정의 */
 const map: any = {} as any
@@ -40,10 +40,10 @@ const mixin  = {
       switch(typeof uri) {
       case C.STRING:
         navigateTo(String(uri), opt)
-        break;
+        break
       case C.NUMBER:
         history.go(Number(uri))
-        break;
+        break
       }
     },
     getParameter(key?: string) {

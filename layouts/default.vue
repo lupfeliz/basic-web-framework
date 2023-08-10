@@ -32,7 +32,7 @@ onBeforeMount(async () => {
     // log.debug('CANCEL POPSTATE', s.popstateHook ? true : false)
     if (s.popstateHook && s.popstateHook instanceof Function) {
       // log.debug('HOOK POPSTATE', e.cancelable)
-      const fnc = s.popstateHook;
+      const fnc = s.popstateHook
       s.popstateHook = undefined
       nextTick(() => fnc(e))
       // setTimeout(() => fnc(e), 1000)
@@ -77,7 +77,7 @@ onBeforeMount(async () => {
   }
   s.saveHist = (data: any, callback?: Function) => {
     return new Promise((resolve: any) => {
-      const pdata = history.state;
+      const pdata = history.state
       pdata.histdata = JSON.stringify(data)
       history.pushState(pdata, '',
         history.state.current

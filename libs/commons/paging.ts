@@ -32,7 +32,7 @@ class Paging {
     pn = Number(pn)
     if (isNaN(pn)) { pn = 1 }
     if (pn < 1) { pn = 1 }
-    let mod = 0;
+    let mod = 0
     const pnt = Math.ceil(this.tot / this.rows)
     // if (pn > this.pages) { mod = (pn - 1) %  this.pages }
     mod = (pn - 1) %  this.pages

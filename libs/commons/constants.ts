@@ -34,3 +34,5 @@ export const EVT_PAGE_LOADED = 'EVT_PAGE_LOADED'
 export const EVT_LAYOUT_LOADED = 'EVT_LAYOUT_LOADED'
 export const EVT_TITLE_CHANGED = 'EVT_TITLE_CHANGED'
 export const EVT_POPSTATE = 'EVT_POPSTATE'
+
+export const DIV = 'div'
