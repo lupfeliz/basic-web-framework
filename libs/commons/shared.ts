@@ -60,8 +60,33 @@ const mixin  = {
     async saveHist(data: any, callback?: Function) {
       await shared.saveHist(data, callback)
     },
-    test() {
-      log.debug('TEST!!!')
+    findForm(self?: any) {
+      if (!self && this) { self = this }
+      let x: any
+      let ctx = self?._
+      log.debug('SELF:', self)
+      const fnchk = (ctx: any) => {
+        let x: any
+        if ((x = ctx?.exposed) &&
+          x?.validate && x?.validate instanceof Function &&
+          x?.reset && x?.reset instanceof Function &&
+          x?.resetField && x?.resetField instanceof Function &&
+          x?.VFORM) {
+          return ctx.exposed.VFORM
+        }
+      }
+      const list = self?._?.subTree?.children
+      // log.debug('LIST:', list)
+      for (const sub of list) {
+        // log.debug('SUB:', sub?.component?.exposed)
+        if (x = fnchk(sub?.component)) { return x }
+      }
+      while (ctx) {
+        // log.debug('CTX:', ctx)
+        if (x = fnchk(ctx)) { return x }
+        ctx = ctx.parent
+      }
+      return undefined
     }
   }
 }

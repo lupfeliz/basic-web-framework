@@ -1,18 +1,18 @@
 <template>
-  <Form as=""
-    ref="vform"
-    v-slot="{ values }"
-    v-bind="attrs"
-    >
-    <slot></slot>
-  </Form>
+  <slot></slot>
 </template>
 <script setup lang="ts">
 import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
-import { Form } from 'vee-validate'
+import { useForm } from 'vee-validate'
 import { defineRule } from 'vee-validate'
 import vrules from '@vee-validate/rules'
+
+const vform = useForm()
+
+onBeforeMount(async () => {
+  log.debug('V-FORM:', vform)
+})
 
 Object.keys(vrules).forEach(rule => {
   defineRule(rule, vrules[rule])
@@ -46,21 +46,18 @@ defineRule('len', (v: any, [vlmin, vlmax]: [number, number], ctx: any) => {
   return ret
 })
 
-const attrs = useAttrs()
-const vform = ref()
-
 const reset = (e: any) => {
-  return vform.value.resetForm(e)
+  return vform.resetForm(e)
 }
 
 const resetField = (f: any, s: any) => {
-  return vform.value.resetField(f, s)
+  return vform.resetField(f, s)
 }
 
 const validate = async (e: any) => {
-  const ret = await vform.value.validate(e)
+  const ret = await vform.validate(e)
   return ret?.valid
 }
 
-defineExpose({ validate, reset, resetField })
+defineExpose({ validate, reset, resetField, VFORM: vform })
 </script>
