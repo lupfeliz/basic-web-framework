@@ -173,9 +173,10 @@ const doRegister = async () => {
       const res = await apiPut({ act: 'user', data: user.value })
       if (res?.data) {
         if (await dialog.confirm(`"${user.value.userNm}" 님의 가입이 완료되었어요.<br/> 로그인 하시겠어요?`)) {
-          self.goPage('/user/login')
+          await self.removeHist(1, '/user/login')
+          // self.goPage('/user/login')
         } else {
-          self.goPage('/')
+          await self.removeHist(1, '/')
         }
       }
     }

@@ -52,6 +52,15 @@ onBeforeMount(async () => {
       if (blen < 1) { return }
       if (!backuri && !history.state?.back) { return }
       if (!backuri) { backuri = history.state?.back }
+      const fnFinish = () => {
+        // log.debug('REPLACE-STATE:', blen, backuri, JSON.stringify(history.state))
+        history.replaceState(history.state, '', backuri)
+        // log.debug('PUSH-STATE:', blen, backuri, JSON.stringify(history.state))
+        s.popstateHook = undefined
+        self.goPage(String(backuri), history.state)
+        if (callback && callback instanceof Function) { callback() }
+        resolve()
+      }
       const fnRemove = () => {
         s.popstateHook = (e: any) => {
           // log.debug('BINX:', blen, backuri, JSON.stringify(history.state))
@@ -60,17 +69,15 @@ onBeforeMount(async () => {
             nextTick(() => fnRemove())
             // setTimeout(() => fnClear(), 1000)
           } else {
-            // log.debug('REPLACE-STATE:', blen, backuri, JSON.stringify(history.state))
-            history.replaceState(history.state, '', backuri)
-            // log.debug('PUSH-STATE:', blen, backuri, JSON.stringify(history.state))
-            s.popstateHook = undefined
-            self.goPage(String(backuri), history.state)
-            if (callback && callback instanceof Function) { callback() }
-            resolve()
+            fnFinish()
           }
         }
         // log.debug('HISTORY BACK!')
-        history.go(-1)
+        if (history.state?.back && history.state?.position > 1) {
+          history.go(-1)
+        } else {
+          fnFinish()
+        }
       }
       fnRemove()
     })
