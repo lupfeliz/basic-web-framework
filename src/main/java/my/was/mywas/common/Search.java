@@ -1,4 +1,4 @@
-package my.was.mywas.board;
+package my.was.mywas.common;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;

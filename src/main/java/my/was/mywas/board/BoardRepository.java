@@ -7,8 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import my.was.mywas.common.Search;
+
 public interface BoardRepository extends JpaRepository<Board, Long> {
-  Iterable<Board> findByTitleLike(String search);
 
   static final String SEARCH_CONDITION = 
     "(:#{#prm.searchType} is not null or true) and " +

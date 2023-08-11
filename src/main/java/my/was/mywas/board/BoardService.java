@@ -5,9 +5,12 @@ import static my.was.mywas.util.DateConverter.dateToStr;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import my.was.mywas.common.Search;
 
 @Service
 public class BoardService {

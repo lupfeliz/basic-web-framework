@@ -1,4 +1,6 @@
-package my.was.mywas.board;
+package my.was.mywas.user;
+
+import java.io.Serializable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -7,7 +9,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,27 +18,21 @@ import lombok.ToString;
 import my.was.mywas.util.DateConverter;
 
 @Entity
-@Table(name = "a0000_board")
+@Table(name="a0000_user")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
-public class Board implements Serializable {
+public class User implements Serializable {
   @Id
   @GeneratedValue(strategy=GenerationType.AUTO)
   private Long id;
 
-  @Column(name = "num", length = 32)
-  private String num;
-
-  @Column(name = "title", length = 128)
-  private String title;
-  
-  @Column(name = "user_id", length = 32)
+  @Column(name = "user_id", length = 32, unique = true)
   private String userId;
 
   @Column(name = "user_nm", length = 32)
   private String userNm;
 
-  @Column(name = "contents", length = 9999)
-  private String contents;
+  @Column(name = "passwd", length = 32)
+  private String passwd;
 
   @Column(name = "ctime")
   @Convert(converter = DateConverter.class)
