@@ -7,6 +7,7 @@ env.config()
 export default defineNuxtConfig({
   devtools: { enabled: true },
   components: false,
+  modules: ['@pinia/nuxt'],
   vite: {
     server: {
       hmr: {
@@ -27,5 +28,11 @@ export default defineNuxtConfig({
   css: [
     '@/assets/css/globals.scss',
     'bootstrap/dist/css/bootstrap.css',
-  ]
+  ],
+  pinia: {
+    autoImports: [
+      'defineStore',
+      ['defineStore', 'definePiniaStore'],
+    ],
+  },
 })

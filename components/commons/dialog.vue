@@ -46,7 +46,8 @@
 import { log } from '@/libs/commons/log'
 import { values } from '@/libs/commons/values'
 import { dialog } from '@/libs/commons/dialog'
-import { shared as s } from '@/libs/commons/shared'
+// import { shared as s } from '@/libs/commons/shared'
+import { useBaseSystem } from '@/store/commons/basesystem'
 import { bindto } from '@/libs/commons/objbinder'
 import MyButton from '@/components/commons/mybutton.vue'
 
@@ -54,13 +55,15 @@ const modal = ref()
 
 const dialogCtx = ref({} as any)
 
+const bssys = useBaseSystem()
+
 let $modal: any
 
 onBeforeMount(async () => {
 })
 
 onMounted(async () => {
-  $modal = new s.bootstrap.Modal(modal.value)
+  $modal = new bssys.bootstrap.Modal(modal.value)
   dialog.alert = alert
   dialog.confirm = confirm
 })

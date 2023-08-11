@@ -105,7 +105,8 @@
 
 import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
-import { inst, shared as s } from '@/libs/commons/shared'
+// import { inst, shared as s } from '@/libs/commons/shared'
+import { inst } from '@/store/commons/basesystem'
 import { apiPost } from '@/libs/commons/api'
 import { $f } from '@/libs/commons/format'
 import { values } from '@/libs/commons/values'
@@ -121,15 +122,15 @@ const { range } = values
 const paging = ref(new Paging())
 
 onBeforeMount(async () => {
-  s.eventbus.on(C.EVT_POPSTATE, async (e: any) => {
-    log.debug('ONPOPSTATE:', JSON.parse(e.state.histdata || '{}'))
-    let data = { page: 1 }
-    if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
-    search(data)
-  })
+  // s.eventbus.on(C.EVT_POPSTATE, async (e: any) => {
+  //   log.debug('ONPOPSTATE:', JSON.parse(e.state.histdata || '{}'))
+  //   let data = { page: 1 }
+  //   if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
+  //   search(data)
+  // })
 })
 onUnmounted(async () => {
-  s.eventbus.off(C.EVT_POPSTATE)
+  // s.eventbus.off(C.EVT_POPSTATE)
 })
 onMounted(async () => {
   let data = { page: 1 }

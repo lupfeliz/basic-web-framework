@@ -14,16 +14,33 @@ const dconf = {
   timeout: timeout
 } as AxiosRequestConfig<string>
 
+const errproc = async (e: any, opt: any) => {
+  if (!opt?.noerr) {
+    log.debug('ERROR:', e)
+    let msg = '통신오류가 발생하였습니다.'
+    switch (e?.response?.status) {
+    case 403:
+      msg = '접근 권한이 없습니다.'
+      break
+    case 404:
+      msg = '잘못된 요청입니다.'
+      break
+    case 500:
+      msg = '처리중 오류가 발생했습니다.'
+      break
+    }
+    await dialog.alert(msg)
+    return e
+  }
+}
+
 const apiPost = async (prm: any, opt?: any) => {
   try {
     let ret
     ret = await axios.post(`${API_BASE}/api/${prm.act}`, JSON.stringify(prm.data), dconf) 
     return ret
   } catch (e) {
-    if (!opt?.noerr) {
-      log.debug('ERROR:', e)
-      await dialog.alert('통신오류가 발생하였습니다.')
-    }
+    return await errproc(e, opt)
   }
 }
 
@@ -32,10 +49,7 @@ const apiPut = async (prm: any, opt?: any) => {
     let ret = await axios.put(`${API_BASE}/api/${prm.act}`, JSON.stringify(prm.data), dconf) 
     return ret
   } catch (e) {
-    if (!opt?.noerr) {
-      log.debug('ERROR:', e)
-      await dialog.alert('통신오류가 발생하였습니다.')
-    }
+    return await errproc(e, opt)
   }
 }
 
@@ -44,10 +58,7 @@ const apiGet = async (prm: any, opt?: any) => {
     let ret = await axios.get(`${API_BASE}/api/${prm.act}`, dconf) 
     return ret
   } catch (e) {
-    if (!opt?.noerr) {
-      log.debug('ERROR:', e)
-      await dialog.alert('통신오류가 발생하였습니다.')
-    }
+    return await errproc(e, opt)
   }
 }
 
@@ -56,10 +67,7 @@ const apiDel = async (prm: any, opt?: any) => {
     let ret = await axios.delete(`${API_BASE}/api/${prm.act}`, dconf) 
     return ret
   } catch (e) {
-    if (!opt?.noerr) {
-      log.debug('ERROR:', e)
-      await dialog.alert('통신오류가 발생하였습니다.')
-    }
+    return await errproc(e, opt)
   }
 }
 

@@ -35,6 +35,10 @@ export const EVT_LAYOUT_LOADED = 'EVT_LAYOUT_LOADED'
 export const EVT_TITLE_CHANGED = 'EVT_TITLE_CHANGED'
 export const EVT_POPSTATE = 'EVT_POPSTATE'
 
+export const PAGE_INSTANCE = 'pageInstance'
+export const LAYOUT_INSTANCE = 'layoutInstance'
+export const PAGE_TITLE = 'pageTitle'
+
 export const DIV = 'div'
 
 export const FN_NIL = (...arg: any[]) => { }

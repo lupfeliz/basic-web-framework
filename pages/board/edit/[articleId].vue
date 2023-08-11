@@ -54,7 +54,8 @@
 </template>
 <script setup lang="ts">
 import * as C from '@/libs/commons/constants'
-import { shared as s, inst } from '@/libs/commons/shared'
+// import { shared as s, inst } from '@/libs/commons/shared'
+import { inst } from '@/store/commons/basesystem'
 import { log } from '@/libs/commons/log'
 import { apiGet, apiPut } from '@/libs/commons/api'
 import { dialog } from '@/libs/commons/dialog'

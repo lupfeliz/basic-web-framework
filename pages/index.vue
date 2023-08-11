@@ -12,7 +12,8 @@
 import MyButton from '@/components/commons/mybutton.vue'
 import { dialog } from '@/libs/commons/dialog'
 import { log } from '@/libs/commons/log'
-import { inst } from '@/libs/commons/shared'
+// import { inst } from '@/libs/commons/shared'
+import { inst } from '@/store/commons/basesystem'
 
 const self = inst(getCurrentInstance())
 const pageTitle = ref('메인페이지')

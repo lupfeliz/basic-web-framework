@@ -10,7 +10,8 @@
 <script setup lang="ts">
 import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
-import { inst } from '@/libs/commons/shared'
+// import { inst } from '@/libs/commons/shared'
+import { inst } from '@/store/commons/basesystem'
 import { useField, FieldContext } from 'vee-validate';
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
@@ -44,7 +45,6 @@ const editor = useEditor({
 watch(() => props.modelValue, (v: any) => {
   editor.value?.commands?.setContent(v)
   value.value = v
-  vfield.meta.validated = false
 })
 
 const emitUpdate = debounce(async (e?: any) => {
