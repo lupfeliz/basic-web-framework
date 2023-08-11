@@ -29,6 +29,7 @@ export const useBaseSystem = defineStore('baseSystem', {
           constructor(a: any) { }
         }
       },
+      popstate: undefined as any,
       popstateHook: undefined as any as Function | undefined,
       removeHist: undefined as any as Function,
       saveHist: undefined as any as Function,

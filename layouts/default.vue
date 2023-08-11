@@ -26,7 +26,6 @@ const libinit = ref()
 
 onBeforeMount(async () => {
   const bssys = useBaseSystem()
-  // s.eventbus.on(C.EVT_PAGE_LOADED, onPageMount)
   // log.debug('REGISTER POPSTATE EVENT!')
   /** history 이동 관련 */
   window.addEventListener(C.POPSTATE, (e: any) => {
@@ -42,7 +41,7 @@ onBeforeMount(async () => {
       e.preventDefault()
       return false
     } else {
-      // s.eventbus.emit(C.EVT_POPSTATE, e)
+      bssys.popstate = e
     }
   })
 

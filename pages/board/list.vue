@@ -105,7 +105,7 @@
 
 import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
-import { inst } from '@/store/commons/basesystem'
+import { useBaseSystem, inst } from '@/store/commons/basesystem'
 import { apiPost } from '@/libs/commons/api'
 import { $f } from '@/libs/commons/format'
 import { values } from '@/libs/commons/values'
@@ -119,15 +119,15 @@ const pageTitle = '게시판'
 const boardData = ref({ list: [] as any[] } as any)
 const { range } = values
 const paging = ref(new Paging())
+const bssys = useBaseSystem()
 
-onBeforeMount(async () => {
-  // s.eventbus.on(C.EVT_POPSTATE, async (e: any) => {
-  //   log.debug('ONPOPSTATE:', JSON.parse(e.state.histdata || '{}'))
-  //   let data = { page: 1 }
-  //   if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
-  //   search(data)
-  // })
-})
+watch(() => bssys.$state?.popstate, (e: any) => {
+  log.debug('ONPOPSTATE:', JSON.parse(e.state.histdata || '{}'))
+  let data = { page: 1 }
+  if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
+  search(data)
+}, { deep: true })
+
 onMounted(async () => {
   let data = { page: 1 }
   if (history?.state?.histdata) { data = JSON.parse(history.state.histdata) }

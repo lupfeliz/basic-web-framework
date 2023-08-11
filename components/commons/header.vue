@@ -43,9 +43,6 @@ const pageTitle = ref(pageTitleDef)
 const router = useRouter()
 const bssys = useBaseSystem()
 
-bssys.$subscribe((e: any) => {
-}, { deep: true, detached: true })
-
 watch(() => bssys.$state?.pageInstance, (e: any) => {
   log.debug('WATCH-PAGEINSTANCE:', e)
   log.debug('PAGE-CHANGED!:', e?.events?.newValue, bssys?.pageInstance)
