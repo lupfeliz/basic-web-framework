@@ -12,16 +12,16 @@
     <h1 class="text-center col-6" v-html="pageTitle"></h1>
     <div class="text-right col-3">
       <MyButton
-        v-if="self.currentUri() !== '/member/login'"
+        v-if="self.currentUri() !== '/user/login'"
         class="btn-secondary mx-1"
-        @click="self.goPage('/member/login')"
+        @click="self.goPage('/user/login')"
         >
         로그인
       </MyButton>
       <MyButton
-        v-if="self.currentUri() !== '/member/register'"
+        v-if="self.currentUri() !== '/user/register'"
         class="btn-secondary mx-1"
-        @click="self.goPage('/member/register')"
+        @click="self.goPage('/user/register')"
         >
         회원가입
       </MyButton>
