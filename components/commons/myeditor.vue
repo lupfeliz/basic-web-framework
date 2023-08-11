@@ -11,7 +11,7 @@
 import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
 import { inst } from '@/libs/commons/shared'
-import { useField } from 'vee-validate';
+import { useField, FieldContext } from 'vee-validate';
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 
@@ -28,7 +28,10 @@ const props = defineProps({
 
 const attrs = useAttrs()
 const emit = defineEmits([C.UPDATE_MODEL_VALUE])
-const vfield = useField(() => props.name || '', props.validrules, { label: ref(props.label) })
+const vfield = props.name ?
+  useField(() => props.name || '', props.validrules,
+    { label: ref(props.label), validateOnValueUpdate: false }) :
+  { value: ref(''), errorMessage: {}, meta: {} } as FieldContext
 const { value, errorMessage } = vfield
 const vmeta: any = vfield.meta
 const { debounce } = lodash

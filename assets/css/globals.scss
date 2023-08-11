@@ -23,7 +23,8 @@ html {
         background-color: #eee;
       }
     }
-    .container.board-article {
+    .container.board-article,
+    .container.input-form {
       > .row > div {
         padding: 0.5rem;
       }

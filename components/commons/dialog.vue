@@ -11,9 +11,9 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-body">
-          <p v-html="ctx.msg"></p>
+          <p v-html="dialogCtx.msg"></p>
           <div class="text-center">
-            <template v-if="ctx.type === 1">
+            <template v-if="dialogCtx.type === 1">
               <MyButton
                 class="btn btn-secondary"
                 @click="clicked(1)"
@@ -21,7 +21,7 @@
                 확인
               </MyButton>
             </template>
-            <template v-if="ctx.type === 2">
+            <template v-if="dialogCtx.type === 2">
               <MyButton
                 class="btn btn-primary mx-1"
                 @click="clicked(1)"
@@ -35,7 +35,6 @@
                 취소
               </MyButton>
             </template>
-
           </div>
         </div>
       </div>
@@ -53,7 +52,7 @@ import MyButton from '@/components/commons/mybutton.vue'
 
 const modal = ref()
 
-const ctx = ref({} as any)
+const dialogCtx = ref({} as any)
 
 let $modal: any
 
@@ -68,7 +67,7 @@ onMounted(async () => {
 
 const alert = (msg: String) => {
   return new Promise<boolean>((resolve, reject) => {
-    bindto(ctx.value, {
+    bindto(dialogCtx.value, {
       msg: msg,
       type: 1,
       resolve: resolve,
@@ -80,9 +79,9 @@ const alert = (msg: String) => {
 
 const confirm = (msg: String) => {
   return new Promise<boolean>((resolve, reject) => {
-    bindto(ctx.value, {
+    bindto(dialogCtx.value, {
       msg: msg,
-      type: 1,
+      type: 2,
       resolve: resolve,
       reject: reject
     })
@@ -91,15 +90,15 @@ const confirm = (msg: String) => {
 }
 
 const clicked = async (cmd: any) => {
-  switch (ctx.value.type) {
+  switch (dialogCtx.value.type) {
   case 1:
-    if (ctx.value.resolve) { ctx.value.resolve(true) }
+    if (dialogCtx.value.resolve) { dialogCtx.value.resolve(true) }
     break
   case 2:
-    if (ctx.value.resolve) { ctx.value.resolve(cmd === 1 ? true : false) }
+    if (dialogCtx.value.resolve) { dialogCtx.value.resolve(cmd === 1 ? true : false) }
     break
   }
-  values.clear(ctx.value)
+  values.clear(dialogCtx.value)
   $modal.hide()
 }
 </script>

@@ -64,15 +64,15 @@ const mixin  = {
       if (!self && this) { self = this }
       let x: any
       let ctx = self?._
-      log.debug('SELF:', self)
+      // log.debug('SELF:', self)
       const fnchk = (ctx: any) => {
         let x: any
         if ((x = ctx?.exposed) &&
           x?.validate && x?.validate instanceof Function &&
           x?.reset && x?.reset instanceof Function &&
           x?.resetField && x?.resetField instanceof Function &&
-          x?.VFORM) {
-          return ctx.exposed.VFORM
+          x?._VFORM_) {
+          return x._VFORM_
         }
       }
       const list = self?._?.subTree?.children
@@ -87,6 +87,9 @@ const mixin  = {
         ctx = ctx.parent
       }
       return undefined
+    },
+    currentUri() {
+      return history?.state?.current
     }
   }
 }

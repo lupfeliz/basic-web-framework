@@ -14,6 +14,13 @@
           작성일자
         </div>
     </div>
+    <template v-if="!(boardData?.list?.length)">
+      <div class="row">
+        <div class="col text-center">
+          게시물이 없습니다.
+        </div>
+      </div>
+    </template>
     <template v-for="(itm, inx) in boardData.list" key="inx">
       <div class="row">
         <div class="col-1">

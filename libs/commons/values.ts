@@ -23,12 +23,12 @@ const values = {
     }
     st = Number(st)
     ed = Number(ed)
-    if (st < ed) {
+    if (st <= ed) {
       for (let inx = st; inx <= ed; inx++) {
         ret.push(inx)
       }
     } else {
-      for (let inx = st; inx >= ed; inx--) {
+      for (let inx = st; inx > ed; inx--) {
         ret.push(inx)
       }
     }

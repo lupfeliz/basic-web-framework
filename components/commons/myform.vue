@@ -10,6 +10,8 @@ import vrules from '@vee-validate/rules'
 
 const vform = useForm()
 
+const userRules: any = { }
+
 onBeforeMount(async () => {
   log.debug('V-FORM:', vform)
 })
@@ -46,6 +48,18 @@ defineRule('len', (v: any, [vlmin, vlmax]: [number, number], ctx: any) => {
   return ret
 })
 
+defineRule('u', (v: any, prm: any[], ctx: any)  => {
+  let ret:boolean | string = true
+  if (prm && prm.length > 0) {
+    const rulenm = prm[0]
+    const rule = userRules[rulenm]
+    if (rule && rule instanceof Function) {
+      ret = rule(v, prm, ctx)
+    }
+  }
+  return ret
+})
+
 const reset = (e: any) => {
   return vform.resetForm(e)
 }
@@ -55,9 +69,18 @@ const resetField = (f: any, s: any) => {
 }
 
 const validate = async (e: any) => {
-  const ret = await vform.validate(e)
-  return ret?.valid
+  return (await vform.validate(e))?.valid
 }
 
-defineExpose({ validate, reset, resetField, VFORM: vform })
+const validateField = async(e: any) => {
+  return (await vform.validateField(e))?.valid
+}
+
+const addValidRules = (rules: any) => {
+  for (const k in rules) {
+    userRules[k] = rules[k]
+  }
+}
+
+defineExpose({ validate, validateField, reset, resetField, addValidRules, _VFORM_: vform })
 </script>

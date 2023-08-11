@@ -36,3 +36,5 @@ export const EVT_TITLE_CHANGED = 'EVT_TITLE_CHANGED'
 export const EVT_POPSTATE = 'EVT_POPSTATE'
 
 export const DIV = 'div'
+
+export const FN_NIL = (...arg: any[]) => { }
