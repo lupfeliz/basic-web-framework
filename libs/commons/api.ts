@@ -1,5 +1,6 @@
 import { log } from '@/libs/commons/log'
 import * as C from '@/libs/commons/constants'
+import { dialog } from '@/libs/commons/dialog'
 
 import axios, { AxiosRequestConfig } from 'axios'
 
@@ -14,23 +15,52 @@ const dconf = {
 } as AxiosRequestConfig<string>
 
 const apiPost = async (prm: any, opt?: any) => {
-  const ret = await axios.post(`${API_BASE}/api/${prm.act}`, JSON.stringify(prm.data), dconf) 
-  return ret
+  try {
+    let ret
+    ret = await axios.post(`${API_BASE}/api/${prm.act}`, JSON.stringify(prm.data), dconf) 
+    return ret
+  } catch (e) {
+    if (!opt?.noerr) {
+      log.debug('ERROR:', e)
+      await dialog.alert('통신오류가 발생하였습니다.')
+    }
+  }
 }
 
 const apiPut = async (prm: any, opt?: any) => {
-  const ret = await axios.put(`${API_BASE}/api/${prm.act}`, JSON.stringify(prm.data), dconf) 
-  return ret
+  try {
+    let ret = await axios.put(`${API_BASE}/api/${prm.act}`, JSON.stringify(prm.data), dconf) 
+    return ret
+  } catch (e) {
+    if (!opt?.noerr) {
+      log.debug('ERROR:', e)
+      await dialog.alert('통신오류가 발생하였습니다.')
+    }
+  }
 }
 
 const apiGet = async (prm: any, opt?: any) => {
-  const ret = await axios.get(`${API_BASE}/api/${prm.act}`, dconf) 
-  return ret
+  try {
+    let ret = await axios.get(`${API_BASE}/api/${prm.act}`, dconf) 
+    return ret
+  } catch (e) {
+    if (!opt?.noerr) {
+      log.debug('ERROR:', e)
+      await dialog.alert('통신오류가 발생하였습니다.')
+    }
+  }
 }
 
 const apiDel = async (prm: any, opt?: any) => {
-  const ret = await axios.delete(`${API_BASE}/api/${prm.act}`, dconf) 
-  return ret
+  try {
+    let ret = await axios.delete(`${API_BASE}/api/${prm.act}`, dconf) 
+    return ret
+  } catch (e) {
+    if (!opt?.noerr) {
+      log.debug('ERROR:', e)
+      await dialog.alert('통신오류가 발생하였습니다.')
+    }
+  }
 }
 
 export { apiPost, apiGet, apiPut, apiDel }

@@ -90,15 +90,10 @@ const editArticle = async (id: string) => {
 }
 
 const deleteArticle = async (id: string) => {
-  try {
-    if (await dialog.confirm(`"${data.value.title || ''}" 게시글을 삭제하시겠습니까?`)) {
-      await apiDel({ act: `board/${id}`})
-      await dialog.alert('삭제가 완료되었습니다')
-      await self.removeHist()
-    }
-  } catch (e) {
-    log.debug('ERROR:', e)
-    await dialog.alert('오류가 발생했습니다')
+  if (await dialog.confirm(`"${data.value.title || ''}" 게시글을 삭제하시겠습니까?`)) {
+    await apiDel({ act: `board/${id}`})
+    await dialog.alert('삭제가 완료되었습니다')
+    await self.removeHist()
   }
 }
 

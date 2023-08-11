@@ -168,21 +168,16 @@ const checkId = async () => {
 const idChanged = async (e: any) => { map.value.dupchk = 0 }
 
 const doRegister = async () => {
-  try {
-    if (await form.value.validate()) {
-      const res = await apiPut({ act: 'user', data: user.value })
-      if (res?.data) {
-        if (await dialog.confirm(`"${user.value.userNm}" 님의 가입이 완료되었어요.<br/> 로그인 하시겠어요?`)) {
-          await self.removeHist(1, '/user/login')
-          // self.goPage('/user/login')
-        } else {
-          await self.removeHist(1, '/')
-        }
+  if (await form.value.validate()) {
+    const res = await apiPut({ act: 'user', data: user.value })
+    if (res?.data) {
+      if (await dialog.confirm(`"${user.value.userNm}" 님의 가입이 완료되었어요.<br/> 로그인 하시겠어요?`)) {
+        await self.removeHist(1, '/user/login')
+        // self.goPage('/user/login')
+      } else {
+        await self.removeHist(1, '/')
       }
     }
-  } catch (e) {
-    log.debug('ERROR:', e)
-    dialog.alert('오류가 발생했습니다')
   }
 }
 

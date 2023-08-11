@@ -90,19 +90,15 @@ const getArticle = async () => {
 }
 
 const putArticle = async () => {
-  try {
-    /** form-validate */
-    if (await form.value.validate()) {
-      await apiPut({
-        act: 'board',
-        data: article.value
-      })
-      /** 업데이트 이후 히스토리 삭제 */
-      await dialog.alert('업데이트가 완료되었습니다')
-      await self.removeHist()
-    }
-  } catch(e) {
-    await dialog.alert('오류가 발생했습니다')
+  /** form-validate */
+  if (await form.value.validate()) {
+    await apiPut({
+      act: 'board',
+      data: article.value
+    })
+    /** 업데이트 이후 히스토리 삭제 */
+    await dialog.alert('업데이트가 완료되었습니다')
+    await self.removeHist()
   }
 }
 

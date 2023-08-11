@@ -112,6 +112,7 @@ import { values } from '@/libs/commons/values'
 import { Paging } from '@/libs/commons/paging'
 
 import MyButton from '@/components/commons/mybutton.vue'
+import { dialog } from '@/libs/commons/dialog'
 
 const self = inst(getCurrentInstance())
 const pageTitle = '게시판'
@@ -137,13 +138,13 @@ onMounted(async () => {
   search(data)
 })
 
-const search = async (data: any, save?: boolean) => {
-  if (save) { self.saveHist(data) }
+const search = async (req: any, save?: boolean) => {
   const res = await apiPost({
     act: 'board',
-    data: data
+    data: req
   })
   if (res?.data?.list) {
+    if (save) { self.saveHist(req) }
     const data = res.data
     paging.value = new Paging(data.rows, data.pages, data.cnt)
     data.totp = Math.ceil(Number(data.cnt) / Number(data.rows))
