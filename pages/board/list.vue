@@ -105,7 +105,6 @@
 
 import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
-// import { inst, shared as s } from '@/libs/commons/shared'
 import { inst } from '@/store/commons/basesystem'
 import { apiPost } from '@/libs/commons/api'
 import { $f } from '@/libs/commons/format'
@@ -128,9 +127,6 @@ onBeforeMount(async () => {
   //   if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
   //   search(data)
   // })
-})
-onUnmounted(async () => {
-  // s.eventbus.off(C.EVT_POPSTATE)
 })
 onMounted(async () => {
   let data = { page: 1 }

@@ -104,7 +104,6 @@
 </template>
 <script setup lang="ts">
 import * as C from '@/libs/commons/constants'
-// import { shared as s, inst } from '@/libs/commons/shared'
 import { inst } from '@/store/commons/basesystem'
 import { log } from '@/libs/commons/log'
 import { apiGet, apiPut } from '@/libs/commons/api'
@@ -174,7 +173,6 @@ const doRegister = async () => {
     if (res?.data) {
       if (await dialog.confirm(`"${user.value.userNm}" 님의 가입이 완료되었어요.<br/> 로그인 하시겠어요?`)) {
         await self.removeHist(1, '/user/login')
-        // self.goPage('/user/login')
       } else {
         await self.removeHist(1, '/')
       }

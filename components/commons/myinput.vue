@@ -11,14 +11,12 @@
 </template>
 <script setup lang="ts">
 import * as C from '@/libs/commons/constants'
-// import { shared as s, inst } from '@/libs/commons/shared'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
 import { log } from '@/libs/commons/log'
 import { useField, FieldContext } from 'vee-validate'
 
 const self = inst(getCurrentInstance())
 const bssys = useBaseSystem()
-// const bssys = s
 
 const props = defineProps({
   type: String,

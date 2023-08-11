@@ -46,7 +46,6 @@
 import { log } from '@/libs/commons/log'
 import { values } from '@/libs/commons/values'
 import { dialog } from '@/libs/commons/dialog'
-// import { shared as s } from '@/libs/commons/shared'
 import { useBaseSystem } from '@/store/commons/basesystem'
 import { bindto } from '@/libs/commons/objbinder'
 import MyButton from '@/components/commons/mybutton.vue'

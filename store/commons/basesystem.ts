@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-// import mitt from 'mitt'
 import { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
 import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
@@ -9,8 +8,6 @@ import { navigateTo } from 'nuxt/app'
 const map: any = {} as any
 type AnyType = typeof map
 type MethodsType = typeof mixin.methods
-// type SharedObjType = (typeof sharedObj)
-// interface SharedType extends SharedObjType, AnyType { }
 interface ComponentMixedType extends ComponentPublicInstance, MethodsType, AnyType { }
 interface ComponentInternalType extends ComponentInternalInstance { ctx: ComponentMixedType }
 interface ComponentType extends ComponentPublicInstance, AnyType {
@@ -41,21 +38,6 @@ export const useBaseSystem = defineStore('baseSystem', {
   actions: {
   },
 })
-
-// const sharedObj = {
-//   // eventbus: mitt(),
-//   // layoutInstance: undefined as any as ComponentType,
-//   // pageInstance: undefined as any as ComponentType,
-//   window: undefined as any,
-//   bootstrap: {
-//     Modal: class {
-//       constructor(a: any) { }
-//     }
-//   },
-//   popstateHook: undefined as any as Function | undefined,
-//   removeHist: undefined as any as Function,
-//   saveHist: undefined as any as Function
-// }
 
 const mixin  = {
   methods: {
@@ -119,7 +101,6 @@ const mixin  = {
   }
 }
 
-// const shared: SharedType = sharedObj as SharedType
 const inst: (e: any) => ComponentMixedType = (e: any) => {
   // log.debug('ROUTE:', useRoute(), '/', useRouter()?.options?.history?.state, '/')
   const ret = new Proxy(e?.ctx, {
@@ -133,5 +114,4 @@ const inst: (e: any) => ComponentMixedType = (e: any) => {
   return ret as any as ComponentMixedType
 }
 
-// export { shared, mixin, inst, ComponentType, AnyType }
 export { mixin, inst, ComponentType, AnyType }

@@ -15,28 +15,14 @@ import Header from '@/components/commons/header.vue'
 import Footer from '@/components/commons/footer.vue'
 import Dialog from '@/components/commons/dialog.vue'
 import * as C from '@/libs/commons/constants'
-// import { shared as s } from '@/libs/commons/shared'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
 import { bootstwrap } from '@/libs/commons/bootstwrap'
 import { log } from '@/libs/commons/log'
 import $ from 'jquery'
 
-// const bssys = s
-
 const self = inst(getCurrentInstance())
 
 const libinit = ref()
-
-// watch(s?.pageInstance, (v: any) => {
-//   log.debug('PAGE-CHNAGED1!', v)
-// })
-
-// watch(() => { 
-//   log.debug('CHECK!!!!!', s?.pageInstance)
-//   return s?.pageInstance
-// }, (v: any) => {
-//   log.debug('PAGE-CHNAGED2!', v)
-// })
 
 onBeforeMount(async () => {
   const bssys = useBaseSystem()
@@ -110,7 +96,6 @@ onBeforeMount(async () => {
   }
 })
 onUnmounted(async () => {
-  // s.eventbus.off(C.EVT_PAGE_LOADED)
   window.removeEventListener(C.POPSTATE, () => { })
 })
 onMounted(async () => { 
