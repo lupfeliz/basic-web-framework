@@ -1,6 +1,7 @@
 
 server:
   port: 8081
+  # port: 9999
 
 spring:
   datasource:
@@ -20,7 +21,4 @@ spring:
 logging:
   level:
     root: ERROR
-    org.springframework: WARN
-    org.hibernate: ERROR
-    org.gradle: ERROR
     my.was: DEBUG
