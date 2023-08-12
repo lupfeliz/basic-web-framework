@@ -1,6 +1,7 @@
 package my.was.mywas.auth;
 
 import org.json.JSONObject;
+import org.json.JSONStringer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,6 +50,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static my.was.mywas.util.Constants.UTF8;
+
 @Slf4j
 @Configuration @EnableWebSecurity
 @SuppressWarnings({ "static-access" })
@@ -57,7 +60,8 @@ public class SecurityConfig {
   private static final String LOGIN_PATH = "/api/user/login";
   private static final String PRM_USER_ID = "userId";
   private static final String PRM_PASSWD = "passwd";
-  private static final String GRANT_USER = "USER";
+  private static final String BOARD_WRITE = "BOARD_WRITE";
+  private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
   @Bean SessionRegistry sessionRegistry() { return new SessionRegistryImpl(); }
   @Bean AuthenticationProvider authenticationProvider() { return new MyWasAuthProvider(); }
@@ -104,7 +108,7 @@ public class SecurityConfig {
         .requestMatchers(
           m.antMatcher(PUT, "/api/board/**"),
           m.antMatcher(DELETE, "/api/board/**")
-          ).hasAnyAuthority(GRANT_USER)
+          ).hasAnyAuthority(BOARD_WRITE)
         .anyRequest()
           .authenticated()
       )
@@ -132,7 +136,7 @@ public class SecurityConfig {
       throws AuthenticationException, IOException, ServletException {
       setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
       String body = req.getReader().lines().collect(Collectors.joining());
-      log.debug("BODY:{}", body);
+      // log.debug("BODY:{}", body);
       JSONObject map = new JSONObject(body);
       UsernamePasswordAuthenticationToken token =
         new UsernamePasswordAuthenticationToken(
@@ -150,15 +154,26 @@ public class SecurityConfig {
        throws IOException, ServletException {
       HttpSession session = req.getSession();
       SecurityContext ctx = SecurityContextHolder.getContext();
+      User user = (User)ctx.getAuthentication().getPrincipal();
+      log.debug("USER:{} / {}", user.getUserId(), user.getUserNm());
       session.setAttribute(
         HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, ctx);
-      res.getWriter().append("{}").flush();
+      res.setCharacterEncoding(UTF8);
+      res.getWriter().append(
+        new JSONStringer()
+        .object()
+          .key("userNm")
+          .value(user.getUserNm())
+        .endObject()
+        .toString()
+      ).flush();
     }
   }
   static class MyWasLoginFail implements AuthenticationFailureHandler {
     @Override public void onAuthenticationFailure(
       HttpServletRequest req, HttpServletResponse res, AuthenticationException e)
         throws IOException, ServletException {
+      res.setCharacterEncoding(UTF8);
       res.getWriter().append("{}").flush();
     }
   }
@@ -174,8 +189,9 @@ public class SecurityConfig {
         throw new BadCredentialsException("AUTH NOT MATCHED");
       }
       List<GrantedAuthority> grant = new LinkedList<>();
-      grant.add(new SimpleGrantedAuthority(GRANT_USER));
-      return new UsernamePasswordAuthenticationToken(userId, passwd, grant);
+      grant.add(new SimpleGrantedAuthority(BOARD_WRITE));
+      grant.add(new SimpleGrantedAuthority(ROLE_ADMIN));
+      return new UsernamePasswordAuthenticationToken(user, passwd, grant);
     }
     @Override public boolean supports(Class<?> auth) { return true; }
   }
