@@ -10,7 +10,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import my.was.mywas.util.CryptoUtil;
 
 import static my.was.mywas.util.DateConverter.dateToStr;
 
@@ -41,8 +40,6 @@ public class UserService {
     String ctime = dateToStr(new Date());
     if (prm.getId() == null || prm.getId() == 0) {
       prm.setCtime(ctime);
-      String passwd = prm.getPasswd();
-      prm.setPasswd(CryptoUtil.enc(passwd, passwd));
     } else {
       User tmp = repository.findById(prm.getId()).get();
       prm.setCtime(tmp.getCtime());
