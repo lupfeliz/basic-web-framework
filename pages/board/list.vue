@@ -32,7 +32,10 @@
           {{ itm.title }}
         </div>
         <div class="col-2">
-          {{ itm.author }}
+          {{ itm.userNm }}
+          <template v-if="itm.userId">
+            ({{ itm.userId }})
+          </template>
         </div>
         <div class="col-2">
           {{ $f('dt', itm.ctime) }}
