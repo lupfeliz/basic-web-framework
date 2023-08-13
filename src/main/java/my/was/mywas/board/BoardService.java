@@ -6,12 +6,19 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import lombok.extern.slf4j.Slf4j;
 import my.was.mywas.common.Search;
+import my.was.mywas.user.User;
+import my.was.mywas.user.UserService;
 
+@Slf4j
 @Service
 public class BoardService {
 
@@ -23,17 +30,33 @@ public class BoardService {
   private static final String LIST = "list";
 
   @Autowired private BoardRepository repository;
+  @Autowired private UserService userService;
 
   public Board save(Board prm) {
+    User user = userService.getCurrentUser();
     String ctime = dateToStr(new Date());
     if (prm.getId() == null || prm.getId() == 0) {
       prm.setCtime(ctime);
+      if (user != null) {
+        prm.setUserId(user.getUserId());
+        prm.setUserNm(user.getUserNm());
+      }
     } else {
       Board tmp = repository.findById(prm.getId()).get();
-      prm.setCtime(tmp.getCtime());
+      tmp.setTitle(prm.getTitle());
+      tmp.setContents(prm.getContents());
+      prm = tmp;
     }
     prm.setUtime(ctime);
-    return repository.save(prm);
+    log.debug("CHECK:{} / {}", prm, user);
+    if (user != null && String.valueOf(user.getUserId()).equals(prm.getUserId())) {
+      return repository.save(prm);
+    } else {
+      throw new ResponseStatusException(
+        HttpStatusCode.valueOf(Response.SC_FORBIDDEN),
+        "NOT ALLOWED"
+      );
+    }
   }
 
   public Map<String, Object> search(Search prm) {

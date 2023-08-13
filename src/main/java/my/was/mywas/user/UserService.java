@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import my.was.mywas.util.CryptoUtil;
 
 import static my.was.mywas.util.DateConverter.dateToStr;
 
@@ -38,11 +41,24 @@ public class UserService {
     String ctime = dateToStr(new Date());
     if (prm.getId() == null || prm.getId() == 0) {
       prm.setCtime(ctime);
+      String passwd = prm.getPasswd();
+      prm.setPasswd(CryptoUtil.enc(passwd, passwd));
     } else {
       User tmp = repository.findById(prm.getId()).get();
       prm.setCtime(tmp.getCtime());
     }
     prm.setUtime(ctime);
     repository.save(prm);
+  }
+
+  public User getCurrentUser() {
+    User ret = null;
+    try {
+      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+      ret = (User)auth.getDetails();
+    } catch (Exception e) {
+      log.debug("ERROR:{}", e);
+    }
+    return ret;
   }
 }

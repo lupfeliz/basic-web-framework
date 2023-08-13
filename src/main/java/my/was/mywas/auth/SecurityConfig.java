@@ -1,5 +1,6 @@
 package my.was.mywas.auth;
 
+import org.apache.catalina.connector.Response;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ import org.springframework.security.web.header.writers.CrossOriginResourcePolicy
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import jakarta.servlet.Filter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -65,8 +67,6 @@ public class SecurityConfig {
 
   @Bean SessionRegistry sessionRegistry() { return new SessionRegistryImpl(); }
   @Bean AuthenticationProvider authenticationProvider() { return new MyWasAuthProvider(); }
-  @Bean AuthenticationSuccessHandler loginSuccess() { return new MyWasLoginSuccess(); }
-  @Bean AuthenticationFailureHandler loginFail() { return new MyWasLoginFail(); }
 
   @Bean
   AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -76,10 +76,7 @@ public class SecurityConfig {
 
   @Bean SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     AntPathRequestMatcher m = new AntPathRequestMatcher("/**");
-    AbstractAuthenticationProcessingFilter jsonFilter = 
-      new MyWasAuthFilter(m.antMatcher(POST, LOGIN_PATH), http);
-      jsonFilter.setAuthenticationSuccessHandler(loginSuccess());
-      jsonFilter.setAuthenticationFailureHandler(loginFail());
+    Filter jsonFilter = new MyWasAuthFilter(m.antMatcher(POST, LOGIN_PATH), http);
 
     http
       .csrf(csrf -> csrf
@@ -88,7 +85,7 @@ public class SecurityConfig {
           m.antMatcher(POST, "/api/**"),
           m.antMatcher(PUT, "/api/**"),
           m.antMatcher(DELETE, "/api/**")
-        ).disable()
+        )
       )
       .cors(cors -> cors.disable())
       .headers(hdr -> hdr
@@ -130,6 +127,8 @@ public class SecurityConfig {
     public MyWasAuthFilter(RequestMatcher matcher, HttpSecurity http) {
       super(matcher);
       this.http = http;
+      this.setAuthenticationSuccessHandler(new MyWasLoginSuccess());
+      this.setAuthenticationFailureHandler(new MyWasLoginFail());
     }
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)
@@ -138,13 +137,15 @@ public class SecurityConfig {
       String body = req.getReader().lines().collect(Collectors.joining());
       // log.debug("BODY:{}", body);
       JSONObject map = new JSONObject(body);
-      UsernamePasswordAuthenticationToken token =
+      Authentication token =
         new UsernamePasswordAuthenticationToken(
           map.optString(PRM_USER_ID, ""),
           map.optString(PRM_PASSWD, "")
         );
+      Authentication auth = null;
       authenticationDetailsSource.buildDetails(req);
-      Authentication auth = getAuthenticationManager().authenticate(token);
+      auth = getAuthenticationManager().authenticate(token);
+      // log.debug("FINAL-AUTH:{}", auth);
       return auth;
     }
   }
@@ -154,10 +155,11 @@ public class SecurityConfig {
        throws IOException, ServletException {
       HttpSession session = req.getSession();
       SecurityContext ctx = SecurityContextHolder.getContext();
-      User user = (User)ctx.getAuthentication().getPrincipal();
-      log.debug("USER:{} / {}", user.getUserId(), user.getUserNm());
+      User user = (User)ctx.getAuthentication().getDetails();
+      // log.debug("USER:{} / {}", user.getUserId(), user.getUserNm());
       session.setAttribute(
         HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, ctx);
+      res.setStatus(Response.SC_OK);
       res.setCharacterEncoding(UTF8);
       res.getWriter().append(
         new JSONStringer()
@@ -173,8 +175,17 @@ public class SecurityConfig {
     @Override public void onAuthenticationFailure(
       HttpServletRequest req, HttpServletResponse res, AuthenticationException e)
         throws IOException, ServletException {
+      log.debug("LOGIN FAILED! {}", e.getMessage());
+      res.setStatus(Response.SC_BAD_REQUEST);
       res.setCharacterEncoding(UTF8);
-      res.getWriter().append("{}").flush();
+      res.getWriter().append(
+        new JSONStringer()
+        .object()
+          .key("msg")
+          .value(e.getMessage())
+        .endObject()
+        .toString()
+      ).flush();
     }
   }
 
@@ -183,7 +194,8 @@ public class SecurityConfig {
     @Override
     public Authentication authenticate(Authentication auth) throws AuthenticationException {
       String userId = auth.getName();
-      String passwd = auth.getCredentials().toString();
+      // String passwd = CryptoUtil.dec(auth.getCredentials().toString(), "");
+      String passwd = String.valueOf(auth.getCredentials());
       User user = userService.getByUserId(userId);
       if (user == null || !passwd.equals(user.getPasswd())) {
         throw new BadCredentialsException("AUTH NOT MATCHED");
@@ -191,7 +203,10 @@ public class SecurityConfig {
       List<GrantedAuthority> grant = new LinkedList<>();
       grant.add(new SimpleGrantedAuthority(BOARD_WRITE));
       grant.add(new SimpleGrantedAuthority(ROLE_ADMIN));
-      return new UsernamePasswordAuthenticationToken(user, passwd, grant);
+      UsernamePasswordAuthenticationToken ret =
+        new UsernamePasswordAuthenticationToken(userId, passwd, grant);
+      ret.setDetails(user);
+      return ret;
     }
     @Override public boolean supports(Class<?> auth) { return true; }
   }
