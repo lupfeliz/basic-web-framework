@@ -18,7 +18,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     "(:#{#prm.searchType} != '3' or (title like %:#{#prm.searchStr}% or contents like %:#{#prm.searchStr}%)) ";
 
   @Query(
-    "select new Board(id, num, title, userId, '', '', ctime, utime) from Board " +
+    "select new Board(id, num, title, userId, userNm, '', ctime, utime) from Board " +
     "where " +
     SEARCH_CONDITION +
     "order by ctime desc"

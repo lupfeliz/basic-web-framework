@@ -36,7 +36,7 @@ public class Board implements Serializable {
   @Column(name = "user_nm", length = 32)
   private String userNm;
 
-  @Column(name = "contents", length = 9999)
+  @Column(name = "contents", length = 99999)
   private String contents;
 
   @Column(name = "ctime")
