@@ -24,11 +24,7 @@ export const useBaseSystem = defineStore('baseSystem', {
       pageInstance: undefined as any as ComponentType,
       layoutInstance: undefined as any as ComponentType,
       window: undefined as any,
-      bootstrap: {
-        Modal: class {
-          constructor(a: any) { }
-        }
-      },
+      bootstrap: { Modal: class { constructor(a: any) { } } },
       popstate: undefined as any,
       popstateHook: undefined as any as Function | undefined,
       removeHist: undefined as any as Function,
@@ -36,8 +32,7 @@ export const useBaseSystem = defineStore('baseSystem', {
       m: {} as any
     }
   },
-  actions: {
-  },
+  actions: { },
 })
 
 const mixin  = {

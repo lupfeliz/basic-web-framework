@@ -14,19 +14,25 @@
       </div>
       <div class="col" v-html="data.contents"></div>
     </div>
+    <template v-if="data.userNm">
     <div class="row">
       <div class="col-2 head">
-        작성일자
+        작성자
       </div>
       <div class="col">
-        {{ $f('dt', data.ctime) }}
+        {{ data.userNm }} 
+        <template v-if="data.userId">
+        ({{ data.userId }})
+        </template>
       </div>
     </div>
+    </template>
     <div class="row">
       <div class="col-2 head">
-        수정일자
+        작성일자 / 수정일자
       </div>
       <div class="col">
+        {{ $f('dt', data.ctime) }} /
         {{ $f('dt', data.utime) }}
       </div>
     </div>
@@ -80,7 +86,7 @@ onMounted(async() => {
 const getArticle = async () => {
   const id = self.getParameter('articleId')
   const res = await apiGet({ act: `board/${id}` })
-  if (res?.data) {
+  if (res?.status === C.SC_OK) {
     data.value = res.data
   }
 }

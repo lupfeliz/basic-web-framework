@@ -1,6 +1,6 @@
+import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
-
-import { } from 'crypto-js'
+import CryptoJS from 'crypto-js'
 
 const values = {
   clear(obj: any) {
@@ -11,6 +11,9 @@ const values = {
         delete obj[k]
       }
     }
+  },
+  clone(obj: any) {
+    return JSON.parse(JSON.stringify(obj))
   },
   range(st: any, ed?: number) {
     let ret = []
@@ -36,86 +39,34 @@ const values = {
     }
     return ret
   },
-  // randomValue(max?: number, min?: number) {
-  //   let ret: number = 0;
-  //   if (min === undefined) { min = 0; }
-  //   if (max !== undefined) {
-  //     const array = new Uint32Array(1);
-  //     window.crypto.getRandomValues(array);
-  //     ret = (array[0] % (max - min)) + min;
-  //   } else {
-  //     const array = new Uint32Array(2);
-  //     window.crypto.getRandomValues(array);
-  //     ret = (array[0] / array[1]);
-  //   }
-  //   log.debug('CHECK:', ret)
-  //   return ret;
-  // },
-  // genAESIv() {
-  //   const self = values;
-  //   const s4 = () => {
-  //     return (((1 + self.randomValue()) * 0x10000) | 0).toString(16).substring(1);
-  //   }
-  //   log.debug(`S4-1: ${Number(s4())}`)
-  //   return Number(s4() + s4() + s4() + s4()).toString(16);
-  // },
-  // genAESKey() {
-  //   const self = values;
-  //   const s4 = () => {
-  //     return (((1 + self.randomValue()) * 0x10000) | 0).toString(16).substring(1);
-  //   }
-  //   log.debug(`S4-2: ${s4()}`)
-  //   return Number(s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4()).toString(32);
-  // },
-  // test() {
-  //   {
-  //     let keySize = 256
-  //     let ivSize = 128
-  //     let iterations = 100
-  //     let pass = 'Secret Password'
-  //     let msg = '테스트'
-  //     const encrypt = () => {
-  //       let salt = CryptoJS.lib.WordArray.random(128/8)
-  //       log.debug('SALT:', salt, salt.toString())
-  //       let key = CryptoJS.PBKDF2(pass, salt, {
-  //         keySize: keySize / 32,
-  //         iterations: iterations
-  //       })
-  //       log.debug('KEY:', key, key.toString())
-  //       let iv = CryptoJS.lib.WordArray.random(ivSize/8)
-  //       log.debug('IV:', iv, iv.toString())
-  //       let encrypted = CryptoJS.AES.encrypt(msg, key, { 
-  //         iv: iv, 
-  //         padding: CryptoJS.pad.Pkcs7,
-  //         mode: CryptoJS.mode.CBC,
-  //         hasher: CryptoJS.algo.SHA256
-  //       })
-  //       log.debug('ENC:', encrypted, encrypted.toString())
-  //       let transitmessage = salt.toString()+ iv.toString() + encrypted.toString();
-  //       return transitmessage
-  //     }
-  //     let transitmessage = encrypt()
-  //     log.debug('TRANSIT:', transitmessage)
-  //     const decrypt = (transitmessage: string) => {
-  //       let salt = CryptoJS.enc.Hex.parse(transitmessage.substring(0, 32));
-  //       let iv = CryptoJS.enc.Hex.parse(transitmessage.substring(32, 64))
-  //       let encrypted = transitmessage.substring(64);
-  //       let key = CryptoJS.PBKDF2(pass, salt, {
-  //         keySize: keySize / 32,
-  //         iterations: iterations
-  //       });
-  //       let decrypted = CryptoJS.AES.decrypt(encrypted, key, {
-  //         iv: iv,
-  //         padding: CryptoJS.pad.Pkcs7,
-  //         mode: CryptoJS.mode.CBC,
-  //         hasher: CryptoJS.algo.SHA256
-  //       })
-  //       return decrypted;
-  //     }
-  //     let decrypted = decrypt(transitmessage)
-  //     log.debug('DECRYPTED:', decrypted.toString(CryptoJS.enc.Utf8));
-  //   }
-  // }
+  cryptokeyPBKDF2(salt: string, passphrase: string, iterations: number, keysize: number) {
+    return CryptoJS.PBKDF2(passphrase,
+      CryptoJS.enc.Hex.parse(salt),
+      { keySize: keysize / 32, iterations: iterations }
+    )
+  },
+  encrypt(salt: string, iv: string, passphrase: string, plaintext: string, iterations: number, keysize: number) {
+    const key = values.cryptokeyPBKDF2(salt, passphrase, iterations, keysize)
+    return CryptoJS.AES.encrypt(plaintext, key, { iv: CryptoJS.enc.Hex.parse(iv), mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 })
+  },
+  decrypt(salt: string, iv: string, passphrase: string, ciphertext: string, iterations: number, keysize: number) {
+    const key = values.cryptokeyPBKDF2(salt, passphrase, iterations, keysize)
+    return CryptoJS.AES.decrypt(ciphertext, key, { iv: CryptoJS.enc.Hex.parse(iv), mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 })
+  },
+  enc(plaintext: string) {
+    const salt = C.HC_DEF_AES_SALT
+    const iv = C.HC_DEF_AES_IV
+    const passphrase = C.HC_DEF_AES_PASSPHRASE
+    const ret = values.encrypt(salt, iv, passphrase, plaintext, 1000, 128)
+    return ret.toString()
+  },
+  dec(ciphertext: string) {
+    const salt = C.HC_DEF_AES_SALT
+    const iv = C.HC_DEF_AES_IV
+    const passphrase = C.HC_DEF_AES_PASSPHRASE
+    const ret = values.decrypt(salt, iv, passphrase, ciphertext, 1000, 128)
+    return ret.toString(CryptoJS.enc.Utf8)
+  }
 }
 
 export { values }

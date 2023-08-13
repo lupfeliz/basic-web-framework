@@ -12,10 +12,6 @@ const vform = useForm()
 
 const userRules: any = { }
 
-onBeforeMount(async () => {
-  log.debug('V-FORM:', vform)
-})
-
 Object.keys(vrules).forEach(rule => {
   defineRule(rule, vrules[rule])
 })

@@ -122,7 +122,7 @@ const paging = ref(new Paging())
 const bssys = useBaseSystem()
 
 watch(() => bssys.$state?.popstate, (e: any) => {
-  log.debug('ONPOPSTATE:', JSON.parse(e.state.histdata || '{}'))
+  // log.debug('ONPOPSTATE:', JSON.parse(e.state.histdata || '{}'))
   let data = { page: 1 }
   if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
   search(data)
@@ -131,7 +131,7 @@ watch(() => bssys.$state?.popstate, (e: any) => {
 onMounted(async () => {
   let data = { page: 1 }
   if (history?.state?.histdata) { data = JSON.parse(history.state.histdata) }
-  log.debug('ONMOUNTED:', history.state)
+  // log.debug('ONMOUNTED:', history.state)
   search(data)
 })
 
@@ -140,7 +140,7 @@ const search = async (req: any, save?: boolean) => {
     act: 'board',
     data: req
   })
-  if (res?.data?.list) {
+  if (res?.status === C.SC_OK) {
     if (save) { self.saveHist(req) }
     const data = res.data
     paging.value = new Paging(data.rows, data.pages, data.cnt)

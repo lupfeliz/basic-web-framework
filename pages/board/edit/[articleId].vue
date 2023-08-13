@@ -81,7 +81,7 @@ const getArticle = async () => {
   if (!isNaN(id)) {
     articleId.value = id
     const res = await apiGet({ act: `board/${id}` })
-    if (res?.data) {
+    if (res?.status === C.SC_OK) {
       article.value = res.data
     }
   } else {
@@ -92,12 +92,14 @@ const getArticle = async () => {
 const putArticle = async () => {
   /** form-validate */
   if (await form.value.validate()) {
-    await apiPut({
+    const res = await apiPut({
       act: 'board',
       data: article.value
     })
     /** 업데이트 이후 히스토리 삭제 */
-    await dialog.alert('업데이트가 완료되었습니다')
+    if (res?.status === C.SC_OK) {
+      await dialog.alert('업데이트가 완료되었습니다')
+    }
     await self.removeHist()
   }
 }

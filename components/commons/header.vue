@@ -2,29 +2,46 @@
   <header class="t-5 py-5 center rounded row">
     <div class="text-left col-3">
       <MyButton
-        :class="[router.options.history.state.back ? 'btn-secondary' : 'hidden']"
+        :class="`btn-secondary mx-1 ${router?.options?.history?.state?.back ? '': 'disabled'}`"
         @click="self.goPage(-1)"
         >
         &lt; 이전 
+      </MyButton>
+      <MyButton
+        v-if="router.options?.history?.state?.current !== '/'"
+        class="btn-secondary mx-1"
+        @click="self.goPage('/')"
+        >
+        홈
       </MyButton>
     </div>
 
     <h1 class="text-center col-6" v-html="pageTitle"></h1>
     <div class="text-right col-3">
-      <MyButton
-        v-if="self.currentUri() !== '/user/login'"
-        class="btn-secondary mx-1"
-        @click="self.goPage('/user/login')"
-        >
-        로그인
-      </MyButton>
-      <MyButton
-        v-if="self.currentUri() !== '/user/register'"
-        class="btn-secondary mx-1"
-        @click="self.goPage('/user/register')"
-        >
-        회원가입
-      </MyButton>
+      <template v-if="ustore?.userId">
+        <MyButton
+          class="btn-secondary mx-1"
+          @click="logout()"
+          >
+          로그아웃
+        </MyButton>
+      </template>
+      <template v-else>
+        <MyButton
+          v-if="self.currentUri() !== '/user/login'"
+          class="btn-secondary mx-1"
+          @click="self.goPage('/user/login')"
+          >
+          로그인
+        </MyButton>
+        <MyButton
+          v-if="self.currentUri() !== '/user/register'"
+          class="btn-secondary mx-1"
+          @click="self.goPage('/user/register')"
+          >
+          회원가입
+        </MyButton>
+      </template>
     </div>
   </header>
 </template>
@@ -33,8 +50,10 @@ import MyButton from '@/components/commons/mybutton.vue'
 
 import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
+import { apiPost } from '@/libs/commons/api'
 import { useBaseSystem, inst, ComponentType } from '@/store/commons/basesystem'
-import pinia from 'pinia'
+import { useUserInfo } from '@/store/commons/userinfo'
+import { dialog } from '@/libs/commons/dialog'
 
 const self = inst(getCurrentInstance())
 
@@ -42,16 +61,13 @@ const pageTitleDef = '샘플프로젝트'
 const pageTitle = ref(pageTitleDef)
 const router = useRouter()
 const bssys = useBaseSystem()
+const ustore = useUserInfo()
 
 watch(() => bssys.$state?.pageInstance, (e: any) => {
-  log.debug('WATCH-PAGEINSTANCE:', e)
-  log.debug('PAGE-CHANGED!:', e?.events?.newValue, bssys?.pageInstance)
-  log.debug('PAGE-CHANGED!:', e?.events?.newValue?.pageTitle, bssys?.pageInstance?.pageTitle)
   onPageMount(e as ComponentType)
 }, { deep: true })
 
 watch(() => bssys.$state?.pageInstance?.pageTitle, (e: any) => {
-  log.debug('WATCH-TITLE:', e)
   titleChanged(bssys.pageTitle)
 }, { deep: true })
 
@@ -72,6 +88,18 @@ const titleChanged = (title: any) => {
   } else {
     pageTitle.value = pageTitleDef
   }
+}
+
+const logout = async () => {
+  const res = await apiPost({
+    act: 'user/logout',
+  })
+  log.debug('RES:', res)
+  if (res?.status === C.SC_OK) {
+    ustore.clear()
+    self.$forceUpdate()
+  }
+  await dialog.alert('로그아웃 되었습니다')
 }
 
 </script>

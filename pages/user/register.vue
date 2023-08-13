@@ -56,9 +56,9 @@
           <MyInput
             type="password"
             label="비밀번호"
-            name="password"
+            name="passwd"
             maxlength="32"
-            v-model="user.password"
+            v-model="user.passwd"
             validrules="required|len:4,32"
             />
         </div>
@@ -73,9 +73,9 @@
           <MyInput
             type="password"
             label="비밀번호 확인"
-            name="passwordCf"
+            name="passwdCf"
             maxlength="32"
-            v-model="map.passwordCf"
+            v-model="map.passwdCf"
             validrules="required|len:4,32|u:passchk"
             />
         </div>
@@ -106,6 +106,7 @@
 import * as C from '@/libs/commons/constants'
 import { inst } from '@/store/commons/basesystem'
 import { log } from '@/libs/commons/log'
+import { values } from '@/libs/commons/values'
 import { apiGet, apiPut } from '@/libs/commons/api'
 import { dialog } from '@/libs/commons/dialog'
 
@@ -125,7 +126,7 @@ onMounted(async () => {
 watch(form, _ => {
   form.value.addValidRules({
     passchk: () => {
-      if (user.value.password !== map.value.passwordCf) {
+      if (user.value.passwd !== map.value.passwdCf) {
         return '비밀번호가 맞지 않습니다'
       }
       return true
@@ -144,13 +145,13 @@ watch(form, _ => {
 
 const map = ref({
   dupchk: 0,
-  passwordCf: ''
+  passwdCf: ''
 })
 
 const user = ref({
   userId: '',
   userNm: '',
-  password: ''
+  passwd: ''
 })
 
 const checkId = async () => {
@@ -169,8 +170,10 @@ const idChanged = async (e: any) => { map.value.dupchk = 0 }
 
 const doRegister = async () => {
   if (await form.value.validate()) {
-    const res = await apiPut({ act: 'user', data: user.value })
-    if (res?.data) {
+    const data = values.clone(user.value)
+    data.passwd = values.enc(data.passwd)
+    const res = await apiPut({ act: 'user', data: data })
+    if (res?.status === C.SC_OK) {
       if (await dialog.confirm(`"${user.value.userNm}" 님의 가입이 완료되었어요.<br/> 로그인 하시겠어요?`)) {
         await self.removeHist(1, '/user/login')
       } else {
