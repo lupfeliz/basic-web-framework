@@ -1,5 +1,5 @@
 <template>
-  <template v-if="libinit">
+  <template v-if="(sys?.m?.libinit)">
     <main>
       <div class="container">
         <Header></Header>
@@ -16,24 +16,23 @@ import Footer from '@/components/commons/footer.vue'
 import Dialog from '@/components/commons/dialog.vue'
 import * as C from '@/libs/commons/constants'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
-import { bootstwrap } from '@/libs/commons/bootstwrap'
 import { log } from '@/libs/commons/log'
 import $ from 'jquery'
 
 const self = inst(getCurrentInstance())
 
-const libinit = ref()
+const sys = ref()
 
 onBeforeMount(async () => {
-  const bssys = useBaseSystem()
+  sys.value = useBaseSystem()
   // log.debug('REGISTER POPSTATE EVENT!')
   /** history 이동 관련 */
   window.addEventListener(C.POPSTATE, (e: any) => {
     // log.debug('CANCEL POPSTATE', s.popstateHook ? true : false)
-    if (bssys.popstateHook && bssys.popstateHook instanceof Function) {
+    if (sys.value.popstateHook && sys.value.popstateHook instanceof Function) {
       // log.debug('HOOK POPSTATE', e.cancelable)
-      const fnc = bssys.popstateHook
-      bssys.popstateHook = undefined
+      const fnc = sys.value.popstateHook
+      sys.value.popstateHook = undefined
       nextTick(() => fnc(e))
       // setTimeout(() => fnc(e), 1000)
       e.cancelBubble = true
@@ -41,12 +40,12 @@ onBeforeMount(async () => {
       e.preventDefault()
       return false
     } else {
-      bssys.popstate = e
+      sys.value.popstate = e
     }
   })
 
   /** history 이동 관련 */
-  bssys.removeHist = (blen?: number, backuri?: string, callback?: Function) => {
+  sys.value.removeHist = (blen?: number, backuri?: string, callback?: Function) => {
     return new Promise((resolve: any) => {
       if (!blen) { blen = 1 }
       if (blen < 1) { return }
@@ -56,13 +55,13 @@ onBeforeMount(async () => {
         // log.debug('REPLACE-STATE:', blen, backuri, JSON.stringify(history.state))
         history.replaceState(history.state, '', backuri)
         // log.debug('PUSH-STATE:', blen, backuri, JSON.stringify(history.state))
-        bssys.popstateHook = undefined
+        sys.value.popstateHook = undefined
         self.goPage(String(backuri), history.state)
         if (callback && callback instanceof Function) { callback() }
         resolve()
       }
       const fnRemove = () => {
-        bssys.popstateHook = (e: any) => {
+        sys.value.popstateHook = (e: any) => {
           // log.debug('BINX:', blen, backuri, JSON.stringify(history.state))
           if (Number(blen) > 0 && history.state) {
             blen = Number(blen) - 1
@@ -82,29 +81,24 @@ onBeforeMount(async () => {
       fnRemove()
     })
   }
-  bssys.saveHist = (data: any, callback?: Function) => {
+  sys.value.saveHist = (data: any, callback?: Function) => {
     return new Promise((resolve: any) => {
       const pdata = history.state
       pdata.histdata = JSON.stringify(data)
-      history.pushState(pdata, '',
-        history.state.current
-      )
+      history.pushState(pdata, '', history.state.current)
       if (callback && callback instanceof Function) { callback() }
       resolve()
     })
   }
-})
-onUnmounted(async () => {
-  window.removeEventListener(C.POPSTATE, () => { })
-})
-onMounted(async () => { 
-  const bssys = useBaseSystem()
-  if (!bssys.m.libinit) {
-    await bootstwrap.new()
-    libinit.value = bssys.m.libinit = true
+  if (!sys.value.m.libinit) {
+    sys.value.window = window
+    sys.value.window.$ = $
+    sys.value.bootstrap = await import ('bootstrap')
+    sys.value.m.libinit = true
   }
 })
 
-const onPageMount = () => {
-}
+onUnmounted(async () => {
+  window.removeEventListener(C.POPSTATE, () => { })
+})
 </script>

@@ -58,4 +58,9 @@ export const SC_BAD_GATEWAY = 502
 export const SC_BAD_REQUEST = 400
 export const SC_INTERNAL_SERVER_ERROR = 500
 
+export const ALERT = 'alert'
+export const CONFIRM = 'confirm'
+
 export const noerr = true
+export const nodim = true
+export const deep = true

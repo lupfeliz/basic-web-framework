@@ -71,3 +71,17 @@ div.pagination {
 span.err-msg {
   color: #f00;
 }
+
+.modal > .modal-dialog > .modal-content.overlay {
+  background: none;
+  border: none;
+  text-align: center;
+  overflow: visible;
+  display: block;
+  font-size:large;
+  color: #fff;
+}
+
+.modal.com-dialog {
+  z-index: 10056;
+}

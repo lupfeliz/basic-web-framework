@@ -1,3 +1,4 @@
+import { nodim } from './constants';
 import { log } from '@/libs/commons/log'
 import * as C from '@/libs/commons/constants'
 import { dialog } from '@/libs/commons/dialog'
@@ -38,23 +39,34 @@ const errproc = async (e: any, opt: any) => {
       }
       break
     }
+    await afterproc(opt)
     await dialog.alert(msg)
   } else {
+    await afterproc(opt)
     return e?.response
   }
 }
 
-const afterproc = async () => {
+const postproc = async (opt?: any) => {
+  if (!opt?.nodim) {
+    dialog.overlay(true)
+  }
+}
+const afterproc = async (opt?: any) => {
   try {
     const { useUserInfo } = await import('@/store/commons/userinfo')
     useUserInfo().expandTimeout()
   } catch (ignore) { }
+  if (!opt?.nodim) {
+    dialog.overlay(false)
+  }
 }
 
 const apiPost = async (prm: any, opt?: any) => {
   try {
+    await postproc(opt)
     const ret = await axios.post(`${API_BASE}${API_PREFIX}${prm.act}`, JSON.stringify(prm.data), dconf) 
-    await afterproc()
+    await afterproc(opt)
     return ret
   } catch (e) {
     return await errproc(e, opt)
@@ -63,8 +75,9 @@ const apiPost = async (prm: any, opt?: any) => {
 
 const apiPut = async (prm: any, opt?: any) => {
   try {
+    await postproc(opt)
     const ret = await axios.put(`${API_BASE}${API_PREFIX}${prm.act}`, JSON.stringify(prm.data), dconf) 
-    await afterproc()
+    await afterproc(opt)
     return ret
   } catch (e) {
     return await errproc(e, opt)
@@ -73,8 +86,9 @@ const apiPut = async (prm: any, opt?: any) => {
 
 const apiGet = async (prm: any, opt?: any) => {
   try {
+    await postproc(opt)
     const ret = await axios.get(`${API_BASE}${API_PREFIX}${prm.act}`, dconf) 
-    await afterproc()
+    await afterproc(opt)
     return ret
   } catch (e) {
     return await errproc(e, opt)
@@ -83,8 +97,9 @@ const apiGet = async (prm: any, opt?: any) => {
 
 const apiDel = async (prm: any, opt?: any) => {
   try {
+    await postproc(opt)
     const ret = await axios.delete(`${API_BASE}${API_PREFIX}${prm.act}`, dconf) 
-    await afterproc()
+    await afterproc(opt)
     return ret
   } catch (e) {
     return await errproc(e, opt)

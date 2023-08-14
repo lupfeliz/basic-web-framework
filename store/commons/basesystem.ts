@@ -3,6 +3,8 @@ import { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
 import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
 import { navigateTo } from 'nuxt/app'
+import bootstrap from 'bootstrap'
+import { dialogContext } from '@/libs/commons/dialog'
 
 /** [ 타입 및 인터페이스 정의 */
 const map: any = {} as any
@@ -24,8 +26,9 @@ export const useBaseSystem = defineStore('baseSystem', {
       pageInstance: undefined as any as ComponentType,
       layoutInstance: undefined as any as ComponentType,
       window: undefined as any,
-      bootstrap: { Modal: class { constructor(a: any) { } } },
+      bootstrap: { } as any as typeof bootstrap,
       popstate: undefined as any,
+      dialogContext: dialogContext,
       popstateHook: undefined as any as Function | undefined,
       removeHist: undefined as any as Function,
       saveHist: undefined as any as Function,
@@ -56,12 +59,12 @@ const mixin  = {
       }
     },
     async removeHist(blen?: number, backuri?: string, callback?: Function) {
-      const bssys = useBaseSystem()
-      await bssys.removeHist(blen, backuri, callback)
+      const sys = useBaseSystem()
+      await sys.removeHist(blen, backuri, callback)
     },
     async saveHist(data: any, callback?: Function) {
-      const bssys = useBaseSystem()
-      await bssys.saveHist(data, callback)
+      const sys = useBaseSystem()
+      await sys.saveHist(data, callback)
     },
     findForm(self?: any) {
       if (!self && this) { self = this }

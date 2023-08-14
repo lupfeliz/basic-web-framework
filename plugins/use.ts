@@ -12,11 +12,11 @@ const plugin = defineNuxtPlugin(nuxtApp => {
     async mounted() {
       let x
       const self: ComponentType = this
-      const bssys = useBaseSystem()
+      const sys = useBaseSystem()
       switch(self?._?.parent?.type?.name) {
       case C.VNM_LAYOUT_LOADER:
         /** 레이아웃 인스턴스 */
-        bssys.layoutInstance = new Proxy(self, {
+        sys.layoutInstance = new Proxy(self, {
           get(o, p: string) {
             let x: any, ret: any = self[p]
             if (!ret && (x = self?._)) { ret = x[p] }
@@ -27,7 +27,7 @@ const plugin = defineNuxtPlugin(nuxtApp => {
         break
       case C.VNM_ROUTE_PROVIDER:
         /** 페이지 인스턴스 */
-        bssys.pageInstance = new Proxy(self, {
+        sys.pageInstance = new Proxy(self, {
           get(o, p: string) {
             let x: any, ret: any = self[p]
             if (!ret && (x = self?._)) { ret = x[p] }

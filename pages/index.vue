@@ -6,6 +6,13 @@
     >
     게시판으로 이동
   </MyButton>
+
+  <MyButton
+    class="btn-primary mx-1"
+    @click="dialog.alert('테스트')"
+    >
+    테스트
+  </MyButton>
 </div>
 </template>
 <script setup lang="ts">

@@ -60,15 +60,15 @@ const self = inst(getCurrentInstance())
 const pageTitleDef = '샘플프로젝트'
 const pageTitle = ref(pageTitleDef)
 const router = useRouter()
-const bssys = useBaseSystem()
+const sys = useBaseSystem()
 const ustore = useUserInfo()
 
-watch(() => bssys.$state?.pageInstance, (e: any) => {
+watch(() => sys.$state?.pageInstance, (e: any) => {
   onPageMount(e as ComponentType)
 }, { deep: true })
 
-watch(() => bssys.$state?.pageInstance?.pageTitle, (e: any) => {
-  titleChanged(bssys.pageTitle)
+watch(() => sys.$state?.pageInstance?.pageTitle, (e: any) => {
+  titleChanged(sys.pageTitle)
 }, { deep: true })
 
 const onPageMount = (page: ComponentType) => {
@@ -76,7 +76,7 @@ const onPageMount = (page: ComponentType) => {
 }
 
 const titleChanged = (title: any) => {
-  let v = bssys.pageInstance?.pageTitle
+  let v = sys.pageInstance?.pageTitle
   if (v) {
     if (isRef(v)) {
       pageTitle.value = String(v.value)
@@ -97,7 +97,6 @@ const logout = async () => {
   log.debug('RES:', res)
   if (res?.status === C.SC_OK) {
     ustore.clear()
-    self.$forceUpdate()
   }
   await dialog.alert('로그아웃 되었습니다')
 }

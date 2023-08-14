@@ -16,7 +16,7 @@ import { log } from '@/libs/commons/log'
 import { useField, FieldContext } from 'vee-validate'
 
 const self = inst(getCurrentInstance())
-const bssys = useBaseSystem()
+const sys = useBaseSystem()
 
 const props = defineProps({
   type: String,

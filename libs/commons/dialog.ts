@@ -1,7 +1,44 @@
+import { dialogContext } from '@/libs/commons/dialog';
+import * as C from '@/libs/commons/constants'
+import { log } from '@/libs/commons/log'
+
+const ctx = reactive({
+  modal: {
+    element: {} as any as Element,
+    instance: {} as any,
+    current: {} as any,
+    queue: [] as any[]
+  },
+  overlay: {
+    element: {} as any as Element,
+    instance: {} as any,
+    current: {} as any,
+    queue: [] as any[]
+  }
+})
 
 const dialog = {
-  alert: async (msg: String) => new Promise<boolean>(() => { }),
-  confirm: async (msg: String) => new Promise<boolean>(() => { })
+  alert: (msg: string) => new Promise<boolean>((resolve) => {
+    ctx.modal.queue.push({
+      type: C.ALERT,
+      msg: msg,
+      resolve
+    })
+  }),
+  confirm: (msg: string) => new Promise<boolean>((resolve) => {
+    ctx.modal.queue.push({
+      type: C.CONFIRM,
+      msg: msg,
+      resolve
+    })
+  }),
+  overlay: (vis?: boolean) => new Promise<void>((resolve) => {
+    if (vis === undefined) { vis = true }
+    ctx.overlay.queue.push({
+      vis: vis,
+      resolve
+    })
+  }),
 }
 
-export { dialog }
+export { dialog, ctx as dialogContext }

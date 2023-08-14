@@ -122,10 +122,9 @@ const pageTitle = '게시판'
 const boardData = ref({ list: [] as any[] } as any)
 const { range } = values
 const paging = ref(new Paging())
-const bssys = useBaseSystem()
+const sys = useBaseSystem()
 
-watch(() => bssys.$state?.popstate, (e: any) => {
-  // log.debug('ONPOPSTATE:', JSON.parse(e.state.histdata || '{}'))
+watch(() => sys.$state?.popstate, (e: any) => {
   let data = { page: 1 }
   if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
   search(data)
@@ -134,7 +133,6 @@ watch(() => bssys.$state?.popstate, (e: any) => {
 onMounted(async () => {
   let data = { page: 1 }
   if (history?.state?.histdata) { data = JSON.parse(history.state.histdata) }
-  // log.debug('ONMOUNTED:', history.state)
   search(data)
 })
 

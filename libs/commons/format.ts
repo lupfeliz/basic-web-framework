@@ -51,6 +51,7 @@ const format = {
 
 const $f = (t: string, v: string) => {
   let ret = v
+  if (!v) { return v }
   switch (t) {
   case 'dt':
     ret = format.dateStrFormat(v, 'YYYY-MM-DD')
