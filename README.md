@@ -433,11 +433,5 @@
 
   --------------------------------------------------------------------------------
 
-<style>
-<!--
-img { border: 1px solid #ccc; }
-strong { color: #ff5500 !important; }
-code { font-family: FixedSys, GulimChe }
-hr { display: none !important; height: 1px !important; }
--->
-</style>
+--------------------------------------------------------------------------------
+###### <style> img { border: 1px solid #ccc; } strong { color: #ff5500 !important; } code { font-family: FixedSys, GulimChe } hr { display: none !important; height: 1px !important; } hr+h6:last-child { display: none !important; } </style>
