@@ -141,7 +141,9 @@ const doOverlay = () => {
     if (overlay.current.resolve) { return }
     if (overlay.queue.length > 0) {
       const item: any = overlay.queue.splice(0, 1)[0]
-      if (overlay.current.state == M_SHOWN && item.vis) {
+      if (
+        (overlay.current.state == M_SHOWN && item.vis) ||
+        (overlay.current.state == M_HIDDEN && !item.vis)) {
         nextTick(doOverlay)
         return
       }
