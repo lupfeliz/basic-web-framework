@@ -1,0 +1,20 @@
+  server:
+    port: 8081
+  spring:
+    datasource:
+      url: jdbc:postgresql://172.17.0.1:5432/myworks
+      username: myuser
+      password: password
+      driverClassName: org.postgresql.Driver
+    jpa:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        ddl-auto: update
+      properties:
+        hibernate:
+          format_sql: false
+      show-sql: false
+  logging:
+    level:
+      root: ERROR
+      my.was: DEBUG
