@@ -1,7 +1,7 @@
 <template>
   <div
     ref="modal"
-    class="modal fade com-dialog"
+    class="modal fade no-tran com-dialog"
     data-bs-backdrop="static"
     data-bs-keyboard="false"
     tabindex="-1"
@@ -15,7 +15,7 @@
           <div class="text-center">
             <template v-if="ctx.modal.current?.type === C.ALERT">
               <MyButton
-                class="btn btn-secondary"
+                class="btn btn-primary"
                 @click="click(1)"
                 >
                 확인
@@ -42,14 +42,14 @@
   </div>
   <div
     ref="overlay"
-    class="modal fade"
+    class="modal fade no-tran com-overlay"
     data-bs-backdrop="static"
     data-bs-keyboard="false"
     tabindex="-1"
     aria-hidden="true"
     >
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content overlay">
+      <div class="modal-content">
         <div class="spinner-border" role="status">
           <span class="visually-hidden"></span>
         </div>
@@ -67,6 +67,8 @@ import { log } from '@/libs/commons/log'
 import { values } from '@/libs/commons/values'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
 import MyButton from '@/components/commons/mybutton.vue'
+import { over } from 'lodash'
+import { dialog } from '@/libs/commons/dialog'
 
 const M_SHOWN = 'shown.bs.modal'
 const M_HIDDEN = 'hidden.bs.modal'
@@ -145,6 +147,11 @@ const doOverlay = () => {
       }
       overlay.current = item
       if (item.vis) {
+        if (!isNaN(Number(item.timeout))) {
+          setTimeout(() => {
+            dialog.overlay(false)
+          }, Number(item.timeout))
+        }
         overlay.instance.show()
       } else {
         overlay.instance.hide()

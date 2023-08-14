@@ -60,6 +60,7 @@ export const SC_INTERNAL_SERVER_ERROR = 500
 
 export const ALERT = 'alert'
 export const CONFIRM = 'confirm'
+export const TRANSPARENT = 'transparent'
 
 export const noerr = true
 export const nodim = true

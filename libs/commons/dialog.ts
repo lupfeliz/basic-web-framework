@@ -32,10 +32,11 @@ const dialog = {
       resolve
     })
   }),
-  overlay: (vis?: boolean) => new Promise<void>((resolve) => {
+  overlay: (vis?: boolean, timeout?: number) => new Promise<void>((resolve) => {
     if (vis === undefined) { vis = true }
     ctx.overlay.queue.push({
       vis: vis,
+      timeout: timeout,
       resolve
     })
   }),

@@ -8,10 +8,17 @@
   </MyButton>
 
   <MyButton
-    class="btn-primary mx-1"
+    class="btn-secondary mx-1"
     @click="dialog.alert('테스트')"
     >
-    테스트
+    테스트(ALERT)
+  </MyButton>
+
+  <MyButton
+    class="btn-secondary mx-1"
+    @click="dialog.overlay(true, 2000)"
+    >
+    테스트(OVERLAY)
   </MyButton>
 </div>
 </template>

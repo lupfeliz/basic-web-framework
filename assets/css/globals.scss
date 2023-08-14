@@ -1,7 +1,5 @@
 html {
   body {
-    header {
-    }
     footer {
       position: fixed;
       top: calc(100vh - 3rem);
@@ -72,7 +70,7 @@ span.err-msg {
   color: #f00;
 }
 
-.modal > .modal-dialog > .modal-content.overlay {
+.modal.com-overlay > .modal-dialog > .modal-content {
   background: none;
   border: none;
   text-align: center;
@@ -82,6 +80,18 @@ span.err-msg {
   color: #fff;
 }
 
+.transparent {
+  opacity: 0;
+}
+
 .modal.com-dialog {
   z-index: 10056;
+}
+
+.modal.no-tran {
+  z-index: 10054;
+  > .modal-dialog {
+    transition: none !important;
+    transform: none !important;
+  }
 }
