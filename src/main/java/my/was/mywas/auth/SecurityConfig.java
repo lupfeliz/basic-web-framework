@@ -10,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.Authentication;
@@ -19,17 +18,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.header.writers.CrossOriginEmbedderPolicyHeaderWriter.CrossOriginEmbedderPolicy;
-import org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHeaderWriter.CrossOriginOpenerPolicy;
-import org.springframework.security.web.header.writers.CrossOriginResourcePolicyHeaderWriter.CrossOriginResourcePolicy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -63,37 +57,20 @@ public class SecurityConfig {
   private static final String PRM_USER_ID = "userId";
   private static final String PRM_PASSWD = "passwd";
   private static final String BOARD_WRITE = "BOARD_WRITE";
+  private static final String ROLE_USER = "ROLE_USER";
   private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
-  @Bean SessionRegistry sessionRegistry() { return new SessionRegistryImpl(); }
   @Bean AuthenticationProvider authenticationProvider() { return new MyWasAuthProvider(); }
-
-  @Bean
-  AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-    AuthenticationManager manager = config.getAuthenticationManager();
-    return manager;
-  }
 
   @Bean SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     AntPathRequestMatcher m = new AntPathRequestMatcher("/**");
     Filter jsonFilter = new MyWasAuthFilter(m.antMatcher(POST, LOGIN_PATH), http);
 
     http
-      .csrf(csrf -> csrf
-        .ignoringRequestMatchers(
-          m.antMatcher(GET, "/api/**"),
-          m.antMatcher(POST, "/api/**"),
-          m.antMatcher(PUT, "/api/**"),
-          m.antMatcher(DELETE, "/api/**")
-        )
-      )
+      .csrf(csrf -> csrf.disable())
       .cors(cors -> cors.disable())
       .headers(hdr -> hdr
         .frameOptions(frm -> frm.sameOrigin())
-        .crossOriginEmbedderPolicy(pol -> pol.policy(CrossOriginEmbedderPolicy.UNSAFE_NONE))
-        .crossOriginOpenerPolicy(pol -> pol.policy(CrossOriginOpenerPolicy.SAME_ORIGIN))
-        .crossOriginResourcePolicy(pol -> pol.policy(CrossOriginResourcePolicy.SAME_SITE))
-        .contentSecurityPolicy(pol -> pol.reportOnly())
         .cacheControl(ccc -> ccc.disable())
       )
       .authorizeHttpRequests(req -> req
@@ -112,12 +89,6 @@ public class SecurityConfig {
       .addFilterAt(jsonFilter, UsernamePasswordAuthenticationFilter.class)
       .formLogin(login -> login.disable())
       .logout(logout -> logout.disable())
-      .sessionManagement(smn -> smn
-        .sessionFixation(sfix -> sfix.changeSessionId())
-        .maximumSessions(1)
-        .maxSessionsPreventsLogin(false)
-        .sessionRegistry(sessionRegistry())
-      )
       .anonymous(anon -> anon.disable());
     return http.build();
   }
@@ -135,7 +106,6 @@ public class SecurityConfig {
       throws AuthenticationException, IOException, ServletException {
       setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
       String body = req.getReader().lines().collect(Collectors.joining());
-      // log.debug("BODY:{}", body);
       JSONObject map = new JSONObject(body);
       Authentication token =
         new UsernamePasswordAuthenticationToken(
@@ -145,7 +115,6 @@ public class SecurityConfig {
       Authentication auth = null;
       authenticationDetailsSource.buildDetails(req);
       auth = getAuthenticationManager().authenticate(token);
-      // log.debug("FINAL-AUTH:{}", auth);
       return auth;
     }
   }
@@ -156,7 +125,6 @@ public class SecurityConfig {
       HttpSession session = req.getSession();
       SecurityContext ctx = SecurityContextHolder.getContext();
       User user = (User)ctx.getAuthentication().getDetails();
-      // log.debug("USER:{} / {}", user.getUserId(), user.getUserNm());
       session.setAttribute(
         HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, ctx);
       res.setStatus(Response.SC_OK);
@@ -194,7 +162,6 @@ public class SecurityConfig {
     @Override
     public Authentication authenticate(Authentication auth) throws AuthenticationException {
       String userId = auth.getName();
-      // String passwd = CryptoUtil.dec(auth.getCredentials().toString(), "");
       String passwd = String.valueOf(auth.getCredentials());
       User user = userService.getByUserId(userId);
       if (user == null || !passwd.equals(user.getPasswd())) {
@@ -203,6 +170,7 @@ public class SecurityConfig {
       List<GrantedAuthority> grant = new LinkedList<>();
       grant.add(new SimpleGrantedAuthority(BOARD_WRITE));
       grant.add(new SimpleGrantedAuthority(ROLE_ADMIN));
+      grant.add(new SimpleGrantedAuthority(ROLE_USER));
       UsernamePasswordAuthenticationToken ret =
         new UsernamePasswordAuthenticationToken(userId, passwd, grant);
       ret.setDetails(user);
