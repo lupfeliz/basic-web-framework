@@ -434,8 +434,10 @@
   --------------------------------------------------------------------------------
 
 <style>
+<!--
 img { border: 1px solid #ccc; }
 strong { color: #ff5500 !important; }
 code { font-family: FixedSys, GulimChe }
 hr { display: none !important; height: 1px !important; }
+-->
 </style>
