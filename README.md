@@ -2,13 +2,11 @@
 
 # 강습준비내용
 
-## 절차
+## code-server 접속방법
 
-### code-server 접속방법
+- 최초 비밀번호 수정 및 `reboot`
 
-- 최초 비밀번호 수정 및 ``reboot``
-
-- 터미널 workspace 폴더에서 ``screen`` 실행
+- 터미널 workspace 폴더에서 `screen` 실행
 
 - 소스제어 에서 git repository 초기화
 
@@ -16,257 +14,298 @@
 
 - .http 활용 (rest client)
 
-- chat-gpt 활용방법 (openai-api 키 발급: ``https://platform.openai.com/account/api-keys``)
+- chat-gpt 활용방법 (openai-api 키 발급: `https://platform.openai.com/account/api-keys`)
 
 - vue(nuxt) ↔ reactjs(next) 변경중점 등
 
-### nuxt 기본 프로젝트 생성 및 실행
+## nuxt 기본 프로젝트 생성 및 실행
 
-- ``npx nuxi init``
+--------------------------------------------------------------------------------
+```bash
+$ npx nuxi init my-app 
+$ cd my-app
+$ git init
+$ npm install
+$ npx nuxt dev
+```
+--------------------------------------------------------------------------------
 
-- ``npm install``
+- vue3 (composition-api / script-setup) 간략설명
 
-- ``npx nuxt dev``
+- nuxt / vite 프로젝트 차이점 간략설명
 
-- ``git init`` 실행
+## 기본적인 설정 및 프로젝트 레이아웃
 
-- vue3 (script-setup) 에서는 this 키워드를 사용할 수 없다.
+- `ts.shim.d.ts` 생성 (`import` 시 빨간줄 제거)
 
-- nuxt / vite 프로젝트 차이점
-
-  - nuxt 프로젝트 : 
-
-  - vite 프로젝트 : 
-
-### 기본적인 설정 및 프로젝트 레이아웃
-
-- ``ts.shim.d.ts`` 생성 (import 시 빨간줄 제거)
-
-  --------------------------------------------------------------------------------
-  ```javascript
-  declare module '*.vue' {
-    import Vue from 'vue'
-    export default Vue
-  }
-  ```
-  --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+```javascript
+declare module '*.vue' {
+  import Vue from 'vue'
+  export default Vue
+}
+```
+--------------------------------------------------------------------------------
 
 - app.vue 삭제
 
-- ``layouts`` ``pages`` ``components/commons`` ``libs/commons`` ``assets`` ``plugins`` 폴더 생성
+- 패키지 설치 `sass` `postcss` `autoprefixer` `bootstrap` `mement` `lodash` `jquery`  등 
 
-- ``sass`` ``postcss`` ``autoprefixer`` ``bootstrap`` ``mement`` 등 패키지 설치 (bootstrap-vue 는 기타 이슈로 인해 사용X)
+- `nuxt.config.ts` 수정 ( 기본설정 )
 
-  --------------------------------------------------------------------------------
-  ```javascript
-  /** nuxt.config.ts 내용추가 */
-  css: [
-    'bootstrap/dist/css/bootstrap.css',
-  ]
-  ```
-  --------------------------------------------------------------------------------
-
-- ``jquery`` ``jquery-ui`` ``@types/jquery`` ``@types/jqueryui`` 등 패키지 추가 설치
-
-- ``constants.ts`` ``log.ts`` ``api.ts`` ``shared.ts`` ``values.ts`` 생성
-
-  --------------------------------------------------------------------------------
-  ```javascript
-  /** log.ts */
-  const fnnull = (...arg: any[]) => { }
-  const fndbug = console.log;
-  const fnwarn = console.warn;
-  const fnerrr = console.error;
-  const log = { trace: fnnull, debug: fndbug, warn: fnwarn, error: fnerrr }
-  export { log }
-  ```
-  --------------------------------------------------------------------------------
-
-- ``pages/index.vue`` ``pages/main/main.vue`` ``components/commons/header`` ``components/commons/footer.vue`` 생성
-
-- ``nuxt.config.ts`` 설정
-
-- ``hmr`` 설정 (clientPort 는 별도 제공 / nginx 로 구동)
-
-  --------------------------------------------------------------------------------
-  ```javascript
+--------------------------------------------------------------------------------
+```javascript
+import env from 'dotenv'
+/** OS 환경변수 읽어오기 */
+env.config()
+export default defineNuxtConfig({
+  devtools: { enabled: true },
   vite: {
     server: {
+      /** 방화벽 안쪽에서 바깥쪽과 hmr 통신하기 위한 설정 */
       hmr: {
         path: '/hmr',
-        clientPort: Number(String(process.env['VITE_HMR_CLIENT_PORT'] || '24678'))
+        clientPort: Number(String(process.env['VITE_HMR_CLIENT_PORT'] || 24678))
       },
-    }
+    },
   },
-  ```
-  --------------------------------------------------------------------------------
+  /** 기본 CSS import */
+  css: [
+    '@/assets/css/globals.scss',
+    'bootstrap/dist/css/bootstrap.css',
+  ],
+})
+```
+--------------------------------------------------------------------------------
 
-- page route 설정
+## 기본 페이지 및 컴포넌트 추가
 
-- 삭제할 파일들
+- `pages/index.vue` `layouts/default.vue` `components/commons/header.vue` `components/commons/footer.vue` 작성
 
-### 기본 페이지 및 컴포넌트 추가
+--------------------------------------------------------------------------------
+```html
+<template>
+  <div>
+    INDEX
+  <div>
+</template>
+<script setup lang="ts">
+</script>
+```
 
-- ``mybutton.vue`` 추가
-
-  --------------------------------------------------------------------------------
-  ```html
-  <template>
-    <button
-      type="button"
-      class="btn"
-      v-bind="attrs"
-      @click="emitClick"
-      >
+```html
+<template>
+  <main>
+    <div>
+      <Header></Header>
       <slot></slot>
-    </button>
-  </template>
-  <script setup lang="ts">
-  import * as C from '@/libs/commons/constants'
-  import { log } from '@/libs/commons/log'
+      <Footer></Footer>
+    </div>
+  </main>
+</template>
+<script setup lang="ts">
+import Header from '@/components/commons/header.vue'
+import Footer from '@/components/commons/footer.vue'
+</script>
+```
 
-  const attrs = useAttrs()
-  const emit = defineEmits([C.CLICK])
+```html
+<template>
+  <header>
+    HEADER
+  </header>
+</template>
+<script setup lang="ts">
+</script>
+```
 
-  onMounted(async () => {
-  })
+```html
+<template>
+  <footer>
+    FOOTER
+  </footer>
+</template>
+<script setup lang="ts">
+</script>
+```
+--------------------------------------------------------------------------------
 
-  const emitClick = async (e: any) => {
-    emit(C.CLICK, e)
-  }
-  </script>
-  ```
-  --------------------------------------------------------------------------------
+- `components/commons/mybutton.vue` 추가 / 페이지 추가 후 alert 이벤트 발생 테스트
 
-- ``dialog.vue``, ``dialog.ts`` 추가
+--------------------------------------------------------------------------------
+```html
+<template>
+  <butto이마트n
+    type="button"
+    class="btn"
+    v-bind="attrs"
+    @click="emitClick"
+    >
+    <slot></slot>
+  </button>
+</template>
+<script setup lang="ts">
+
+const props = defineProps({ })
+const attrs = useAttrs()
+const emit = defineEmits(['click'])
+const emitClick = async (e: any) => {
+  emit('click', e)
+}
+</script>
+```
+--------------------------------------------------------------------------------
+
+- `constants.ts` `log.ts` `api.ts` `shared.ts` `values.ts` 등 공통 유틸 생성 (공통된 상수 및 메소드 정리)
+
+--------------------------------------------------------------------------------
+```javascript
+/** constants.ts */
+... 생략 ...
+export const UPDATE_MODEL_VALUE = 'update:modelValue'
+export const CLICK = 'click'
+export const KEYUP = 'keyup'
+
+export const JSONV = 'json'
+export const UTF8 = 'utf-8'
+... 생략 ...
+```
+
+```javascript
+/** log.ts */
+const fnnill = (..._: any[]) => { }
+const fndebug = console.log
+const fnwarn = console.warn
+const fnerror = console.error
+const log = { trace: fnnill, debug: fndebug, warn: fnwarn, error: fnerror }
+export { log }
+```
+--------------------------------------------------------------------------------
+
+- `dialog.vue` `dialog.ts` 추가 ( 경고창 등 투박한 네이티브 제거 )
   ※ bootstrap 은 vue3 에서 사용시 dynamic-import 를 사용해야 한다. (layout 에 추가)
 
-  --------------------------------------------------------------------------------
-  ```html
-  <template>
-    <div
-      ref="modal"
-      class="modal fade"
-      data-bs-backdrop="static"
-      data-bs-keyboard="false"
-      tabindex="-1"
-      aria-labelledby="staticBackdropLabel"
-      aria-hidden="true"
-      >
-      ... 생략 ...
-    </div>
-  </template>
-  <script setup lang="ts">
-  ... 생략 ...
-  onMounted(async () => {
-    $modal = new s.bootstrap.Modal(modal.value)
-    dialog.alert = alert
-    dialog.confirm = confirm
+--------------------------------------------------------------------------------
+```html
+<template>
+  <div
+    ref="modal"
+    class="modal fade"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+    >
+    ... 생략 ...
+  </div>
+</template>
+<script setup lang="ts">
+... 생략 ...
+const modal = ref()
+const ctx = ref(reactive({
+  element: {} as any as Element,
+  instance: {} as any,
+  current: {} as any,
+  queue: [] as any[]
+}))
+watch(modal.value, async () => {
+  const bootstrap = await import('bootstrap')
+  $modal = new bootstrap.Modal(modal.value)
+  dialog.alert = alert
+  dialog.confirm = confirm
+})
+const alert = (msg: String) => {
+  return new Promise<boolean>((resolve) => {
+    ((c: any) => { c.msg = msg c.type = 1 c.resolve = resolve })(ctx.value)
+    $modal.show()
   })
-  const alert = (msg: String) => {
-    return new Promise<boolean>((resolve, reject) => {
-      ((c: any) => {
-        c.msg = msg
-        c.type = 1
-        c.resolve = resolve
-        c.reject = reject
-        log.debug('CTX:', c)
-      })(ctx.value)
-      $modal.show()
-    })
-  }
-  const confirm = (msg: String) => {
-    return new Promise<boolean>((resolve, reject) => {
-      ((c: any) => {
-        c.msg = msg
-        c.type = 2
-        c.resolve = resolve
-        c.reject = reject
-      })(ctx.value)
-      $modal.show()
-    })
-  }
-  ... 생략 ...
-  </script>
-  ```
+}
+const confirm = (msg: String) => {
+  return new Promise<boolean>((resolve) => {
+    ((c: any) => { c.msg = msg c.type = 2 c.resolve = resolve })(ctx.value)
+    $modal.show()
+  })
+}
+... 생략 ...
+</script>
+```
+```javascript
+const dialog = {
+  alert: async (msg: String) => new Promise<boolean>(() => { }),
+  confirm: async (msg: String) => new Promise<boolean>(() => { })
+}
+export { dialog }
+```
+--------------------------------------------------------------------------------
 
-  --------------------------------------------------------------------------------
-  ```javascript
-  const dialog = {
-    alert: async (msg: String) => new Promise<boolean>(() => { }),
-    confirm: async (msg: String) => new Promise<boolean>(() => { })
-  }
-  export { dialog }
-  ```
-  --------------------------------------------------------------------------------
-
-### 통신 모듈 준비
+## 통신 모듈 준비
 
 - api.ts
 
-  --------------------------------------------------------------------------------
-  ```javascript
-  import { log } from '@/libs/commons/log'
-  import * as C from '@/libs/commons/constants'
-  import axios, { AxiosRequestConfig } from 'axios'
-  let API_BASE = '.'
-  const headers = JSON.parse(`{ "${C.CONTENT_TYPE}": "${C.CTYPE_JSON}; ${C.CHARSET}=${C.UTF8}" }`)
-  const timeout = 30 * 1000
-  const dconf = {
-    headers,
-    responseType: C.JSONV,
-    responseEncoding: C.UTF8,
-    timeout: timeout
-  } as AxiosRequestConfig<string>
-  /** POST 메소드 */
-  const apiPost = async (prm: any, opt?: any) => {
-    const ret = await axios.post(`${API_BASE}/api/${prm.act}`, JSON.stringify(prm.data), dconf) 
-    return ret
-  }
-  /** PUT 메소드 */
-  const apiPost = async (prm: any, opt?: any) => {
-  const apiPut = async (prm: any, opt?: any) => {
-    const ret = await axios.put(`${API_BASE}/api/${prm.act}`, JSON.stringify(prm.data), dconf) 
-    return ret
-  }
-  /** GET 메소드 */
-  const apiGet = async (prm: any, opt?: any) => {
-    const ret = await axios.get(`${API_BASE}/api/${prm.act}`, dconf) 
-    return ret
-  }
-  /** DELETE 메소드 */
-  const apiDel = async (prm: any, opt?: any) => {
-    const ret = await axios.delete(`${API_BASE}/api/${prm.act}`, dconf) 
-    return ret
-  }
-  export { apiPost, apiGet, apiPut, apiDel }
-  ```
-  --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+```javascript
+import { log } from '@/libs/commons/log'
+import * as C from '@/libs/commons/constants'
+import axios, { AxiosRequestConfig } from 'axios'
+let API_BASE = '.'
+const headers = JSON.parse(`{ "${C.CONTENT_TYPE}": "${C.CTYPE_JSON}; ${C.CHARSET}=${C.UTF8}" }`)
+const timeout = 30 * 1000
+const dconf = {
+  headers,
+  responseType: C.JSONV,
+  responseEncoding: C.UTF8,
+  timeout: timeout
+} as AxiosRequestConfig<string>
+/** POST 메소드 */
+const apiPost = async (prm: any, opt?: any) => {
+  const ret = await axios.post(`${API_BASE}/api/${prm.act}`, JSON.stringify(prm.data), dconf) 
+  return ret
+}
+/** PUT 메소드 */
+const apiPost = async (prm: any, opt?: any) => {
+const apiPut = async (prm: any, opt?: any) => {
+  const ret = await axios.put(`${API_BASE}/api/${prm.act}`, JSON.stringify(prm.data), dconf) 
+  return ret
+}
+/** GET 메소드 */
+const apiGet = async (prm: any, opt?: any) => {
+  const ret = await axios.get(`${API_BASE}/api/${prm.act}`, dconf) 
+  return ret
+}
+/** DELETE 메소드 */
+const apiDel = async (prm: any, opt?: any) => {
+  const ret = await axios.delete(`${API_BASE}/api/${prm.act}`, dconf) 
+  return ret
+}
+export { apiPost, apiGet, apiPut, apiDel }
+```
+--------------------------------------------------------------------------------
 
-### 통신 proxy 준비
+## 통신 proxy 준비
 
 - nuxt.conf.ts
 
-  --------------------------------------------------------------------------------
-  ```javascript
-  vite: {
-    server: {
-      ... 생략 ...
-      proxy: {
-        '^/api/.*': {
-          target: 'http://localhost:8081',
-          changeOrigin: true,
-          rewrite: (path) => {
-            return path.replace(/^\/api\//g, '/');
-          }
+--------------------------------------------------------------------------------
+```javascript
+vite: {
+  server: {
+    ... 생략 ...
+    proxy: {
+      '^/api/.*': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+        rewrite: (path) => {
+          return path.replace(/^\/api\//g, '/');
         }
       }
     }
   }
-  ```
+}
+```
   --------------------------------------------------------------------------------
 
-### 데이터 셋팅
+## 데이터 셋팅
 
 - 로그인, 게시판 구현을 위한 데이터
 
@@ -291,7 +330,7 @@
   ```
   --------------------------------------------------------------------------------
 
-### was 셋팅 (데이터 흐름 파악을 위해)
+## was 셋팅 (데이터 흐름 파악을 위해)
 
 - gradle 프로젝트 생성
 
@@ -405,11 +444,11 @@
 
 - ``./gradlew build -x test`` 빌드 수행
 
-### 메뉴구성 (라우팅)
+## 메뉴구성 (라우팅)
 
-### 로그인 구현
+## 로그인 구현
 
-### 게시판 구현
+## 게시판 구현
 
 ## 기타
 
@@ -434,4 +473,4 @@
   --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
-###### <style> img { border: 1px solid #ccc; } strong { color: #ff5500 !important; } code { font-family: FixedSys, GulimChe } hr { display: none !important; height: 1px !important; } hr+h6:last-child { display: none !important; } </style>
+- <style> img { border: 1px solid #ccc; } strong { color: #ff5500 !important; } code { font-family: FixedSys, GulimChe } hr { display: none !important; height: 1px !important; } hr+ul:last-child { display: none !important; } </style>
