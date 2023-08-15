@@ -130,12 +130,12 @@ import Footer from '@/components/commons/footer.vue'
 ```
 --------------------------------------------------------------------------------
 
-- `components/commons/mybutton.vue` 추가 / 페이지 추가 후 alert 이벤트 발생 테스트
+- `components/commons/mybutton.vue` 추가 / 페이지 추가 후 alert 이벤트 발생 테스트 ( 이후 myinput, myeditor, myform 추가)
 
 --------------------------------------------------------------------------------
 ```html
 <template>
-  <butto이마트n
+  <button
     type="button"
     class="btn"
     v-bind="attrs"
