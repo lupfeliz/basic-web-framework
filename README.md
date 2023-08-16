@@ -36,10 +36,32 @@ $ npx nuxt dev
 
 ## 기본적인 설정 및 프로젝트 레이아웃
 
+- 기본 폴더구조
+--------------------------------------------------------------------------------
+```yaml
++ ROOT
+  # 공통으로 사용하는 함수(메소드) 등 모음
+  + libs
+  # 공통으로 사용하는 컴포넌트 (버튼, 입력박스, 폼) 등 모음
+  + components
+  # Nuxt Layout (Nuxt 예약 폴더)
+  + layout
+  # Nuxt 경로 Routing (Nuxt 예약 폴더)
+  + pages
+  # webpack 등에 의해 변형되지 않고 사용되는 리소스 (css, js, image, html..)
+  + public
+  # 모듈에서 사용하는 리소스 (css, js, image, html..)
+  + assets
+  # 스토어
+  + store
+```
+--------------------------------------------------------------------------------
+
 - `ts.shim.d.ts` 생성 (`import` 시 빨간줄 제거)
 
 --------------------------------------------------------------------------------
 ```javascript
+/** /ts.shims.d.ts */
 declare module '*.vue' {
   import Vue from 'vue'
   export default Vue
@@ -55,6 +77,7 @@ declare module '*.vue' {
 
 --------------------------------------------------------------------------------
 ```javascript
+/** /nuxt.config.ts */
 import env from 'dotenv'
 /** OS 환경변수 읽어오기 */
 env.config()
@@ -80,13 +103,14 @@ export default defineNuxtConfig({
 
 ## 기본 페이지 및 컴포넌트 추가
 
-- `pages/index.vue` `layouts/default.vue` `components/commons/header.vue` `components/commons/footer.vue` 작성
+- 아래 파일들을 추가한다.
 
 --------------------------------------------------------------------------------
 ```html
+<!-- /pages/index.vue -->
 <template>
   <div>
-    INDEX
+    메인 페이지 본문 내용
   <div>
 </template>
 <script setup lang="ts">
@@ -94,11 +118,15 @@ export default defineNuxtConfig({
 ```
 
 ```html
+<!-- /layouts/default.vue -->
 <template>
   <main>
     <div>
+      <!-- 머리글 -->
       <Header></Header>
+      <!-- 본문 (경로페이지) -->
       <slot></slot>
+      <!-- 꼬리글 -->
       <Footer></Footer>
     </div>
   </main>
@@ -110,9 +138,10 @@ import Footer from '@/components/commons/footer.vue'
 ```
 
 ```html
+<!-- /components/commons/header.vue -->
 <template>
   <header>
-    HEADER
+    머리글
   </header>
 </template>
 <script setup lang="ts">
@@ -120,9 +149,10 @@ import Footer from '@/components/commons/footer.vue'
 ```
 
 ```html
+<!-- /components/commons/footer.vue -->
 <template>
   <footer>
-    FOOTER
+    꼬리글
   </footer>
 </template>
 <script setup lang="ts">
@@ -130,10 +160,11 @@ import Footer from '@/components/commons/footer.vue'
 ```
 --------------------------------------------------------------------------------
 
-- `components/commons/mybutton.vue` 추가 / 페이지 추가 후 alert 이벤트 발생 테스트 ( 이후 myinput, myeditor, myform 추가)
+- `mybutton.vue` 추가 / 페이지 추가 후 alert 이벤트 발생 테스트 ( 이후 myinput, myeditor, myform 추가)
 
 --------------------------------------------------------------------------------
 ```html
+<!-- /components/commons/mybutton.vue -->
 <template>
   <button
     type="button"
@@ -160,11 +191,13 @@ const emitClick = async (e: any) => {
 
 --------------------------------------------------------------------------------
 ```javascript
-/** constants.ts */
+/** /libs/commons/constants.ts */
 ... 생략 ...
 export const UPDATE_MODEL_VALUE = 'update:modelValue'
 export const CLICK = 'click'
 export const KEYUP = 'keyup'
+export const ALERT = 'alert'
+export const CONFIRM = 'confirm'
 
 export const JSONV = 'json'
 export const UTF8 = 'utf-8'
@@ -172,7 +205,7 @@ export const UTF8 = 'utf-8'
 ```
 
 ```javascript
-/** log.ts */
+/** /libs/commons/log.ts */
 const fnnill = (..._: any[]) => { }
 const fndebug = console.log
 const fnwarn = console.warn
@@ -185,59 +218,108 @@ export { log }
 - `dialog.vue` `dialog.ts` 추가 ( 경고창 등 투박한 네이티브 제거 )
   ※ bootstrap 은 vue3 에서 사용시 dynamic-import 를 사용해야 한다. (layout 에 추가)
 
+- Prmoise.resolve / async-await 기능 중점으로 설명
+
+> Modal 컴포넌트 참고 : https://getbootstrap.com/docs/5.0/components/modal/
+
 --------------------------------------------------------------------------------
-```html
-<template>
-  <div
-    ref="modal"
-    class="modal fade"
-    data-bs-backdrop="static"
-    data-bs-keyboard="false"
-    tabindex="-1"
-    aria-labelledby="staticBackdropLabel"
-    aria-hidden="true"
-    >
-    ... 생략 ...
-  </div>
-</template>
-<script setup lang="ts">
-... 생략 ...
-const modal = ref()
-const ctx = ref(reactive({
-  element: {} as any as Element,
-  instance: {} as any,
-  current: {} as any,
-  queue: [] as any[]
-}))
-watch(modal.value, async () => {
-  const bootstrap = await import('bootstrap')
-  $modal = new bootstrap.Modal(modal.value)
-  dialog.alert = alert
-  dialog.confirm = confirm
-})
-const alert = (msg: String) => {
-  return new Promise<boolean>((resolve) => {
-    ((c: any) => { c.msg = msg c.type = 1 c.resolve = resolve })(ctx.value)
-    $modal.show()
-  })
-}
-const confirm = (msg: String) => {
-  return new Promise<boolean>((resolve) => {
-    ((c: any) => { c.msg = msg c.type = 2 c.resolve = resolve })(ctx.value)
-    $modal.show()
-  })
-}
-... 생략 ...
-</script>
-```
 ```javascript
+/** /libs/commons/dialog.ts */
 const dialog = {
-  alert: async (msg: String) => new Promise<boolean>(() => { }),
-  confirm: async (msg: String) => new Promise<boolean>(() => { })
+  alert: (msg: string) => new Promise<boolean>((resolve) => { }),
+  confirm: (msg: string) => new Promise<boolean>((resolve) => { })
 }
 export { dialog }
 ```
+```html
+<!-- /components/commons/dialog.vue -->
+<template>
+  <div
+    ref="modalElement"
+    class="modal fade"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+    tabindex="-1"
+    >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+          <p v-html="ctx.current?.msg"></p>
+          <div class="text-center">
+            <template v-if="ctx.current?.type === C.ALERT">
+              <MyButton class="btn btn-primary mx-1" @click="click(1)">확인</MyButton>
+            </template>
+            <template v-if="ctx.current?.type === C.CONFIRM">
+              <MyButton class="btn btn-primary mx-1" @click="click(1)">확인</MyButton>
+              <MyButton class="btn btn-secondary mx-1" @click="click(2)">취소</MyButton>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script setup lang="ts">
+import * as C from '@/libs/commons/constants'
+import { log } from '@/libs/commons/log'
+import { dialog } from '@/libs/commons/dialog'
+import MyButton from '@/components/commons/mybutton.vue'
+const modalElement = ref()
+/** 대화창 상태저장소 */
+const ctx = ref({
+  element: {} as any as Element,
+  instance: {} as any,
+  current: {} as any,
+  bootstrap: undefined as any
+})
+/** modalElement DOM 이 활성화 될때까지 대기 */
+watch(modalElement, async () => {
+  const bootstrap = await import('bootstrap')
+  ctx.value.element = modalElement.value
+  ctx.value.instance = new bootstrap.Modal(modalElement.value)
+  dialog.alert = alert
+  dialog.confirm = confirm
+})
+/** modal을 경고창 형태로 활성화(Promise.resolve 저장후 대기) */
+const alert = (msg: String) => {
+  return new Promise<boolean>((resolve) => {
+    ((c: any) => { c.msg = msg; c.type = C.ALERT; c.resolve = resolve })(ctx.value.current)
+    ctx.value.instance.show()
+  })
+}
+/** modal을 선택창 형태로 활성화(Promise.resolve 저장후 대기) */
+const confirm = (msg: String) => {
+  return new Promise<boolean>((resolve) => {
+    ((c: any) => { c.msg = msg; c.type = C.CONFIRM; c.resolve = resolve })(ctx.value.current)
+    ctx.value.instance.show()
+  })
+}
+/** 상태저장소에 저장된 Promise.resolve 를 수행하여 Promise 대기상태 해제 후 modal 해제 */
+const click = async (cmd: any) => {
+  switch (ctx.value.current.type) {
+  case C.ALERT: if (ctx.value.current.resolve) { ctx.value.current.resolve(true) } break
+  case C.CONFIRM: if (ctx.value.current.resolve) { ctx.value.current.resolve(cmd === 1 ? true : false) } break
+  }
+  ctx.value.current = {}
+  ctx.value.instance.hide()
+}
+</script>
+```
 --------------------------------------------------------------------------------
+
+## 스타일정리 (1차)
+
+- Bootstrap Containers
+
+  > https://getbootstrap.com/docs/5.1/layout/containers/
+
+- Header Jumbotron ( Bootstrap )
+
+  > https://www.w3schools.com/bootstrap5/bootstrap_jumbotron.php
+
+
 
 ## 통신 모듈 준비
 
