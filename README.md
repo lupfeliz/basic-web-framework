@@ -2,7 +2,7 @@
 
 # 강습준비내용
 
-## code-server 접속방법
+## 1. code-server 접속방법
 
 - 최초 비밀번호 수정 및 `reboot`
 
@@ -18,7 +18,7 @@
 
 - vue(nuxt) ↔ reactjs(next) 변경중점 등
 
-## nuxt 기본 프로젝트 생성 및 실행
+## 2. nuxt 기본 프로젝트 생성 및 실행
 
 --------------------------------------------------------------------------------
 ```bash
@@ -34,26 +34,26 @@ $ npx nuxt dev
 
 - nuxt / vite 프로젝트 차이점 간략설명
 
-## 기본적인 설정 및 프로젝트 레이아웃
+## 3. 기본적인 설정 및 프로젝트 레이아웃
 
 - 기본 폴더구조
 --------------------------------------------------------------------------------
 ```yaml
-+ ROOT
+ROOT:
   # 공통으로 사용하는 함수(메소드) 등 모음
-  + libs
+  + libs:
   # 공통으로 사용하는 컴포넌트 (버튼, 입력박스, 폼) 등 모음
-  + components
+  + components:
   # Nuxt Layout (Nuxt 예약 폴더)
-  + layout
+  + layout:
   # Nuxt 경로 Routing (Nuxt 예약 폴더)
-  + pages
+  + pages:
   # webpack 등에 의해 변형되지 않고 사용되는 리소스 (css, js, image, html..)
-  + public
+  + public:
   # 모듈에서 사용하는 리소스 (css, js, image, html..)
-  + assets
+  + assets:
   # 스토어
-  + store
+  + store:
 ```
 --------------------------------------------------------------------------------
 
@@ -101,7 +101,7 @@ export default defineNuxtConfig({
 ```
 --------------------------------------------------------------------------------
 
-## 기본 페이지 및 컴포넌트 추가
+## 4. 기본 페이지 및 컴포넌트 추가
 
 - 아래 파일들을 추가한다.
 
@@ -141,7 +141,11 @@ import Footer from '@/components/commons/footer.vue'
 <!-- /components/commons/header.vue -->
 <template>
   <header>
-    머리글
+    <div class="mt-4 py-5 row">
+      <div class="col text-center">
+        <h1>머리글</h1>
+      </div>
+    </div>
   </header>
 </template>
 <script setup lang="ts">
@@ -151,7 +155,7 @@ import Footer from '@/components/commons/footer.vue'
 ```html
 <!-- /components/commons/footer.vue -->
 <template>
-  <footer>
+  <footer class="text-center">
     꼬리글
   </footer>
 </template>
@@ -309,24 +313,73 @@ const click = async (cmd: any) => {
 ```
 --------------------------------------------------------------------------------
 
-## 스타일정리 (1차)
+## 5. 역할별 페이지 라우팅 추가
 
-- Bootstrap Containers
+- 아래와 같이 폴더 / 파일들을 생성한다.
 
-  > https://getbootstrap.com/docs/5.1/layout/containers/
+--------------------------------------------------------------------------------
+```yaml
++ROOT:
+  +pages:
+    +board:
+      + edit:
+        # 게시글 수정
+        - [articleId].vue
+      # 게시판 목록조회
+      - list.vue
+      # 게시글보기
+      - [articleId].vue
+    +user:
+      # 회원가입
+      - register.vue
+      # 로그인
+      - login.vue
+    # 메인페이지
+    -index.vue
+```
+--------------------------------------------------------------------------------
+```html
+<!-- /pages/board/list.vue -->
+<template>
+  <div class="container">
+    <div class="row head">
+      <div class="col-1"> 번호 </div>
+      <div class="col"> 제목 </div>
+      <div class="col-2"> 작성자 </div>
+      <div class="col-2"> 작성일자 </div>
+    </div>
+    <template v-if="!(boardData?.list?.length)" key="inx">
+      <div class="row">
+        <div class="col text-center">
+          게시물이 없습니다
+        </div>
+      </div>
+    </template>
+    <template v-for="(itm, inx) in boardData.list" key="inx">
+      <div class="row list">
+        <div class="col-1"> </div>
+        <div class="col"> </div>
+        <div class="col-2"> </div>
+        <div class="col-2"> </div>
+      </div>
+    </template>
+  </div>
+</template>
+<script setup lang="ts">
+const boardData = ref({
+  list: []
+})
+</script>
+```
+--------------------------------------------------------------------------------
 
-- Header Jumbotron ( Bootstrap )
-
-  > https://www.w3schools.com/bootstrap5/bootstrap_jumbotron.php
-
-
-
-## 통신 모듈 준비
+## 6. 통신 모듈 및 환경 준비
 
 - api.ts
 
 --------------------------------------------------------------------------------
 ```javascript
+/** /libs/commons/api.ts */
 import { log } from '@/libs/commons/log'
 import * as C from '@/libs/commons/constants'
 import axios, { AxiosRequestConfig } from 'axios'
@@ -362,14 +415,9 @@ const apiDel = async (prm: any, opt?: any) => {
 }
 export { apiPost, apiGet, apiPut, apiDel }
 ```
---------------------------------------------------------------------------------
 
-## 통신 proxy 준비
-
-- nuxt.conf.ts
-
---------------------------------------------------------------------------------
 ```javascript
+/** /nuxt.conf.ts */
 vite: {
   server: {
     ... 생략 ...
@@ -387,32 +435,7 @@ vite: {
 ```
   --------------------------------------------------------------------------------
 
-## 데이터 셋팅
-
-- 로그인, 게시판 구현을 위한 데이터
-
-  --------------------------------------------------------------------------------
-  ```sql
-  CREATE TABLE a0000_user(
-      id int NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-      user_id VARCHAR(32),
-      passwd VARCHAR(64),
-      ctime TIMESTAMP,
-      utime TIMESTAMP
-  );
-  CREATE TABLE a0000_board(
-      id int NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-      num NUMERIC,
-      title VARCHAR(255),
-      user_id VARCHAR(32),
-      contents VARCHAR(99999),
-      ctime TIMESTAMP,
-      utime TIMESTAMP
-  );
-  ```
-  --------------------------------------------------------------------------------
-
-## was 셋팅 (데이터 흐름 파악을 위해)
+## API 서버 기반 구축
 
 - gradle 프로젝트 생성
 
@@ -425,112 +448,105 @@ vite: {
 
 - application.yml 수정
 
-  ```yaml
-  server:
-    port: 8081
-  spring:
-    datasource:
-      url: jdbc:postgresql://172.17.0.1:5432/myworks
-      username: myuser
-      password: password
-      driverClassName: org.postgresql.Driver
-    jpa:
+--------------------------------------------------------------------------------
+```yaml
+# /src/main/resources/application.yml
+server:
+  port: 8081
+spring:
+  datasource:
+    url: jdbc:postgresql://172.17.0.1:5432/myworks
+    username: myuser
+    password: password
+    driverClassName: org.postgresql.Driver
+  jpa:
+    hibernate:
+      dialect: org.hibernate.dialect.PostgreSQL10Dialect
+      ddl-auto: update
+    properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQL10Dialect
-        ddl-auto: update
-      properties:
-        hibernate:
-          format_sql: false
-      show-sql: false
-  logging:
-    level:
-      root: ERROR
-      my.was: DEBUG
-  ```
+        format_sql: false
+    show-sql: false
+logging:
+  level:
+    root: ERROR
+    my.was: DEBUG
+```
 
-- spring security 작성
-
-  --------------------------------------------------------------------------------
-  ```java
-  @Configuration @EnableWebSecurity
-  public class SecurityConfig {
-    @Bean SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-      http.authorizeHttpRequests(
-        (authorizeHttpRequests) -> 
-          authorizeHttpRequests.requestMatchers(
-            new AntPathRequestMatcher("/**"))
-          .permitAll()
-      )
-      .csrf((csrf) -> 
-        csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/**"))
-      )
-      .headers((headers) ->
-        headers.addHeaderWriter(new XFrameOptionsHeaderWriter(
-          XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN
-        ))
-      );
-      return http.build();
-    }
+```java
+/** /src/main/java/my/was/mywas/auth/SecurityConfig.java  */
+@Configuration @EnableWebSecurity
+public class SecurityConfig {
+  @Bean SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests(
+      (authorizeHttpRequests) -> 
+        authorizeHttpRequests.requestMatchers(
+          new AntPathRequestMatcher("/**"))
+        .permitAll()
+    )
+    .csrf((csrf) -> 
+      csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/**"))
+    )
+    .headers((headers) ->
+      headers.addHeaderWriter(new XFrameOptionsHeaderWriter(
+        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN
+      ))
+    );
+    return http.build();
   }
-  ```
-  --------------------------------------------------------------------------------
+}
+```
+--------------------------------------------------------------------------------
 
-- api controller 작성 (post, put, get, delete)
+- 게시판 api 작성 (entity, controller, service, repository)
 
-  --------------------------------------------------------------------------------
-  ```java
-  ```
-  --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+```java
+/** /src/main/java/my/was/mywas/board/BoardController.java */
+```
 
+```java
+/** /src/main/java/my/was/mywas/board/BoardService.java */
+```
 
-- service 작성
+```java
+/** /src/main/java/my/was/mywas/board/BoardRepository.java */
+public interface BoardRepository extends JpaRepository<Board, Long> {
+  Iterable<Board> findByTitleLike(String search);
 
-  --------------------------------------------------------------------------------
-  ```java
-  ```
-  --------------------------------------------------------------------------------
+  static final String SEARCH_CONDITION = 
+    "(:#{#prm.searchType} is not null or true) and " +
+    "(:#{#prm.searchType} != '1' or title like %:#{#prm.searchStr}%) and " +
+    "(:#{#prm.searchType} != '2' or contents like %:#{#prm.searchStr}%) and " +
+    "(:#{#prm.searchType} != '3' or (title like %:#{#prm.searchStr}% or contents like %:#{#prm.searchStr}%)) ";
 
-- repository 작성
+  @Query(
+    "select new Board(id, num, title, userId, '', ctime, utime) from Board " +
+    "where " +
+    SEARCH_CONDITION +
+    "order by ctime desc"
+  )
+  Iterable<Board> searchContent(@Param("prm") BoardSearch prm);
 
-  --------------------------------------------------------------------------------
-  ```java
-  public interface BoardRepository extends JpaRepository<Board, Long> {
-    Iterable<Board> findByTitleLike(String search);
+  @Query( "select count(*) from Board " +
+    "where " + SEARCH_CONDITION
+  )
+  int searchCount(@Param("prm") BoardSearch prm);
 
-    static final String SEARCH_CONDITION = 
-      "(:#{#prm.searchType} is not null or true) and " +
-      "(:#{#prm.searchType} != '1' or title like %:#{#prm.searchStr}%) and " +
-      "(:#{#prm.searchType} != '2' or contents like %:#{#prm.searchStr}%) and " +
-      "(:#{#prm.searchType} != '3' or (title like %:#{#prm.searchStr}% or contents like %:#{#prm.searchStr}%)) ";
-
-    @Query(
-      "select new Board(id, num, title, userId, '', ctime, utime) from Board " +
-      "where " +
-      SEARCH_CONDITION +
-      "order by ctime desc"
-    )
-    Iterable<Board> searchContent(@Param("prm") BoardSearch prm);
-
-    @Query( "select count(*) from Board " +
-      "where " + SEARCH_CONDITION
-    )
-    int searchCount(@Param("prm") BoardSearch prm);
-
-    @Query(
-      "select count(*) from Board "
-    )
-    int totalCount(@Param("prm") BoardSearch prm);
-  }
-  ```
-  --------------------------------------------------------------------------------
+  @Query(
+    "select count(*) from Board "
+  )
+  int totalCount(@Param("prm") BoardSearch prm);
+}
+```
+--------------------------------------------------------------------------------
 
 - ``./gradlew build -x test`` 빌드 수행
 
-## 메뉴구성 (라우팅)
+## 게시판 구현
 
 ## 로그인 구현
 
-## 게시판 구현
 
 ## 기타
 
@@ -538,21 +554,7 @@ vite: {
 
 - history 객체 다루는 이유 (SPA / back 시 데이터 사라짐 등)
 
-- Pinia 를 이용한 영속저장
-
 - 페이지 라이프 사이클 (onBeforeMount -> onMounted ...)
-
-- 강습에 사용된 프로젝트 파일 추가 (repo 등 제거)
-
-- .gitignore 등 기본 적으로 사용될 파일들 템플릿 제공
-
-- 추천하는 플러그인 
-
-  ``Markdown Preview Enhanced`` : md 문서 뷰어
-  ``Mermaid Editor`` : mmd 도형 뷰어
-  ``Draw.io Integration`` : 다이어그램 편집기
-
-  --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
 - <style> img { border: 1px solid #ccc; } strong { color: #ff5500 !important; } code { font-family: FixedSys, GulimChe } hr { display: none !important; height: 1px !important; } hr+ul:last-child { display: none !important; } </style>
