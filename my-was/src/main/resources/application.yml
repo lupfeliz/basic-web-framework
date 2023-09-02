@@ -1,5 +1,5 @@
   server:
-    port: 8081
+    port: 8080
   spring:
     datasource:
       url: jdbc:postgresql://172.17.0.1:5432/myworks
