@@ -6,32 +6,29 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import my.was.mywas.common.Search;
 
-public interface BoardRepository extends JpaRepository<Board, Long> {
+public interface BoardRepository extends JpaRepository<Board, Long>, BoardJPQuries {
 
-  static final String SEARCH_CONDITION = 
-    "(:#{#prm.searchType} is not null or true) and " +
-    "(:#{#prm.searchType} != '1' or title like %:#{#prm.searchStr}%) and " +
-    "(:#{#prm.searchType} != '2' or contents like %:#{#prm.searchStr}%) and " +
-    "(:#{#prm.searchType} != '3' or (title like %:#{#prm.searchStr}% or contents like %:#{#prm.searchStr}%)) ";
+  @Query(BOARD_SEARCH_QUERY)
+  List<Board> searchContent(@Param(PRM) Search prm, Pageable pageable);
 
-  @Query(
-    "select new Board(id, num, title, userId, userNm, '', ctime, utime) from Board " +
-    "where " +
-    SEARCH_CONDITION +
-    "order by ctime desc"
-  )
-  List<Board> searchContent(@Param("prm") Search prm, Pageable pageable);
+  @Query(BOARD_COUNT_QUERY)
+  int searchCount(@Param(PRM) Search prm);
 
-  @Query( "select count(*) from Board " +
-    "where " + SEARCH_CONDITION
-  )
-  int searchCount(@Param("prm") Search prm);
+  @Query(BOARD_COUNT_ALL)
+  int totalCount(@Param(PRM) Search prm);
 
-  @Query(
-    "select count(*) from Board "
-  )
-  int totalCount(@Param("prm") Search prm);
+  @Repository public static class Extension {
+    @PersistenceContext private EntityManager em;
+    public Object totalCount() {
+      TypedQuery<Object> q = em.createQuery("select count(*) from Board", null);
+      return q.getSingleResult();
+    }
+  }
 }

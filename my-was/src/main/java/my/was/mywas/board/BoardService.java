@@ -30,6 +30,7 @@ public class BoardService {
   private static final String LIST = "list";
 
   @Autowired private BoardRepository repository;
+  @Autowired private BoardRepository.Extension repositoryExt;
   @Autowired private UserService userService;
 
   public Board save(Board prm) {
@@ -68,7 +69,7 @@ public class BoardService {
     Map<String, Object> ret = new LinkedHashMap<>();
     PageRequest pageable = PageRequest.of(prm.getPage() - 1, prm.getRows());
     ret.put(CNT, repository.searchCount(prm));
-    ret.put(TOT, repository.totalCount(prm));
+    ret.put(TOT, repositoryExt.totalCount());
     ret.put(PAGE, prm.getPage());
     ret.put(ROWS, prm.getRows());
     ret.put(PAGES, prm.getPages());

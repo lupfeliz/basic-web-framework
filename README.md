@@ -337,7 +337,9 @@ const click = async (cmd: any) => {
     # 메인페이지
     -index.vue
 ```
---------------------------------------------------------------------------------
+
+- 게시판 기반 페이지를 작성한다.
+
 ```html
 <!-- /pages/board/list.vue -->
 <template>
@@ -357,17 +359,24 @@ const click = async (cmd: any) => {
     </template>
     <template v-for="(itm, inx) in boardData.list" key="inx">
       <div class="row list">
-        <div class="col-1"> </div>
-        <div class="col"> </div>
-        <div class="col-2"> </div>
-        <div class="col-2"> </div>
+        <div class="col-1"> {{ inx }} </div>
+        <div class="col"> {{ itm.title }}</div>
+        <div class="col-2"> {{ itm.userId }} </div>
+        <div class="col-2"> {{ itm.cdate }} </div>
       </div>
     </template>
   </div>
 </template>
 <script setup lang="ts">
 const boardData = ref({
-  list: []
+  list: [
+    {
+      subject: '제목',
+      userId: '글쓴이',
+      cdate: '20230101',
+      udate: '20230101',
+    }
+  ]
 })
 </script>
 ```
@@ -474,7 +483,7 @@ logging:
 ```
 
 ```java
-/** /src/main/java/my/was/mywas/auth/SecurityConfig.java  */
+/** /src/main/java/my/was/mywas/auth/SecurityConfig.java */
 @Configuration @EnableWebSecurity
 public class SecurityConfig {
   @Bean SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -501,6 +510,24 @@ public class SecurityConfig {
 - 게시판 api 작성 (entity, controller, service, repository)
 
 --------------------------------------------------------------------------------
+
+```java
+/** /src/main/java/my/was/mywas/board/Board.java */
+@Entity
+@Table(name = "a0000_board")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString
+public class Board {
+  @Id @GeneratedValue(strategy = GenerationType.AUTO) private Long id;
+  @Column(name = "num") private String num;
+  @Column(name = "title", length = 128) private String title;
+  @Column(name = "user_id", length = 32) private String userId;
+  @Column(name = "user_nm", length = 32) private String userNm;
+  @Column(name = "contents", length = 99999) private String contents;
+  @Column(name = "cdate") @Convert(converter = DateConverter.class) private String cdate;
+  @Column(name = "udate") @Convert(converter = DateConverter.class) private String udate;
+}
+```
+
 ```java
 /** /src/main/java/my/was/mywas/board/BoardController.java */
 ```
@@ -541,7 +568,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 ```
 --------------------------------------------------------------------------------
 
-- ``./gradlew build -x test`` 빌드 수행
+- ``./gradlew build -x test`` 빌드 수역할별 페이지 라우팅 추가행
 
 ## 게시판 구현
 
