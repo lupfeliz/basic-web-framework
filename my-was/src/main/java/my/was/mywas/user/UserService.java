@@ -3,6 +3,7 @@ package my.was.mywas.user;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -19,13 +20,17 @@ public class UserService {
   @Autowired private UserRepository repository;
 
   public User get(String id) {
-    return repository.findById(Long.parseLong(id)).get();
+    Optional<User> res = repository.findById(Long.parseLong(id));
+    if (!res.isEmpty()) {
+      return res.get();
+    }
+    return null;
   }
 
   public User getByUserId(String userId) {
     List<User> users = repository.findByUserId(userId);
     log.debug("USERS:{} / {}", userId, users);
-    if (users.size() > 0) {
+    if (!users.isEmpty()) {
       return users.get(0);
     } else {
       return null;
@@ -41,8 +46,10 @@ public class UserService {
     if (prm.getId() == null || prm.getId() == 0) {
       prm.setCtime(ctime);
     } else {
-      User tmp = repository.findById(prm.getId()).get();
-      prm.setCtime(tmp.getCtime());
+      Optional<User> res = repository.findById(prm.getId());
+      if (!res.isEmpty()) {
+        prm.setCtime(res.get().getCtime());
+      }
     }
     prm.setUtime(ctime);
     repository.save(prm);

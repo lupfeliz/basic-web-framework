@@ -25,7 +25,7 @@ public class UserController {
   @Autowired UserService service;
 
   @PostMapping("/logout")
-  public Object logout(HttpSession session) throws Exception {
+  public Object logout(HttpSession session) {
     SecurityContext ctx = SecurityContextHolder.getContext();
     ctx.setAuthentication(null);
     session.removeAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);

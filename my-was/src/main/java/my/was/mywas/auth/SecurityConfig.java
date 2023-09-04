@@ -1,6 +1,5 @@
 package my.was.mywas.auth;
 
-import org.apache.catalina.connector.Response;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,7 +126,7 @@ public class SecurityConfig {
       User user = (User)ctx.getAuthentication().getDetails();
       session.setAttribute(
         HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, ctx);
-      res.setStatus(Response.SC_OK);
+      res.setStatus(HttpServletResponse.SC_OK);
       res.setCharacterEncoding(UTF8);
       res.getWriter().append(
         new JSONStringer()
@@ -144,7 +143,7 @@ public class SecurityConfig {
       HttpServletRequest req, HttpServletResponse res, AuthenticationException e)
         throws IOException, ServletException {
       log.debug("LOGIN FAILED! {}", e.getMessage());
-      res.setStatus(Response.SC_BAD_REQUEST);
+      res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       res.setCharacterEncoding(UTF8);
       res.getWriter().append(
         new JSONStringer()

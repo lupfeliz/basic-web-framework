@@ -5,14 +5,15 @@ import static my.was.mywas.util.DateConverter.dateToStr;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import my.was.mywas.common.Search;
 import my.was.mywas.user.User;
@@ -54,7 +55,7 @@ public class BoardService {
       return repository.save(prm);
     } else {
       throw new ResponseStatusException(
-        HttpStatusCode.valueOf(Response.SC_FORBIDDEN),
+        HttpStatusCode.valueOf(HttpServletResponse.SC_FORBIDDEN),
         "NOT ALLOWED"
       );
     }
@@ -78,7 +79,11 @@ public class BoardService {
   }
 
   public Board get(String id) {
-    return repository.findById(Long.parseLong(id)).get();
+    Optional<Board> result = repository.findById(Long.parseLong(id));
+    if (!result.isEmpty()) {
+      return result.get();
+    }
+    return null;
   }
 
   public void delete(String id) {
