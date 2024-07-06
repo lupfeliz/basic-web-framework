@@ -1,41 +1,59 @@
 'use client'
-import { ElementType, ComponentPropsWithRef, createElement, MouseEvent, useState, useRef } from 'react'
-import TCKEditor from '@ckeditor/ckeditor5-react/dist/ckeditor'
-import TClassicEditor from '@ckeditor/ckeditor5-build-classic/build/ckeditor'
+import { ComponentPropsWithRef, useState, useRef } from 'react'
+import { useEditor, EditorContent, EditorContentProps } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
 import * as C from '@/libs/constants'
 import app, { type ContextType } from '@/libs/app-context'
+import lodash from 'lodash'
 
-type EditorProps = ComponentPropsWithRef<'div'> & {
+import { Mark, mergeAttributes } from '@tiptap/core'
+
+const Span = Mark.create({
+  name: 'span',
+  group: 'inline',
+  inline: true,
+  selectable: true,
+  atom: false,
+  parseHTML() { return [ { tag: 'span' }, ] },
+  renderHTML({ HTMLAttributes }) {
+    return ['span', mergeAttributes(HTMLAttributes), 0]
+  },
+  addAttributes() {
+    return { class: { default: null }, style: { default: null } }
+  },
+})
+
+type EditorProps = ComponentPropsWithRef<'div'> & EditorContentProps & {
   model?: any
   name?: string
 }
 type ItemType = {
   props: EditorProps
-  elem: any
-}
-type StoreType = {
-  CKEditor?: typeof TCKEditor<TClassicEditor>
-  ClassicEditor?: typeof TClassicEditor
+  elem: any,
+  editor: any
 }
 
 const { log, genId, copyExclude, copyRef, useUpdate, useLauncher, putAll, subscribe, defineComponent, modelValue } = app
-
-const ctx: ContextType<ItemType> & StoreType = {
-  CKEditor: C.UNDEFINED,
-  ClassicEditor: C.UNDEFINED
+const { debounce } = lodash
+const ctx: ContextType<ItemType> = {
 }
 export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & any) => {
-  const pprops = copyExclude(props, ['model'])
+  const pprops = copyExclude(props, ['model', 'editor'])
   const [id] = useState(genId())
   const elem: any = useRef()
-  ctx[id] = putAll(ctx[id] || {}, { props, elem })
+  const editor = useEditor({
+    extensions: [StarterKit, Span],
+    content: '',
+  })
+
+  ctx[id] = putAll(ctx[id] || {}, { props, elem, editor })
   useLauncher({
     async mounted() {
       copyRef(ref, elem)
-      const { props, value } = modelValue(ctx[id])
       subscribe((state: number, mode: number) => {
         if (mode && ctx[id]) {
-          const { props, value } = modelValue(ctx[id])
+          const { value } = modelValue(ctx[id])
+          ctx[id].editor && ctx[id].editor.commands.setContent(value)
           update(app.state(1, 0))
         }
         update(state)
@@ -45,16 +63,22 @@ export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & an
     async unmount() { delete ctx[id] }
   })
   const update = useUpdate()
-  const onChange = async (e: any, v: any) => {
+  const onChange = debounce(async (v) => {
     const { props, setValue } = modelValue(ctx[id])
-    setValue(v ? props?.value : '')
-    update(app.state(1, 1))
-  }
+    setValue(v)
+    update(app.state(1))
+  }, 100)
+  editor && editor.on('transaction', ({ editor }) => {
+    onChange(editor.getHTML())
+  })
   return (
   <>
-    <div>
-      
-    </div>
+    <EditorContent
+      ref={ elem }
+      /* @ts-ignore */
+      editor={ editor }
+      { ...pprops }
+      />
   </>
   )
 })

@@ -6,7 +6,6 @@ const { log, definePage, goPage, useUpdate, useLauncher, subscribe } = app
 
 export default definePage((props) => {
   const [data] = useState({
-    gstate: 0,
     formdata: {
       input01: '',
       input02: 'AAAA',
@@ -26,7 +25,6 @@ export default definePage((props) => {
   useLauncher({
     async mounted() {
       subscribe(async (state, mode) => {
-        data.gstate = state
         update(state)
       })
       setTimeout(async () => {
@@ -45,7 +43,7 @@ export default definePage((props) => {
     <hr/>
     <section>
       <Block className='my-1'>
-      GLOBAL-STATE-VALUE: { data.gstate }
+      GLOBAL-STATE-VALUE: { app.state() }
       </Block>
       <hr/>
     </section>

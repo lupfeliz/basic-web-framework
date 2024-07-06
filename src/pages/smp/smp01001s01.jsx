@@ -1,19 +1,20 @@
 import app from '@/libs/app-context'
-import { Block, Button, Checkbox, Input, Select } from '@/components'
+import { Block, Button, Checkbox, Input, Select, Editor } from '@/components'
 import { useState } from 'react'
 
 const { log, definePage, goPage, useUpdate, useLauncher, subscribe, clear } = app
 
 export default definePage((props) => {
   const [data] = useState({
-    gstate: 0,
+    timer: 3,
     formdata: {
       input01: '',
       input02: 'AAAA',
       checkbox1: 'Y',
       checkbox2: '',
       checklist: ['', '', '', ''],
-      select1: ''
+      select1: '',
+      content: ''
     },
     options1: [
       { name: '선택해주세요', value: '' },
@@ -23,21 +24,34 @@ export default definePage((props) => {
       'gmail.com',
     ]
   })
-  useLauncher({
-    async mounted() {
-      subscribe(async (state, mode) => {
-        data.gstate = state
-        update(state)
-      })
-      setTimeout(async () => {
+  const update = useUpdate()
+  const mounted = async () => {
+    subscribe(async (state, mode) => {
+      update(state)
+    })
+    const fnctime = async () => {
+      if (data.timer == 1) {
         data.formdata.input02 = 'BBBB'
         data.formdata.checkbox2 = 'C'
         data.formdata.select1 = 'kakao.com'
+        data.formdata.content = `<p><span style="color:#f00">CONTENT</span></p>`
+        const res = await fetch('/api/cmn/cmn00000', {
+          method: 'get',
+          headers: [],
+          keepalive: true
+        })
+        log.debug('FETCH-RES:', await res.json())
+
         app.state(1, 1)
-      }, 3000)
+      } else if (data.timer > 0) {
+        setTimeout(fnctime, 1000)
+        app.state(1)
+      }
+      data.timer--
     }
-  })
-  const update = useUpdate()
+    setTimeout(fnctime, 1000)
+  }
+  useLauncher({ mounted })
   return (
   <>
   <div>
@@ -45,7 +59,7 @@ export default definePage((props) => {
     <hr/>
     <section>
       <Block className='my-1'>
-      GLOBAL-STATE-VALUE: { data.gstate }
+      GLOBAL-STATE-VALUE: { app.state() }
       </Block>
       <hr/>
     </section>
@@ -104,7 +118,10 @@ export default definePage((props) => {
           size='small'
           />
         <span className='mx-1 my-1'>
-        [change after 3sec: { data.formdata.input02 }]
+          { data.timer > 0 ? (
+            <> [change after { data.timer }sec: { data.formdata.input02 }] </>
+          ) : '' }
+        
         </span>
       </Block>
       <hr />
@@ -151,11 +168,22 @@ export default definePage((props) => {
       <h2>SELECT</h2>
       <Block className='my-1'>
         <Select
+          size='small'
           model={ data.formdata }
           name='select1'
           options={ data.options1 }
           />
       </Block>
+    </section>
+    <section>
+      <h2>EDITOR</h2>
+      <Block>
+        <Editor
+          model={ data.formdata }
+          name='content'
+          />
+      </Block>
+      <hr />
     </section>
     <section>
       <h2>FORMDATA</h2>
