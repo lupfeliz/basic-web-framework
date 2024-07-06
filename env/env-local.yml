@@ -1,0 +1,14 @@
+app:
+  profile: 'local'
+api:
+  -
+    base: '/api'
+    alter: '/api'
+    server: 'http://localhost:8080'
+    timeout: 10000
+    chktime: 3000
+security:
+  key:
+    rsa: 'MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAJ7hSaVDpxLfO89qow1kztJsojeGVDrQtujnTkgy2wvk78yXi1a17nhpOXEVwztxqg07YPIL1J8PGhmUHG6MvUyxjTus7oVJfhRD1/yq2RtEzF+Vi5KuadmORJuWjz9miVTP79KqdzEvCyVAkd/3S7kcwyNRgII8/zwMSwxvSi0PAgMBAAECgYAAtTsz+tA/OuQwkyHJtpU4987WybhZI2iut56dNqsq8BXSHqY6WXqfrFJILwdTd/HMkeyWynm0Q87eicCnDMjcjJS7kHtNkF5AfrvKvdIAZVyFlbwMLy+KPiaq2dkoa/Z3mml2ld2cs7g77UuxyrNSjl7lYOYxkcIAcSFJsZqW2QJBAKMZ0rK78Gw5lEyFUzrGx0lXHAP9rO13zXIkbGRscJ+wqFzUChWY0KmUZCh4xpHeTagFGykPuq0A/0Lq0UyQMCcCQQD5YAMtrfBn9P14eb5hDYL8v2vEdno5QbUKKwb0DEPVoshZTXaJbcfrZAFCP+uLgrBppcEJPWBnLreAHqcG4UTZAkBPhLeFDLwbB7eV1yrM7T0cNKwkBfnZjR9NFxUBoR0HvklXeMmx3d9dzktGsBuf4pJZ6KNlUZXh4yqQpYuFmIbhAkEAj3PP4EMi/GpONTOzdJkVNNfY4pdVEALgZg0CXvl/PDH8FoMdIUlpq9tHbhjfIs33NY8IUIxiHHkfTjBT3P1RYQJAbFbaqUc7rfeKkAFOhS6AvnhEgwQtD5GuJsx8pC7Q06BwZ/40d9EMyh2QNoSxzuspzHvPicZFhoW1soRnppHNWQ=='
+log:
+  level: 'debug'

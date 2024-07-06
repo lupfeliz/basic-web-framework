@@ -13,7 +13,9 @@ import { AppProps } from 'next/app'
 
 import * as C from '@/libs/constants'
 import values from '@/libs/values'
+import crypto from '@/libs/crypto'
 import log, { getLogger } from '@/libs/log'
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
 
 type LauncherProps = {
   mounted?: Function0<any>
@@ -169,8 +171,14 @@ const app = {
     const debounced: any = debounce(pass, delay)
     appContextStore.subscribe(debounced)
   },
-  config(props: AppProps) {
+  ready(props: AppProps) {
     const $body = $(document.body)
+    try {
+      const el = document.querySelector('script#page-config[type="text/plain"]')
+      const conf = JSON.parse(crypto.aes.decrypt(el?.innerHTML || '', '{$$CRYPTO_KEY$$}'))
+      log.setLevel(conf.log.level)
+      log.debug('CONF:', conf)
+    } catch (e) { log.debug('E:', e) }
     const fnunload = async () => {
       window.removeEventListener('beforeunload', fnunload)
       $body.addClass('hide-onload')
@@ -179,7 +187,6 @@ const app = {
       window.addEventListener('beforeunload', fnunload)
       document.removeEventListener('DOMContentLoaded', fnload)
       $body.removeClass('hide-onload')
-      getConfig()?.publicRuntimeConfig
     }
     if (document.readyState !== 'complete') {
       document.addEventListener('DOMContentLoaded', fnload)
@@ -207,7 +214,9 @@ const app = {
       return v
     }
     return { props, model, name, inx, value, setValue }
-  }
+  },
+  pubconf: publicRuntimeConfig,
+  svrconf: serverRuntimeConfig,
 }
 
 export default app

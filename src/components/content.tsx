@@ -1,6 +1,6 @@
 import { ComponentPropsWithRef, createElement } from 'react'
 import app from '@/libs/app-context'
-const { defineComponent } = app
+const { log, defineComponent, copyExclude } = app
 type ContentProps = ComponentPropsWithRef<'div'> & {
   tag?: string,
   content?: any,
@@ -8,8 +8,9 @@ type ContentProps = ComponentPropsWithRef<'div'> & {
 }
 export default defineComponent((props: ContentProps, ref: ContentProps['ref']) => {
   const tag = props.tag || 'div'
+  const pprops = copyExclude(props, ['tag', 'content'])
   return createElement(tag, {
-    ...props,
+    ...pprops,
     ref: ref,
     dangerouslySetInnerHTML: {
       __html: ( props?.content || '' )
