@@ -142,5 +142,4 @@ const log = makeProxy(new Log(ROOT, console)).setLevel(DEBUG)
 const getLogger = log.getLogger
 
 export default log
-export { getLogger }
-export { type Levels, type AppenderType }
+export { getLogger, type Levels, type AppenderType }
