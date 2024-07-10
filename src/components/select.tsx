@@ -22,7 +22,7 @@ type ItemType = {
   options?: OptionType[]
 }
 
-const { log, copyExclude, clear, genId, copyRef, useUpdate, useLauncher, putAll, subscribe, defineComponent, modelValue } = app
+const { copyExclude, clear, genId, copyRef, useUpdate, useLauncher, putAll, defineComponent, modelValue } = app
 
 const ctx: ContextType<ItemType> = { }
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {

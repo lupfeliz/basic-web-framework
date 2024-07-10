@@ -36,7 +36,7 @@ return {
         /\/libs\/app-context\.[jt]s$/,
         /\/pages\/_document\.[jt]sx$/,
       ],
-      loader: `${process.cwd()}/replaceLoader.js`,
+      loader: `${process.cwd()}/env/replace-loader.js`,
     })
     return cfg
   },

@@ -2,7 +2,6 @@
 import _TextField, { TextFieldProps as _TextFieldProps } from '@mui/material/TextField'
 import { useRef, useState } from 'react'
 import $ from 'jquery'
-import * as C from '@/libs/constants'
 import app, { type ContextType } from '@/libs/app-context'
 
 type InputProps = _TextFieldProps & {
@@ -15,7 +14,6 @@ type ItemType = {
 }
 
 const { copyExclude, genId, copyRef, useUpdate, useLauncher, putAll, subscribe, defineComponent, modelValue } = app
-
 const ctx: ContextType<ItemType> = { }
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model', 'onEnter'])
@@ -54,8 +52,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     }
   }
   return (
-  <_TextField
-    ref={ elem }
+  <_TextField ref={ elem }
     onChange={ onChange }
     onKeyDown={ onKeyDown }
     { ...pprops }

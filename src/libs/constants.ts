@@ -44,6 +44,7 @@ export const AUTHORIZATION = 'Authorization'
 export const POST = 'post'
 export const GET = 'get'
 export const PUT = 'put'
+export const DELETE = 'delete'
 export const TOKEN_REFRESH = 'tokenRefresh'
 
 export const SC_OK = 200

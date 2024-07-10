@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { AnimatePresence } from 'framer-motion'
-import LayoutDefault from '@/components/layout-default'
+import LayoutDefault from '@/components/layout'
 import app from '@/libs/app-context'
 import '@/styles/globals.scss'
 import '@/styles/util.scss'

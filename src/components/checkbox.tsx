@@ -2,7 +2,6 @@
 import _Checkbox, { CheckboxProps as _CheckboxProps } from '@mui/material/Checkbox'
 import _Radio, { RadioProps as _RadioProps } from '@mui/material/Radio'
 import { useRef, useState } from 'react'
-import * as C from '@/libs/constants'
 import app, { type ContextType } from '@/libs/app-context'
 
 type CheckboxProps = _CheckboxProps & _RadioProps & {
@@ -49,19 +48,9 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
   return (
   <>
   { props.type === 'radio' ? (
-    <_Radio
-      ref={ elem }
-      checked={ ctx[id]?.checked || false }
-      onChange={ onChange }
-      { ...pprops }
-      />
+    <_Radio ref={ elem } checked={ ctx[id]?.checked || false } onChange={ onChange } { ...pprops } />
     ) : (
-    <_Checkbox
-      ref={ elem }
-      checked={ ctx[id]?.checked || false }
-      onChange={ onChange }
-      { ...pprops }
-      />
+    <_Checkbox ref={ elem } checked={ ctx[id]?.checked || false } onChange={ onChange } { ...pprops } />
     )
   }
   </>

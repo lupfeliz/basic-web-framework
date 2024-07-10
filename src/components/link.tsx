@@ -1,25 +1,20 @@
 'use client'
-import { ElementType, ComponentPropsWithRef, createElement, MouseEvent } from 'react'
+import { ComponentPropsWithRef, createElement, MouseEvent } from 'react'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
-const { copyExclude, putAll, defineComponent } = app
 type LinkProps = ComponentPropsWithRef<'a'> & {
   href?: any
   param?: any
 }
-export default defineComponent((props: LinkProps, ref: LinkProps['ref']) => {
-  const pprops = copyExclude(props, [])
+export default app.defineComponent((props: LinkProps, ref: LinkProps['ref']) => {
+  const pprops = app.copyExclude(props, ['param'])
   const onClick = async (e: MouseEvent) => {
     if (props.href !== C.UNDEFINED) {
       e && e.preventDefault()
       e && e.stopPropagation()
       app.goPage(props.href, props.param)
     }
-    if (props?.onClick instanceof Function) { props.onClick(e as any) }
+    if (props?.onClick) { props.onClick(e as any) }
   }
-  return createElement('a', {
-    ...pprops,
-    ref: ref,
-    onClick: onClick 
-  })
+  return createElement('a', { ref: ref, onClick: onClick, ...pprops })
 })

@@ -11,11 +11,8 @@ export default definePage((props) => {
       INDEX PAGE
     </h1>
     <section>
-      <Button
-        href='/smp/smp01001s01'
-        >
-        SAMPLE
-      </Button>
+      <Button href='/smp/smp01001s01'> SAMPLE1 </Button>
+      <Button href='/smp/smp01001s02'> SAMPLE2 </Button>
     </section>
   </div>
   </>

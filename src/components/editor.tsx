@@ -1,12 +1,10 @@
 'use client'
 import { ComponentPropsWithRef, useState, useRef } from 'react'
 import { useEditor, EditorContent, EditorContentProps } from '@tiptap/react'
+import { Mark, mergeAttributes } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
-import * as C from '@/libs/constants'
 import app, { type ContextType } from '@/libs/app-context'
 import lodash from 'lodash'
-
-import { Mark, mergeAttributes } from '@tiptap/core'
 
 const Span = Mark.create({
   name: 'span',
@@ -15,12 +13,8 @@ const Span = Mark.create({
   selectable: true,
   atom: false,
   parseHTML() { return [ { tag: 'span' }, ] },
-  renderHTML({ HTMLAttributes }) {
-    return ['span', mergeAttributes(HTMLAttributes), 0]
-  },
-  addAttributes() {
-    return { class: { default: null }, style: { default: null } }
-  },
+  renderHTML({ HTMLAttributes }) { return ['span', mergeAttributes(HTMLAttributes), 0] },
+  addAttributes() { return { class: { default: null }, style: { default: null } } },
 })
 
 type EditorProps = ComponentPropsWithRef<'div'> & EditorContentProps & {
@@ -33,7 +27,7 @@ type ItemType = {
   editor: any
 }
 
-const { log, genId, copyExclude, copyRef, useUpdate, useLauncher, putAll, subscribe, defineComponent, modelValue } = app
+const { genId, copyExclude, copyRef, useUpdate, useLauncher, putAll, subscribe, defineComponent, modelValue } = app
 const { debounce } = lodash
 const ctx: ContextType<ItemType> = {
 }
@@ -72,13 +66,10 @@ export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & an
     onChange(editor.getHTML())
   })
   return (
-  <>
-    <EditorContent
-      ref={ elem }
-      /* @ts-ignore */
-      editor={ editor }
-      { ...pprops }
-      />
-  </>
+  <EditorContent ref={ elem }
+    /* @ts-ignore */
+    editor={ editor }
+    { ...pprops }
+    />
   )
 })
