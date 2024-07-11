@@ -9,28 +9,28 @@ type PutAllOptType = {
 const { UNDEFINED } = C
 
 const values = {
-  putAll<T>(obj: T, source: any, opt: PutAllOptType = UNDEFINED) {
-    let target: any = obj
-    if (target == null) { return target }
-    if (source == null) { return target }
-    if (target === source) { return target }
-    if (!opt) { opt = { root: target } }
+  putAll<T>(target: T, source: any, opt: PutAllOptType = UNDEFINED) {
+    let obj: any = target
+    if (obj == null) { return obj }
+    if (source == null) { return obj }
+    if (obj === source) { return obj }
+    if (!opt) { opt = { root: obj } }
     for (const k in source) {
-      const titem = target[k]
+      const titem = obj[k]
       const sitem = source[k]
       if (titem !== undefined) {
         if (typeof (titem) === C.STRING) {
-          target[k] = source[k]
+          obj[k] = source[k]
         } else if ((opt?.deep) && titem instanceof Array && sitem instanceof Array) {
           values.putAll(titem, sitem, opt)
         } else if ((opt?.deep) && typeof(titem) === C.OBJECT && typeof(sitem) === C.OBJECT) {
           values.putAll(titem, sitem, opt)
         } else {
           /** 타입이 다르다면 무조건 치환. */
-          target[k] = source[k]
+          obj[k] = source[k]
         }
       } else {
-        target[k] = source[k]
+        obj[k] = source[k]
       }
     }
     return target

@@ -1,71 +1,100 @@
 import * as C from '@/libs/constants'
 import log from './log'
+import values from './values'
+import http from 'http'
+import https from 'https'
 
-const init = async (apicd: string, opt: any) => {
-  const headers = {}
-  const timeout = 1000
-  const signal = AbortSignal.timeout(timeout)
-  return { headers, timeout, signal }
+type OptType = {
+  method?: String
+  apicd?: String
+  resolve?: Function
+  reject?: Function
 }
 
-const mkres = async (apiType: string, apicd: string, result: Promise<any>, opt: any, resolve: Function, reject: Function) => {
+const { putAll } = values
+const keepalive = true
+
+const init = async (method: string, apicd: string, data?: any, opt?: any) => {
+  const headers = putAll({}, opt?.headers || {})
+  const timeout = opt?.timeout || 1000
+  const signal = AbortSignal.timeout(timeout)
+  const url = api.mkuri(apicd)
+  let body: any = ''
+
+  if (!headers[C.CONTENT_TYPE]) {
+    headers[C.CONTENT_TYPE] = C.CTYPE_JSON
+  }
+  if (String(headers[C.CONTENT_TYPE]).startsWith(C.CTYPE_JSON)) {
+    body = JSON.stringify(data || {})
+  } else if (String(headers[C.CONTENT_TYPE]).startsWith(C.CTYPE_GRAPHQL)) {
+    body = data || ''
+  } 
+  return { method, url, body, headers, timeout, signal }
+}
+
+const mkres = async (result: Promise<any>, opt?: OptType) => {
   const res = await result
   const hdrs = res?.headers || { get: (v: any) => {} }
   switch (hdrs.get('content-type')) {
   case 'application/json': {
-    return resolve(await res.json())
+    return opt?.resolve && opt.resolve(await res.json())
   } break
   }
   // const body = res?.body?.getReader && await res.body.getReader().read() || {}
   // const data = URL.createObjectURL(await new Response(body?.value).blob())
-  return resolve({})
+  return opt?.resolve && opt.resolve({})
 }
 
 const api = {
   async ping(opt?: any) {
-    return new Promise<any>(async (resolve, reject) => {
-      const apicd = `cmn00000`
-      const { headers, signal } = await init(apicd, opt)
-      const r = fetch(api.mkuri(apicd), { method: C.GET, headers, signal })
-      return await mkres(C.GET, apicd, r, opt, resolve, reject)
-    })
+    // return new Promise<any>(async (resolve, reject) => {
+    //   const apicd = `cmn00000`
+    //   const { method, headers, signal, url } = await init(C.GET, apicd, opt)
+    //   const r = fetch(url, { method, headers, signal, keepalive })
+    //   return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject }))
+    // })
+    return
   },
   async post(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
       await api.ping(opt)
-      const { headers, signal } = await init(apicd, opt)
-      const r = fetch(api.mkuri(apicd), { method: C.POST, headers, signal })
-      return await mkres(C.POST, apicd, r, opt, resolve, reject)
+      const { method, url, body, headers, signal } = await init(C.POST, apicd, data, opt)
+      const r = fetch(url, { method, body, headers, signal, keepalive })
+      return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject }))
     })
   },
   async get(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
       await api.ping(opt)
-      const { headers, signal } = await init(apicd, opt)
-      const r = fetch(api.mkuri(apicd), { method: C.GET, headers, signal })
-      return await mkres(C.GET, apicd, r, opt, resolve, reject)
+      const { method, url, headers, signal } = await init(C.GET, apicd, data, opt)
+      const r = fetch(url, { method, headers, signal, keepalive })
+      return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject }))
     })
   },
   async put(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
       await api.ping(opt)
-      const { headers, signal } = await init(apicd, opt)
-      const r = fetch(api.mkuri(apicd), { method: C.PUT, headers, signal })
-      return await mkres(C.PUT, apicd, r, opt, resolve, reject)
+      const { method, url, body, headers, signal } = await init(C.PUT, apicd, data, opt)
+      const r = fetch(url, { method, body, headers, signal, keepalive })
+      return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject }))
     })
   },
   async delete(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
       await api.ping(opt)
-      const { headers, signal } = await init(apicd, opt)
-      const r = fetch(api.mkuri(apicd), { method: C.DELETE, headers, signal })
-      return await mkres(C.DELETE, apicd, r, opt, resolve, reject)
+      const { method, headers, signal, url } = await init(C.DELETE, apicd, data, opt)
+      const r = fetch(url, { method, headers, signal, keepalive })
+      return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject }))
     })
   },
   mkuri(apicd: string) {
     const mat: any = apicd && /^([a-z]+)[0-9a-zA-Z]+$/g.exec(apicd) || {}
-    const ret = `/api/${mat[1]}/${mat[0]}`
-    return ret 
+    if (mat && mat[1]) {
+      return `/api/${mat[1]}/${mat[0]}`
+    } else {
+log.debug('RET:', apicd)
+      return apicd
+    }
   }
 }
 
