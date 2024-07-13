@@ -35,13 +35,6 @@ export default definePage((props) => {
         data.formdata.checkbox2 = 'C'
         data.formdata.select1 = 'kakao.com'
         data.formdata.content = `<p><span style="color:#f00">CONTENT</span></p>`
-        const res = await fetch('/api/cmn/cmn00000', {
-          method: 'get',
-          headers: [],
-          keepalive: true
-        })
-        log.debug('FETCH-RES:', await res.json())
-
         app.state(1, 1)
       } else if (data.timer > 0) {
         setTimeout(fnctime, 1000)

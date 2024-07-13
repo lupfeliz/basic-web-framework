@@ -49,10 +49,9 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
   <>
   { props.type === 'radio' ? (
     <_Radio ref={ elem } checked={ ctx[id]?.checked || false } onChange={ onChange } { ...pprops } />
-    ) : (
+  ) : (
     <_Checkbox ref={ elem } checked={ ctx[id]?.checked || false } onChange={ onChange } { ...pprops } />
-    )
-  }
+  ) }
   </>
   )
 })

@@ -28,7 +28,7 @@ export default definePage((props) => {
       log.debug('RES:', res)
     } break
     case 2: {
-      const res = await api.post(`/graphql`, `
+      const res = await api.post(`https://devlog.ntiple.com/graphql`, `
         query GetPostsEdges {
           posts {
             edges {

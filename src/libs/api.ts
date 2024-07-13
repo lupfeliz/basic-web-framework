@@ -92,7 +92,6 @@ const api = {
     if (mat && mat[1]) {
       return `/api/${mat[1]}/${mat[0]}`
     } else {
-log.debug('RET:', apicd)
       return apicd
     }
   }
