@@ -37,6 +37,8 @@ return {
       test: [
         /\/libs\/app-context\.[jt]s$/,
         /\/pages\/_document\.[jt]sx$/,
+        /\/libs\/constants\.[jt]s$/,
+        /\/pages\/smp\/smp01001s02\.[jt]sx$/
       ],
       loader: `${process.cwd()}/env/replace-loader.js`,
     })

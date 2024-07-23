@@ -1,7 +1,6 @@
 'use client'
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Function0, Function2, debounce } from 'lodash'
-import getConfig from 'next/config'
 import $ from 'jquery'
 import { createSlice } from '@reduxjs/toolkit'
 import { configureStore } from '@reduxjs/toolkit'
@@ -15,7 +14,6 @@ import * as C from '@/libs/constants'
 import values from '@/libs/values'
 import crypto from '@/libs/crypto'
 import log, { getLogger } from '@/libs/log'
-const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
 
 type LauncherProps = {
   mounted?: Function0<any>
@@ -51,8 +49,14 @@ const appContextStore = configureStore({
   reducer: appContextSlice.reducer
 })
 
-const appConfig = {
-  router: {} as NextRouter
+const appProps = {
+  router: {} as NextRouter,
+  config: {
+    api: { timeout: 0 },
+    security: {
+      key: { rsa: '' }
+    }
+  }
 }
 
 const app = {
@@ -68,7 +72,7 @@ const app = {
   useLauncher(prm: LauncherProps) {
     const router = useRouter()
     const [phase, setPhase] = React.useState(0)
-    if (!appConfig?.router) { appConfig.router = router as any }
+    if (!appProps?.router) { appProps.router = router as any }
     React.useEffect(() => {
       let retproc = () => { }
       let res = C.UNDEFINED
@@ -115,7 +119,7 @@ const app = {
     // log.debug('GO-PAGE:', uri, appConfig.router)
     if (typeof uri === C.STRING) {
       try {
-        appConfig.router.push(String(uri), String(uri), param)
+        appProps.router.push(String(uri), String(uri), param)
       } catch (e) {
         log.debug('E:', e)
       }
@@ -178,6 +182,7 @@ const app = {
       const conf = JSON.parse(crypto.aes.decrypt(el?.innerHTML || '', '{$$CRYPTO_KEY$$}'))
       log.setLevel(conf.log.level)
       log.debug('CONF:', conf)
+      app.putAll(appProps.config, conf)
     } catch (e) { log.debug('E:', e) }
     const fnunload = async () => {
       window.removeEventListener('beforeunload', fnunload)
@@ -193,7 +198,7 @@ const app = {
     } else {
       fnload()
     }
-    appConfig.router = props.router
+    appProps.router = props.router
   },
   modelValue(ctx: any) {
     const props = ctx?.props || {}
@@ -215,8 +220,7 @@ const app = {
     }
     return { props, model, name, inx, value, setValue }
   },
-  pubconf: publicRuntimeConfig,
-  svrconf: serverRuntimeConfig,
+  getConfig: () => appProps.config,
 }
 
 export default app

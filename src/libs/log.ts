@@ -47,6 +47,7 @@ class Log {
   warn = fnwarn
   error = fnerrr
   getLogger(namespace: string = ROOT, appender?: AppenderType) {
+    let ret: Log = UNDEFINED
     let inst: Log = UNDEFINED
     let level = logctx[namespace]?.level || logctx[ROOT]?.level || DEBUG
     if (namespace) { inst = logctx[namespace] }
@@ -54,9 +55,9 @@ class Log {
     if (!inst) { inst = logctx[ROOT] }
     if (inst) {
       inst.setLevel(level)
-      return makeProxy(inst)
+      ret = makeProxy(inst)
     }
-    return null
+    return ret
   }
   getLevel() { return this.level }
   getNamespace() { return this.namespace }
