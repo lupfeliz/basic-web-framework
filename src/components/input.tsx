@@ -1,46 +1,39 @@
 'use client'
 import _TextField, { TextFieldProps as _TextFieldProps } from '@mui/material/TextField'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import $ from 'jquery'
-import app, { type ContextType } from '@/libs/app-context'
+import app from '@/libs/app-context'
+import * as C from '@/libs/constants'
 
 type InputProps = _TextFieldProps & {
   model?: any
   onEnter?: Function
 }
-type ItemType = {
-  props: InputProps
-  elem: any
-}
 
-const { copyExclude, genId, copyRef, useUpdate, useLauncher, putAll, subscribe, defineComponent, modelValue } = app
-const ctx: ContextType<ItemType> = { }
+const { copyExclude, copyRef, useSetup, defineComponent, modelValue } = app
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model', 'onEnter'])
-  const [id] = useState(genId())
   const elem: any = useRef()
-  ctx[id] = putAll(ctx[id] || {}, { props, elem })
-  useLauncher({
+  const self = useSetup({
+    name: 'input',
+    props: { props },
+    vars: { },
     async mounted() {
       copyRef(ref, elem)
-      $(elem?.current).find('input').val(modelValue(ctx[id])?.value || '')
-      subscribe((state: number, mode: number) => {
-        if (mode && ctx[id]) {
-          $(elem?.current).find('input').val(modelValue(ctx[id])?.value || '')
-          update(app.state(1, 0))
-        }
-        update(state)
-      })
-      update(app.state(1))
+      $(elem?.current).find('input').val(modelValue(self())?.value || '')
     },
-    async unmount() { delete ctx[id] }
+    async updated(mode) {
+      if (mode && vars) {
+        $(elem?.current).find('input').val(modelValue(self())?.value || '')
+      }
+    }
   })
-  const update = useUpdate()
+  const { vars, update } = self()
   const onChange = async (e: any) => {
-    const { setValue } = modelValue(ctx[id])
+    const { setValue } = modelValue(self())
     const v = $(elem?.current).find('input').val()
     /** 변경시 데이터모델에 값전달 */
-    setValue(v, () => update(app.state(1)))
+    setValue(v, () => update(C.UPDATE_FULL))
     if (props.onChange) { props.onChange(e as any) }
   }
   const onKeyDown = async (e: any) => {

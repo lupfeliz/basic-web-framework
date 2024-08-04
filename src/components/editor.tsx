@@ -1,9 +1,10 @@
 'use client'
-import { ComponentPropsWithRef, useState, useRef } from 'react'
+import { ComponentPropsWithRef, useRef } from 'react'
 import { useEditor, EditorContent, EditorContentProps } from '@tiptap/react'
 import { Mark, mergeAttributes } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
-import app, { type ContextType } from '@/libs/app-context'
+import app from '@/libs/app-context'
+import * as C from '@/libs/constants'
 import lodash from 'lodash'
 
 const Span = Mark.create({
@@ -21,46 +22,35 @@ type EditorProps = ComponentPropsWithRef<'div'> & EditorContentProps & {
   model?: any
   name?: string
 }
-type ItemType = {
-  props: EditorProps
-  elem: any,
-  editor: any
-}
 
-const { genId, copyExclude, copyRef, useUpdate, useLauncher, putAll, subscribe, defineComponent, modelValue } = app
+const { log, copyExclude, copyRef, useSetup, defineComponent, modelValue } = app
 const { debounce } = lodash
-const ctx: ContextType<ItemType> = {
-}
 export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model', 'editor'])
-  const [id] = useState(genId())
   const elem: any = useRef()
   const editor = useEditor({
     extensions: [StarterKit, Span],
     content: '',
   })
 
-  ctx[id] = putAll(ctx[id] || {}, { props, elem, editor })
-  useLauncher({
+  const self = useSetup({
+    name: 'editor',
+    props: { props, editor },
+    vars: { },
     async mounted() {
       copyRef(ref, elem)
-      subscribe((state: number, mode: number) => {
-        if (mode && ctx[id]) {
-          const { value } = modelValue(ctx[id])
-          ctx[id].editor && ctx[id].editor.commands.setContent(value)
-          update(app.state(1, 0))
-        }
-        update(state)
-      })
-      update(app.state(1))
     },
-    async unmount() { delete ctx[id] }
+    updated: debounce(async (mode: number) => {
+      if (mode && vars) {
+        const { value } = modelValue(self())
+        self()?.editor?.commands.setContent(value)
+      }
+    }, 100)
   })
-  const update = useUpdate()
+  const { vars, update } = self()
   const onChange = debounce(async (v) => {
-    const { props, setValue } = modelValue(ctx[id])
-    setValue(v)
-    update(app.state(1))
+    const { setValue } = modelValue(self())
+    setValue(v, () => update(C.UPDATE_FULL))
   }, 100)
   editor && editor.on('transaction', ({ editor }) => {
     onChange(editor.getHTML())

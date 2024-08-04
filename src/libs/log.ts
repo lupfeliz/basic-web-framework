@@ -1,10 +1,4 @@
-/**
- * @File        : log.ts
- * @Version     : $Rev$
- * @Author      : 정재백
- * @History     : 2023-09-04 최초 작성
- * @Description : 클라이언트 로깅 모듈
- **/
+/** Java 의 Logger 와 비슷하게 작성된 로거, setLevel 에 의해 동적으로 레벨링 가능하다 */
 import * as C from './constants'
 
 const { FN_NIL, ROOT, TRACE, DEBUG, INFO, WARN, ERROR, UNDEFINED } = C
@@ -61,6 +55,7 @@ class Log {
   }
   getLevel() { return this.level }
   getNamespace() { return this.namespace }
+  /** 로그 레벨링, log.setLevel('info') 실행 후 log.debug('log') 호출시 콘솔에 출력되지 않음  */
   setLevel(level: Levels, appender?: AppenderType) {
     let inst = this.inst
     if (appender) { inst.appender = appender }
@@ -108,6 +103,7 @@ class Log {
     default: { inst.setLevel(DEBUG, appender) }}
     return this
   }
+  /** window.console 이외의 appender 를 사용하고자 할 때 사용 */
   setAppender(appender: AppenderType = console) {
     this.setLevel(this.level, appender)
   }
@@ -131,6 +127,7 @@ class Log {
   }
 }
 
+/** Proxy 객체화 하여 내부 멤버를 조작할수 없도록 한다 */
 const makeProxy = (log: Log) => {
   return new Proxy(log, {
     set(o: any, k: any, v: any) {

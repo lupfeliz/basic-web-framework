@@ -1,11 +1,33 @@
 import app from '@/libs/app-context'
 import { Block, Button, Checkbox, Input, Select, Editor } from '@/components'
-import { useState } from 'react'
 
-const { log, definePage, goPage, useUpdate, useLauncher, subscribe, clear } = app
+const { log, definePage, goPage, useSetup, clear } = app
 
 export default definePage((props) => {
-  const [data] = useState({
+  const mounted = async () => {
+    log.debug('MOUNTED! SMP01001S01', props)
+    const fnctime = async () => {
+      if (vars.timer == 1) {
+        vars.formdata.input02 = 'BBBB'
+        vars.formdata.checkbox2 = 'C'
+        vars.formdata.select1 = 'kakao.com'
+        vars.formdata.content = `<p><span style="color:#f00">CONTENT</span></p>`
+        update(3)
+      } else if (vars.timer > 0) {
+        setTimeout(fnctime, 1000)
+        update(2)
+      }
+      vars.timer--
+    }
+    setTimeout(fnctime, 1000)
+  }
+  const unmount = async () => {
+    log.debug('UNMOUNT! SMP01001S01')
+  }
+  const updated = async () => {
+    log.debug('UPDATED! SMP01001S01')
+  }
+  const { update, vars } = useSetup({ mounted, unmount, updated, name: 'SMP01001S01', vars: props.vars || {
     timer: 3,
     formdata: {
       input01: '',
@@ -23,28 +45,8 @@ export default definePage((props) => {
       'kakao.com',
       'gmail.com',
     ]
-  })
-  const update = useUpdate()
-  const mounted = async () => {
-    subscribe(async (state, mode) => {
-      update(state)
-    })
-    const fnctime = async () => {
-      if (data.timer == 1) {
-        data.formdata.input02 = 'BBBB'
-        data.formdata.checkbox2 = 'C'
-        data.formdata.select1 = 'kakao.com'
-        data.formdata.content = `<p><span style="color:#f00">CONTENT</span></p>`
-        app.state(1, 1)
-      } else if (data.timer > 0) {
-        setTimeout(fnctime, 1000)
-        app.state(1)
-      }
-      data.timer--
-    }
-    setTimeout(fnctime, 1000)
-  }
-  useLauncher({ mounted })
+  } })()
+
   return (
   <>
   <div>
@@ -69,8 +71,8 @@ export default definePage((props) => {
           className='mx-1'
           variant='contained'
           onClick={ () => {
-            clear(data.formdata)
-            update(app.state(1))
+            clear(vars?.formdata)
+            update(1)
           } }
           >
           CLEAR
@@ -89,6 +91,14 @@ export default definePage((props) => {
           >
           BUTTON
         </Button>
+        <Button
+          className='mx-1'
+          variant='outlined'
+          color='info'
+          href={'/smp/smp01001s02'}
+          >
+          LINK
+        </Button>
       </Block>
       <hr />
     </section>
@@ -96,23 +106,23 @@ export default definePage((props) => {
       <h2>INPUT</h2>
       <Block className='my-1'>
         <Input
-          model={ data.formdata }
+          model={ vars?.formdata }
           name='input01'
           size='small'
           />
         <span className='mx-1 my-1'>
-        [VALUE: { data.formdata.input01 }]
+        [VALUE: { vars?.formdata?.input01 }]
         </span>
       </Block>
       <Block className='my-1'>
         <Input
-          model={ data.formdata }
+          model={ vars?.formdata }
           name='input02'
           size='small'
           />
         <span className='mx-1 my-1'>
-          { data.timer > 0 ? (
-            <> [change after { data.timer }sec: { data.formdata.input02 }] </>
+          { vars?.timer > 0 ? (
+            <> [change after { vars?.timer }sec: { vars?.formdata?.input02 }] </>
           ) : '' }
         
         </span>
@@ -123,33 +133,33 @@ export default definePage((props) => {
       <h2>CHECKBOX</h2>
       <Block className='my-1'>
         <Checkbox
-          model={ data.formdata }
+          model={ vars?.formdata }
           name='checkbox1'
           value='Y'
           />
         <Checkbox
-          model={ data.formdata }
+          model={ vars?.formdata }
           name='checkbox2'
           value='A'
           />
         <Checkbox
           type='radio'
-          model={ data.formdata }
+          model={ vars?.formdata }
           name='checkbox2'
           value='B'
           />
         <Checkbox
           type='radio'
-          model={ data.formdata }
+          model={ vars?.formdata }
           name='checkbox2'
           value='C'
           />
       </Block>
       <Block className='my-1'>
-        { data.formdata.checklist.map((itm, inx) => (
+        { vars?.formdata?.checklist && vars?.formdata?.checklist.map((itm, inx) => (
           <Checkbox
             key={ inx }
-            model={ data.formdata }
+            model={ vars?.formdata }
             name={ `checklist.${inx}` }
             value='Y'
             />
@@ -162,9 +172,9 @@ export default definePage((props) => {
       <Block className='my-1'>
         <Select
           size='small'
-          model={ data.formdata }
+          model={ vars?.formdata }
           name='select1'
-          options={ data.options1 }
+          options={ vars?.options1 }
           />
       </Block>
     </section>
@@ -172,7 +182,7 @@ export default definePage((props) => {
       <h2>EDITOR</h2>
       <Block>
         <Editor
-          model={ data.formdata }
+          model={ vars?.formdata }
           name='content'
           />
       </Block>
@@ -181,7 +191,7 @@ export default definePage((props) => {
     <section>
       <h2>FORMDATA</h2>
       <Block className='my-1'>
-        FORMDATA: [{ JSON.stringify(data.formdata) }]
+        FORMDATA: [{ JSON.stringify(vars?.formdata) }]
       </Block>
       <hr />
     </section>

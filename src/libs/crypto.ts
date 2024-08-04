@@ -1,15 +1,10 @@
-/**
- * @File        : crypto.ts
- * @Version     : $Rev$
- * @Author      : 정재백
- * @History     : 2023-10-10 최초 작성
- * @Description : 암호화 유틸
- **/
+/** app 내에서 aes 와 rsa 방식 암복호화를 간편하게 다룰 목적으로 작성 */
 import cryptojs from 'crypto-js'
 import * as C from './constants'
 import log from './log'
 
 type WordArray = cryptojs.lib.WordArray
+/** 암호화 기본키 저장소 */
 const context = {
   aes: {
     defbit: 256,
@@ -27,11 +22,12 @@ const context = {
 }
 
 context.aes.defkey = cryptojs.enc.Utf8.parse(''.padEnd(context.aes.defbit / 8, '\0'))
-context.aes.opt.iv = cryptojs.enc.Hex.parse(''.padEnd(context.aes.defbit / 8, '0'))
+context.aes.opt.iv = cryptojs.enc.Hex.parse(''.padEnd(16, '0'))
 
 const NIL_ARR = cryptojs.enc.Hex.parse('00')
 
 const crypto = {
+  /** AES 모듈 */
   aes: {
     init: async (key?: any) => {
       if (key) { context.aes.defkey = crypto.aes.key(key) }
@@ -49,8 +45,9 @@ const crypto = {
       if (key) {
         if (typeof key === C.STRING || typeof key === C.NUMBER) {
           key = String(key)
-          if (key.length > (bit / 8)) { key = String(key).substring(0, bit / 8) }
-          if (key.length < (bit / 8)) { key = String(key).padEnd(bit / 8, '\0') }
+          const b64len = Math.round(bit * 3 / 2 / 8)
+          if (key.length > (b64len)) { key = String(key).substring(0, b64len) }
+          if (key.length < (b64len)) { key = String(key).padEnd(b64len, '\0') }
           if (ret === undefined) { try { ret = crypto.b64dec(key) } catch (e) { log.debug('E:', e) } }
           if (ret === undefined) { try { ret = crypto.hexdec(key) } catch (e) { log.debug('E:', e) } }
         } else {
@@ -64,9 +61,10 @@ const crypto = {
       context.aes.defkey = this.key(key, bit)
     }
   },
+  /** RSA 모듈 / JSEncrypt 에서는 private key 를 사용해야만 암/복호화가 모두 지원된다 */
   rsa: {
     init: async (keyval?: string, keytype?: string) => {
-      if (!context.rsa.cryptor) {
+      if (!context?.rsa?.cryptor) {
         const JSEncrypt = (await import('jsencrypt')).default
         context.rsa.cryptor = new JSEncrypt()
         switch (keytype) {

@@ -1,3 +1,4 @@
+/** 자주 사용되는 상수 정의 */
 export const ROOT = 'ROOT'
 export const DEBUG = 'debug'
 export const INFO = 'info'
@@ -47,6 +48,14 @@ export const GET = 'get'
 export const PUT = 'put'
 export const DELETE = 'delete'
 export const TOKEN_REFRESH = 'tokenRefresh'
+
+export const EXTRA_TIME = 1000 * 5
+export const EXPIRE_NOTIFY_TIME = 1000 * 60 * 2
+
+export const UPDATE_ENTIRE = 3
+export const UPDATE_FULL = 2
+export const UPDATE_SELF = 1
+export const UPDATE_IF_NOT = 0
 
 export const SC_OK = 200
 export const SC_MOVED_PERMANENTLY = 301

@@ -1,21 +1,18 @@
 import { Html, Head, Main, NextScript } from 'next/document'
-import { Content } from '@/components'
 import app from '@/libs/app-context'
-import crypto from '@/libs/crypto'
-const { definePage, svrconf } = app
-export default definePage(() => {
-  const confstr = crypto.aes.encrypt(JSON.stringify(svrconf), '{$$CRYPTO_KEY$$}')
+import parse from 'html-react-parser'
+
+export default app.definePage(() => {
   return (
   <Html>
     <Head>
-      <Content tag='style' type='text/css' content={`
+      {/* 페이지 hard-loading 시 적용할 기본 transition */}
+      { parse(`<style type="text/css">
         body { transition: opacity 0.4s 0.2s ease }
         .hide-onload { opacity: 0; }
-      `}/>
-      <Content tag='script' id='page-config' type='text/plain'
-        content={ `${confstr}` }
-        />
+      </style>`) }
     </Head>
+    {/* hide-onload 클래스가 사라지면 트랜지션이 시작된다. */}
     <body className='hide-onload'>
       <Main />
       <NextScript />
