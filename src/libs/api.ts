@@ -13,6 +13,7 @@ type OptType = {
 const { putAll, getConfig, log } = app
 const keepalive = true
 
+/** 초기화, 기본적으로 사용되는 통신헤더 등을 만들어 준다 */
 const init = async (method: string, apicd: string, data?: any, opt?: any) => {
   const headers = putAll({}, opt?.headers || {})
   const timeout = opt?.timeout || getConfig()?.api?.timeout || 1000
@@ -26,6 +27,7 @@ const init = async (method: string, apicd: string, data?: any, opt?: any) => {
   if (String(headers[C.CONTENT_TYPE]).startsWith(C.CTYPE_JSON)) {
     body = JSON.stringify(data || {})
   } 
+  /** JWT 토큰이 저장되어있는 경우 헤더에 Bearer 추가 */
   const user = userContext.getUserInfo()
   if (user && user?.accessToken?.value) {
     switch (opt?.authtype) {
@@ -42,11 +44,13 @@ const init = async (method: string, apicd: string, data?: any, opt?: any) => {
   return { method, url, body, headers, signal }
 }
 
+/** 통신결과 처리 */
 const mkres = async (r: Promise<Response>, opt?: OptType) => {
   let ret = { }
   let t: any = ''
   const resp = await r
   const hdrs = resp?.headers || { get: (v: any) => {} }
+  /** 통신결과 헤더에서 로그인 JWT 토큰이 발견된 경우 토큰저장소에 저장 */
   if ((t = hdrs.get(C.AUTHORIZATION.toLowerCase()))) {
     const auth: string[] = String(t).split(' ')
     if (auth.length > 1 && auth[0] === C.BEARER) {
@@ -80,6 +84,7 @@ const mkres = async (r: Promise<Response>, opt?: OptType) => {
               expireTime: current + Number(decval[3])
             }
           })
+          /** 토큰 만료시간을 모니터링 한다 */
           userContext.checkExpire()
         }
       } catch (e) {
@@ -88,9 +93,11 @@ const mkres = async (r: Promise<Response>, opt?: OptType) => {
     }
   }
   switch (hdrs.get('content-type')) {
+  /** 결과 타입이 JSON 인경우 */
   case 'application/json': {
     ret = await resp.json()
   } break
+  /** 결과 타입이 OCTET-STREAM (다운로드) 인경우 */
   case 'application/octet-stream': {
     ret = await resp.blob()
   } break
@@ -101,6 +108,7 @@ const mkres = async (r: Promise<Response>, opt?: OptType) => {
 
 const api = {
   nextping: 0,
+  /** PING, 백엔드가 정상인지 체크하는 용도 */
   async ping(opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
       const apicd = `cmn00000`
@@ -112,10 +120,10 @@ const api = {
       const res: any = await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject }))
       /** 다음 ping 은 10초 이후 */
       api.nextping = curtime + (1000 * 10)
-      // res?.rescd === '0000'
       return res
     })
   },
+  /** POST 메소드 처리 */
   async post(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
       await api.ping(opt)
@@ -124,6 +132,7 @@ const api = {
       return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject }))
     })
   },
+  /** GET 메소드 처리 */
   async get(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
       await api.ping(opt)
@@ -132,6 +141,7 @@ const api = {
       return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject }))
     })
   },
+  /** PUT 메소드 처리 */
   async put(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
       await api.ping(opt)
@@ -140,6 +150,7 @@ const api = {
       return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject }))
     })
   },
+  /** DELETE 메소드 처리 */
   async delete(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
       await api.ping(opt)
@@ -148,6 +159,7 @@ const api = {
       return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject }))
     })
   },
+  /** URL 을 형태에 맞게 조립해 준다 */
   mkuri(apicd: string) {
     const mat: any = apicd && /^([a-z]+)[0-9a-zA-Z]+$/g.exec(apicd) || {}
     if (mat && mat[1]) {

@@ -1,3 +1,7 @@
+/**
+ * 아무런 역할을 하지 않는 일반 div 블럭과 같지만
+ * jsx 태그 영역에서 영역구분을 위한 용도로 작성 (단순하게 태그 이름 구분을 위한 컴포넌트)
+ **/
 import { ComponentPropsWithRef } from 'react'
 import app from '@/libs/app-context'
 type BlockProps = ComponentPropsWithRef<'div'> & { }

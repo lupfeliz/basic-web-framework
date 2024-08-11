@@ -5,6 +5,7 @@ import { useRef } from 'react'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
 
+/** mui 기본 체크박스(라디오버튼) 속성 타입 상속  */
 type CheckboxProps = _CheckboxProps & _RadioProps & {
   model?: any
   type?: 'checkbox' | 'radio'
@@ -23,16 +24,18 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
     },
     async mounted() {
       copyRef(ref, elem)
+      /** 초기 데이터 화면반영 */
       const { props, value } = modelValue(self())
       vars.checked = props?.value == value
-      log.debug('SEND FROM CHECKBOX..')
     },
     async updated() {
+      /** 데이터가 변경되면 실제 화면에 즉시 반영 */
       const { props, value } = modelValue(self())
       vars.checked = props?.value == value
     }
   })
   const { vars, update } = self()
+  /** 체크박스 변경 이벤트 발생시 처리 */
   const onChange = async (e: any, v: any) => {
     const { props, setValue } = modelValue(self())
     setValue(v ? props?.value : '')
@@ -41,6 +44,7 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
   }
   return (
   <>
+  {/* 표현타입에 따라 체크박스 또는 라디오버튼 으로 표현된다 */}
   { props.type === 'radio' ? (
     <_Radio ref={ elem } checked={ vars.checked || false } onChange={ onChange } { ...pprops } />
   ) : (

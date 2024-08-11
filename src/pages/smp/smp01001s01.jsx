@@ -1,36 +1,14 @@
 import app from '@/libs/app-context'
+import * as C from '@/libs/constants'
 import { Block, Button, Checkbox, Input, Select, Editor } from '@/components'
 
 const { log, definePage, goPage, useSetup, clear } = app
 
 export default definePage((props) => {
-  const mounted = async () => {
-    log.debug('MOUNTED! SMP01001S01', props)
-    const fnctime = async () => {
-      if (vars.timer == 1) {
-        vars.formdata.input02 = 'BBBB'
-        vars.formdata.checkbox2 = 'C'
-        vars.formdata.select1 = 'kakao.com'
-        vars.formdata.content = `<p><span style="color:#f00">CONTENT</span></p>`
-        vars.formdata.idgen.map((v, i, l) => l[i] = app.genId())
-        update(3)
-      } else if (vars.timer > 0) {
-        setTimeout(fnctime, 1000)
-        update(2)
-      }
-      vars.timer--
-    }
-    setTimeout(fnctime, 1000)
-    vars.formdata.idgen.map((v, i, l) => l[i] = app.genId())
-  }
-  const unmount = async () => {
-    log.debug('UNMOUNT! SMP01001S01')
-  }
-  const updated = async () => {
-    log.debug('UPDATED! SMP01001S01')
-  }
   const { update, vars } = useSetup({ mounted, unmount, updated, name: 'SMP01001S01', vars: {
+    /** 3초 타이머 */
     timer: 3,
+    /** 폼데이터 */
     formdata: {
       input01: '',
       input02: 'AAAA',
@@ -39,16 +17,50 @@ export default definePage((props) => {
       checklist: ['', '', '', ''],
       select1: '',
       content: '',
-      idgen: ['', '', '', '']
     },
+    /** 선택기 목록 설정 */
     options1: [
       { name: '선택해주세요', value: '' },
       'hotmail.com',
       'naver.com',
       'kakao.com',
       'gmail.com',
-    ]
+    ],
+    /** 난수테스트용 */
+    idgen: ['', '', '', '']
   } })()
+  /** 페이지 시작 이벤트처리 */
+  async function mounted() {
+    log.debug('MOUNTED! SMP01001S01', props)
+    const fdata = vars.formdata
+    /** 3초가 지나면 데이터 강제 업데이트를 수행한다 */
+    const fnctime = async () => {
+      if (vars.timer == 1) {
+        fdata.input02 = 'BBBB'
+        fdata.checkbox2 = 'C'
+        fdata.select1 = 'kakao.com'
+        fdata.content = `<p><span style="color:#f00">CONTENT</span></p>`
+        vars.idgen.map((v, i, l) => l[i] = app.genId())
+        /** 전체 데이터 갱신으로 화면 데이터가 자동으로 바뀐다 */
+        update(C.UPDATE_ENTIRE)
+      } else if (vars.timer > 0) {
+        setTimeout(fnctime, 1000)
+        update(C.UPDATE_FULL)
+      }
+      vars.timer--
+    }
+    setTimeout(fnctime, 1000)
+    /** 난수 생성 테스트 */
+    vars.idgen.map((v, i, l) => l[i] = app.genId())
+  }
+  /** 페이지 종료 이벤트 처리 */
+  async function unmount() {
+    log.debug('UNMOUNT! SMP01001S01')
+  }
+  /** 페이지 업데이트 이벤트 처리 */
+  async function updated() {
+    log.debug('UPDATED! SMP01001S01')
+  }
   return (
   <>
   <div>
@@ -61,13 +73,13 @@ export default definePage((props) => {
       <hr/>
     </section>
     <section>
-      <h2> BUTTON </h2>
+      <h2> 버튼 컴포넌트 </h2>
       <Block className='my-1'>
         <Button
           className='mx-1'
           onClick={ () => goPage(-1) }
           >
-          BACK
+          뒤로가기
         </Button>
         <Button
           className='mx-1'
@@ -77,21 +89,21 @@ export default definePage((props) => {
             update(1)
           } }
           >
-          CLEAR
+          데이터삭제
         </Button>
         <Button
           className='mx-1'
           variant='contained'
           color='warning'
           >
-          BUTTON
+          경고버튼
         </Button>
         <Button
           className='mx-1'
           variant='outlined'
           color='info'
           >
-          BUTTON
+          기본버튼
         </Button>
         <Button
           className='mx-1'
@@ -99,13 +111,13 @@ export default definePage((props) => {
           color='info'
           href={'/smp/smp01001s02'}
           >
-          LINK
+          페이지링크
         </Button>
       </Block>
       <hr />
     </section>
     <section>
-      <h2>INPUT</h2>
+      <h2>입력컴포넌트</h2>
       <Block className='my-1'>
         <Input
           model={ vars?.formdata }
@@ -132,7 +144,7 @@ export default definePage((props) => {
       <hr />
     </section>
     <section>
-      <h2>CHECKBOX</h2>
+      <h2>체크박스</h2>
       <Block className='my-1'>
         <Checkbox
           model={ vars?.formdata }
@@ -170,7 +182,7 @@ export default definePage((props) => {
       <hr />
     </section>
     <section>
-      <h2>SELECT</h2>
+      <h2>선택기</h2>
       <Block className='my-1'>
         <Select
           size='small'
@@ -181,7 +193,7 @@ export default definePage((props) => {
       </Block>
     </section>
     <section>
-      <h2>EDITOR</h2>
+      <h2>편집기</h2>
       <Block>
         <Editor
           model={ vars?.formdata }
@@ -191,18 +203,21 @@ export default definePage((props) => {
       <hr />
     </section>
     <section>
-      <h2>FORMDATA</h2>
+      <h2>전체 폼데이터</h2>
       <Block className='my-1'>
         FORMDATA: [{ JSON.stringify(vars?.formdata) }]
       </Block>
       <hr />
     </section>
     <section>
-    { (vars?.formdata?.idgen || []).map((v, i) => (
-    <div key={ i }>
-      { i } : { v }
-    </div>
-    )) }
+      <h2>난수생성 테스트</h2>
+      <div>
+      { (vars?.idgen || []).map((v, i) => (
+      <div key={ i }>
+        { i } : { v }
+      </div>
+      )) }
+      </div>
     </section>
   </div>
   </>

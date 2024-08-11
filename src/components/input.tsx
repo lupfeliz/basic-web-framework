@@ -20,15 +20,18 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     vars: { },
     async mounted() {
       copyRef(ref, elem)
+      /** 최초상태 화면반영 */
       $(elem?.current).find('input').val(modelValue(self())?.value || '')
     },
     async updated(mode) {
       if (mode && vars) {
+      /** 화면 강제 업데이트 발생시 화면반영 */
         $(elem?.current).find('input').val(modelValue(self())?.value || '')
       }
     }
   })
   const { vars, update } = self()
+  /** 입력컴포넌트 변경이벤트 처리 */
   const onChange = async (e: any) => {
     const { setValue } = modelValue(self())
     const v = $(elem?.current).find('input').val()
@@ -36,6 +39,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     setValue(v, () => update(C.UPDATE_FULL))
     if (props.onChange) { props.onChange(e as any) }
   }
+  /** 입력컴포넌트 키입력 이벤트 처리 */
   const onKeyDown = async (e: any) => {
     const keycode = e?.keyCode || 0
     switch (keycode) {

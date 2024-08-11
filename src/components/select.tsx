@@ -5,11 +5,13 @@ import { useRef } from 'react'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
 
+/** 선택목록 타입 */
 type OptionType = {
   name?: string
   value?: any
   selected?: boolean
 }
+/** mui 선택기 타입 상속 */
 type InputProps = _SelectProps & {
   model?: any
   options?: OptionType[]
@@ -66,6 +68,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     value={vars?.index || (vars?.options?.length > 0 ? 0 : '')}
     { ...pprops }
     >
+    {/* 선택목록 생성*/}
     { vars?.options?.length > 0 && vars.options.map((itm, inx) => (
     <_MenuItem
       key={ inx }

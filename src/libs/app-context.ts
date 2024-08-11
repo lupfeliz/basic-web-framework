@@ -106,13 +106,14 @@ const app = {
     const [phase, setPhase] = React.useState(0)
     const [, setState] = React.useState(0)
     ctx[uid] = app.putAll(ctx[uid] || { name: prm?.name, vars: prm?.vars || { } }, { props: prm?.props || { } })
-    const self = () => {
+    const self = (vars?: any, props?: any) => {
       let ret = {
         uid,
         update: (mode: any) => setState(app.state(mode, uid)),
         vars: ctx[uid].vars as V,
-        props: ctx[uid].props as P,
+        props: (props || ctx[uid].props) as P,
       }
+      if (vars) { for (const k in vars) { (ret.vars as any)[k] = vars[k] } }
       return ret as SetupType<V, P>
     }
     app.putAll(self, self())

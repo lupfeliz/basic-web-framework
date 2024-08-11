@@ -13,17 +13,12 @@ export default app.definePage((props) => {
       <Button
         href='/smp/smp01001s01'
         >
-        SAMPLE1
+        컴포넌트샘플
       </Button>
       <Button
         href='/smp/smp01001s02'
         >
-        SAMPLE2
-      </Button>
-      <Button
-        href='/smp/smp01001s03'
-        >
-        SAMPLE3
+        통신샘플
       </Button>
     </section>
   </div>
