@@ -22,7 +22,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   const elem: any = useRef()
   const self = useSetup({
     name: 'select',
-    props: { props },
+    props,
     vars: {
       index: 0,
       value: '',

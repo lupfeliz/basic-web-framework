@@ -17,7 +17,7 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
   const elem: any = useRef()
   const self = useSetup({
     name: 'checkbox',
-    props: { props },
+    props,
     vars: {
       checked: false,
     },

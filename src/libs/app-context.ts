@@ -1,7 +1,7 @@
 'use client'
 /** APP 구동시 빈번하게 사용되는 기능들의 복합체, values 등 유틸들이 mixin 되어 있다 */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Function2, debounce } from 'lodash'
+import { Function1, Function2, debounce } from 'lodash'
 import $ from 'jquery'
 import getConfig from 'next/config'
 import { createSlice } from '@reduxjs/toolkit'
@@ -54,6 +54,7 @@ const decryptAES = (v: string, k: string) => JSON.parse(cjaes.decrypt(v, k).toSt
 /** 전역 일반객체 저장소 (non-serializable 객체) */
 const appvars = {
   ready: false,
+  uidseq: 0,
   router: {} as NextRouter,
   config: {
     api: { timeout: 0 },
@@ -86,7 +87,7 @@ const app = {
   /** values, log, getLogger mixin */
   ...values, log, getLogger,
   /** 앱 내 유일키 생성 */
-  genId() { return `${new Date().getTime()}${values.randomStr(3, C.NUMBER)}` },
+  genId() { return `${new Date().getTime()}${String((appvars.uidseq = (appvars.uidseq + 1) % 1000) + 1000).substring(1, 4)}` },
   /**
    * react 에서 vue 생명주기 메소드인 mounted / unmount 를 흉내낸 방법
    * 다음과 같이 사용한다
@@ -104,15 +105,15 @@ const app = {
     const [uid] = React.useState(app.genId())
     const [phase, setPhase] = React.useState(0)
     const [, setState] = React.useState(0)
-    ctx[uid] = app.putAll(ctx[uid] || { name: prm?.name, vars: prm?.vars || { } }, { ...prm?.props })
+    ctx[uid] = app.putAll(ctx[uid] || { name: prm?.name, vars: prm?.vars || { } }, { props: prm?.props || { } })
     const self = () => {
       let ret = {
         uid,
         update: (mode: any) => setState(app.state(mode, uid)),
         vars: ctx[uid].vars as V,
+        props: ctx[uid].props as P,
       }
-      for (const k in prm?.props) { (ret as any)[k] = (ctx[uid] as any)[k] }
-      return ret as SetupType<V, P> & P
+      return ret as SetupType<V, P>
     }
     app.putAll(self, self())
     if (!appvars?.router) { appvars.router = router as any }
@@ -256,8 +257,8 @@ const app = {
     appvars.router = props.router
   },
   /** 입력성 컴포넌트 (input 등)에서 자동으로 값을 입력하도록 수행하는 메소드 */
-  modelValue(self: SetupType<any, any>) {
-    const props = self?.props || {}
+  modelValue<V, P>(self: SetupType<V, P>) {
+    const props = self?.props || {} as any
     const model = props?.model
     const name = props?.name ? props.name.split(/[.]/)[0] : undefined
     const inx = props?.name ? props.name.split(/[.]/)[1] : -1
@@ -274,7 +275,7 @@ const app = {
       }
       return v
     }
-    return { props, model, name, inx, value, setValue }
+    return { props: self?.props, vars: self?.vars, model, name, inx, value, setValue }
   },
   publicRuntimeConfig,
   serverRuntimeConfig,

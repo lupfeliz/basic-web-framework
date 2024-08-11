@@ -16,7 +16,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   const elem: any = useRef()
   const self = useSetup({
     name: 'input',
-    props: { props },
+    props,
     vars: { },
     async mounted() {
       copyRef(ref, elem)

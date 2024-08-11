@@ -12,6 +12,7 @@ export default definePage((props) => {
         vars.formdata.checkbox2 = 'C'
         vars.formdata.select1 = 'kakao.com'
         vars.formdata.content = `<p><span style="color:#f00">CONTENT</span></p>`
+        vars.formdata.idgen.map((v, i, l) => l[i] = app.genId())
         update(3)
       } else if (vars.timer > 0) {
         setTimeout(fnctime, 1000)
@@ -20,6 +21,7 @@ export default definePage((props) => {
       vars.timer--
     }
     setTimeout(fnctime, 1000)
+    vars.formdata.idgen.map((v, i, l) => l[i] = app.genId())
   }
   const unmount = async () => {
     log.debug('UNMOUNT! SMP01001S01')
@@ -27,7 +29,7 @@ export default definePage((props) => {
   const updated = async () => {
     log.debug('UPDATED! SMP01001S01')
   }
-  const { update, vars } = useSetup({ mounted, unmount, updated, name: 'SMP01001S01', vars: props.vars || {
+  const { update, vars } = useSetup({ mounted, unmount, updated, name: 'SMP01001S01', vars: {
     timer: 3,
     formdata: {
       input01: '',
@@ -36,7 +38,8 @@ export default definePage((props) => {
       checkbox2: '',
       checklist: ['', '', '', ''],
       select1: '',
-      content: ''
+      content: '',
+      idgen: ['', '', '', '']
     },
     options1: [
       { name: '선택해주세요', value: '' },
@@ -46,7 +49,6 @@ export default definePage((props) => {
       'gmail.com',
     ]
   } })()
-
   return (
   <>
   <div>
@@ -194,6 +196,13 @@ export default definePage((props) => {
         FORMDATA: [{ JSON.stringify(vars?.formdata) }]
       </Block>
       <hr />
+    </section>
+    <section>
+    { (vars?.formdata?.idgen || []).map((v, i) => (
+    <div key={ i }>
+      { i } : { v }
+    </div>
+    )) }
     </section>
   </div>
   </>

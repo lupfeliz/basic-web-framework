@@ -35,15 +35,15 @@ export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & an
 
   const self = useSetup({
     name: 'editor',
-    props: { props, editor },
-    vars: { },
+    props,
+    vars: { editor },
     async mounted() {
       copyRef(ref, elem)
     },
     updated: debounce(async (mode: number) => {
       if (mode && vars) {
         const { value } = modelValue(self())
-        self()?.editor?.commands.setContent(value)
+        self()?.vars?.editor?.commands.setContent(value)
       }
     }, 100)
   })
