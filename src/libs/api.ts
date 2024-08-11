@@ -68,7 +68,7 @@ const mkres = async (r: Promise<Response>, opt?: OptType) => {
               expireTime: current + Number(decval[3] !== '_' ? decval[5] : 0)
             }
           })
-          log.debug('CHECH:', decval[3].length, decval[3])
+          log.debug('CHECK:', decval[3].length, decval[3])
           userContext.checkExpire()
         } else if (decval && decval.length > 3) {
           /** 로그인 연장 인경우 */
@@ -90,7 +90,11 @@ const mkres = async (r: Promise<Response>, opt?: OptType) => {
   switch (hdrs.get('content-type')) {
   case 'application/json': {
     ret = await resp.json()
-  } }
+  } break
+  case 'application/octet-stream': {
+    ret = await resp.blob()
+  } break
+  default: }
   if (opt?.resolve) { opt.resolve(ret) }
   return ret
 }
