@@ -107,7 +107,7 @@ export default defineComponent(() => {
         </>
         ) }
         <Button
-          href='/atc/atc01001s04'
+          href='/atc/atc01001s04/1'
           >
           게시판
         </Button>

@@ -268,18 +268,18 @@ const app = {
     if (appvars.astate == C.APPSTATE_INIT) {
       appvars.astate = C.APPSTATE_START
       try {
+        const api = (await import('@/libs/api')).default
+        const crypto = (await import('@/libs/crypto')).default
+        const userContext = (await import('@/libs/user-context')).default
         const conf = decryptAES(encrypted(), C.CRYPTO_KEY)
         app.putAll(appvars.config, conf)
         log.setLevel(conf.log.level)
         log.debug('CONF:', conf)
-        const api = (await import('@/libs/api')).default
-        const crypto = (await import('@/libs/crypto')).default
         const cres = await api.get(`cmn01001`, {})
         await crypto.rsa.init(app.getConfig().security.key.rsa, C.PRIVATE_KEY)
         const aeskey = crypto.rsa.decrypt(cres?.check || '')
         await crypto.aes.init(aeskey)
         appvars.astate = C.APPSTATE_ENV
-        const userContext = (await import('@/libs/user-context')).default
         const userInfo = userContext.getUserInfo()
         if (userInfo?.userId) { userContext.checkExpire() }
         appvars.astate = C.APPSTATE_USER
