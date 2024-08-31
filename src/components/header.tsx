@@ -9,6 +9,9 @@ export default defineComponent(() => {
   const self = useSetup({
     vars: {
       aside: false
+    },
+    async mounted() {
+      userContext.subscribe(() => update(C.UPDATE_SELF))
     }
   })
   const { vars, update, ready } = self()
@@ -55,6 +58,16 @@ export default defineComponent(() => {
       open={ vars.aside }
       onClick={ () => openAside(false) }
       >
+      { ready() && (userInfo?.userId) && (
+        <>
+          <Block className='text-center my-1'>
+            { userInfo.userNm }
+          </Block>
+          <Block className='text-center my-1'>
+            { userInfo.timelabel }
+          </Block>
+        </>
+      ) }
       <Block>
         <Button
           href={'/'}
@@ -76,6 +89,11 @@ export default defineComponent(() => {
         </>
         ) : (
         <>
+          <Button
+            onClick={ userContext.tokenRefresh }
+            >
+            로그인연장
+          </Button>
           <Button
             onClick={ logout }
             >

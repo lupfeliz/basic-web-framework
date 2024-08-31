@@ -37,8 +37,9 @@ export const CTYPE_MULTIPART = 'multipart/form-data'
 export const APPSTATE_INIT = 0
 export const APPSTATE_START = 1
 export const APPSTATE_ENV = 2
-export const APPSTATE_ERROR = 3
+export const APPSTATE_USER = 3
 export const APPSTATE_READY = 4
+export const APPSTATE_ERROR = 5
 
 export const UNDEFINED = undefined as any
 

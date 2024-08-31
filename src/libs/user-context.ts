@@ -6,6 +6,7 @@ import storage from 'redux-persist/lib/storage/session'
 
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
+import api from '@/libs/api'
 
 const { log, clone } = app
 
@@ -19,7 +20,8 @@ const schema = {
     /** 접근유지용 토큰(refresh-token) 저장소 */
     refreshToken: { value: '', expireTime: 0 },
     lastAccess: 0,
-    notifyExpire: false
+    notifyExpire: false,
+    timelabel: ''
   }
 }
 
@@ -79,6 +81,7 @@ const userContext = {
       const diff = Math.floor((accessToken.expireTime - current) / 1000)
       const minute = Math.floor(diff / 60)
       const mod = diff - (minute * 60)
+      userContext.setUserInfo({ timelabel: `${String(minute).padStart(2, '0')}:${String(mod).padStart(2, '0')}` })
       if (mod % 10 == 0) { log.debug(`DIFF: ${minute} min ${mod} sec / ${diff} / ${current} / ${app.getConfig().auth?.expiry}`) }
     }
     if (refreshToken?.value && refreshToken?.expireTime < (current - C.EXTRA_TIME)) {
@@ -89,7 +92,11 @@ const userContext = {
     if ((accessToken?.value && accessToken?.expireTime <
       (current + C.EXPIRE_NOTIFY_TIME - C.EXTRA_TIME)) && !userInfo?.notifyExpire
       ) {
-      /** TODO: 만료시간 알림처리 */
+      if (confirm(`인증이 ${Math.ceil((accessToken?.expireTime - current) / 1000 / 60)}분 안에 만료됩니다. 연장하시겠어요?`)) {
+        userContext.tokenRefresh()
+      } else {
+        userContext.setUserInfo({ notifyExpire: true })
+      }
     }
     if (accessToken?.value && accessToken?.expireTime < (current - C.EXTRA_TIME)) {
       log.debug('ACCESS-TOKEN EXPIRED')
@@ -105,6 +112,9 @@ const userContext = {
     if (!expired) {
       userVars.timerHandle = setTimeout(userContext.checkExpire, 1000)
     }
+  },
+  async tokenRefresh() {
+    api.post(`lgn01002`, {}, { authtype: C.TOKEN_REFRESH })
   },
   /** 강제 로그아웃 */
   async logout(notify: boolean = true) {

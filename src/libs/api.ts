@@ -69,8 +69,9 @@ const mkres = async (r: Promise<Response>, opt?: OptType) => {
             },
             refreshToken: {
               value: (decval[3] !== '_' ? decval[3] : C.UNDEFINED),
-              expireTime: current + Number(decval[3] !== '_' ? decval[5] : 0)
-            }
+              expireTime: current + Number(decval[3] !== '_' ? decval[5] : 0),
+            },
+            notifyExpire: false
           })
           log.debug('CHECK:', decval[3].length, decval[3])
           userContext.checkExpire()
@@ -167,7 +168,6 @@ const api = {
     return new Promise<any>(async (resolve, reject) => {
       await api.ping(opt)
       const { method, url, headers, signal } = await init(C.GET, apicd, data, opt)
-console.log('API-GET:', url)
       const r = fetch(url, { method, headers, signal, keepalive })
       return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject }))
     })

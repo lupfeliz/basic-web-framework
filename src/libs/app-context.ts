@@ -53,6 +53,7 @@ const decryptAES = (v: string, k: string) => JSON.parse(cjaes.decrypt(v, k).toSt
 /** 전역 일반객체 저장소 (non-serializable 객체) */
 const appvars = {
   appstate: 0,
+  gstate: 0,
   uidseq: 0,
   router: {} as NextRouter,
   config: {
@@ -73,7 +74,7 @@ const appContextSlice = createSlice({
     sendid: ''
   },
   reducers: {
-    setState: (state, { payload }) => {
+    setAppInfo: (state, { payload }) => {
       if (payload?.state || 0) { state.state = payload.state }
       if (payload?.mode !== C.UNDEFINED) { state.mode = payload.mode }
       state.sendid = payload?.sendid || ''
@@ -238,15 +239,15 @@ const app = {
   /** 전역상태변수, 인자로 1이상의 값이 입력되면 subscribe 하고 있는 모든 객체에 전파된다 */
   state: (mode?: number, sendid = '') => {
     mode = Number(mode) || C.UPDATE_IF_NOT
-    const state = (appContextStore.getState().state) % (Number.MAX_SAFE_INTEGER / 2) + (mode ? 1 : 0)
-    if (mode > 1) {
-      app._dispatchState(state, mode > 2 ? mode : C.UNDEFINED, sendid)
+    const state = appvars.gstate = (appvars.gstate) % (Number.MAX_SAFE_INTEGER / 2) + (mode ? 1 : 0)
+    if (mode > C.UPDATE_SELF) {
+      app._dispatchState(state, mode > C.UPDATE_FULL ? mode : C.UNDEFINED, sendid)
     }
     return state
   },
   /** 너무 자주 수행되지 않도록 debounce 를 걸어준다 */
   _dispatchState: debounce((state = 0, mode = 0, sendid= '') => {
-    appContextStore.dispatch(appContextSlice.actions.setState({ state, mode, sendid })) 
+    appContextStore.dispatch(appContextSlice.actions.setAppInfo({ state, mode, sendid })) 
   }, 10),
   /** 전역상태변수 상태를 모니터링(subscribe) 하도록 구독한다. */
   subscribe(fnc: Function2<number, string, void>, delay = 0) {
@@ -275,6 +276,10 @@ const app = {
         const aeskey = crypto.rsa.decrypt(cres?.check || '')
         await crypto.aes.init(aeskey)
         appvars.appstate = C.APPSTATE_ENV
+        const userContext = (await import('@/libs/user-context')).default
+        const userInfo = userContext.getUserInfo()
+        if (userInfo?.userId) { userContext.checkExpire() }
+        appvars.appstate = C.APPSTATE_USER
       } catch (e) {
         appvars.appstate = C.APPSTATE_ERROR
         log.debug('E:', e)
