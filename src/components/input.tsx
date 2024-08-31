@@ -1,4 +1,3 @@
-'use client'
 import _TextField, { TextFieldProps as _TextFieldProps } from '@mui/material/TextField'
 import { useRef } from 'react'
 import $ from 'jquery'
@@ -8,11 +7,15 @@ import * as C from '@/libs/constants'
 type InputProps = _TextFieldProps & {
   model?: any
   onEnter?: Function
+  maxLength?: number
+  inputMode?: string
+  pattern?: string
 }
 
 const { copyExclude, copyRef, useSetup, defineComponent, modelValue } = app
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
-  const pprops = copyExclude(props, ['model', 'onEnter'])
+  const pprops = copyExclude(props, ['model', 'onEnter', 'maxLength', 'inputMode', 'pattern'])
+  const iprops = props?.inputProps || {}
   const elem: any = useRef()
   const self = useSetup({
     name: 'input',
@@ -52,6 +55,12 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   <_TextField ref={ elem }
     onChange={ onChange }
     onKeyDown={ onKeyDown }
+    hiddenLabel
+    inputProps={{
+      maxLength: props?.maxLength || iprops?.maxLength,
+      inputMode: props?.inputMode || iprops?.inputMode,
+      pattern: props?.pattern || iprops?.pattern
+    }}
     { ...pprops }
     />
   )

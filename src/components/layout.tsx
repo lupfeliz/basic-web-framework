@@ -9,24 +9,23 @@ type LayoutProps = HTMLMotionProps<'div'>
 export default app.defineComponent((props: LayoutProps, ref: any) => {
   const { children, ...rest } = props
   return (
-    <div ref={ ref }>
+    <>
       {/* 머리말(HEADER) 영역 */}
       <Header />
       {/* 페이징 트랜지션, goPage 로 이동시 트랜지션이 걸린다 */}
       <motion.main
+        ref={ ref }
         initial={ { x: '5%', opacity: 0 } }
         animate={ { x: 0, opacity: 1 } }
         exit={ { x: '-5%', opacity: 0 } }
         transition={ { duration: 0.25, ease: 'easeInOut' } }
         { ...rest }
         >
-        <Container>
         {/* 페이지 내용 */}
         { children as any }
-        </Container>
       </motion.main>
       {/* 꼬리말(FOOTER) 영역 */}
       <Footer />
-    </div>
+    </>
   )
 })

@@ -1,4 +1,3 @@
-'use client'
 import _Checkbox, { CheckboxProps as _CheckboxProps } from '@mui/material/Checkbox'
 import _Radio, { RadioProps as _RadioProps } from '@mui/material/Radio'
 import { useRef } from 'react'

@@ -34,6 +34,7 @@ return {
   output: /generate/.test(cmd) ? 'export' : undefined,
   /** 빌드결과물 생성위치 : /dist */
   distDir: 'dist',
+  basePath: yml?.app?.basePath || undefined,
   /** 개발모드에서 페이지가 두번씩 접근되는 현상 방지 */
   reactStrictMode: prod ? true : false,
   /** 빌드타임에 사용되는 설정정보 */

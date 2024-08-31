@@ -1,4 +1,3 @@
-'use client'
 import _Select, { SelectProps as _SelectProps } from '@mui/material/Select'
 import _MenuItem from '@mui/material/MenuItem'
 import { useRef } from 'react'
@@ -17,10 +16,10 @@ type InputProps = _SelectProps & {
   options?: OptionType[]
 }
 
-const { copyExclude, clear, copyRef, useSetup, defineComponent, modelValue } = app
+const { log, copyExclude, clear, copyRef, useSetup, defineComponent, modelValue } = app
 
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
-  const pprops = copyExclude(props, ['model', 'options', 'onEnter'])
+  const pprops = copyExclude(props, ['model', 'options', 'onChange'])
   const elem: any = useRef()
   const self = useSetup({
     name: 'select',
@@ -36,8 +35,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   })
   const { vars, update } = self()
 
+  /** 렌더링 시 필요한 선택목록 정보 조합 */
   if (props?.options && props?.options instanceof Array && vars?.options) {
-    const options: any = vars.options
     clear(vars.options)
     const { value: mvalue } = modelValue(self())
     for (let inx = 0; inx < props.options.length; inx++) {
@@ -48,7 +47,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         vars.index = inx
         vars.value = value
       }
-      options.push({ name: name, value: value, selected: value == mvalue })
+      vars.options.push({ name: name, value: value, selected: value == mvalue })
     }
     if (mvalue === undefined) { vars.index = 0 }
   }

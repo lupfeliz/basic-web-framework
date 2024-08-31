@@ -1,4 +1,3 @@
-'use client'
 import { ComponentPropsWithRef, createElement, MouseEvent } from 'react'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'

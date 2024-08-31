@@ -16,7 +16,7 @@ const keepalive = true
 /** 초기화, 기본적으로 사용되는 통신헤더 등을 만들어 준다 */
 const init = async (method: string, apicd: string, data?: any, opt?: any) => {
   const headers = putAll({}, opt?.headers || {})
-  const timeout = opt?.timeout || getConfig()?.api?.timeout || 1000
+  const timeout = opt?.timeout || getConfig()?.api?.timeout || 10000
   const signal = AbortSignal.timeout(timeout)
   const url = api.mkuri(apicd)
   
@@ -92,17 +92,47 @@ const mkres = async (r: Promise<Response>, opt?: OptType) => {
       }
     }
   }
-  switch (hdrs.get('content-type')) {
-  /** 결과 타입이 JSON 인경우 */
-  case 'application/json': {
-    ret = await resp.json()
+  /** 상태값에 따른 오류처리 */
+  const state = { error: false, message: '' }
+  switch (resp.status) {
+  case C.SC_BAD_GATEWAY:
+  case C.SC_GATEWAY_TIMEOUT:
+  case C.SC_INTERNAL_SERVER_ERROR:
+  case C.SC_RESOURCE_LIMIT_IS_REACHED:
+  case C.SC_SERVICE_UNAVAILABLE: {
+    putAll(state, { error: true, message: `처리 중 오류가 발생했어요` })
   } break
-  /** 결과 타입이 OCTET-STREAM (다운로드) 인경우 */
-  case 'application/octet-stream': {
-    ret = await resp.blob()
+  case C.SC_UNAUTHORIZED: {
+    putAll(state, { error: true, message: `로그인을 해 주세요` })
+    await userContext.logout(false)
+  } break
+  case C.SC_FORBIDDEN: {
+    putAll(state, { error: true, message: `접근 권한이 없어요` })
+  } break
+  case C.SC_NOT_FOUND:
+  case C.SC_BAD_REQUEST: {
+    putAll(state, { error: true, message: `처리할 수 없는 요청이예요` })
+  } break
+  case C.SC_OK: {
   } break
   default: }
-  if (opt?.resolve) { opt.resolve(ret) }
+
+  /** 정상인경우 결과값 리턴처리 */
+  if (!state.error) {
+    switch (hdrs.get('content-type')) {
+    /** 결과 타입이 JSON 인경우 */
+    case 'application/json': {
+      ret = await resp.json()
+    } break
+    /** 결과 타입이 OCTET-STREAM (다운로드) 인경우 */
+    case 'application/octet-stream': {
+      ret = await resp.blob()
+    } break
+    default: }
+    if (opt?.resolve) { opt.resolve(ret) }
+  } else {
+    return opt?.reject && opt.reject(state) || {}
+  }
   return ret
 }
 
@@ -137,6 +167,7 @@ const api = {
     return new Promise<any>(async (resolve, reject) => {
       await api.ping(opt)
       const { method, url, headers, signal } = await init(C.GET, apicd, data, opt)
+console.log('API-GET:', url)
       const r = fetch(url, { method, headers, signal, keepalive })
       return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject }))
     })
@@ -161,9 +192,9 @@ const api = {
   },
   /** URL 을 형태에 맞게 조립해 준다 */
   mkuri(apicd: string) {
-    const mat: any = apicd && /^([a-z]+)[0-9a-zA-Z]+$/g.exec(apicd) || {}
+    const mat: any = apicd && /^([a-z]+)([0-9a-zA-Z]+)([/].*){0,1}$/g.exec(apicd) || {}
     if (mat && mat[1]) {
-      return `/api/${mat[1]}/${mat[0]}`
+      return `${app.getConfig()?.api?.base || '/api'}/${mat[1]}/${mat[0]}`
     } else {
       return apicd
     }

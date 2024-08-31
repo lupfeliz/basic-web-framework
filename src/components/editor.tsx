@@ -1,4 +1,3 @@
-'use client'
 import { ComponentPropsWithRef, useRef } from 'react'
 import { useEditor, EditorContent, EditorContentProps } from '@tiptap/react'
 import { Mark, mergeAttributes } from '@tiptap/core'
@@ -34,6 +33,7 @@ export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & an
   const editor = useEditor({
     /** 위에서 작성한 Span 플러그인을 사용한다. (이 선언이 없으면 'span' 태그가 불가하어 컬러등 스타일링이 불가능) */
     extensions: [StarterKit, Span],
+    immediatelyRender: false,
     content: '',
   })
 

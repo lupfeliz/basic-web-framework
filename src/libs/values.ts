@@ -120,6 +120,28 @@ const values = {
     } }
     return ret
   },
+  matcher(v: any, def: any, ...arg: any[]) {
+    let ret = C.UNDEFINED
+    let defval = C.UNDEFINED
+    let vlst = v
+    if (!arg) { return ret }
+    if (!(vlst instanceof Array)) { vlst = [vlst] }
+    for (let inx = 0; inx < arg.length; inx += 2) {
+      let alst = arg[inx]
+      if (!(alst instanceof Array)) { alst = [alst] }
+      for (const aitm of alst) {
+        for (const vitm of vlst) {
+          if (vitm === aitm) {
+            ret = arg[inx + 1]
+            break
+          }
+          if (aitm === def) { defval = arg[inx + 1] }
+        }
+      }
+    }
+    if (ret === C.UNDEFINED) { ret = defval }
+    return ret
+  },
 }
 
 export default values

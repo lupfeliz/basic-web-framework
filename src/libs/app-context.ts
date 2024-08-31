@@ -1,7 +1,7 @@
 'use client'
 /** APP 구동시 빈번하게 사용되는 기능들의 복합체, values 등 유틸들이 mixin 되어 있다 */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Function1, Function2, debounce } from 'lodash'
+import { Function2, debounce } from 'lodash'
 import $ from 'jquery'
 import getConfig from 'next/config'
 import { createSlice } from '@reduxjs/toolkit'
@@ -27,12 +27,12 @@ type LauncherProps<V, P> = {
   unsubscribe?: Function
   vars?: V
   props?: P
-  init?: boolean
 }
 
 type SetupType<V, P> = {
   uid: string
   update: UpdateFunction
+  ready: Function
   vars: V
   props?: P
 }
@@ -57,7 +57,7 @@ const appvars = {
   uidseq: 0,
   router: {} as NextRouter,
   config: {
-    api: { timeout: 0 },
+    api: { base: '', alter: '', server: '', timeout: 0 },
     auth: { expiry: 0 },
     security: {
       key: { rsa: '' }
@@ -110,8 +110,9 @@ const app = {
       let ret = {
         uid,
         update: (mode: any) => setState(app.state(mode, uid)),
-        vars: ctx[uid].vars as V,
-        props: (props || ctx[uid].props) as P,
+        ready: () => !!phase,
+        vars: ctx[uid]?.vars || {} as V,
+        props: (props || ctx[uid]?.props || {}) as P,
       }
       if (vars) { for (const k in vars) { (ret.vars as any)[k] = vars[k] } }
       return ret as SetupType<V, P>
@@ -196,22 +197,32 @@ const app = {
   },
   /** react 컴포넌트 선언 */
   defineComponent<A, B, C extends A & B>(compo?: A, _opts?: B) {
-    let ret = C.UNDEFINED
-    let opts: any = _opts
+    let ret: any = compo
+    let opts: any = app.copyExclude(_opts || {})
     if (compo && compo instanceof Function) {
-      ret = compo.length >= 2 ? forwardRef(compo as any) : compo
+      if (compo.length >= 2) {
+        if (opts?.nossr) {
+          ret = dynamic(() => Promise.resolve(forwardRef(compo as any)), { ssr: false }) as any
+        } else {
+          ret = forwardRef(compo as any)
+        }
+      } else {
+        if (opts?.nossr) {
+          ret = dynamic(() => Promise.resolve(compo as any), { ssr: false }) as any
+        }
+      }
       if (opts) {
+        delete opts['nossr']
         app.putAll(ret, opts)
       }
     }
     return ret as any as C
   },
   /** 전역상태변수, 인자로 1이상의 값이 입력되면 subscribe 하고 있는 모든 객체에 전파된다 */
-  state: (mode: number = C.UPDATE_IF_NOT, sendid = '') => {
-    let add = 0
-    if (mode) { add = mode }
-    const state = (appContextStore.getState().state) % (Number.MAX_SAFE_INTEGER / 2) + (add ? 1 : 0)
-    if (add > 1) {
+  state: (mode?: number, sendid = '') => {
+    mode = Number(mode) || C.UPDATE_IF_NOT
+    const state = (appContextStore.getState().state) % (Number.MAX_SAFE_INTEGER / 2) + (mode ? 1 : 0)
+    if (mode > 1) {
       app._dispatchState(state, mode > 2 ? mode : C.UNDEFINED, sendid)
     }
     return state
@@ -264,10 +275,10 @@ const app = {
     const name = props?.name ? props.name.split(/[.]/)[0] : undefined
     const inx = props?.name ? props.name.split(/[.]/)[1] : -1
     let value = (model && name) ? model[name] : undefined
-    if (typeof value == C.OBJECT) { value = value[inx] }
+    if (value && typeof value == C.OBJECT) { value = value[inx] }
     const setValue = (v: any, callback?: Function) => {
       if (model && name) {
-        if (typeof model[name] == C.OBJECT && inx != -1) {
+        if (model[name] && typeof model[name] == C.OBJECT && inx != -1) {
           model[name][inx] = v
         } else {
           model[name] = v
@@ -277,6 +288,45 @@ const app = {
       return v
     }
     return { props: self?.props, vars: self?.vars, model, name, inx, value, setValue }
+  },
+  getParameter: (key?: string) => {
+    let ret: any = C.UNDEFINED
+    const prm: any = { }
+    try {
+      {
+  //   if (!ret) {
+  //     if (history && history.state && history.state.options) {
+  //       ret = history.state.options[key];
+  //     }
+  //   }
+  //   if (!ret) {
+  //     const prm = new URLSearchParams(location.search);
+  //     if (prm && prm.has(key)) {
+  //       ret = prm.get(key);
+  //     }
+  //   }
+  //   return ret;
+  // },
+      }
+      {
+        const d1 = String(history?.state?.url || '').split(/[/]/)
+        const d2 = String(history?.state?.as || '').split(/[/]/)
+        let len = d1.length > d2.length ? d1.length : d2.length
+        for (let inx = 0; inx < len; inx++) {
+          if (/[\[]([a-zA-Z0-9_-]+)[\]]/.test(d1[inx] || '')) {
+            prm[d1[inx].substring(1, d1[inx].length - 1)] = d2[inx]
+          }
+        }
+      }
+    } catch (e) {
+      log.debug('E:', e)
+    }
+    if (Object.keys(prm).length > 0) { log.debug('PRM:', prm, history) }
+    ret = key ? prm[key] : prm
+    return ret
+  },
+  pathvars() {
+
   },
   publicRuntimeConfig,
   serverRuntimeConfig,

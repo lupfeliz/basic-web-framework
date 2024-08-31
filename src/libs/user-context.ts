@@ -96,6 +96,8 @@ const userContext = {
       if (accessToken.value && accessToken?.expireTime >= 0) {
         expired = true
         userContext.logout()
+        alert('로그아웃 되었어요')
+        app.goPage('/')
       }
     }
     accessToken = clone(userInfo.accessToken)

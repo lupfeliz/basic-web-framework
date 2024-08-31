@@ -3,7 +3,7 @@ import { AnimatePresence } from 'framer-motion'
 import LayoutDefault from '@/components/layout'
 import app from '@/libs/app-context'
 /** 전역 스타일시트 */
-import '@/assets/styles/global.scss'
+import '@/pages/global.scss'
 const { useSetup, definePage } = app
 export default definePage((props) => {
   const { Component, pageProps, router } = props
@@ -27,7 +27,7 @@ export default definePage((props) => {
     {/* 트랜지션감지 */}
     <AnimatePresence mode='wait' initial={ false }>
       {/* 실제 경로에 맞는 페이지 컴포넌트 */}
-      { applyLayout(<Component {...pageProps} />, router) }
+      { applyLayout(<Component key={router.asPath} {...pageProps} />, router) }
     </AnimatePresence>
     </>
   )
