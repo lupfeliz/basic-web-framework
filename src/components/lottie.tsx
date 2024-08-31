@@ -14,14 +14,14 @@ type LottieProps = ComponentPropsWithRef<'div'> & {
   autoplay?: boolean
   renderer?: any,
 }
-const { defineComponent, useSetup, log, copyExclude, copyRef } = app
+const { defineComponent, useSetup, log, copyExclude, copyRef, basepath } = app
 export default defineComponent((props: LottieProps, ref: LottieProps['ref']) => {
   const pprops = copyExclude(props, [])
   const eref = useRef() as any
   useSetup({
     async mounted() {
-      let src = props?.src
-      log.trace('PATH:', src)
+      let src = await basepath(props?.src || '')
+      log.debug('LOTTIE-PATH:', src, app.getConfig().app.basePath)
       const element = eref?.current
       copyRef(ref, eref)
       if (!element?.getAttribute('data-loaded')) {

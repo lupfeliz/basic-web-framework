@@ -57,6 +57,7 @@ const appvars = {
   uidseq: 0,
   router: {} as NextRouter,
   config: {
+    app: { profile: '', basePath: '' },
     api: { base: '', alter: '', server: '', timeout: 0 },
     auth: { expiry: 0 },
     security: {
@@ -352,9 +353,31 @@ const app = {
     ret = key ? prm[key] : prm
     return ret
   },
-  pathvars() {
-
+  async basepath(uri: string) {
+    await app.waitmon(() => appvars.astate === C.APPSTATE_READY)
+    if (uri.startsWith('/')) { uri = `${String(app.getConfig()?.app?.basePath || '').replace(/[\/]+/g, '/')}${uri}` }
+    return uri
   },
+  waitmon(check: () => any, opt?: any) {
+    if (opt === undefined) { opt = { } }
+    const ctx = {
+      __max_check: opt.maxcheck || 100,
+      __interval: opt.interval || 100
+    }
+    return new Promise<any>((resolve, _reject) => {
+      const fnexec = function() {
+        /** 조건을 만족시키면 */
+        if (check()) {
+            resolve(true)
+        } else if (ctx.__max_check > 0) {
+          ctx.__max_check--
+          setTimeout(fnexec, ctx.__interval)
+        }
+      }
+      fnexec()
+    })
+  },
+  astate: () => appvars.astate,
   publicRuntimeConfig,
   serverRuntimeConfig,
   getConfig: () => appvars.config,
