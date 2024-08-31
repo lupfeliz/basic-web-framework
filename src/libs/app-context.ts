@@ -109,7 +109,7 @@ const app = {
       let ret = {
         uid,
         update: (mode: any) => setState(app.state(mode, uid)),
-        ready: () => !!phase,
+        ready: () => !!(appvars.appstate && phase),
         vars: ctx[uid]?.vars || {} as V,
         props: (props || ctx[uid]?.props || {}) as P,
       }
@@ -167,17 +167,35 @@ const app = {
    * 페이지 이동함수, /pages 폴더 를 기준으로 한 uri 절대경로를 입력해 주면 된다
    * useRouter 를 사용했으므로 경로파라메터도 인식하며, -1 입력시 뒤로가기 기능을 수행한다.
    **/
-  async goPage(uri: string | number, param?: any) {
+  goPage(uri: string | number, param?: any) {
     // log.debug('GO-PAGE:', uri, appvars.router)
-    if (typeof uri === C.STRING) {
-      try {
-        appvars.router.push(String(uri), String(uri), param)
-      } catch (e) {
-        log.debug('E:', e)
+    return new Promise<any>(async (resolve, reject) => {
+      let prevuri = location.pathname
+      const callback = async () => {
+        if (location.pathname !== prevuri) {
+          resolve(prevuri = location.pathname)
+          log.debug('URI-CHANGED:', location.pathname)
+          observer.disconnect()
+          window.removeEventListener('beforeunload', callback)
+        }
       }
-    } else if (typeof uri === C.NUMBER) {
-      history.go(Number(uri))
-    }
+      const observer = new MutationObserver(callback)
+      observer.observe(document, { subtree: true, childList: true })
+      window.addEventListener('beforeunload', callback)
+      if (typeof uri === C.STRING) {
+        try {
+          await appvars.router.push(String(uri), String(uri), param)
+        } catch (e) {
+          log.debug('E:', e)
+          reject(e)
+        }
+      } else if (typeof uri === C.NUMBER) {
+        history.go(Number(uri))
+      }
+    })
+  },
+  sleep(time: number) {
+    return new Promise(r => setTimeout(r, time))
   },
   /** react 페이지 선언 */
   definePage<A, B, C extends A & B>(compo?: A, _opts?: B) {
@@ -240,11 +258,11 @@ const app = {
     return appContextStore.subscribe(debounced)
   },
   /** APP 최초 구동시 수행되는 프로세스 */
-  async ready(props: AppProps) {
+  async onload(props: AppProps) {
     const $body = $(document.body)
     appvars.router = props.router
-    if (appvars.appstate == 0) {
-      appvars.appstate = 1
+    if (appvars.appstate == C.APPSTATE_INIT) {
+      appvars.appstate = C.APPSTATE_START
       try {
         const conf = decryptAES(encrypted(), C.CRYPTO_KEY)
         app.putAll(appvars.config, conf)
@@ -254,11 +272,13 @@ const app = {
         const crypto = (await import('@/libs/crypto')).default
         const cres = await api.get(`cmn01001`, {})
         await crypto.rsa.init(app.getConfig().security.key.rsa, C.PRIVATE_KEY)
-        const check = cres?.check || ''
-        const aeskey = crypto.rsa.decrypt(check)
+        const aeskey = crypto.rsa.decrypt(cres?.check || '')
         await crypto.aes.init(aeskey)
-        appvars.appstate = 2
-      } catch (e) { log.debug('E:', e) }
+        appvars.appstate = C.APPSTATE_ENV
+      } catch (e) {
+        appvars.appstate = C.APPSTATE_ERROR
+        log.debug('E:', e)
+      }
       const fnunload = async () => {
         window.removeEventListener('beforeunload', fnunload)
         $body.addClass('hide-onload')
@@ -267,6 +287,8 @@ const app = {
         window.addEventListener('beforeunload', fnunload)
         document.removeEventListener('DOMContentLoaded', fnload)
         $body.removeClass('hide-onload')
+        /** 트랜지션시간 300ms */
+        setTimeout(() => appvars.appstate = C.APPSTATE_READY, 300)
       }
       if (document.readyState !== 'complete') {
         document.addEventListener('DOMContentLoaded', fnload)

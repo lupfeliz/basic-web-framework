@@ -11,7 +11,7 @@ export default definePage((props) => {
     name: '_app',
     async mounted() {
       /** APP 최초구동을 수행한다 */
-      app.ready(props)
+      app.onload(props)
     }
   })
   /** 페이지 선언시 다른 layout 속성이 발견되면 해당 레이아웃으로 전환한다 */

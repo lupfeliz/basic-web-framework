@@ -5,7 +5,7 @@ import crypto from '@/libs/crypto'
 import * as C from '@/libs/constants'
 import { Block, Form, Button, Input, Select, Container, Checkbox } from '@/components'
 
-const { definePage, useSetup, log, goPage, clone } = app
+const { definePage, useSetup, log, goPage, clone, sleep } = app
 const { matcher } = values
 
 export default definePage(() => {
@@ -19,6 +19,7 @@ export default definePage(() => {
         passwd2: '',
         emailId: '',
         emailHost: '',
+        email: ''
       },
       iddupchk: false,
       emailSelector: 'select',
@@ -91,7 +92,8 @@ export default definePage(() => {
         log.debug('RES:', res)
         if (res.rescd === '0000') {
           result = true
-          goPage(`/usr/usr01001s02`)
+          await goPage(-1)
+          await goPage(`/usr/usr01001s02`)
         }
       } catch (e) {
         log.debug('E:', e)

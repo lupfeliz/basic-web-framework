@@ -1,11 +1,11 @@
 import app from '@/libs/app-context'
 import api from '@/libs/api'
+import userContext from '@/libs/user-context'
 import * as C from '@/libs/constants'
 import { Container, Block, Button, Pagination, Link } from '@/components'
 import moment from 'moment'
 
 const { definePage, useSetup, log, clone, getParameter, goPage } = app
-
 
 export default definePage(() => {
   const self = useSetup({
@@ -29,7 +29,8 @@ export default definePage(() => {
     },
   })
 
-  const { vars, update } = self()
+  const { vars, update, ready } = self()
+  const userInfo = userContext.getUserInfo()
 
   const print = {
     num: (inx) => (vars.pdata?.rowTotal || 0) - (vars.pdata?.rowStart || 0) - inx,
@@ -76,12 +77,14 @@ export default definePage(() => {
   <Container>
     <section className='title'>
       <h2>게시물 목록</h2>
+      { ready() && userInfo.userId && (
       <Button
         variant='contained'
         href='/atc/atc01001s01'
         >
         새글작성
       </Button>
+      ) }
     </section>
     <hr/>
     <section>

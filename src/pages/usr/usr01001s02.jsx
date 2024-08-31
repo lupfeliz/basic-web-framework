@@ -24,7 +24,7 @@ export default definePage(() => {
           <Block>
             <Button
               variant='contained'
-              onClick={() => goPage(-2) }
+              onClick={() => goPage(-1) }
               >
               이전 페이지로 이동
             </Button>
