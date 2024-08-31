@@ -103,24 +103,25 @@ const mkres = async (r: Promise<Response>, opt?: OptType) => {
   }
   /** 상태값에 따른 오류처리 */
   const state = { error: false, message: '' }
+  let msgcode = async () => (await (resp?.json && resp.json()))?.message
   switch (resp.status) {
   case C.SC_BAD_GATEWAY:
   case C.SC_GATEWAY_TIMEOUT:
   case C.SC_INTERNAL_SERVER_ERROR:
   case C.SC_RESOURCE_LIMIT_IS_REACHED:
   case C.SC_SERVICE_UNAVAILABLE: {
-    putAll(state, { error: true, message: `처리 중 오류가 발생했어요` })
+    putAll(state, { error: true, message: `처리 중 오류가 발생했어요`, msgcode: await msgcode() })
   } break
   case C.SC_UNAUTHORIZED: {
-    putAll(state, { error: true, message: `로그인을 해 주세요` })
+    putAll(state, { error: true, message: `로그인을 해 주세요`, msgcode: await msgcode() })
     await userContext.logout(false)
   } break
   case C.SC_FORBIDDEN: {
-    putAll(state, { error: true, message: `접근 권한이 없어요` })
+    putAll(state, { error: true, message: `접근 권한이 없어요`, msgcode: await msgcode() })
   } break
   case C.SC_NOT_FOUND:
   case C.SC_BAD_REQUEST: {
-    putAll(state, { error: true, message: `처리할 수 없는 요청이예요` })
+    putAll(state, { error: true, message: `처리할 수 없는 요청이예요`, msgcode: await msgcode() })
   } break
   case C.SC_OK: {
   } break

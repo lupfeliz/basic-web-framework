@@ -37,7 +37,14 @@ export default definePage(() => {
       } else {
         alert('로그인이 실패했습니다')
       }
-    } catch (e) { log.debug('E:', e) }
+    } catch (e) {
+      log.debug('E:', e)
+      if (e?.msgcode == 'USER_NOT_FOUND') {
+        alert('사용자 아이디 혹은 비밀번호가 잘못되었어요')
+      } else {
+        alert(e?.message || '오류가 발생했어요')
+      }
+    }
   }
 
   return (
