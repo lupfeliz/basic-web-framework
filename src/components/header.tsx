@@ -10,8 +10,8 @@ export default defineComponent(() => {
     vars: {
       aside: false
     },
-    async mounted() {
-      userContext.subscribe(() => update(C.UPDATE_SELF))
+    async mounted({ releaser }) {
+      releaser(userContext.subscribe(() => update(C.UPDATE_SELF)))
     }
   })
   const { vars, update, ready } = self()

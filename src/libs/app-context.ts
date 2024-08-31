@@ -1,6 +1,6 @@
 /** APP 구동시 빈번하게 사용되는 기능들의 복합체, values 등 유틸들이 mixin 되어 있다 */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Function2, debounce } from 'lodash'
+import { Function1, Function2, debounce } from 'lodash'
 import $ from 'jquery'
 import getConfig from 'next/config'
 import { createSlice } from '@reduxjs/toolkit'
@@ -20,10 +20,10 @@ type UpdateFunction = (mode?: number) => void
 
 type LauncherProps<V, P> = {
   name?: string
-  mounted?: Function
+  mounted?: Function1<{ releaser: Function1<any, void> }, void>
   unmount?: Function
   updated?: Function2<number, string, void>
-  unsubscribe?: Function
+  releaselist?: Function[]
   vars?: V
   props?: P
 }
@@ -52,7 +52,7 @@ const decryptAES = (v: string, k: string) => JSON.parse(cjaes.decrypt(v, k).toSt
 
 /** 전역 일반객체 저장소 (non-serializable 객체) */
 const appvars = {
-  appstate: 0,
+  astate: 0,
   gstate: 0,
   uidseq: 0,
   router: {} as NextRouter,
@@ -105,12 +105,12 @@ const app = {
     const [uid] = React.useState(app.genId())
     const [phase, setPhase] = React.useState(0)
     const [, setState] = React.useState(0)
-    ctx[uid] = app.putAll(ctx[uid] || { name: prm?.name, vars: prm?.vars || { } }, { props: prm?.props || { } })
+    ctx[uid] = app.putAll(ctx[uid] || { name: prm?.name, vars: prm?.vars || {}, releaselist: [] }, { props: prm?.props || {} })
     const self = (vars?: any, props?: any) => {
       let ret = {
         uid,
         update: (mode: any) => setState(app.state(mode, uid)),
-        ready: () => !!(appvars.appstate && phase),
+        ready: () => !!(appvars.astate && phase),
         vars: ctx[uid]?.vars || {} as V,
         props: (props || ctx[uid]?.props || {}) as P,
       }
@@ -128,19 +128,20 @@ const app = {
         if (prm?.mounted) {
           setTimeout(async () => {
             try {
-              res = prm?.mounted ? prm.mounted() : { }
+              const releaser = (v: Function) => (ctx[uid]?.releaselist || []).push(v)
+              res = prm?.mounted && prm.mounted({ releaser })
               if (res && res instanceof Promise) { res = await res }
-              const unsubscribe: any = app.subscribe(async (mode, sendid) => {
+              const unsubscribe = app.subscribe(async (mode, sendid) => {
                 const sender = ctx[sendid] || {}
                 log.trace(`SUBSCRIBE : ${sender?.name || ''} → ${prm?.name || ''}`)
                 let res = prm?.updated ? prm.updated(mode, sendid) : {}
                 if (res && res instanceof Promise) { res = await res }
                 setState(app.state(0, uid))
               })
-              ctx[uid].unsubscribe = () => {
-                log.trace('UNSUBSCRIBE...', uid)
+              releaser(() => {
+                log.trace('UNSUBSCRIBE...', ctx[uid]?.name || uid)
                 unsubscribe()
-              }
+              })
             } catch (e) { log.trace('E:', e) }
             setPhase(2)
           }, 0)
@@ -155,7 +156,9 @@ const app = {
           try {
             if (prm?.unmount) { prm?.unmount && prm.unmount() } 
           } catch (e) { log.trace('E:', e) }
-          if (ctx[uid]?.unsubscribe) { (ctx[uid] as any).unsubscribe() }
+          for (const releaser of (ctx[uid]?.releaselist || [])) {
+            if (releaser && releaser instanceof Function) { releaser() }
+          }
           delete ctx[uid]
           log.trace('CTX-QTY:', Object.keys(ctx).length)
         }
@@ -262,8 +265,8 @@ const app = {
   async onload(props: AppProps) {
     const $body = $(document.body)
     appvars.router = props.router
-    if (appvars.appstate == C.APPSTATE_INIT) {
-      appvars.appstate = C.APPSTATE_START
+    if (appvars.astate == C.APPSTATE_INIT) {
+      appvars.astate = C.APPSTATE_START
       try {
         const conf = decryptAES(encrypted(), C.CRYPTO_KEY)
         app.putAll(appvars.config, conf)
@@ -275,13 +278,13 @@ const app = {
         await crypto.rsa.init(app.getConfig().security.key.rsa, C.PRIVATE_KEY)
         const aeskey = crypto.rsa.decrypt(cres?.check || '')
         await crypto.aes.init(aeskey)
-        appvars.appstate = C.APPSTATE_ENV
+        appvars.astate = C.APPSTATE_ENV
         const userContext = (await import('@/libs/user-context')).default
         const userInfo = userContext.getUserInfo()
         if (userInfo?.userId) { userContext.checkExpire() }
-        appvars.appstate = C.APPSTATE_USER
+        appvars.astate = C.APPSTATE_USER
       } catch (e) {
-        appvars.appstate = C.APPSTATE_ERROR
+        appvars.astate = C.APPSTATE_ERROR
         log.debug('E:', e)
       }
       const fnunload = async () => {
@@ -293,7 +296,7 @@ const app = {
         document.removeEventListener('DOMContentLoaded', fnload)
         $body.removeClass('hide-onload')
         /** 트랜지션시간 300ms */
-        setTimeout(() => appvars.appstate = C.APPSTATE_READY, 300)
+        setTimeout(() => appvars.astate = C.APPSTATE_READY, 300)
       }
       if (document.readyState !== 'complete') {
         document.addEventListener('DOMContentLoaded', fnload)
