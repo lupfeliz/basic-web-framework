@@ -1,7 +1,7 @@
 import app from '@/libs/app-context'
 import { Block, Form, Button, Container, Lottie } from '@/components'
 
-const { definePage } = app
+const { definePage, goPage } = app
 
 export default definePage(() => {
   return (
@@ -24,9 +24,9 @@ export default definePage(() => {
           <Block>
             <Button
               variant='contained'
-              href='/lgn/lgn01001s01'
+              onClick={() => goPage(-2) }
               >
-              로그인 페이지로 이동
+              이전 페이지로 이동
             </Button>
           </Block>
         </article>

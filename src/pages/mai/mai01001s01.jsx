@@ -26,6 +26,11 @@ export default definePage(() => {
             >
             로그인
           </Button>
+          <Button
+            href='/usr/usr01001s01'
+            >
+            회원가입
+          </Button>
         </Block>
         ) : (<></>) }
         <Block>

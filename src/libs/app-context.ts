@@ -1,4 +1,3 @@
-'use client'
 /** APP 구동시 빈번하게 사용되는 기능들의 복합체, values 등 유틸들이 mixin 되어 있다 */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Function2, debounce } from 'lodash'
@@ -53,7 +52,7 @@ const decryptAES = (v: string, k: string) => JSON.parse(cjaes.decrypt(v, k).toSt
 
 /** 전역 일반객체 저장소 (non-serializable 객체) */
 const appvars = {
-  ready: false,
+  appstate: 0,
   uidseq: 0,
   router: {} as NextRouter,
   config: {
@@ -241,15 +240,24 @@ const app = {
     return appContextStore.subscribe(debounced)
   },
   /** APP 최초 구동시 수행되는 프로세스 */
-  ready(props: AppProps) {
+  async ready(props: AppProps) {
     const $body = $(document.body)
-    if (!appvars.ready) {
-      appvars.ready = true
+    appvars.router = props.router
+    if (appvars.appstate == 0) {
+      appvars.appstate = 1
       try {
         const conf = decryptAES(encrypted(), C.CRYPTO_KEY)
         app.putAll(appvars.config, conf)
         log.setLevel(conf.log.level)
         log.debug('CONF:', conf)
+        const api = (await import('@/libs/api')).default
+        const crypto = (await import('@/libs/crypto')).default
+        const cres = await api.get(`cmn01001`, {})
+        await crypto.rsa.init(app.getConfig().security.key.rsa, C.PRIVATE_KEY)
+        const check = cres?.check || ''
+        const aeskey = crypto.rsa.decrypt(check)
+        await crypto.aes.init(aeskey)
+        appvars.appstate = 2
       } catch (e) { log.debug('E:', e) }
       const fnunload = async () => {
         window.removeEventListener('beforeunload', fnunload)
@@ -266,7 +274,6 @@ const app = {
         fnload()
       }
     }
-    appvars.router = props.router
   },
   /** 입력성 컴포넌트 (input 등)에서 자동으로 값을 입력하도록 수행하는 메소드 */
   modelValue<V, P>(self: SetupType<V, P>) {

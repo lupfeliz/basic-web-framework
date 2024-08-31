@@ -15,21 +15,10 @@ export default definePage(() => {
         passwd: '',
       },
       aeskey: '',
-    },
-    async mounted() {
-      try {
-        const res = await api.get(`cmn01001`, {})
-        await crypto.rsa.init(getConfig().security.key.rsa, C.PRIVATE_KEY)
-        const check = res?.check || ''
-        vars.aeskey = crypto.rsa.decrypt(check)
-        await crypto.aes.init(vars.aeskey)
-      } catch (e) {
-        log.debug('E:', e)
-      }
     }
   })
 
-  const { vars, update } = self()
+  const { vars } = self()
 
   const submit = async () => {
     const formdata = clone (vars.formdata)
