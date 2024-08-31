@@ -329,34 +329,24 @@ const app = {
   getParameter: (key?: string) => {
     let ret: any = C.UNDEFINED
     const prm: any = { }
+    let o: any
     try {
-      {
-  //   if (!ret) {
-  //     if (history && history.state && history.state.options) {
-  //       ret = history.state.options[key];
-  //     }
-  //   }
-  //   if (!ret) {
-  //     const prm = new URLSearchParams(location.search);
-  //     if (prm && prm.has(key)) {
-  //       ret = prm.get(key);
-  //     }
-  //   }
-  //   return ret;
-  // },
-      }
-      {
-        const d1 = String(history?.state?.url || '').split(/[/]/)
-        const d2 = String(history?.state?.as || '').split(/[/]/)
-        let len = d1.length > d2.length ? d1.length : d2.length
-        for (let inx = 0; inx < len; inx++) {
-          if (/[\[]([a-zA-Z0-9_-]+)[\]]/.test(d1[inx] || '')) {
-            prm[d1[inx].substring(1, d1[inx].length - 1)] = d2[inx]
-          }
+      const d1 = String(history?.state?.url || '').split(/[/]/)
+      const d2 = String(history?.state?.as || '').split(/[/]/)
+      let len = d1.length > d2.length ? d1.length : d2.length
+      for (let inx = 0; inx < len; inx++) {
+        if (/[\[]([a-zA-Z0-9_-]+)[\]]/.test(d1[inx] || '')) {
+          prm[d1[inx].substring(1, d1[inx].length - 1)] = d2[inx]
         }
       }
     } catch (e) {
       log.debug('E:', e)
+    }
+    if ((o = history?.state?.options)) {
+      for (const k of Object.keys(o)) { prm[k] = o[k] }
+    }
+    if (o = new URLSearchParams(location.search)) {
+      for (const k of o.keys()) { prm[k] = o.get(k) }
     }
     if (Object.keys(prm).length > 0) { log.debug('PRM:', prm, history) }
     ret = key ? prm[key] : prm

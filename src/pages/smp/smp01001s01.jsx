@@ -124,6 +124,7 @@ export default definePage((props) => {
             variant='outlined'
             color='info'
             href={'/smp/smp01001s02'}
+            param={ { key: 'a', val: 'b' } }
             >
             페이지링크
           </Button>

@@ -5,7 +5,7 @@ import crypto from '@/libs/crypto'
 import { Button, Block, Container } from '@/components'
 import userContext from '@/libs/user-context'
 
-const { log, definePage, useSetup, goPage } = app
+const { log, definePage, useSetup, goPage, getParameter } = app
 
 export default definePage((props) => {
   const self = useSetup({
@@ -14,6 +14,9 @@ export default definePage((props) => {
       userInfo: { },
       articles: [ ],
       message: ''
+    },
+    async mounted() {
+      log.debug('CHECKPARAM:', getParameter())
     }
   })
   const { update, vars } = self()
