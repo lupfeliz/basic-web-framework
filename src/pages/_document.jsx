@@ -1,3 +1,10 @@
+/**
+ * @File        : _document.jsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 공통 정적 엔트리 페이지
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import { Html, Head, Main, NextScript } from 'next/document'
 import { Content } from '@/components'
 import app from '@/libs/app-context'

@@ -1,3 +1,10 @@
+/**
+ * @File        : atc01001s04/[pagenum].jsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 게시물 목록 페이지
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import app from '@/libs/app-context'
 import api from '@/libs/api'
 import userContext from '@/libs/user-context'

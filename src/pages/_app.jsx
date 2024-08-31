@@ -1,3 +1,10 @@
+/**
+ * @File        : _app.jsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 공통 동적 프로세스 엔트리 페이지
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import Head from 'next/head'
 import { AnimatePresence } from 'framer-motion'
 import LayoutDefault from '@/components/layout'
@@ -8,7 +15,6 @@ const { useSetup, definePage } = app
 export default definePage((props) => {
   const { Component, pageProps, router } = props
   useSetup({
-    name: '_app',
     async mounted() {
       /** APP 최초구동을 수행한다 */
       app.onload(props)

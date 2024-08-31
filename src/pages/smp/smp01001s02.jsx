@@ -1,3 +1,10 @@
+/**
+ * @File        : smp01001s02.jsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 통신 샘플
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import app from '@/libs/app-context'
 import api from '@/libs/api'
 import * as C from '@/libs/constants'

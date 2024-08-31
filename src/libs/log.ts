@@ -1,4 +1,10 @@
-/** Java 의 Logger 와 비슷하게 작성된 로거, setLevel 에 의해 동적으로 레벨링 가능하다 */
+/**
+ * @File        : log.ts
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : Java 의 Logger 와 비슷하게 작성된 로거, setLevel 에 의해 동적으로 레벨링 가능하다
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import * as C from './constants'
 
 const { FN_NIL, ROOT, TRACE, DEBUG, INFO, WARN, ERROR, UNDEFINED } = C

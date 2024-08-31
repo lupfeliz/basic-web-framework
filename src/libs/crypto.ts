@@ -1,4 +1,11 @@
-/** app 내에서 aes 와 rsa 방식 암복호화를 간편하게 다룰 목적으로 작성 */
+/**
+ * @File        : crypto.ts
+ * @Author      : 정재백
+ * @Since       : 2023-10-10
+ * @Description : 암호화 유틸
+ *                app 내에서 aes 와 rsa 방식 암복호화를 간편하게 다룰 목적으로 작성
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import cryptojs from 'crypto-js'
 import * as C from './constants'
 import log from './log'

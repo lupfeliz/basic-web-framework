@@ -1,4 +1,10 @@
-/** 빌드시 소스코드를 가로채어 변화시켜주는 웹팩 플러그인 */
+/**
+ * @File        : replace-loader.js
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 빌드시 소스코드를 가로채어 변화시켜주는 웹팩 플러그인
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 module.exports = function(source) {
   let result = String(source || '')
   let mat

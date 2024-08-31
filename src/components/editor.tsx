@@ -1,10 +1,17 @@
-import { ComponentPropsWithRef, useRef } from 'react'
+/**
+ * @File        : editor.tsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 편집기 컴포넌트
+ * @Site        : https://devlog.ntiple.com/795
+ **/
+import { ComponentPropsWithRef } from 'react'
 import { useEditor, EditorContent, EditorContentProps } from '@tiptap/react'
 import { Mark, mergeAttributes } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
+import lodash from 'lodash'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
-import lodash from 'lodash'
 
 /** 편집기 내부에서 span 태그 사용이 가능하도록 편집기(tiptap) 플러그인 작성 */
 const Span = Mark.create({
@@ -24,7 +31,7 @@ type EditorProps = ComponentPropsWithRef<'div'> & EditorContentProps & {
   name?: string
 }
 
-const { log, copyExclude, copyRef, useSetup, defineComponent, modelValue } = app
+const { useRef, copyExclude, copyRef, useSetup, defineComponent, modelValue } = app
 const { debounce } = lodash
 
 export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & any) => {

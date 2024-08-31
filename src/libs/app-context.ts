@@ -1,11 +1,18 @@
-/** APP 구동시 빈번하게 사용되는 기능들의 복합체, values 등 유틸들이 mixin 되어 있다 */
+/**
+ * @File        : app-context.ts
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 통합기능모듈
+ *                APP 구동시 빈번하게 사용되는 기능들의 복합체, values 등 유틸들이 mixin 되어 있다
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Function1, Function2, debounce } from 'lodash'
 import $ from 'jquery'
 import getConfig from 'next/config'
 import { createSlice } from '@reduxjs/toolkit'
 import { configureStore } from '@reduxjs/toolkit'
-import React, { forwardRef } from 'react'
+import React, { useRef, forwardRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { NextRouter } from 'next/router'
 import dynamic from 'next/dynamic'
@@ -86,7 +93,7 @@ const appContextSlice = createSlice({
 const appContextStore = configureStore({ reducer: appContextSlice.reducer })
 const app = {
   /** values, log, getLogger mixin */
-  ...values, log, getLogger,
+  ...values, log, getLogger, useRef,
   /** 앱 내 유일키 생성 */
   genId() { return `${new Date().getTime()}${String((appvars.uidseq = (appvars.uidseq + 1) % 1000) + 1000).substring(1, 4)}` },
   /**

@@ -1,11 +1,11 @@
 /**
  * @File        : lottie.tsx
- * @Version     : $Rev$
  * @Author      : 정재백
- * @History     : 2024-05-04 최초 작성
+ * @Since       : 2024-04-16 
  * @Description : Lottie 컴포넌트
+ * @Site        : https://devlog.ntiple.com/795
  **/
-import { ComponentPropsWithRef, useRef } from 'react'
+import { ComponentPropsWithRef } from 'react'
 import _Lottie from 'lottie-web'
 import app from '@/libs/app-context'
 type LottieProps = ComponentPropsWithRef<'div'> & {
@@ -14,7 +14,7 @@ type LottieProps = ComponentPropsWithRef<'div'> & {
   autoplay?: boolean
   renderer?: any,
 }
-const { defineComponent, useSetup, log, copyExclude, copyRef, basepath } = app
+const { defineComponent, useSetup, log, copyExclude, copyRef, basepath, useRef } = app
 export default defineComponent((props: LottieProps, ref: LottieProps['ref']) => {
   const pprops = copyExclude(props, [])
   const eref = useRef() as any

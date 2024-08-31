@@ -1,4 +1,12 @@
-import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit'
+/**
+ * @File        : user-context.ts
+ * @Author      : 정재백
+ * @Since       : 2024-04-20
+ * @Description : 사용자 정보 저장소
+ * @Site        : https://devlog.ntiple.com/795
+ **/
+
+import { createSlice, configureStore } from '@reduxjs/toolkit'
 import { persistStore, persistReducer } from 'redux-persist'
 import { getPersistConfig } from 'redux-deep-persist'
 /** 세션스토리지 사용선언, 탭별로 영속저장이 유지된다 */

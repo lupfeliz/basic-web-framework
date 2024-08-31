@@ -1,10 +1,17 @@
+/**
+ * @File        : lgn01001s01.jsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 로그인 페이지
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import app from '@/libs/app-context'
 import api from '@/libs/api'
 import crypto from '@/libs/crypto'
 import * as C from '@/libs/constants'
 import { Form, Block, Button, Container, Input } from '@/components'
 
-const { definePage, useSetup, clone, log, getConfig, goPage } = app
+const { definePage, useSetup, clone, log, goPage } = app
 
 export default definePage(() => {
 
@@ -13,8 +20,7 @@ export default definePage(() => {
       formdata: {
         userId: '',
         passwd: '',
-      },
-      aeskey: '',
+      }
     }
   })
 
@@ -26,7 +32,7 @@ export default definePage(() => {
     try {
       const res = await api.post(`lgn01001`, formdata)
       log.debug('RES:', res)
-      if (res.rescd === '0000') {
+      if (res.rescd === C.RESCD_OK) {
         goPage(-1)
       } else {
         alert('로그인이 실패했습니다')

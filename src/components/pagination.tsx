@@ -1,10 +1,16 @@
+/**
+ * @File        : pagination.tsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : Pagination 컴포넌트
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import _Pagination, { PaginationProps as _PaginationProps } from '@mui/material/Pagination';
 import _Stack from '@mui/material/Stack';
-import { useRef } from 'react'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
 
-const { defineComponent, copyExclude, useSetup, copyRef, log } = app
+const { defineComponent, copyExclude, useSetup, copyRef, useRef } = app
 
 type PaginationProps = _PaginationProps & {
   onChange?: Function

@@ -1,10 +1,17 @@
+/**
+ * @File        : usr01001s03.jsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 마이페이지
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import app from '@/libs/app-context'
 import api from '@/libs/api'
 import userContext from '@/libs/user-context'
 import values from '@/libs/values'
 import crypto from '@/libs/crypto'
 import * as C from '@/libs/constants'
-import { Block, Form, Button, Input, Select, Container, Checkbox } from '@/components'
+import { Block, Form, Button, Input, Select, Container } from '@/components'
 
 const { definePage, useSetup, log, goPage, clone } = app
 const { matcher } = values
@@ -46,7 +53,6 @@ export default definePage(() => {
         vars.formdata.emailHost = email[5]
       }
       update(C.UPDATE_ENTIRE)
-      // log.debug('RES:', email[1], email[5])
     }
   })
   const { update, vars, ready } = self()
@@ -70,21 +76,19 @@ export default definePage(() => {
       alert(msg)
     } else {
       let result = false
-      // dialog.progress(true)
       try {
         /** 필요한 파라메터만 복사한다. */
         Object.keys(model).map((k) => ['id', 'userId', 'passwd', 'email'].indexOf(k) == -1 && delete model[k])
         if (model.passwd) { model.passwd = crypto.aes.encrypt(model.passwd) }
         let res = await api.put(`usr01002`, model)
         log.debug('RES:', res)
-        if (res.rescd === '0000') {
+        if (res.rescd === C.RESCD_OK) {
           result = true
           goPage(-1)
         }
       } catch (e) {
         log.debug('E:', e)
       }
-      // thread(() => { dialog.progress(false) }, 500)
       if (!result) {
         alert('회원 정보 수정에 실패했어요 잠시후 다시 시도해 주세요')
       }

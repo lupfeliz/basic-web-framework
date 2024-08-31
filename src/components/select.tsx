@@ -1,6 +1,12 @@
+/**
+ * @File        : select.tsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 선택 컴포넌트
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import _Select, { SelectProps as _SelectProps } from '@mui/material/Select'
 import _MenuItem from '@mui/material/MenuItem'
-import { useRef } from 'react'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
 
@@ -16,7 +22,7 @@ type InputProps = _SelectProps & {
   options?: OptionType[]
 }
 
-const { log, copyExclude, clear, copyRef, useSetup, defineComponent, modelValue } = app
+const { useRef, copyExclude, clear, copyRef, useSetup, defineComponent, modelValue } = app
 
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model', 'options', 'onChange'])

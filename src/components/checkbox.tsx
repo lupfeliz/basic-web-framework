@@ -1,6 +1,12 @@
+/**
+ * @File        : checkbox.tsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 체크박스 컴포넌트
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import _Checkbox, { CheckboxProps as _CheckboxProps } from '@mui/material/Checkbox'
 import _Radio, { RadioProps as _RadioProps } from '@mui/material/Radio'
-import { useRef } from 'react'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
 
@@ -10,13 +16,12 @@ type CheckboxProps = _CheckboxProps & _RadioProps & {
   type?: 'checkbox' | 'radio'
 }
 
-const { log, copyExclude, copyRef, useSetup, defineComponent, modelValue } = app
+const { useRef, copyExclude, copyRef, useSetup, defineComponent, modelValue } = app
 
 export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model'])
   const elem: any = useRef()
   const self = useSetup({
-    name: 'checkbox',
     props,
     vars: {
       checked: false,

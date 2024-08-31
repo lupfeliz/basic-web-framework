@@ -1,3 +1,11 @@
+/**
+ * @File        : api.ts
+ * @Author      : 정재백
+ * @Since       : 2023-08-09
+ * @Description : api 통신모듈
+ * @Site        : https://devlog.ntiple.com/795
+ **/
+
 import * as C from '@/libs/constants'
 import app from './app-context'
 import userContext from './user-context'

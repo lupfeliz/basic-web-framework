@@ -1,18 +1,19 @@
+/**
+ * @File        : smp01001s01.jsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 페이지 컴포넌트 샘플
+ *                컴포넌트 변경이 감지되면 자동으로 데이터를 갱신할 수 있고
+ *                반대로 데이터 갱신 후 update(C.UPDATE_ENTIRE) 를 수행하여
+ *                컴포넌트를 업데이트 시킬 수 있다.
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
 import { Block, Button, Checkbox, Input, Select, Editor, Lottie, Container } from '@/components'
-import $ from 'jquery'
-import lodash from 'lodash'
 
 const { log, definePage, goPage, useSetup, clear } = app
-const { debounce } = lodash
 
-/**
- * 페이지 컴포넌트 샘플
- * 컴포넌트 변경이 감지되면 자동으로 데이터를 갱신할 수 있고
- * 반대로 데이터 갱신 후 update(C.UPDATE_ENTIRE) 를 수행하여
- * 컴포넌트를 업데이트 시킬 수 있다.
- **/
 export default definePage((props) => {
   const { update, vars } = useSetup({ mounted, unmount, updated, vars: {
     /** 3초 타이머 */

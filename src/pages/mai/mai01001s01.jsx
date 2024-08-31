@@ -1,3 +1,10 @@
+/**
+ * @File        : mai01001s01.jsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 메인 페이지
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import app from '@/libs/app-context'
 import userContext from '@/libs/user-context'
 import { Button, Block, Container } from '@/components'

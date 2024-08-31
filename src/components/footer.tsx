@@ -1,22 +1,27 @@
-import { useRef } from 'react'
+/**
+ * @File        : footer.tsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 꼬리말 컴포넌트
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import $ from 'jquery'
 import lodash from 'lodash'
 import app from '@/libs/app-context'
 import { Container } from '@/components'
-const { defineComponent, useSetup } = app
-const { debounce } = lodash
 
+const { defineComponent, useSetup, useRef } = app
+const { debounce } = lodash
+const evtlst = ['scroll', 'resize']
 export default defineComponent(() => {
   const eref = useRef({} as HTMLDivElement)
   useSetup({
-    async mounted() {
-      window.addEventListener('scroll', fncResize)
-      window.addEventListener('resize', fncResize)
+    async mounted({ releaser }) {
+      evtlst.map(v => window.addEventListener(v, fncResize))
       fncResize()
     },
     async unmount() {
-      window.removeEventListener('scroll', fncResize)
-      window.removeEventListener('resize', fncResize)
+      evtlst.map(v => window.removeEventListener(v, fncResize))
     }
   })
   const fncResizePost = debounce(() => {

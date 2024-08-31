@@ -1,9 +1,15 @@
-/** 페이지 트랜지션이 적용된 기본 레이아웃, Header 와 Footer 요소가 존재함. */
+/**
+ * @File        : layout.tsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 기본 레이아웃 컴포넌트
+ *                페이지 트랜지션이 적용된 기본 레이아웃, Header 와 Footer 요소가 존재함.
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import { motion, HTMLMotionProps } from 'framer-motion'
 import app from '@/libs/app-context'
 import Header from './header'
 import Footer from './footer'
-import { Container } from '@mui/material'
 
 type LayoutProps = HTMLMotionProps<'div'>
 export default app.defineComponent((props: LayoutProps, ref: any) => {

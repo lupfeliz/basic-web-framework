@@ -1,5 +1,11 @@
+/**
+ * @File        : input.tsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 입력 컴포넌트
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import _TextField, { TextFieldProps as _TextFieldProps } from '@mui/material/TextField'
-import { useRef } from 'react'
 import $ from 'jquery'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
@@ -12,7 +18,7 @@ type InputProps = _TextFieldProps & {
   pattern?: string
 }
 
-const { copyExclude, copyRef, useSetup, defineComponent, modelValue } = app
+const { copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue } = app
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model', 'onEnter', 'maxLength', 'inputMode', 'pattern'])
   const iprops = props?.inputProps || {}

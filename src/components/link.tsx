@@ -1,3 +1,10 @@
+/**
+ * @File        : link.tsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 페이지 링크 컴포넌트 (a태그)
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import { ComponentPropsWithRef, createElement, MouseEvent } from 'react'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'

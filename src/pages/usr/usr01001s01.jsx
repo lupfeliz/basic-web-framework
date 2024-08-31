@@ -1,9 +1,16 @@
+/**
+ * @File        : usr01001s01.jsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 회원가입
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import app from '@/libs/app-context'
 import api from '@/libs/api'
 import values from '@/libs/values'
 import crypto from '@/libs/crypto'
 import * as C from '@/libs/constants'
-import { Block, Form, Button, Input, Select, Container, Checkbox } from '@/components'
+import { Block, Form, Button, Input, Select, Container } from '@/components'
 
 const { definePage, useSetup, log, goPage, clone, sleep } = app
 const { matcher } = values
@@ -53,7 +60,7 @@ export default definePage(() => {
       model.userId = String(model.userId)
         .toLowerCase().replace(/[^a-zA-Z0-9]+/, '')
       const res = await api.get(`usr01001/${model.userId}`)
-      if (res?.rescd !== '0000') {
+      if (res?.rescd !== C.RESCD_OK) {
         alert(`"${model.userId}" 는 이미 사용중이거나 사용할수 없어요.`)
       } else {
         vars.iddupchk = true
@@ -90,7 +97,7 @@ export default definePage(() => {
         model.passwd = crypto.aes.encrypt(model.passwd)
         let res = await api.put(`usr01001`, model)
         log.debug('RES:', res)
-        if (res.rescd === '0000') {
+        if (res.rescd === C.RESCD_OK) {
           result = true
           await goPage(-1)
           await goPage(`/usr/usr01001s02`)

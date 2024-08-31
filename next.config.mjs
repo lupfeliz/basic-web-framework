@@ -1,3 +1,10 @@
+/**
+ * @File        : next.config.mjs
+ * @Author      : 정재백
+ * @Since       : 2023-03-22
+ * @Description : nextjs 구동설정
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import yaml from 'js-yaml'
 import cryptojs from 'crypto-js'
 import fs from 'fs'

@@ -1,6 +1,13 @@
+## @File        : env-**.yml
+## @Author      : 정재백
+## @Since       : 2024-04-16 
+## @Description : 환경설정파일
+## @Site        : https://devlog.ntiple.com/795
+
 app:
   ## 프로파일 local / dev /prod 등 상황에 따라 작성한다
   profile: 'prod'
+  basePath: ''
 api:
   ## API 자바서버 주소 reverse-proxy 로 작동하므로 localhost 로 작성해도 된다.
   base: '/api'

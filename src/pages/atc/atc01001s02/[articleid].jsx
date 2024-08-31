@@ -1,3 +1,10 @@
+/**
+ * @File        : atc01001s02/[articleid].jsx
+ * @Author      : 정재백
+ * @Since       : 2024-04-16 
+ * @Description : 게시물 조회 페이지
+ * @Site        : https://devlog.ntiple.com/795
+ **/
 import app from '@/libs/app-context'
 import api from '@/libs/api'
 import * as C from '@/libs/constants'
@@ -55,7 +62,7 @@ export default definePage(() => {
         log.debug('CHECK:', model)
         const res = await api.put(`atc01001`, model)
         log.debug('RES:', res)
-        if (res.rescd === '0000') {
+        if (res.rescd === C.RESCD_OK) {
           result = true
           goPage(-1)
         }
