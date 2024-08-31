@@ -186,6 +186,7 @@ export default definePage(() => {
               className='mx-1'
               variant='outlined'
               size='large'
+              onClick={ () => goPage(-1) }
               >
               취소
             </Button>
