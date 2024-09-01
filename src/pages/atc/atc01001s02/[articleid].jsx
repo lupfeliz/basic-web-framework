@@ -31,6 +31,7 @@ export default definePage(() => {
       },
     },
     async mounted() {
+      /** getParameter 로 path-variable (articleid)을 읽어온다 */
       loadData(getParameter('articleid'))
     }
   })

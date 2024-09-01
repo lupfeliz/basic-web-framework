@@ -15,7 +15,8 @@ import { Block, Button, Checkbox, Input, Select, Editor, Lottie, Container } fro
 const { log, definePage, goPage, useSetup, clear } = app
 
 export default definePage((props) => {
-  const { update, vars } = useSetup({ mounted, unmount, updated, vars: {
+  const self = useSetup({
+    vars: {
     /** 3초 타이머 */
     timer: 3,
     /** 폼데이터 */
@@ -38,10 +39,10 @@ export default definePage((props) => {
     ],
     /** 난수테스트용 */
     idgen: ['', '', '', ''],
-    pageHeight: 0,
-    scrollTop: 0,
-    pageScale: 1,
-  } })()
+    },
+    mounted, unmount, updated
+  })
+  const { update, vars } = self()
   /** 페이지 시작 이벤트처리 */
   async function mounted() {
     log.debug('MOUNTED! SMP01001S01', props)

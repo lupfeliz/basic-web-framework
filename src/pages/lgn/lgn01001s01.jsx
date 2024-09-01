@@ -48,7 +48,7 @@ export default definePage(() => {
   }
 
   return (
-  <Container id='usr01001s01'>
+  <Container>
     <section className='title'>
       <h2>로그인</h2>
     </section>

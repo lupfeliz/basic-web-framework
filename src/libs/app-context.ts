@@ -289,7 +289,7 @@ const app = {
         await crypto.aes.init(aeskey)
         appvars.astate = C.APPSTATE_ENV
         const userInfo = userContext.getUserInfo()
-        if (userInfo?.userId) { userContext.checkExpire() }
+        if (userInfo?.userId && (userInfo.accessToken?.expireTime || 0) > new Date().getTime()) { userContext.checkExpire() }
         appvars.astate = C.APPSTATE_USER
       } catch (e) {
         appvars.astate = C.APPSTATE_ERROR

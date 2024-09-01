@@ -17,7 +17,7 @@ export default definePage(() => {
   const userInfo = userContext.getUserInfo()
 
   return (
-  <Container id='mai01001s01'>
+  <Container>
     <section className='title'>
       <h2>메인페이지</h2>
     </section>
@@ -26,7 +26,7 @@ export default definePage(() => {
       <p> 샘플 게시판 어플리케이션 입니다. </p>
       <p> 현재 페이지는 메인페이지 입니다. </p>
       <article>
-        { ready() && !(userInfo?.userId) ? (
+        { ready() && !(userInfo?.userId) && (
         <Block>
           <Button
             href='/lgn/lgn01001s01'
@@ -39,7 +39,7 @@ export default definePage(() => {
             회원가입
           </Button>
         </Block>
-        ) : (<></>) }
+        ) }
         <Block>
           <Button
             href='/atc/atc01001s04/1'

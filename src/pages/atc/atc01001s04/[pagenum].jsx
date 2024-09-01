@@ -20,6 +20,7 @@ export default definePage(() => {
       data: {
         list: [],
       },
+      /** pagination 을위한 데이터 */
       pdata: {
         currentPage: 1,
         rowCount: 10,
@@ -42,6 +43,7 @@ export default definePage(() => {
   const print = {
     num: (inx) => (vars.pdata?.rowTotal || 0) - (vars.pdata?.rowStart || 0) - inx,
     cdate: (date) => date && moment(date).format('YYYY-MM-DD'),
+    /** 상태에 따라 다른 메시지가 출력된다 */
     state(state) {
       switch (state) {
       case 0: return '잠시만 기다려 주세요.'

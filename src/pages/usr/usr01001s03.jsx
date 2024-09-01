@@ -44,6 +44,7 @@ export default definePage(() => {
         { name: '직접입력', value: '_' },
       ]
     },
+    /** email 등 저장하고 있지 않은 개인정보를 표시하기 위해 불러들임 */
     async mounted() {
       const res = await api.get(`usr01002/${userInfo.userId}`)
       vars.formdata = res
@@ -63,6 +64,7 @@ export default definePage(() => {
       update(C.UPDATE_SELF)
     }
   }
+  /** validation 진행 후 submit */
   const submit = async () => {
     let msg = ''
     let model = clone(vars.formdata)

@@ -47,6 +47,7 @@ export default definePage(() => {
   })
   const { update, vars } = self()
   const emailHostChanged = async () => {
+    /** 직접입력인 경우 입력컴포넌트 전환 */
     if (vars.formdata.emailHost == '_') {
       vars.emailSelector = 'input'
       vars.formdata.emailHost = ''
@@ -71,6 +72,7 @@ export default definePage(() => {
       alert('아이디를 입력해 주세요')
     }
   }
+  /** 회원가입, was 에 전달하기 전에 validation 부터 수행한다. */
   const submit = async () => {
     let msg = ''
     let model = clone(vars.formdata)

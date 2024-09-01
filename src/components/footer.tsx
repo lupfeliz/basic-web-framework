@@ -26,6 +26,7 @@ export default defineComponent(() => {
   })
   const fncResizePost = debounce(() => {
     const page = $('html,body')
+    /** footer sticky 기능을 위해 css 변수를 수정한다 */
     const footer = eref.current || {}
     {[
       '--screen-height', `${window.innerHeight || 0}px`,
