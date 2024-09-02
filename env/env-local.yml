@@ -9,11 +9,22 @@ app:
   profile: 'local'
   basePath: ''
 api:
-  ## API 자바서버 주소 reverse-proxy 로 작동하므로 localhost 로 작성해도 된다.
-  base: '/api'
-  alter: '/api'
-  server: 'http://localhost:8080'
-  timeout: 10000
+  - 
+    ## API 자바서버 주소 reverse-proxy 로 작동하므로 localhost 로 작성해도 된다.
+    base: '/api'
+    alter: '/api'
+    server: 'http://localhost:8080'
+    timeout: 10000
+  -
+    base: '/h2-console'
+    alter: '/h2-console'
+    server: 'http://localhost:8080'
+    timeout: 10000
+  -
+    base: '/swagger-ui'
+    alter: '/h2-console'
+    server: 'http://localhost:8080'
+    timeout: 10000
 security:
   key:
     ## 페이지 적재후 API 와 키교환을 위한 RSA 암호화 키

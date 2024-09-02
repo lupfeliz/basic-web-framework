@@ -29,11 +29,11 @@ if (!process.env?.PRINTED) {
   })
 }
 /** API 프록시 설정 */
-const apiproxy = [ ]
-apiproxy.push({
-  source: `${yml?.api?.base || '/api'}/:path*`,
-  destination: `${yml?.api?.server || 'http://localhost:8080'}${yml?.api?.alter || '/api'}/:path*`
-})
+const apiproxy = [ ];
+(yml?.api || []).map(api => apiproxy.push({
+  source: `${api?.base || '/api'}/:path*`,
+  destination: `${api?.server || 'http://localhost:8080'}${api?.alter || '/api'}/:path*`
+}))
 return {
   /** /api 경로로 요청이 들어올 경우 API 자바서버로 프록시 */
   async rewrites() { return apiproxy },

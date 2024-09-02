@@ -61,6 +61,13 @@ export default definePage(() => {
             샘플2
           </Button>
         </Block>
+        <Block>
+          <Button
+            href='/h2-console/test.do'
+            >
+            DB콘솔
+          </Button>
+        </Block>
       </article>
     </section>
   </Container>

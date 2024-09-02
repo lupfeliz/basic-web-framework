@@ -24,7 +24,7 @@ const keepalive = true
 /** 초기화, 기본적으로 사용되는 통신헤더 등을 만들어 준다 */
 const init = async (method: string, apicd: string, data?: any, opt?: any) => {
   const headers = putAll({}, opt?.headers || {})
-  const timeout = opt?.timeout || getConfig()?.api?.timeout || 10000
+  const timeout = opt?.timeout || (getConfig()?.api[0] || {})?.timeout || 10000
   const signal = AbortSignal.timeout(timeout)
   const url = api.mkuri(apicd)
   
@@ -203,7 +203,7 @@ const api = {
   mkuri(apicd: string) {
     const mat: any = apicd && /^([a-z]+)([0-9a-zA-Z]+)([/].*){0,1}$/g.exec(apicd) || {}
     if (mat && mat[1]) {
-      return `${app.getConfig()?.api?.base || '/api'}/${mat[1]}/${mat[0]}`
+      return `${(app.getConfig()?.api[0] || {})?.base || '/api'}/${mat[1]}/${mat[0]}`
     } else {
       return apicd
     }

@@ -10,7 +10,7 @@
  **/
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
-import { Block, Button, Checkbox, Input, Select, Editor, Lottie, Container } from '@/components'
+import { Block, Button, Checkbox, Input, Select, Editor, Lottie, Container, Image } from '@/components'
 
 const { log, definePage, goPage, useSetup, clear } = app
 
@@ -223,6 +223,13 @@ export default definePage((props) => {
         <hr />
         <Block className='my-1 w-full overflow-x-auto'>
           FORMDATA: [{ JSON.stringify(vars?.formdata) }]
+        </Block>
+      </article>
+      <article>
+        <h3>IMAGE</h3>
+        <hr />
+        <Block>
+          <Image src={ '/assets/images/test.gif' } alt='' />
         </Block>
       </article>
       <article>
