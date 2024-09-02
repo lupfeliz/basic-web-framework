@@ -63,9 +63,9 @@ export default definePage(() => {
         </Block>
         <Block>
           <Button
-            href='/h2-console/test.do'
+            href='https://devwas.ntiple.com/study202403/swagger/swagger-ui/index.html'
             >
-            DB콘솔
+            오픈API
           </Button>
         </Block>
       </article>
