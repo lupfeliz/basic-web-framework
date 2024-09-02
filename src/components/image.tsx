@@ -9,15 +9,13 @@
 import { ComponentPropsWithRef } from 'react'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
-// import _Image, { ImageProps  as _ImageProps} from 'next/image'
-// type ImageProps = _ImageProps & { }
 type ImageProps = ComponentPropsWithRef<'img'> & { }
 const { defineComponent, useSetup, copyExclude, copyRef, basepath, useRef } = app
 export default defineComponent((props: ImageProps, ref: any) => {
   const pprops = copyExclude(props, ['src', 'alt'])
   const eref = useRef() as any
   const self = useSetup({
-    vars: { src: props.src },
+    vars: { src: C.UNDEFINED },
     async mounted() {
       copyRef(ref, eref)
       update(C.UPDATE_SELF)
