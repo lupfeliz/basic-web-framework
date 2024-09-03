@@ -65,7 +65,7 @@ const appvars = {
   router: {} as NextRouter,
   config: {
     app: { profile: '', basePath: '' },
-    api: { base: '', alter: '', server: '', timeout: 0 },
+    api: [{ base: '', alter: '', server: '', timeout: 0 }],
     auth: { expiry: 0 },
     security: {
       key: { rsa: '' }

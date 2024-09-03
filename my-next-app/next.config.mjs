@@ -18,7 +18,7 @@ const PROFILE = process.env.PROFILE || 'local'
 const yml = yaml.load(fs.readFileSync(`${process.cwd()}/env/env-${PROFILE}.yml`, 'utf8'))
 if (!process.env?.PRINTED) {
   console.log('================================================================================')
-  console.log(`샘플앱 / 프로파일 : ${PROFILE} / 구동모드 : ${cmd} / API프록시 : ${yml.api?.server}`)
+  console.log(`샘플앱 / 프로파일 : ${PROFILE} / 구동모드 : ${cmd} / API프록시 : ${((yml?.api || [])[0] || {})?.server}`)
   console.log('================================================================================')
   process.env.PRINTED = true
   /** 설정정보 등을 암호화 하여 클라이언트로 보내기 위한 AES 키, replace-loader 에 의해 constants 에 입력된다 */

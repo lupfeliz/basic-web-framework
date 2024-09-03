@@ -86,4 +86,5 @@ springdoc:
 
 logging:
   level:
+    root: DEBUG
     org.springframework.boot: INFO
