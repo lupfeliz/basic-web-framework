@@ -43,7 +43,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
   const { vars, update, ready } = self()
   return (
   <>
-  { ready && (
+  { ready() && (
     <div 
       className='ag-theme-quartz'
       style={{ height: 500 }}
