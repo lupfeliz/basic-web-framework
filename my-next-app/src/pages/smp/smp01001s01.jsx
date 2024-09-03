@@ -59,7 +59,7 @@ export default definePage((props) => {
         fdata.content = `<p><span style="color:#f00">CONTENT</span></p>`
         vars.idgen.map((v, i, l) => l[i] = app.genId())
         vars.columnDefs = [
-          { field: 'make', headerName: '메이커', sortable: false, rowSpan: (p => p.data.make == 'Ford' ? 2 : 1) },
+          { field: 'make', headerName: '메이커', sortable: false, groupBy: true },
           { field: 'model', sortable: false },
           { field: 'price', sortable: true },
           { field: 'electric', sortable: false }
@@ -67,8 +67,8 @@ export default definePage((props) => {
         vars.rowData = [
           { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
           { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
-          { make: 'Toyota', model: 'Corolla', price: 29600, electric: false },
-          { make: 'Toyota', model: 'Corolla', price: 29600, electric: false },
+          { make: 'Toyota', model: 'Corolla1', price: 29650, electric: false },
+          { make: 'Toyota', model: 'Corolla2', price: 29600, electric: false },
         ]
 
         /** 전체 데이터 갱신으로 화면 데이터가 자동으로 바뀐다 */
@@ -239,7 +239,8 @@ export default definePage((props) => {
         <hr />
         <Block className='my-1'>
           <DataGrid
-            columnDefs={ vars.columnDefs || []}
+            gridStyle={{ height: 500 }}
+            columnDefs={ vars.columnDefs || [] }
             rowData={ vars.rowData || [] }
             />
         </Block>

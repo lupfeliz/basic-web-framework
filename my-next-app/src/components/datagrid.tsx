@@ -5,15 +5,18 @@
  * @Description : 그리드 컴포넌트
  * @Site        : https://devlog.ntiple.com/795
  **/
-import { AgGridReact, AgGridReactProps } from 'ag-grid-react'
+import { AgGridReact, AgGridReactProps, CustomDateProps } from 'ag-grid-react'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
 import $ from 'jquery'
 
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import { MutableRefObject } from 'react'
+import { CSSProperties, MutableRefObject } from 'react'
+import { ColDef, ColSpanParams, RowSpanParams } from 'ag-grid-community'
 type DataGridProps = AgGridReactProps & {
+  gridClass: string
+  gridStyle: CSSProperties
   ref: MutableRefObject<HTMLDivElement>
 }
 
@@ -26,7 +29,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     props,
     vars: {
       rowData: [ ] as any[],
-      columnDefs: [ ] as any[]
+      columnDefs: [ ] as ColDef[]
     },
     async mounted() {
       copyRef(ref, eref)
@@ -50,12 +53,43 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
 
     for (let cinx = 0; cinx < vars.columnDefs.length; cinx++) {
       const cdef = vars.columnDefs[cinx]
+      const cfld = String(cdef.field || '')
+      {
+        // if ((cdef as any).groupBy) {
+        //   for (let rinx = 0; rinx < vars.rowData.length; rinx++) {
+        //     const row = vars.rowData[rinx]
+        //   }
+        // }
+      }
+      // {
+      //   const ocspn = cdef?.colSpan
+      //   cdef.colSpan = (p: ColSpanParams<any, any>) => {
+      //     return 1
+      //   }
+      // }
+      {
+        const orspn = cdef?.rowSpan
+        cdef.rowSpan = (p: RowSpanParams<any, any>) => {
+          let ret = 1
+          if (cinx == 0) {
+            LOOP: for (let rinx = (p.node?.rowIndex || 0) + 1; rinx < vars.rowData.length; rinx++) {
+              const row = vars.rowData[rinx]
+              if (row[cfld] == p.data[cfld]) {
+                ret++
+              } else {
+                break LOOP
+              }
+            }
+            log.debug('SPAN:', cfld, ret, p.data[cfld])
+          }
+          return ret
+        }
+      }
       {
         const ocls = cdef?.cellClass || ''
         cdef.cellClass = (p: any) => {
           let o: any
           const ccls = p.colDef.cellClass
-          const cfld = p.colDef.field
           const rinx = Number(p.node.rowIndex || 0)
           if (!p.data.__element) { p.data.__element = $(eref.current).find(`.ag-body .ag-row[row-index="${rinx}"]`)[0] }
           const elem = p.data.__element
@@ -84,10 +118,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
           }
           return ret.join(' ')
         }
-        if (ocls) { cdef.cellClass.ocls = ocls }
-      }
-      {
-        const orspn = cdef?.rowSpan
+        if (ocls) { (cdef.cellClass as any).ocls = ocls }
       }
       {
         const ocmpr = cdef?.comparator
@@ -96,7 +127,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
           if (v1 == v2) { return 0 }
           return (v1 > v2) ? 1 : -1
         }
-        if (ocmpr) { cdef.comparator.ocmpr = ocmpr }
+        if (ocmpr) { (cdef.comparator as any).ocmpr = ocmpr }
       }
     }
   }
@@ -109,10 +140,11 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
   { ready() && (
     <div 
       ref={ eref }
-      className='ag-theme-quartz'
-      style={{ height: 500 }}
+      className={ props.gridClass || 'ag-theme-quartz' }
+      style={ props.gridStyle }
       >
       <AgGridReact
+        suppressPropertyNamesCheck={ true }
         suppressRowTransform={ true }
         columnDefs={ vars?.columnDefs || [] }
         rowData={ vars?.rowData || [] }
