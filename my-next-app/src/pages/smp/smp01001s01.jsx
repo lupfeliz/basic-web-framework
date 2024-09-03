@@ -59,14 +59,15 @@ export default definePage((props) => {
         fdata.content = `<p><span style="color:#f00">CONTENT</span></p>`
         vars.idgen.map((v, i, l) => l[i] = app.genId())
         vars.columnDefs = [
-          { field: 'make' },
-          { field: 'model' },
-          { field: 'price' },
-          { field: 'electric' }
+          { field: 'make', sortable: false, rowSpan: (p => p.data.make == 'Ford' ? 2 : 1) },
+          { field: 'model', sortable: false },
+          { field: 'price', sortable: true },
+          { field: 'electric', sortable: false }
         ]
         vars.rowData = [
           { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
           { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
+          { make: 'Toyota', model: 'Corolla', price: 29600, electric: false, __cell_class: { make: 'rspan-slave' } },
           { make: 'Toyota', model: 'Corolla', price: 29600, electric: false },
         ]
 

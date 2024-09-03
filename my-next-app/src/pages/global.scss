@@ -275,3 +275,16 @@ table.articles {
 .max-w-2\/3 {
   max-width: calc(100% * 2 / 3);
 }
+
+.ag-root-wrapper {
+  .rspan-prime {
+    display: flex;
+    align-items: center;
+  }
+  .rspan-slave {
+    color: rgba(255, 255, 255, 0);
+    border-top: 1px solid #fff;
+    position: relative;
+    top: -1px;
+  }
+}
