@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+lombok.config
+
+demo-app.db.mv.db
