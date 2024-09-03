@@ -18,11 +18,13 @@ export default defineComponent(() => {
       aside: false
     },
     async mounted({ releaser }) {
+      /** 사용자 로그인 만료시간 모니터링 */
       releaser(userContext.subscribe(() => update(C.UPDATE_SELF)))
     }
   })
   const { vars, update, ready } = self()
   const userInfo = userContext.getUserInfo()
+  /** aside 메뉴 오픈 */
   const openAside = (visible: boolean) => {
     vars.aside = visible
     update(C.UPDATE_FULL)

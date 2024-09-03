@@ -56,10 +56,6 @@ export default definePage(() => {
     <section className='flex-form'>
       <Form>
         <article className='text-center'>
-          <Block>
-            <p>
-            </p>
-          </Block>
           <Block className='form-block'>
             <label htmlFor='frm-user-id'> 아이디 </label>
             <Block className='form-element'>

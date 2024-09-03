@@ -39,6 +39,7 @@ export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & an
   const elem: any = useRef()
   const editor = useEditor({
     /** 위에서 작성한 Span 플러그인을 사용한다. (이 선언이 없으면 'span' 태그가 불가하어 컬러등 스타일링이 불가능) */
+    immediatelyRender: false,
     extensions: [StarterKit, Span],
     content: '',
   })
