@@ -10,7 +10,7 @@
  **/
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
-import { Block, Button, Checkbox, Input, Select, Editor, Lottie, Container, Image } from '@/components'
+import { Block, Button, Checkbox, Input, Select, Editor, Lottie, Container, Image, DataGrid } from '@/components'
 
 const { log, definePage, goPage, useSetup, clear } = app
 
@@ -39,6 +39,9 @@ export default definePage((props) => {
     ],
     /** 난수테스트용 */
     idgen: ['', '', '', ''],
+
+    columnDefs: [],
+    rowData: []
     },
     mounted, unmount, updated
   })
@@ -55,6 +58,18 @@ export default definePage((props) => {
         fdata.select1 = 'kakao.com'
         fdata.content = `<p><span style="color:#f00">CONTENT</span></p>`
         vars.idgen.map((v, i, l) => l[i] = app.genId())
+        vars.columnDefs = [
+          { field: 'make' },
+          { field: 'model' },
+          { field: 'price' },
+          { field: 'electric' }
+        ]
+        vars.rowData = [
+          { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
+          { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
+          { make: 'Toyota', model: 'Corolla', price: 29600, electric: false },
+        ]
+
         /** 전체 데이터 갱신으로 화면 데이터가 자동으로 바뀐다 */
         update(C.UPDATE_ENTIRE)
       } else if (vars.timer > 0) {
@@ -215,6 +230,16 @@ export default definePage((props) => {
           <Editor
             model={ vars?.formdata }
             name='content'
+            />
+        </Block>
+      </article>
+      <article>
+        <h3> DATA-GRID </h3>
+        <hr />
+        <Block className='my-1'>
+          <DataGrid
+            columnDefs={ vars.columnDefs || []}
+            rowData={ vars.rowData || [] }
             />
         </Block>
       </article>

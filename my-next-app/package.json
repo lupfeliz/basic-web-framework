@@ -18,6 +18,8 @@
     "@tiptap/pm": "^2.6.6",
     "@tiptap/react": "^2.6.6",
     "@tiptap/starter-kit": "^2.6.6",
+    "ag-grid-community": "^32.1.0",
+    "ag-grid-react": "^32.1.0",
     "crypto-js": "^4.2.0",
     "framer-motion": "^11.3.31",
     "html-react-parser": "^5.1.15",
