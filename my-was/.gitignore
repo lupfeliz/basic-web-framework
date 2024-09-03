@@ -38,3 +38,5 @@ out/
 lombok.config
 
 demo-app.db.mv.db
+
+/src/main/resources/static/*
