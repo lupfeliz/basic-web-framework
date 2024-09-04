@@ -9,11 +9,12 @@ import { AgGridReact, AgGridReactProps, CustomDateProps } from 'ag-grid-react'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
 import $ from 'jquery'
+import lodash from 'lodash'
 
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { CSSProperties, MutableRefObject } from 'react'
-import { ColDef, ColSpanParams, RowSpanParams } from 'ag-grid-community'
+import { ColDef, ColSpanParams, GridApi, GridReadyEvent, RowSpanParams } from 'ag-grid-community'
 type DataGridProps = AgGridReactProps & {
   gridClass: string
   gridStyle: CSSProperties
@@ -21,6 +22,7 @@ type DataGridProps = AgGridReactProps & {
 }
 
 const { useSetup, clone, putAll, defineComponent, log, copyExclude, copyRef, useRef } = app
+const { debounce } = lodash
 
 export default defineComponent((props: DataGridProps, ref: DataGridProps['ref']) => {
   const pprops = copyExclude(props, ['columnDefs', 'rowData', 'onGridReady'])
@@ -29,7 +31,8 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     props,
     vars: {
       rowData: [ ] as any[],
-      columnDefs: [ ] as ColDef[]
+      columnDefs: [ ] as ColDef[],
+      api: { } as GridApi
     },
     async mounted() {
       copyRef(ref, eref)
@@ -67,24 +70,24 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
       //     return 1
       //   }
       // }
-      {
-        const orspn = cdef?.rowSpan
-        cdef.rowSpan = (p: RowSpanParams<any, any>) => {
-          let ret = 1
-          if (cinx == 0) {
-            LOOP: for (let rinx = (p.node?.rowIndex || 0) + 1; rinx < vars.rowData.length; rinx++) {
-              const row = vars.rowData[rinx]
-              if (row[cfld] == p.data[cfld]) {
-                ret++
-              } else {
-                break LOOP
-              }
-            }
-            log.debug('SPAN:', cfld, ret, p.data[cfld])
-          }
-          return ret
-        }
-      }
+      // {
+      //   const orspn = cdef?.rowSpan
+      //   cdef.rowSpan = (p: RowSpanParams<any, any>) => {
+      //     let ret = 1
+      //     if (cinx == 0) {
+      //       LOOP: for (let rinx = (p.node?.rowIndex || 0) + 1; rinx < vars.rowData.length; rinx++) {
+      //         const row = vars.rowData[rinx]
+      //         if (row[cfld] == p.data[cfld]) {
+      //           ret++
+      //         } else {
+      //           break LOOP
+      //         }
+      //       }
+      //       log.debug('SPAN:', cfld, ret, p.data[cfld])
+      //     }
+      //     return ret
+      //   }
+      // }
       {
         const ocls = cdef?.cellClass || ''
         cdef.cellClass = (p: any) => {
@@ -114,7 +117,9 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
             }
           }
           {
-            if ((o = p.data?.__cell_class) && (o = o[p.colDef.field])) { ret.push(o) }
+log.debug('CHECK1:', p.data[cfld], p.data?.__cell_class, cfld, ((p.data?.__cell_class || {})[cfld]))
+            if ((o = p.data?.__cell_class) && (o = o[cfld])) { ret.push(o) }
+log.debug('CHECK2:', o, ret)
           }
           return ret.join(' ')
         }
@@ -123,6 +128,11 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
       {
         const ocmpr = cdef?.comparator
         cdef.comparator = (v1: any, v2: any, n1: any, n2: any, desc: any) => {
+if (v1 == '33850') {
+  n1.data.__cell_class = { make: 'red' }
+  n1.data.price = Number('1')
+  dbupdate()
+}
           log.debug('VALUE:', v1, v2, n1, n2, vars.columnDefs[cinx].field, desc)
           if (v1 == v2) { return 0 }
           return (v1 > v2) ? 1 : -1
@@ -131,10 +141,20 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
       }
     }
   }
-  const onGridReady = async (e: any) => {
+  const onGridReady = async (e: GridReadyEvent) => {
+    log.debug('================================================================================')
+    vars.api = e.api
     const props = self().props
     if (props?.onGridReady) { props.onGridReady(e) }
   }
+const dbupdate = debounce(() => {
+  // vars.api.setGridOption('columnDefs', putAll([], vars?.columnDefs))
+  // vars.api.setGridOption('rowData', putAll([], vars?.rowData))
+  vars.api.setGridOption('columnDefs', vars?.columnDefs)
+  vars.api.setGridOption('rowData', vars?.rowData)
+  // update(C.UPDATE_SELF)
+  // update(C.UPDATE_IF_NOT)
+}, 1000)
   return (
   <>
   { ready() && (

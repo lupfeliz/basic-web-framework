@@ -66,7 +66,17 @@ export default definePage((props) => {
         ]
         vars.rowData = [
           { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
+          { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
           { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
+          { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
+          { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
+          { make: 'Ford', model: 'F-Series', price: 33851, electric: false },
+          { make: 'Ford', model: 'F-Series', price: 33852, electric: false },
+          { make: 'Ford', model: 'F-Series', price: 33853, electric: false },
+          { make: 'Ford', model: 'F-Series', price: 33854, electric: false },
+          { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
+          { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
+          { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
           { make: 'Toyota', model: 'Corolla1', price: 29650, electric: false },
           { make: 'Toyota', model: 'Corolla2', price: 29600, electric: false },
         ]
