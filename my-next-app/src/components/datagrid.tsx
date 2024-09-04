@@ -39,6 +39,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
       copyRef(ref, eref)
       refreshData(props)
       update(C.UPDATE_SELF)
+      ;(window as any).GRIDUPDATE = dbupdate
     },
     async unmount() {
 
@@ -101,8 +102,9 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
           let o: any
           const ccls = p.colDef.cellClass
           const rinx = Number(p.node.rowIndex || 0)
-          const elem = $(eref.current).find(`[row-id="${p.node.id}"]`)[0]
-          log.trace('ELEM:', elem)
+          const celem = $(eref.current).find(`[row-id="${p.node.id}"]`)[0]
+          let elem = celem
+          log.trace('ELEM:', celem)
           let ret: string[] = []
           ret.push(`dgi-${rinx}-${cinx}`)
           {
@@ -115,8 +117,12 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
             if (rspan > 1) {
               ret.push('rspan-prime')
               log.debug('ROWSPAN:', rspan, p)
-              for (let inx = 2; inx <= rspan; inx++) {
-                o = vars.rowData[rinx + inx - 1]
+              LOOP: for (let inx = 2; inx <= rspan; inx++) {
+                elem = elem.nextSibling as typeof elem
+                if (!elem) { break LOOP }
+                const ninx = Number(elem.getAttribute('row-index'))
+                // o = vars.rowData[rinx + inx - 1]
+                o = vars.rowData[ninx]
                 o = o.__cell_class ? o.__cell_class : (o.__cell_class = {})
                 o[cfld] = 'rspan-slave'
               }
@@ -132,11 +138,11 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
       {
         const ocmpr = cdef?.comparator
         cdef.comparator = (v1: any, v2: any, n1: any, n2: any, desc: any) => {
-if (v1 === 33850) {
-  n1.data.__cell_class = { make: `red` }
-  n1.data.price = 1
-  dbupdate()
-}
+// if (v1 === 33850) {
+//   n1.data.__cell_class = { make: `red` }
+//   n1.data.price = 1
+//   dbupdate()
+// }
           // log.debug('VALUE:', v1, v2, n1, n2, vars.columnDefs[cinx].field, desc)
           if (v1 == v2) { return 0 }
           return (v1 > v2) ? 1 : -1
