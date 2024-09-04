@@ -50,13 +50,13 @@ export default definePage((props) => {
         log.debug('RES:', res)
         vars.userInfo = userContext.getUserInfo()
         log.debug('USER:', vars.userInfo)
-        update(C.UPDATE_FULL)
+        update(C.UPDATE_SELF)
       } break
       case 2: {
         /** 로그아웃 */
         userContext.logout()
         vars.userInfo = userContext.getUserInfo()
-        update(C.UPDATE_FULL)
+        update(C.UPDATE_SELF)
       } break
       case 3: {
         /** 게시물 조회 */
@@ -68,13 +68,13 @@ export default definePage((props) => {
         })
         log.debug('RES:', res)
         vars.articles = res?.list || []
-        update(C.UPDATE_FULL)
+        update(C.UPDATE_SELF)
       } break
       default: }
     } catch (e) {
       log.debug('E:', e)
       vars.message = e.message
-      update(C.UPDATE_FULL)
+      update(C.UPDATE_SELF)
     }
   }
   return (

@@ -67,7 +67,7 @@ export default definePage(() => {
         vars.iddupchk = true
         alert(`"${model.userId}" 는 사용 가능해요.`)
       }
-      update(C.UPDATE_FULL)
+      update(C.UPDATE_SELF)
     } else {
       alert('아이디를 입력해 주세요')
     }

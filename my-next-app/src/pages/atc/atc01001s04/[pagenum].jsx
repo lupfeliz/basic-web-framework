@@ -55,7 +55,7 @@ export default definePage(() => {
 
   const loadData = async (pagenum = C.UNDEFINED) => {
     vars.state = 0
-    update(C.UPDATE_FULL)
+    update(C.UPDATE_ENTIRE)
     try {
       if (pagenum !== C.UNDEFINED) {
         vars.pdata.rowStart = ((pagenum - 1) || 0) * vars.pdata.rowCount
@@ -76,7 +76,7 @@ export default definePage(() => {
       vars.state = e?.message || '오류가 발생했습니다.'
       log.debug('E:', e)
     }
-    update(C.UPDATE_FULL)
+    update(C.UPDATE_ENTIRE)
   }
 
   const pageChanged = async () => {

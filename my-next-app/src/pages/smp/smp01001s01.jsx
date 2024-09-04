@@ -58,6 +58,19 @@ export default definePage((props) => {
         fdata.select1 = 'kakao.com'
         fdata.content = `<p><span style="color:#f00">CONTENT</span></p>`
         vars.idgen.map((v, i, l) => l[i] = app.genId())
+        /** 전체 데이터 갱신으로 화면 데이터가 자동으로 바뀐다 */
+        update(C.UPDATE_ENTIRE)
+      } else if (vars.timer > 0) {
+        setTimeout(fnctime, 1000)
+        update(C.UPDATE_SELF)
+      }
+      vars.timer--
+    }
+    setTimeout(fnctime, 1000)
+    /** 난수 생성 테스트 */
+    vars.idgen.map((v, i, l) => l[i] = app.genId())
+
+    {
         vars.columnDefs = [
           { field: 'make', headerName: '메이커', sortable: false, groupBy: true },
           { field: 'model', sortable: false },
@@ -80,18 +93,8 @@ export default definePage((props) => {
           { make: 'Toyota', model: 'Corolla1', price: 29650, electric: false },
           { make: 'Toyota', model: 'Corolla2', price: 29600, electric: false },
         ]
-
-        /** 전체 데이터 갱신으로 화면 데이터가 자동으로 바뀐다 */
-        update(C.UPDATE_ENTIRE)
-      } else if (vars.timer > 0) {
-        setTimeout(fnctime, 1000)
-        update(C.UPDATE_FULL)
-      }
-      vars.timer--
+      update(C.UPDATE_ENTIRE)
     }
-    setTimeout(fnctime, 1000)
-    /** 난수 생성 테스트 */
-    vars.idgen.map((v, i, l) => l[i] = app.genId())
   }
   /** 페이지 종료 이벤트 처리 */
   async function unmount() {
@@ -111,6 +114,10 @@ export default definePage((props) => {
       <article>
         <Block className='my-1'>
         <p> GLOBAL-STATE-VALUE: { app.state() } </p>
+        <p> UPDATE_IF_NOT: { app.tstate(C.UPDATE_IF_NOT) } </p>
+        <p> UPDATE_SELF: { app.tstate(C.UPDATE_SELF) } </p>
+        <p> UPDATE_FULL: { app.tstate(C.UPDATE_FULL) } </p>
+        <p> UPDATE_ENTIRE: { app.tstate(C.UPDATE_ENTIRE) } </p>
         </Block>
       </article>
       <article>

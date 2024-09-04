@@ -37,7 +37,7 @@ export default definePage(() => {
     const res = await api.get(`atc01001/${articleId}`)
     vars.data = clone(res)
     log.debug('RES:', res)
-    update(C.UPDATE_FULL)
+    update(C.UPDATE_ENTIRE)
   }
 
   const print = {

@@ -61,6 +61,7 @@ const decryptAES = (v: string, k: string) => JSON.parse(cjaes.decrypt(v, k).toSt
 const appvars = {
   astate: 0,
   gstate: 0,
+  tstate: {} as any,
   uidseq: 0,
   router: {} as NextRouter,
   config: {
@@ -69,7 +70,9 @@ const appvars = {
     auth: { expiry: 0 },
     security: {
       key: { rsa: '' }
-    }
+    },
+    serverRuntimeConfig,
+    publicRuntimeConfig
   }
 }
 
@@ -249,10 +252,11 @@ const app = {
   state: (mode?: number, sendid = '') => {
     mode = Number(mode) || C.UPDATE_IF_NOT
     const state = appvars.gstate = (appvars.gstate) % (Number.MAX_SAFE_INTEGER / 2) + (mode ? 1 : 0)
+    appvars.tstate[mode] = (appvars.tstate[mode] || 0) + 1
     if (mode > C.UPDATE_SELF) {
       app._dispatchState(state, mode > C.UPDATE_FULL ? mode : C.UNDEFINED, sendid)
     }
-    return state
+    return appvars.astate && state
   },
   /** 너무 자주 수행되지 않도록 debounce 를 걸어준다 */
   _dispatchState: debounce((state = 0, mode = 0, sendid= '') => {
@@ -388,8 +392,7 @@ const app = {
     })
   },
   astate: () => appvars.astate,
-  publicRuntimeConfig,
-  serverRuntimeConfig,
+  tstate: (mode: number) => (appvars.astate && appvars.tstate[mode]) || 0,
   getConfig: () => appvars.config,
 }
 

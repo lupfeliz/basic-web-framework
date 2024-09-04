@@ -14,7 +14,7 @@ import lodash from 'lodash'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { CSSProperties, MutableRefObject } from 'react'
-import { ColDef, ColSpanParams, GridApi, GridReadyEvent, RowSpanParams, CellClassParams } from 'ag-grid-community'
+import { ColDef, ColSpanParams, GridApi, GridReadyEvent, RowSpanParams, CellClassParams, RowDataUpdatedEvent, SortChangedEvent } from 'ag-grid-community'
 type DataGridProps = AgGridReactProps & {
   gridClass: string
   gridStyle: CSSProperties
@@ -32,129 +32,195 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     vars: {
       rowData: [ ] as any[],
       columnDefs: [ ] as ColDef[],
-      gridCtx: [] as any[],
+      ctx: {
+        cols: [] as any[],
+        rows: [] as any[],
+        sort: [] as any[],
+        rowSpan: {} as any,
+        cellStyle: {} as any,
+        phase: 0
+      },
       api: { } as GridApi
     },
     async mounted() {
       copyRef(ref, eref)
       refreshData(props)
       update(C.UPDATE_SELF)
-      ;(window as any).GRIDUPDATE = dbupdate
     },
     async unmount() {
-
     },
     async updated(mode) {
       if (mode === C.UPDATE_ENTIRE && vars) {
         refreshData(self().props)
-        update(C.UPDATE_IF_NOT)
+        /** FIXME: rowspan 적용, cellclass 적용 이 한꺼번에 되지 않아 부득이 2번 호출해 주어야 함. */
+        setTimeout(() => refreshData(self().props), 100)
+        // setTimeout(() => render1(), 100)
+        // setTimeout(() => {
+        //   const { props } = self()
+        //   vars.columnDefs = putAll([], props?.columnDefs)
+        //   vars.rowData = putAll([], props?.rowData)
+        // }, 100)
+        update(C.UPDATE_SELF)
       }
     }
   })
   const { vars, update, ready } = self()
-  const refreshData = (props: any) => {
-    vars.columnDefs = putAll([], props?.columnDefs)
-    vars.rowData = putAll([], props?.rowData)
-    for (let rinx = 0; rinx < vars.rowData.length; rinx++) {
-    }
-    for (let cinx = 0; cinx < vars.columnDefs.length; cinx++) {
-      const cdef = vars.columnDefs[cinx]
-      const cfld = String(cdef.field || '')
-      {
-        // if ((cdef as any).groupBy) {
-        //   for (let rinx = 0; rinx < vars.rowData.length; rinx++) {
-        //     const row = vars.rowData[rinx]
+  const refreshData = (props: any, phase: number = 0) => {
+    vars.ctx.phase = phase
+    switch (phase) {
+    case 0: {
+      vars.columnDefs = putAll([], props?.columnDefs)
+      vars.rowData = putAll([], props?.rowData)
+      vars.ctx.rows = []
+      vars.ctx.cols = []
+      // /**  처음부터 rowspan 등을 계산한다 */
+      // for (let rinx = 0; rinx < vars.rowData.length; rinx++) { }
+      LOOP_COL: for (let cinx = 0; cinx < vars.columnDefs.length; cinx++) {
+        const cdef = vars.columnDefs[cinx]
+        const cfld = String(cdef.field || '')
+        vars.ctx.cols.push({
+          rowSpan: cdef?.rowSpan,
+          cellClass: cdef?.cellClass,
+          cellStyle: cdef?.cellStyle
+        })
+        {
+          if ((cdef as any).groupBy) {
+            for (let rinx = 0; rinx < vars.rowData.length; rinx++) {
+              const row = vars.rowData[rinx]
+            }
+          }
+        }
+        // {
+        //   const ocspn = cdef?.colSpan
+        //   cdef.colSpan = (p: ColSpanParams<any, any>) => {
+        //     return 1
         //   }
         // }
-      }
-      // {
-      //   const ocspn = cdef?.colSpan
-      //   cdef.colSpan = (p: ColSpanParams<any, any>) => {
-      //     return 1
-      //   }
-      // }
-      {
-        const orspn = cdef?.rowSpan
-        cdef.rowSpan = (p: RowSpanParams<any, any>) => {
-          let ret = 1
-          const celem = $(eref.current).find(`[row-id="${p?.node?.id}"]`)[0]
-          let elem = celem
-          if (cinx == 0) {
-            LOOP: for (let rinx = (p.node?.rowIndex || 0) + 1; rinx < vars.rowData.length; rinx++) {
-              elem = elem.nextSibling as typeof elem
-              if (!elem) { break LOOP }
-              const ninx = Number(elem.getAttribute('row-index'))
-              const row = vars.rowData[ninx]
-              if (row[cfld] == p.data[cfld]) {
-                ret++
-              } else {
-                break LOOP
+        {
+          cdef.rowSpan = (p: RowSpanParams<any, any>) => {
+            let ret = 1
+            if (p.node) {
+              if(vars.ctx.rowSpan[cfld]) {
+                ret = (vars.ctx.rowSpan[cfld][p.node.rowIndex || 0] || {}).size || 1
               }
             }
-            log.debug('SPAN:', cfld, ret, p.data[cfld])
+            return ret
           }
-          return ret
         }
-      }
-      {
-        const ocls = cdef?.cellClass || ''
-        cdef.cellClass = (p: CellClassParams) => {
-          let o: any
-          const ccls = p.colDef.cellClass
-          const rinx = Number(p.node.rowIndex || 0)
-          const celem = $(eref.current).find(`[row-id="${p.node.id}"]`)[0]
-          let elem = celem
-          log.trace('ELEM:', celem)
-          let ret: string[] = []
-          ret.push(`dgi-${rinx}-${cinx}`)
-          {
-            let ocls = (ccls as any)?.ocls || ''
-            if (ocls && ocls instanceof Function) { ocls = ocls(p) }
-            if (ocls) { ret.push(ocls) }
-          }
-          {
-            let rspan = Number((p.colDef?.rowSpan && p.colDef.rowSpan(p)) || 1)
-            if (rspan > 1) {
-              ret.push('rspan-prime')
-              log.debug('ROWSPAN:', rspan, p)
-              LOOP: for (let inx = 2; inx <= rspan; inx++) {
-                elem = elem.nextSibling as typeof elem
-                if (!elem) { break LOOP }
-                const ninx = Number(elem.getAttribute('row-index'))
-                // o = vars.rowData[rinx + inx - 1]
-                o = vars.rowData[ninx]
-                o = o.__cell_class ? o.__cell_class : (o.__cell_class = {})
-                o[cfld] = 'rspan-slave'
+        {
+          cdef.cellClass = (p: CellClassParams) => {
+            let o: any
+            const ccls = p.colDef.cellClass
+            const rinx = Number(p.node.rowIndex || 0)
+            let ret: string[] = []
+            ret.push(`dgi-${rinx}-${cinx}`)
+            {
+              if ((vars.ctx.cellStyle[cfld] || [])[rinx]) {
+                ret.push(vars.ctx.cellStyle[cfld][rinx])
               }
             }
+            return ret.join(' ')
           }
-          {
-            if ((o = p.data?.__cell_class) && (o = o[cfld])) { ret.push(o) }
-          }
-          return ret.join(' ')
         }
-        if (ocls) { (cdef.cellClass as any).ocls = ocls }
+  //       {
+  //         const ocmpr = cdef?.comparator
+  //         cdef.comparator = (v1: any, v2: any, n1: any, n2: any, desc: any) => {
+  // // if (v1 === 33850) {
+  // //   n1.data.__cell_class = { make: `red` }
+  // //   n1.data.price = 1
+  // //   dbupdate()
+  // // }
+  //           // log.debug('VALUE:', v1, v2, n1, n2, vars.columnDefs[cinx].field, desc)
+  //           if (v1 == v2) { return 0 }
+  //           return (v1 > v2) ? 1 : -1
+  //         }
+  //         if (ocmpr) { (cdef.comparator as any).ocmpr = ocmpr }
+  //       }
       }
-      {
-        const ocmpr = cdef?.comparator
-        cdef.comparator = (v1: any, v2: any, n1: any, n2: any, desc: any) => {
-// if (v1 === 33850) {
-//   n1.data.__cell_class = { make: `red` }
-//   n1.data.price = 1
-//   dbupdate()
-// }
-          // log.debug('VALUE:', v1, v2, n1, n2, vars.columnDefs[cinx].field, desc)
-          if (v1 == v2) { return 0 }
-          return (v1 > v2) ? 1 : -1
+    } break
+    case 1: {
+
+    } break
+    default: }
+    afterSort()
+    // setTimeout(render1, 500)
+  }
+  const afterSort = () => {
+    let o: any
+    vars.ctx.rowSpan = {}
+    CLOOP: for (let cinx = 0; cinx < vars.columnDefs.length; cinx++) {
+      const cdef = o = vars.columnDefs[cinx]
+      const cfld = cdef.field || ''
+      const vcrsp = vars.ctx.rowSpan[cfld] = [] as any[]
+      const vccst = vars.ctx.cellStyle[cfld] = [] as any[]
+      if (cfld && o.groupBy) {
+        let sval = C.UNDEFINED
+        const getSpaninf = (rinx1: number) => vcrsp[rinx1] || (vcrsp[rinx1] = {})
+        let spaninf = C.UNDEFINED
+        RLOOP: for (let rinx = 0; rinx < vars.rowData.length; rinx++) {
+          const rinx1 = vars.api?.getDisplayedRowAtIndex(rinx)?.rowIndex || 0
+          const crow = vars.rowData[rinx1]
+          if (sval === crow[cfld]) {
+            if (spaninf) {
+              spaninf.topctx.size += 1
+              if (!vccst[spaninf.topinx]) { vccst[spaninf.topinx] = [] }
+              if (!vccst[rinx]) { vccst[rinx] = [] }
+              if (vccst[spaninf.topinx].indexOf('rspan-prime') === -1) { vccst[spaninf.topinx].push('rspan-prime') }
+              if ((o = vccst[spaninf.topinx].indexOf('rspan-slave')) !== -1) { vccst[spaninf.topinx].splice(o, 1) }
+              if (vccst[rinx].indexOf('rspan-slave') === -1) { vccst[rinx].push('rspan-slave') }
+              if ((o = vccst[rinx].indexOf('rspan-prime')) !== -1) { vccst[rinx].splice(o, 1) }
+            }
+          } else {
+            putAll(spaninf = getSpaninf(rinx), { size: 1, topinx: rinx, toprow: crow, topctx: spaninf })
+          }
+          sval = crow[cfld]
         }
-        if (ocmpr) { (cdef.comparator as any).ocmpr = ocmpr }
+        log.debug('CHECK-ROWSPAN:', cfld, vcrsp)
       }
     }
   }
+  const render1 = async () => {
+    vars.columnDefs = putAll([], vars.columnDefs)
+    vars.rowData = putAll([], vars.rowData)
+  }
+  // const render1 = async () => {
+  //   vars.ctx.phase = 1
+  //   let cinx = 0
+  //   let cfld = 'make'
+  //   for (let rinx = 0; rinx < vars.rowData.length; rinx++) {
+  //     const rowIndex = vars.api?.getDisplayedRowAtIndex(rinx)?.rowIndex || 0
+  //     const row = vars.rowData[rowIndex]
+  //   }
+  //   update(C.UPDATE_SELF)
+  // }
+  // const render2 = async () => {
+  //   vars.ctx.phase = 2
+  //   update(C.UPDATE_SELF)
+  // }
   const onGridReady = async (e: GridReadyEvent) => {
     vars.api = e.api
+    // vars.api?.getState()?.sort?.sortModel
     const props = self().props
     if (props?.onGridReady) { props.onGridReady(e) }
+
+// ({ GRIDUPDATE: dbupdate, GRIDAPI: e.api, VARS: vars })
+{
+(window as any).GRIDUPDATE = dbupdate;
+(window as any).GRIDAPI = e.api;
+(window as any).VARS = vars;
+}
+  }
+  const onRowDataUpdated = async (e: RowDataUpdatedEvent) => {
+  }
+  const onSortChanged = async (e: SortChangedEvent) => {
+    const sorted = []
+    for (let inx = 0; inx < vars.rowData.length; inx++) {
+      sorted.push(vars.api.getDisplayedRowAtIndex(inx)?.data)
+    }
+    log.debug('SORTED:', sorted)
+    refreshData(self().props)
+    setTimeout(() => refreshData(self().props), 100)
+    update(C.UPDATE_SELF)
   }
   const dbupdate = debounce(() => {
     log.debug('ROW-DATA:', vars.rowData)
@@ -175,6 +241,8 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
         columnDefs={ vars?.columnDefs || [] }
         rowData={ vars?.rowData || [] }
         onGridReady={ onGridReady }
+        onRowDataUpdated={ onRowDataUpdated }
+        onSortChanged={ onSortChanged }
         { ...(pprops as any) }
         />
     </div>
