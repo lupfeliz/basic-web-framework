@@ -117,9 +117,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
             }
           }
           {
-log.debug('CHECK1:', p.data[cfld], p.data?.__cell_class, cfld, ((p.data?.__cell_class || {})[cfld]))
             if ((o = p.data?.__cell_class) && (o = o[cfld])) { ret.push(o) }
-log.debug('CHECK2:', o, ret)
           }
           return ret.join(' ')
         }
@@ -128,12 +126,12 @@ log.debug('CHECK2:', o, ret)
       {
         const ocmpr = cdef?.comparator
         cdef.comparator = (v1: any, v2: any, n1: any, n2: any, desc: any) => {
-if (v1 == '33850') {
+if (v1 === 33850) {
   n1.data.__cell_class = { make: 'red' }
-  n1.data.price = Number('1')
+  n1.data.price = 1
   dbupdate()
 }
-          log.debug('VALUE:', v1, v2, n1, n2, vars.columnDefs[cinx].field, desc)
+          // log.debug('VALUE:', v1, v2, n1, n2, vars.columnDefs[cinx].field, desc)
           if (v1 == v2) { return 0 }
           return (v1 > v2) ? 1 : -1
         }
@@ -142,19 +140,14 @@ if (v1 == '33850') {
     }
   }
   const onGridReady = async (e: GridReadyEvent) => {
-    log.debug('================================================================================')
     vars.api = e.api
     const props = self().props
     if (props?.onGridReady) { props.onGridReady(e) }
   }
-const dbupdate = debounce(() => {
-  // vars.api.setGridOption('columnDefs', putAll([], vars?.columnDefs))
-  // vars.api.setGridOption('rowData', putAll([], vars?.rowData))
-  vars.api.setGridOption('columnDefs', vars?.columnDefs)
-  vars.api.setGridOption('rowData', vars?.rowData)
-  // update(C.UPDATE_SELF)
-  // update(C.UPDATE_IF_NOT)
-}, 1000)
+  const dbupdate = debounce(() => {
+    vars.api.setGridOption('columnDefs', vars?.columnDefs)
+    vars.api.setGridOption('rowData', vars?.rowData)
+  }, 100)
   return (
   <>
   { ready() && (
