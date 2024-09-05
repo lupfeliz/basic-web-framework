@@ -21,8 +21,7 @@ type DataGridProps = AgGridReactProps & {
   ref: MutableRefObject<HTMLDivElement>
 }
 
-const { useSetup, clone, putAll, defineComponent, log, copyExclude, copyRef, useRef, waitmon } = app
-const { debounce } = lodash
+const { useSetup, putAll, defineComponent, log, copyExclude, copyRef, useRef, waitmon } = app
 
 export default defineComponent((props: DataGridProps, ref: DataGridProps['ref']) => {
   const pprops = copyExclude(props, ['columnDefs', 'rowData', 'onGridReady'])
@@ -136,17 +135,16 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
   }
   const onGridReady = async (e: GridReadyEvent) => {
     vars.api = e.api
-    // vars.api?.getState()?.sort?.sortModel
     const props = self().props
     if (props?.onGridReady) { props.onGridReady(e) }
-    {
-      (window as any).GRIDAPI = e.api;
-      (window as any).UPDATE = update;
-      (window as any).GRIDREFRESH = (mode: any) => refreshData(self().props, mode);
-      (window as any).GRIDSORTED = afterSort;
-      (window as any).GRIDAPI = e.api;
-      (window as any).VARS = vars;
-    }
+    // {
+    //   (window as any).GRIDAPI = e.api;
+    //   (window as any).UPDATE = update;
+    //   (window as any).GRIDREFRESH = (mode: any) => refreshData(self().props, mode);
+    //   (window as any).GRIDSORTED = afterSort;
+    //   (window as any).GRIDAPI = e.api;
+    //   (window as any).VARS = vars;
+    // }
   }
   const onRowDataUpdated = async (e: RowDataUpdatedEvent) => {
     log.debug('ONROWDATAUPDATED:', vars.ctx.phase)

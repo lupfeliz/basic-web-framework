@@ -25,7 +25,7 @@ const keepalive = true
 const init = async (method: string, apicd: string, data?: any, opt?: any) => {
   const headers = putAll({}, opt?.headers || {})
   const timeout = opt?.timeout || (getConfig()?.api[0] || {})?.timeout || 10000
-  const signal = AbortSignal.timeout(timeout)
+  const signal = AbortSignal?.timeout && AbortSignal.timeout(timeout)
   const url = api.mkuri(apicd)
   
   let body: any = ''
