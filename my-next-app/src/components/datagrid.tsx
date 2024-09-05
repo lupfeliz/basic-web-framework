@@ -21,12 +21,11 @@ type DataGridProps = AgGridReactProps & {
   ref: MutableRefObject<HTMLDivElement>
 }
 
-const { useSetup, clone, putAll, defineComponent, log, copyExclude, copyRef, useRef } = app
+const { useSetup, clone, putAll, defineComponent, log, copyExclude, copyRef, useRef, waitmon } = app
 const { debounce } = lodash
 
 export default defineComponent((props: DataGridProps, ref: DataGridProps['ref']) => {
   const pprops = copyExclude(props, ['columnDefs', 'rowData', 'onGridReady'])
-  const eref = useRef<any>()
   const self = useSetup({
     props,
     vars: {
@@ -40,62 +39,32 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
         cellStyle: {} as any,
         phase: 0
       },
-      api: { } as GridApi
+      api: C.UNDEFINED as GridApi,
+      eref: useRef<any>(),
     },
     async mounted() {
-      copyRef(ref, eref)
-      refreshData(props)
-      update(C.UPDATE_SELF)
+      copyRef(ref, vars.eref)
+      refreshData(self().props)
     },
     async unmount() {
     },
     async updated(mode) {
       if (mode === C.UPDATE_ENTIRE && vars) {
         refreshData(self().props)
-        /** FIXME: rowspan 적용, cellclass 적용 이 한꺼번에 되지 않아 부득이 2번 호출해 주어야 함. */
-        setTimeout(() => refreshData(self().props), 100)
-        // setTimeout(() => render1(), 100)
-        // setTimeout(() => {
-        //   const { props } = self()
-        //   vars.columnDefs = putAll([], props?.columnDefs)
-        //   vars.rowData = putAll([], props?.rowData)
-        // }, 100)
-        update(C.UPDATE_SELF)
       }
     }
   })
   const { vars, update, ready } = self()
   const refreshData = (props: any, phase: number = 0) => {
     vars.ctx.phase = phase
+    vars.columnDefs = putAll([], props?.columnDefs)
+    vars.rowData = putAll([], props?.rowData)
     switch (phase) {
-    case 0: {
-      vars.columnDefs = putAll([], props?.columnDefs)
-      vars.rowData = putAll([], props?.rowData)
-      vars.ctx.rows = []
-      vars.ctx.cols = []
-      // /**  처음부터 rowspan 등을 계산한다 */
-      // for (let rinx = 0; rinx < vars.rowData.length; rinx++) { }
+    case 1: {
+      afterSort()
       LOOP_COL: for (let cinx = 0; cinx < vars.columnDefs.length; cinx++) {
         const cdef = vars.columnDefs[cinx]
         const cfld = String(cdef.field || '')
-        vars.ctx.cols.push({
-          rowSpan: cdef?.rowSpan,
-          cellClass: cdef?.cellClass,
-          cellStyle: cdef?.cellStyle
-        })
-        {
-          if ((cdef as any).groupBy) {
-            for (let rinx = 0; rinx < vars.rowData.length; rinx++) {
-              const row = vars.rowData[rinx]
-            }
-          }
-        }
-        // {
-        //   const ocspn = cdef?.colSpan
-        //   cdef.colSpan = (p: ColSpanParams<any, any>) => {
-        //     return 1
-        //   }
-        // }
         {
           cdef.rowSpan = (p: RowSpanParams<any, any>) => {
             let ret = 1
@@ -122,56 +91,42 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
             return ret.join(' ')
           }
         }
-  //       {
-  //         const ocmpr = cdef?.comparator
-  //         cdef.comparator = (v1: any, v2: any, n1: any, n2: any, desc: any) => {
-  // // if (v1 === 33850) {
-  // //   n1.data.__cell_class = { make: `red` }
-  // //   n1.data.price = 1
-  // //   dbupdate()
-  // // }
-  //           // log.debug('VALUE:', v1, v2, n1, n2, vars.columnDefs[cinx].field, desc)
-  //           if (v1 == v2) { return 0 }
-  //           return (v1 > v2) ? 1 : -1
-  //         }
-  //         if (ocmpr) { (cdef.comparator as any).ocmpr = ocmpr }
-  //       }
       }
-    } break
-    case 1: {
-
+      update(C.UPDATE_SELF)
     } break
     default: }
-    afterSort()
     // setTimeout(render1, 500)
   }
   const afterSort = () => {
     let o: any
     vars.ctx.rowSpan = {}
+    waitmon(() => vars.api)
     CLOOP: for (let cinx = 0; cinx < vars.columnDefs.length; cinx++) {
       const cdef = o = vars.columnDefs[cinx]
       const cfld = cdef.field || ''
       const vcrsp = vars.ctx.rowSpan[cfld] = [] as any[]
       const vccst = vars.ctx.cellStyle[cfld] = [] as any[]
+      const sorted = []
       if (cfld && o.groupBy) {
         let sval = C.UNDEFINED
         const getSpaninf = (rinx1: number) => vcrsp[rinx1] || (vcrsp[rinx1] = {})
         let spaninf = C.UNDEFINED
-        RLOOP: for (let rinx = 0; rinx < vars.rowData.length; rinx++) {
-          const rinx1 = vars.api?.getDisplayedRowAtIndex(rinx)?.rowIndex || 0
-          const crow = vars.rowData[rinx1]
+        for (let rinx = 0; rinx < vars.rowData.length; rinx++) { sorted[rinx] = vars.api?.getDisplayedRowAtIndex(rinx) }
+        RLOOP: for (let rinx = 0; rinx < sorted.length; rinx++) {
+          const oinx = Number(sorted[rinx]?.rowIndex || 0)
+          const crow = sorted[rinx]?.data || {}
           if (sval === crow[cfld]) {
             if (spaninf) {
               spaninf.topctx.size += 1
               if (!vccst[spaninf.topinx]) { vccst[spaninf.topinx] = [] }
-              if (!vccst[rinx]) { vccst[rinx] = [] }
+              if (!vccst[oinx]) { vccst[oinx] = [] }
               if (vccst[spaninf.topinx].indexOf('rspan-prime') === -1) { vccst[spaninf.topinx].push('rspan-prime') }
               if ((o = vccst[spaninf.topinx].indexOf('rspan-slave')) !== -1) { vccst[spaninf.topinx].splice(o, 1) }
-              if (vccst[rinx].indexOf('rspan-slave') === -1) { vccst[rinx].push('rspan-slave') }
-              if ((o = vccst[rinx].indexOf('rspan-prime')) !== -1) { vccst[rinx].splice(o, 1) }
+              if (vccst[oinx].indexOf('rspan-slave') === -1) { vccst[oinx].push('rspan-slave') }
+              if ((o = vccst[oinx].indexOf('rspan-prime')) !== -1) { vccst[oinx].splice(o, 1) }
             }
           } else {
-            putAll(spaninf = getSpaninf(rinx), { size: 1, topinx: rinx, toprow: crow, topctx: spaninf })
+            putAll(spaninf = getSpaninf(rinx), { size: 1, oinx: oinx, topinx: oinx, toprow: crow, topctx: spaninf })
           }
           sval = crow[cfld]
         }
@@ -179,59 +134,38 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
       }
     }
   }
-  const render1 = async () => {
-    vars.columnDefs = putAll([], vars.columnDefs)
-    vars.rowData = putAll([], vars.rowData)
-  }
-  // const render1 = async () => {
-  //   vars.ctx.phase = 1
-  //   let cinx = 0
-  //   let cfld = 'make'
-  //   for (let rinx = 0; rinx < vars.rowData.length; rinx++) {
-  //     const rowIndex = vars.api?.getDisplayedRowAtIndex(rinx)?.rowIndex || 0
-  //     const row = vars.rowData[rowIndex]
-  //   }
-  //   update(C.UPDATE_SELF)
-  // }
-  // const render2 = async () => {
-  //   vars.ctx.phase = 2
-  //   update(C.UPDATE_SELF)
-  // }
   const onGridReady = async (e: GridReadyEvent) => {
     vars.api = e.api
     // vars.api?.getState()?.sort?.sortModel
     const props = self().props
     if (props?.onGridReady) { props.onGridReady(e) }
-
-// ({ GRIDUPDATE: dbupdate, GRIDAPI: e.api, VARS: vars })
-{
-(window as any).GRIDUPDATE = dbupdate;
-(window as any).GRIDAPI = e.api;
-(window as any).VARS = vars;
-}
+    {
+      (window as any).GRIDAPI = e.api;
+      (window as any).UPDATE = update;
+      (window as any).GRIDREFRESH = (mode: any) => refreshData(self().props, mode);
+      (window as any).GRIDSORTED = afterSort;
+      (window as any).GRIDAPI = e.api;
+      (window as any).VARS = vars;
+    }
   }
   const onRowDataUpdated = async (e: RowDataUpdatedEvent) => {
+    log.debug('ONROWDATAUPDATED:', vars.ctx.phase)
+    switch (vars.ctx.phase) {
+    case 0: {
+      refreshData(self().props, 1)
+    } break
+    }
   }
   const onSortChanged = async (e: SortChangedEvent) => {
     const sorted = []
-    for (let inx = 0; inx < vars.rowData.length; inx++) {
-      sorted.push(vars.api.getDisplayedRowAtIndex(inx)?.data)
-    }
-    log.debug('SORTED:', sorted)
-    refreshData(self().props)
-    setTimeout(() => refreshData(self().props), 100)
-    update(C.UPDATE_SELF)
-  }
-  const dbupdate = debounce(() => {
-    log.debug('ROW-DATA:', vars.rowData)
+    afterSort()
     vars.api.setGridOption('columnDefs', vars.columnDefs)
-    vars.api.setGridOption('rowData', vars.rowData)
-  }, 100)
+  }
   return (
   <>
   { ready() && (
     <div 
-      ref={ eref }
+      ref={ vars?.eref }
       className={ props.gridClass || 'ag-theme-quartz' }
       style={ props.gridStyle }
       >

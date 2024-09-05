@@ -284,11 +284,23 @@ table.articles {
   .rspan-prime {
     display: flex;
     align-items: center;
+    background-color: var(--ag-background-color);
+    // border-top: 1px solid var(--ag-border-color);
+    border-bottom: 1px solid var(--ag-border-color);
+    // position: relative;
+    // top: -1px;
   }
   .rspan-slave {
     color: rgba(255, 255, 255, 0);
-    border-top: 1px solid #fff;
-    position: relative;
-    top: -1px;
+    // border: 1px solid var(--ag-background-color);
+    // border-top: 1px solid #fff;
+    // position: relative;
+    // top: -1px;
+  }
+
+  .ag-row-hover {
+    .rspan-prime {
+      background-color: var(--ag-row-hover-color);
+    }
   }
 }
