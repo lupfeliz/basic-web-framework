@@ -16,6 +16,7 @@ const evtlst = ['scroll', 'resize']
 export default defineComponent(() => {
   const eref = useRef({} as HTMLDivElement)
   useSetup({
+    name: 'footer',
     async mounted({ releaser }) {
       evtlst.map(v => window.addEventListener(v, fncResize))
       fncResize()

@@ -15,6 +15,7 @@ export default defineComponent((props: ImageProps, ref: any) => {
   const pprops = copyExclude(props, ['src', 'alt'])
   const eref = useRef() as any
   const self = useSetup({
+    name: 'image',
     vars: { src: C.UNDEFINED },
     async mounted() {
       copyRef(ref, eref)

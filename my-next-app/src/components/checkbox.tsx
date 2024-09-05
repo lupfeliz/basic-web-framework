@@ -22,6 +22,7 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
   const pprops = copyExclude(props, ['model'])
   const elem: any = useRef()
   const self = useSetup({
+    name: 'checkbox',
     props,
     vars: {
       checked: false,

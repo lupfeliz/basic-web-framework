@@ -26,6 +26,7 @@ export default defineComponent((props: PaginationProps, ref: PaginationProps['re
   const pprops = copyExclude(props, ['onChange', 'model'])
   const elem = useRef({} as HTMLDivElement)
   const self = useSetup({
+    name: 'pagination',
     vars: props.model || { },
     async mounted() {
       copyRef(ref, elem)

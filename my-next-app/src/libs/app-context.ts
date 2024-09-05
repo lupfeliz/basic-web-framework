@@ -33,6 +33,7 @@ type LauncherProps<V, P> = {
   releaselist?: Function[]
   vars?: V
   props?: P
+  phase?: number
 }
 
 type SetupType<V, P> = {
@@ -116,12 +117,12 @@ const app = {
     const [uid] = React.useState(app.genId())
     const [phase, setPhase] = React.useState(0)
     const [, setState] = React.useState(0)
-    ctx[uid] = app.putAll(ctx[uid] || { name: prm?.name, vars: prm?.vars || {}, releaselist: [] }, { props: prm?.props || {} })
+    ctx[uid] = app.putAll(ctx[uid] || { name: prm?.name, vars: prm?.vars || {}, releaselist: [] }, { props: prm?.props || {}, phase })
     const self = (vars?: any, props?: any) => {
       let ret = {
         uid,
         update: (mode: any) => setState(app.state(mode, uid)),
-        ready: () => !!(appvars.astate && phase),
+        ready: () => !!(appvars.astate && ctx[uid].phase),
         vars: ctx[uid]?.vars || {} as V,
         props: (props || ctx[uid]?.props || {}) as P,
       }

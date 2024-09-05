@@ -9,7 +9,6 @@ import { AgGridReact, AgGridReactProps, CustomDateProps } from 'ag-grid-react'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
 import $ from 'jquery'
-import lodash from 'lodash'
 
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
@@ -29,6 +28,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     'onGridReady', 'onGridPreDestroyed', 'onRowDataUpdated', 'onSortChanged',
   ])
   const self = useSetup({
+    name: 'datagrid',
     props,
     vars: {
       rowData: [ ] as any[],
@@ -54,6 +54,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     },
     async updated(mode) {
       if (mode === C.UPDATE_ENTIRE && vars) {
+        waitmon(() => ready())
         refreshData(self().props)
       }
     }
@@ -99,7 +100,6 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
       update(C.UPDATE_SELF)
     } break
     default: }
-    // setTimeout(render1, 500)
   }
   const afterSort = () => {
     let o: any
@@ -141,38 +141,29 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
   const onGridReady = async (e: GridReadyEvent) => {
     vars.api = e.api
     const props = self().props
-    if (props?.onGridReady) { props.onGridReady(e) }
-
     vars.$gridwrap = $(vars.elem.current).find('.ag-root-wrapper')
     vars.$gridview = vars.$gridwrap.find('.ag-body-viewport')
-    vars.$gridwrap[0].addEventListener('resize', fnGridResize)
-    vars.$gridview[0].addEventListener('scroll', fnGridResize)
+    if (props?.onGridReady) { props.onGridReady(e) }
   }
   const onGridPreDestroyed = async (e: GridPreDestroyedEvent) => {
-    vars.$gridwrap[0].removeEventListener('resize', fnGridResize)
-    vars.$gridview[0].removeEventListener('scroll', fnGridResize)
+    const props = self().props
+    if (props?.onGridPreDestroyed) { props.onGridPreDestroyed(e) }
   }
   const onRowDataUpdated = async (e: RowDataUpdatedEvent) => {
+    const props = self().props
     log.debug('ONROWDATAUPDATED:', vars.ctx.phase)
     switch (vars.ctx.phase) {
     case 0: {
       refreshData(self().props, 1)
     } break
-    }
+    default: }
+    if (props?.onRowDataUpdated) { props.onRowDataUpdated(e) }
   }
   const onSortChanged = async (e: SortChangedEvent) => {
     const sorted = []
     afterSort()
     vars.api.setGridOption('columnDefs', vars.columnDefs)
-  }
-  async function fnGridResize() {
-    // if (vars.$gridwrap.width() == vars.$gridview.width()) {
-    //   console.log('SCROLLBAR:', $(vars.elem.current).find('.ag-body-horizontal-scroll'))
-    //   $(vars.elem.current).find('.ag-body-horizontal-scroll').addClass('hidden')
-    // } else {
-    //   $(vars.elem.current).find('.ag-body-horizontal-scroll').removeClass('hidden')
-    // }
-    // log.debug('GRID RESIZE...', vars.$gridwrap.width(), vars.$gridview.width())
+    if (props?.onSortChanged) { props.onSortChanged(e) }
   }
   return (
   <>

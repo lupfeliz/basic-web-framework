@@ -14,6 +14,7 @@ import { Menu as MenuIcon, ArrowBackIos as ArrowBackIcon } from '@mui/icons-mate
 const { defineComponent, useSetup, goPage } = app
 export default defineComponent(() => {
   const self = useSetup({
+    name: 'header',
     vars: {
       aside: false
     },
