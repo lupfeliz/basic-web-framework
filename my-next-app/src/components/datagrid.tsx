@@ -14,7 +14,7 @@ import lodash from 'lodash'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { CSSProperties, MutableRefObject } from 'react'
-import { ColDef, ColSpanParams, GridApi, GridReadyEvent, RowSpanParams, CellClassParams, RowDataUpdatedEvent, SortChangedEvent } from 'ag-grid-community'
+import { ColDef, ColSpanParams, GridApi, GridReadyEvent, RowSpanParams, CellClassParams, RowDataUpdatedEvent, SortChangedEvent, GridPreDestroyedEvent } from 'ag-grid-community'
 type DataGridProps = AgGridReactProps & {
   gridClass: string
   gridStyle: CSSProperties
@@ -24,7 +24,10 @@ type DataGridProps = AgGridReactProps & {
 const { useSetup, putAll, defineComponent, log, copyExclude, copyRef, useRef, waitmon } = app
 
 export default defineComponent((props: DataGridProps, ref: DataGridProps['ref']) => {
-  const pprops = copyExclude(props, ['columnDefs', 'rowData', 'onGridReady'])
+  const pprops = copyExclude(props, [
+    'suppressPropertyNamesCheck', 'suppressRowTransform', 'columnDefs', 'rowData', 
+    'onGridReady', 'onGridPreDestroyed', 'onRowDataUpdated', 'onSortChanged',
+  ])
   const self = useSetup({
     props,
     vars: {
@@ -39,10 +42,12 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
         phase: 0
       },
       api: C.UNDEFINED as GridApi,
-      eref: useRef<any>(),
+      elem: useRef<any>(),
+      $gridwrap: C.UNDEFINED as JQuery<HTMLElement>,
+      $gridview: C.UNDEFINED as JQuery<HTMLElement>,
     },
     async mounted() {
-      copyRef(ref, vars.eref)
+      copyRef(ref, vars.elem)
       refreshData(self().props)
     },
     async unmount() {
@@ -137,14 +142,15 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     vars.api = e.api
     const props = self().props
     if (props?.onGridReady) { props.onGridReady(e) }
-    // {
-    //   (window as any).GRIDAPI = e.api;
-    //   (window as any).UPDATE = update;
-    //   (window as any).GRIDREFRESH = (mode: any) => refreshData(self().props, mode);
-    //   (window as any).GRIDSORTED = afterSort;
-    //   (window as any).GRIDAPI = e.api;
-    //   (window as any).VARS = vars;
-    // }
+
+    vars.$gridwrap = $(vars.elem.current).find('.ag-root-wrapper')
+    vars.$gridview = vars.$gridwrap.find('.ag-body-viewport')
+    vars.$gridwrap[0].addEventListener('resize', fnGridResize)
+    vars.$gridview[0].addEventListener('scroll', fnGridResize)
+  }
+  const onGridPreDestroyed = async (e: GridPreDestroyedEvent) => {
+    vars.$gridwrap[0].removeEventListener('resize', fnGridResize)
+    vars.$gridview[0].removeEventListener('scroll', fnGridResize)
   }
   const onRowDataUpdated = async (e: RowDataUpdatedEvent) => {
     log.debug('ONROWDATAUPDATED:', vars.ctx.phase)
@@ -159,11 +165,20 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     afterSort()
     vars.api.setGridOption('columnDefs', vars.columnDefs)
   }
+  async function fnGridResize() {
+    // if (vars.$gridwrap.width() == vars.$gridview.width()) {
+    //   console.log('SCROLLBAR:', $(vars.elem.current).find('.ag-body-horizontal-scroll'))
+    //   $(vars.elem.current).find('.ag-body-horizontal-scroll').addClass('hidden')
+    // } else {
+    //   $(vars.elem.current).find('.ag-body-horizontal-scroll').removeClass('hidden')
+    // }
+    // log.debug('GRID RESIZE...', vars.$gridwrap.width(), vars.$gridview.width())
+  }
   return (
   <>
   { ready() && (
     <div 
-      ref={ vars?.eref }
+      ref={ vars?.elem }
       className={ props.gridClass || 'ag-theme-quartz' }
       style={ props.gridStyle }
       >
@@ -173,6 +188,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
         columnDefs={ vars?.columnDefs || [] }
         rowData={ vars?.rowData || [] }
         onGridReady={ onGridReady }
+        onGridPreDestroyed={ onGridPreDestroyed }
         onRowDataUpdated={ onRowDataUpdated }
         onSortChanged={ onSortChanged }
         { ...(pprops as any) }
