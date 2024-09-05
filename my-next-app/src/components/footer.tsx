@@ -27,13 +27,13 @@ export default defineComponent(() => {
       fncResize()
       document.addEventListener('touchstart', fncHide)
       document.addEventListener('touchend', fncCancelHide)
-      vars.elem.current.addEventListener('touchstart', fncHide)
+      vars.elem?.current && vars.elem.current.addEventListener('touchstart', fncHide)
     },
     async unmount() {
       evtlst.map(v => window.removeEventListener(v, fncResize))
       document.removeEventListener('touchstart', fncHide)
       document.removeEventListener('touchend', fncCancelHide)
-      vars.elem.current.removeEventListener('touchstart', fncHide)
+      vars.elem?.current && vars.elem.current.removeEventListener('touchstart', fncHide)
     }
   })
   const { vars } = self()
