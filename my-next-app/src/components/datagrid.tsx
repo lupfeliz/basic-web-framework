@@ -134,7 +134,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
           }
           sval = crow[cfld]
         }
-        log.debug('CHECK-ROWSPAN:', cfld, vcrsp)
+        log.trace('CHECK-ROWSPAN:', cfld, vcrsp)
       }
     }
   }
@@ -151,7 +151,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
   }
   const onRowDataUpdated = async (e: RowDataUpdatedEvent) => {
     const props = self().props
-    log.debug('ONROWDATAUPDATED:', vars.ctx.phase)
+    log.trace('ONROWDATAUPDATED:', vars.ctx.phase)
     switch (vars.ctx.phase) {
     case 0: {
       refreshData(self().props, 1)

@@ -36,7 +36,7 @@ export default defineComponent(() => {
     ].map((v, i, l) => (i % 2) &&
       footer?.style?.setProperty(l[i - 1], v))}
     footer?.classList?.remove('hide')
-  }, 10)
+  }, 100)
   const fncResize = () => {
     eref?.current?.classList?.add('sticky', 'hide')
     fncResizePost()
