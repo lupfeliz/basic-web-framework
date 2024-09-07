@@ -48,22 +48,24 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     },
     async mounted() {
       copyRef(ref, vars.elem)
-      refreshData(self().props)
+      await refreshData(self().props)
+      update(C.UPDATE_SELF)
     },
     async unmount() {
     },
     async updated(mode) {
-      if (mode === C.UPDATE_ENTIRE && vars) {
-        waitmon(() => ready())
-        refreshData(self().props)
+      if (mode === C.UPDATE_ENTIRE) {
+        await refreshData(self().props)
+        update(C.UPDATE_IF_NOT)
       }
     }
   })
   const { vars, update, ready } = self()
-  const refreshData = (props: any, phase: number = 0) => {
+  const refreshData = async (props: any, phase: number = 0) => {
     vars.ctx.phase = phase
     vars.columnDefs = putAll([], props?.columnDefs)
     vars.rowData = putAll([], props?.rowData)
+    await waitmon(() => ready())
     switch (phase) {
     case 1: {
       afterSort()
@@ -104,7 +106,6 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
   const afterSort = () => {
     let o: any
     vars.ctx.rowSpan = {}
-    waitmon(() => vars.api)
     CLOOP: for (let cinx = 0; cinx < vars.columnDefs.length; cinx++) {
       const cdef = o = vars.columnDefs[cinx]
       const cfld = cdef.field || ''
@@ -160,7 +161,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     if (props?.onRowDataUpdated) { props.onRowDataUpdated(e) }
   }
   const onSortChanged = async (e: SortChangedEvent) => {
-    const sorted = []
+    await waitmon(() => vars.api)
     afterSort()
     vars.api.setGridOption('columnDefs', vars.columnDefs)
     if (props?.onSortChanged) { props.onSortChanged(e) }

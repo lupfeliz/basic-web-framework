@@ -27,7 +27,7 @@ import log, { getLogger } from '@/libs/log'
 type UpdateFunction = (mode?: number) => void
 
 type LauncherProps<V, P> = {
-  uid: string
+  uid?: string
   name?: string
   mounted?: Function1<{ releaser: Function1<any, void> }, void>
   unmount?: Function
