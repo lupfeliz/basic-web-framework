@@ -3,10 +3,8 @@
  * @Author      : 정재백
  * @Since       : 2024-09-07
  * @Description : redux 대체용 으로 간단하게 사용할 수 있는 store
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
-import log from './log'
-
 type ReducerProps = {
   type?: string
   payload?: any
@@ -96,7 +94,17 @@ const configureStore: <T>(prm: StoreProps<T>) => StoreType<T> = <T>(prm: StorePr
   return {
     dispatch: (prm: ReducerProps) => {
       let ret = reducer[0](state, prm)
-      for (const k in subscribers) { subscribers[k](prm) }
+      for (const k in subscribers) {
+        try {
+          if (subscribers[k]) {
+            subscribers[k]()
+          } else {
+            delete subscribers[k]
+          }
+        } catch (e) {
+          delete subscribers[k]
+        }
+      }
       return ret
     },
     subscribe: (fnc: Function) => {
