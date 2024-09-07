@@ -10,8 +10,9 @@
 import { Function1, Function2, debounce } from 'lodash'
 import $ from 'jquery'
 import getConfig from 'next/config'
-import { createSlice } from '@reduxjs/toolkit'
-import { configureStore } from '@reduxjs/toolkit'
+// import { createSlice } from '@reduxjs/toolkit'
+// import { configureStore } from '@reduxjs/toolkit'
+import { createSlice, configureStore } from './simple-store'
 import React, { useRef, forwardRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { NextRouter } from 'next/router'
@@ -26,6 +27,7 @@ import log, { getLogger } from '@/libs/log'
 type UpdateFunction = (mode?: number) => void
 
 type LauncherProps<V, P> = {
+  uid: string
   name?: string
   mounted?: Function1<{ releaser: Function1<any, void> }, void>
   unmount?: Function
@@ -117,7 +119,7 @@ const app = {
     const [uid] = React.useState(app.genId())
     const [phase, setPhase] = React.useState(0)
     const [, setState] = React.useState(0)
-    ctx[uid] = app.putAll(ctx[uid] || { name: prm?.name, vars: prm?.vars || {}, releaselist: [] }, { props: prm?.props || {}, phase })
+    ctx[uid] = app.putAll(ctx[uid] || { uid, name: prm?.name, vars: prm?.vars || {}, releaselist: [] }, { props: prm?.props || {}, phase })
     const self = (vars?: any, props?: any) => {
       let ret = {
         uid,

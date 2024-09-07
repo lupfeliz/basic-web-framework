@@ -16,6 +16,7 @@ const { log, definePage, goPage, useSetup, clear } = app
 
 export default definePage((props) => {
   const self = useSetup({
+    name: 'smp01001s01',
     vars: {
     /** 3초 타이머 */
     timer: 3,
@@ -71,28 +72,28 @@ export default definePage((props) => {
     vars.idgen.map((v, i, l) => l[i] = app.genId())
 
     {
-        vars.columnDefs = [
-          { field: 'make', headerName: '메이커', sortable: false, groupBy: true },
-          { field: 'model', sortable: false },
-          { field: 'price', sortable: true },
-          { field: 'electric', sortable: false }
-        ]
-        vars.rowData = [
-          { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
-          { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
-          { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
-          { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
-          { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
-          { make: 'Ford', model: 'F-Series', price: 33851, electric: false },
-          { make: 'Ford', model: 'F-Series', price: 33852, electric: false },
-          { make: 'Ford', model: 'F-Series', price: 33853, electric: false },
-          { make: 'Ford', model: 'F-Series', price: 33854, electric: false },
-          { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
-          { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
-          { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
-          { make: 'Toyota', model: 'Corolla1', price: 29650, electric: false },
-          { make: 'Toyota', model: 'Corolla2', price: 29600, electric: false },
-        ]
+      vars.columnDefs = [
+        { field: 'make', headerName: '메이커', sortable: false, groupBy: true },
+        { field: 'model', sortable: false },
+        { field: 'price', sortable: true },
+        { field: 'electric', sortable: false }
+      ]
+      vars.rowData = [
+        { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
+        { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
+        { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
+        { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
+        { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
+        { make: 'Ford', model: 'F-Series', price: 33851, electric: false },
+        { make: 'Ford', model: 'F-Series', price: 33852, electric: false },
+        { make: 'Ford', model: 'F-Series', price: 33853, electric: false },
+        { make: 'Ford', model: 'F-Series', price: 33854, electric: false },
+        { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
+        { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
+        { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
+        { make: 'Toyota', model: 'Corolla1', price: 29650, electric: false },
+        { make: 'Toyota', model: 'Corolla2', price: 29600, electric: false },
+      ]
       update(C.UPDATE_ENTIRE)
     }
   }
