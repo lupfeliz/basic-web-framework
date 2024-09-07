@@ -21,7 +21,7 @@ export default defineComponent((props: ImageProps, ref: any) => {
       copyRef(ref, eref)
       update(C.UPDATE_SELF)
     },
-    async updated() { vars.src = await basepath(String(props?.src || '')) }
+    async updated() { vars.src = basepath(String(props?.src || '')) }
   })
   const { vars, update } = self()
   return (

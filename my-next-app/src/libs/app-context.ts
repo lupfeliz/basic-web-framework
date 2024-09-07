@@ -4,15 +4,15 @@
  * @Since       : 2024-04-16 
  * @Description : 통합기능모듈
  *                APP 구동시 빈번하게 사용되는 기능들의 복합체, values 등 유틸들이 mixin 되어 있다
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Function1, Function2, debounce } from 'lodash'
 import $ from 'jquery'
 import getConfig from 'next/config'
+import { createSlice, configureStore } from '@/libs/simple-store'
 // import { createSlice } from '@reduxjs/toolkit'
 // import { configureStore } from '@reduxjs/toolkit'
-import { createSlice, configureStore } from './simple-store'
 import React, { useRef, forwardRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { NextRouter } from 'next/router'
@@ -145,17 +145,19 @@ const app = {
               const releaser = (v: Function) => (ctx[uid]?.releaselist || []).push(v)
               res = prm?.mounted && prm.mounted({ releaser })
               if (res && res instanceof Promise) { res = await res }
-              const unsubscribe = app.subscribe(async (mode, sendid) => {
-                const sender = ctx[sendid] || {}
-                log.trace(`SUBSCRIBE : ${sender?.name || ''} → ${prm?.name || ''}`)
-                let res = prm?.updated ? prm.updated(mode, sendid) : {}
-                if (res && res instanceof Promise) { res = await res }
-                setState(app.state(0, uid))
-              })
-              releaser(() => {
-                log.trace('UNSUBSCRIBE...', ctx[uid]?.name || uid)
-                unsubscribe()
-              })
+              if (prm.updated) {
+                const unsubscribe = app.subscribe(async (mode, sendid) => {
+                  const sender = ctx[sendid] || {}
+                  log.trace(`SUBSCRIBE : ${sender?.name || ''} → ${prm?.name || ''}`)
+                  let res = prm?.updated ? prm.updated(mode, sendid) : {}
+                  if (res && res instanceof Promise) { res = await res }
+                  setState(app.state(0, uid))
+                })
+                releaser(() => {
+                  log.trace('UNSUBSCRIBE...', ctx[uid]?.name || uid)
+                  unsubscribe()
+                })
+              }
             } catch (e) { log.trace('E:', e) }
             setPhase(2)
           }, 0)
@@ -370,9 +372,8 @@ const app = {
     ret = key ? prm[key] : prm
     return ret
   },
-  async basepath(uri: string) {
-    await app.waitmon(() => appvars.astate === C.APPSTATE_READY)
-    if (uri.startsWith('/')) { uri = `${String(app.getConfig()?.app?.basePath || '').replace(/[\/]+/g, '/')}${uri}` }
+  basepath(uri: string) {
+    if (uri.startsWith('/')) { uri = `${(publicRuntimeConfig?.basePath || '').replace(/[\/]+/g, '/')}${uri}` }
     return uri
   },
   waitmon(check: () => any, opt?: any) {
@@ -397,6 +398,7 @@ const app = {
   astate: () => appvars.astate,
   tstate: (mode: number) => (appvars.astate && appvars.tstate[mode]) || 0,
   getConfig: () => appvars.config,
+  isServer: () => typeof window === 'undefined',
 }
 
 export default app

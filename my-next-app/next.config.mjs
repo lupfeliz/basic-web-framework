@@ -3,11 +3,15 @@
  * @Author      : 정재백
  * @Since       : 2023-03-22
  * @Description : nextjs 구동설정
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 import yaml from 'js-yaml'
 import cryptojs from 'crypto-js'
-import fs from 'fs'
+import { copyFileSync, readFileSync, existsSync, rmSync } from 'fs'
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
+const dir = dirname(fileURLToPath(import.meta.url))
+
 const nextConfig = () => {
 /** 커맨드 : npm run dev 했을경우 : dev */
 const cmd = process.env.npm_lifecycle_event
@@ -15,12 +19,14 @@ const cmd = process.env.npm_lifecycle_event
 const prod = process.env.NODE_ENV === 'production'
 /** 프로파일별 환경변수를 읽어온다 */
 const PROFILE = process.env.PROFILE || 'local'
-const yml = yaml.load(fs.readFileSync(`${process.cwd()}/env/env-${PROFILE}.yml`, 'utf8'))
+const yml = yaml.load(readFileSync(`${process.cwd()}/env/env-${PROFILE}.yml`, 'utf8'))
 if (!process.env?.PRINTED) {
   console.log('================================================================================')
-  console.log(`샘플앱 / 프로파일 : ${PROFILE} / 구동모드 : ${cmd} / API프록시 : ${((yml?.api || [])[0] || {})?.server}`)
+  console.log(`샘플앱 / 프로파일 : ${PROFILE} / 구동모드 : ${cmd}[${prod}] / API프록시 : ${((yml?.api || [])[0] || {})?.server}`)
   console.log('================================================================================')
   process.env.PRINTED = true
+  if (existsSync(`${dir}/babel.config.js`)) { rmSync(`${dir}/babel.config.js`) }
+  if (/(bbuild|bgenerate)/.test(cmd)) { copyFileSync(`${dir}/tools/babel/babel.config.js`, `${dir}/babel.config.js`) }
   /** 설정정보 등을 암호화 하여 클라이언트로 보내기 위한 AES 키, replace-loader 에 의해 constants 에 입력된다 */
   const cryptokey = btoa(Array(32).fill('0').map((v, i, l) => l[i] = Math.round(Math.random() * 255)))
   process.env.BUILD_STORE = JSON.stringify({
@@ -47,9 +53,31 @@ return {
   /** 빌드타임에 사용되는 설정정보 */
   serverRuntimeConfig: yml,
   /** 브라우저에 전달할 설정정보 */
-  publicRuntimeConfig: { profile: PROFILE },
+  publicRuntimeConfig: { profile: PROFILE, basePath: yml.app.basePath || '' },
   /** 웹팩 빌드중 소스코드를 가로채 변경한다 (replace-loader) */
   webpack: (cfg, opt) => {
+    cfg.cache = /dev/.test(cmd) ? false : true
+    // cfg.infrastructureLogging = { debug: /PackFileCache/ },
+    cfg.module.rules.push(
+      { test: /\.(js)$/, generator: { filename: '[name].[ext]' } },
+      { test: /\.(woff2)$/, generator: { filename: '[name].[ext]' } },
+    )
+    cfg.output.filename = cfg.output.filename.replace('-[chunkhash]', '')
+    cfg.output.chunkFilename = cfg.output.chunkFilename.replace('.[contenthash]', '')
+    cfg.module.generator.asset.filename = cfg.module.generator.asset.filename.replace('.[hash:8]', '')
+    if (cfg.plugins && cfg.module?.rules) {
+      for (const plugin of cfg.plugins) {
+        if (plugin?.constructor.name === 'CopyFilePlugin') {
+          if (plugin.name === 'static/chunks/polyfills-[hash].js') {
+            plugin.name = 'static/chunks/polyfills.js'
+          }
+        }
+        if (plugin?.constructor.name === 'NextMiniCssExtractPlugin') {
+          plugin.options.filename = plugin.options.filename.replace('[contenthash]', '[name]')
+          plugin.options.chunkFilename = plugin.options.chunkFilename.replace('[contenthash]', '[name]')
+        }
+      }
+    }
     cfg?.module?.rules?.push && cfg.module.rules.push({
       test: [ /\/libs\/(constants|app-context)\.[jt]s$/ ],
       loader: `${process.cwd()}/env/replace-loader.js`,
@@ -57,4 +85,5 @@ return {
     return cfg
   },
 }}
+
 export default nextConfig()

@@ -21,7 +21,7 @@ export default defineComponent((props: LottieProps, ref: LottieProps['ref']) => 
   useSetup({
     name: 'lottie',
     async mounted() {
-      let src = await basepath(props?.src || '')
+      let src = basepath(props?.src || '')
       log.debug('LOTTIE-PATH:', src, app.getConfig().app.basePath)
       const element = eref?.current
       copyRef(ref, eref)
