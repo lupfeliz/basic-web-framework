@@ -185,10 +185,10 @@ const configureStore: <T>(p: StoreProps<T>) => StoreType<T> = <T>(prm: StoreProp
 }
 
 const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
-  console.log('CONFIG:', config)
+  // console.log('CONFIG:', config)
   const write = debounce((v: any) => {
     let str = JSON.stringify(v || {})
-    console.log('WRITE:', str)
+    // console.log('WRITE:', str)
     config.storage.setItem(`persist:${config.key}`, str)
   }, 100)
   const ret = (state: any, action: any) => {
@@ -196,28 +196,15 @@ const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
     if (action.type === TYPE_PERSIST) {
       console.log('REDUCE-TYPE:', state, action, config.key)
       /** FIXME: 임시코드 */
-      // action.rehydrate = (key: any, payload: any, err: any) => {
-      //   let inb = {} as T
-      //   let org = {} as T
-      //   let red = {} as T
-      //   inb = { astate: 10, bstate: 0, cstate: 0 } as T
-      //   red = config.stateReconciler(inb, org, red)
-      //   ret = state
-      // }
       action.register(config.key)
       action.rehydrate(config.key, state, undefined)
-      // action.register(key)
-      // action.rehydrate(key, payload, err)
     } else if (action.type === TYPE_REHYDRATE) {
       console.log('REDUCE-TYPE:', state, action, config.key)
-      // err: undefined
-      // key: "persist"
-      // payload: Object { astate: 6, bstate: 8, cstate: 0, … }
       /** FIXME: 임시코드 */
       let pdata = {}
       if (typeof window) {
         config.storage.getItem(`persist:${config.key}`).then((data: any) => {
-          console.log('DATA:', `persist:${config.key}`, data)
+          // console.log('DATA:', `persist:${config.key}`, data)
           if (data) { pdata = JSON.parse(data) }
           config.stateReconciler(pdata, reducer(undefined as any, {}), state)
         })
@@ -227,110 +214,14 @@ const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
       ret = reducer(state, action)
       write(ret)
     }
-    console.log('P_REDUCE:', state, action, ret, config)
+    // console.log('P_REDUCE:', state, action, ret, config)
     return ret
   }
   return ret 
-
-/**
-sessionStorage['persist:persist'] = '{"astate":"2","bstate":"1","cstate":"0","_persist":"{\\"version\\":1,\\"rehydrated\\":true}"}'
-////////////////////////////////////////////////////////////////////////////////
-{
-type: "persist/PERSIST"
-register: function register(key)​
-rehydrate: function rehydrate(key, payload, err)
-}
-=>
-{
-_persist: Object { version: 1, rehydrated: false }
-userInfo: Object { userId: "", lastAccess: 0, notifyExpire: false, … }
-}
-////////////////////////////////////////////////////////////////////////////////
-{
-type: "persist/REHYDRATE"​
-err: undefined
-key: "user"
-payload: Object { userInfo: {…}, _persist: {…} }
-}
-=>
-{
-_persist: Object { version: 1, rehydrated: true }
-userInfo: Object { userId: "", lastAccess: 0, notifyExpire: false, … }
-}
-////////////////////////////////////////////////////////////////////////////////
-REDUCE: undefined { type: '@@redux/INITm.n.p.t.n' } {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  }
-}
-REDUCE:{
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  }
-} {
-  type: 'persist/PERSIST',
-  register: [Function: register],
-  rehydrate: [Function: rehydrate]
-} {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  },
-  _persist: { version: 1, rehydrated: false }
-}
-REDUCE: {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  },
-  _persist: { version: 1, rehydrated: false }
-} {
-  type: 'persist/REHYDRATE',
-  payload: undefined,
-  err: undefined,
-  key: 'user'
-} {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  },
-  _persist: { version: 1, rehydrated: true }
-}
-////////////////////////////////////////////////////////////////////////////////
-**/
 }
 
 const persistStore = <T>(store: StoreType<T>) => {
   /** TODO: reduce(TYPE_INIT) -> reduce(TYPE_PERSIST) -> reduce(TYPE_REHYDRATE) 순서대로 수행 */
-
-  // store.dispatch({ type: TYPE_PERSIST, register: (key) => {}, rehydrate: (key, payload, err) => {} })
   const hyinf: any = { }
   let res: any
   res = store.dispatch({
@@ -366,192 +257,6 @@ const getPersistConfig = <T>(props: PersistConfig<T>) => {
     transforms: [],
   }
   return  ret
-/**
-key: "user"
-stateReconciler: function autoMergeDeep(inboundState, originalState, reducedState)​
-storage: Object { getItem: getItem(key), setItem: setItem(key, item), removeItem: removeItem(key)
 }
-transforms: Array []
-version: 1
-
-
-
-CHECK: {
-  version: 1,
-  key: 'user',
-  storage: {
-    getItem: [Function: getItem],
-    setItem: [Function: setItem],
-    removeItem: [Function: removeItem]
-  },
-  transforms: [],
-  stateReconciler: [Function: autoMergeDeep]
-}
-REDUCE: undefined { type: '@@redux/INIT7.5.g.3.u.e' } {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  }
-}
-REDUCE: {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  }
-} {
-  type: 'persist/PERSIST',
-  register: [Function: register],
-  rehydrate: [Function: rehydrate]
-} {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  }
-}
-REDUCE: {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  }
-} {
-  type: 'persist/REHYDRATE',
-  payload: undefined,
-  err: undefined,
-  key: 'user'
-} {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  }
-}  
-
-////////////////////////////////////////////////////////////////////////////////
-
-P_REDUCE: undefined { type: '@@redux/INITo.b.w.2.9' } {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  }
-}
-P_REDUCE: {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  }
-} {
-  type: 'persist/PERSIST',
-  register: [Function: register],
-  rehydrate: [Function: rehydrate]
-} {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  },
-  _persist: { version: 1, rehydrated: false }
-}
-P_REDUCE: {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  },
-  _persist: { version: 1, rehydrated: false }
-} {
-  type: 'persist/REHYDRATE',
-  payload: undefined,
-  err: undefined,
-  key: 'user'
-} {
-  userInfo: {
-    userId: '',
-    userNm: '',
-    accessToken: { value: '', expireTime: 0 },
-    refreshToken: { value: '', expireTime: 0 },
-    lastAccess: 0,
-    notifyExpire: false,
-    timelabel: ''
-  },
-  _persist: { version: 1, rehydrated: true }
-}
-
-P_REDUCE: 
-Object { userInfo: {…}, _persist: {…} }
-  _persist: Object { version: 1, rehydrated: true }
-  userInfo: Object { userId: "lupfeliz", userNm: "정재백", lastAccess: 0, … }
-  <prototype>: Object { … }
-Object { type: "user/setUserInfo", payload: {…} }
-  type: "user/setUserInfo"
-  payload: Object { timelabel: "30:01" }
-  <prototype>: Object { … }
-Object { userInfo: {…}, _persist: {…} }
-  _persist: Object { version: 1, rehydrated: true }
-  userInfo: Object { userId: "lupfeliz", userNm: "정재백", lastAccess: 0, … }
-  <prototype>: Object { … }
-  __defineGetter__: function __defineGetter__()
-  __defineSetter__: function __defineSetter__()
-  __lookupGetter__: function __lookupGetter__()
-  __lookupSetter__: function __lookupSetter__()
-  __proto__: 
-  constructor: function Object()
-  hasOwnProperty: function hasOwnProperty()
-  isPrototypeOf: function isPrototypeOf()
-  propertyIsEnumerable: function propertyIsEnumerable()
-  toLocaleString: function toLocaleString()
-  toString: function toString()
-  valueOf: function valueOf()
-  <get __proto__()>: function __proto__()
-  <set __proto__()>: function __proto__()
-**/
-}
-
-// const slice = createSlice({ name: 'abcd', initialState: { astate: 0, bstate: 0, cstate: 0, }, reducers: { setState: (state, { payload }) => { } } })
-// const reducer1 = slice.reducer
-// const reducer2 = combineReducers({ c1: slice.reducer })
-// const store = configureStore({ reducer: reducer2 })
-// store.getState().c1.astate;
 
 export { createSlice, configureStore, configureStore as createStore, persistStore, persistReducer, getPersistConfig, combineReducers }

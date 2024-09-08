@@ -105,10 +105,7 @@ configwrap.stateReconciler = putAll((...p) => {
   return ret
 })
 
-log.debug('--------------------------------------------------------------------------------')
-log.debug('CONFIG:', config, configwrap)
 const preducer = persistReducer(configwrap, wreducer)
-log.debug('--------------------------------------------------------------------------------')
 const pwreducer = (...p) => {
   const ret = preducer(...p)
   log.debug('PWREDUCER:', ...p, ' => ', ret)
