@@ -52,6 +52,14 @@ type StoreType<T> = {
   replaceReducer: () => any
 }
 
+type PersistConfig<T> = {
+  key: string
+  version?: number
+  storage: Storage
+  blacklist?: Array<string>
+  rootReducer: ReducerType<T>
+}
+
 const storeCtx = {
   uidseq: 0,
   subscribers: {} as Record<string, any>,
@@ -60,6 +68,10 @@ const storeCtx = {
 }
 
 const genId = () => String((storeCtx.uidseq = (storeCtx.uidseq + 1) % Number.MAX_SAFE_INTEGER))
+
+const TYPE_INIT = '@@redux/INIT'
+const TYPE_PERSIST = 'persist/PERSIST'
+const TYPE_REHYDRATE = 'persist/REHYDRATE'
 
 const createSlice: <T, N extends string>(p: SliceProps<T, N>) => SliceType<T, N> =
   <T, N extends string>(prm: SliceProps<T, N>) => {
@@ -79,7 +91,8 @@ const createSlice: <T, N extends string>(p: SliceProps<T, N>) => SliceType<T, N>
   }
   ret.reducer = (state, action) => {
     let ret = undefined as T
-    if (!state) {
+    if (!state || String(action.type) === TYPE_INIT) {
+      console.log('INIT:', action.type)
       ret = mystate
       for (const k in prm.initialState) { ret[k] = prm.initialState[k] }
     } else {
@@ -117,7 +130,7 @@ const combineReducers: <T extends Record<string, any>, R extends CombineResultTy
 
 const configureStore: <T>(prm: StoreProps<T>) => StoreType<T> = <T>(prm: StoreProps<T>) => {
   const reducer = [prm.reducer]
-  const state = reducer[0](undefined, {})
+  const state = reducer[0](undefined, { type: TYPE_INIT })
   const uid = genId()
   const subscribers = storeCtx.subscribers[uid] = { } as Record<string, Function>
   return {
@@ -150,7 +163,10 @@ const configureStore: <T>(prm: StoreProps<T>) => StoreType<T> = <T>(prm: StorePr
   } as StoreType<T>
 }
 
-const persistReducer = (config: any, reducer: any) => {
+const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
+  const ret = reducer
+
+  return ret 
 
 /**
 ////////////////////////////////////////////////////////////////////////////////
@@ -249,7 +265,15 @@ REDUCE: {
 const persistStore = () => {
 }
 
-const getPersistConfig = () => {
+const getPersistConfig = <P>(props: PersistConfig<P>) => {
+  const ret = {
+    key: "user",
+    storage: props.storage,
+    version: props.version,
+    stateReconciler: (inboundState: any, originalState: any, reducedState: any) => {},
+    transforms: [],
+  }
+  return  ret
 /**
 key: "user"
 stateReconciler: function autoMergeDeep(inboundState, originalState, reducedState)​

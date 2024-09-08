@@ -7,14 +7,17 @@
  **/
 import app from '@/libs/app-context'
 import api from '@/libs/api'
-// import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit'
-import { createSlice, configureStore, combineReducers } from '@/libs/simple-store'
+import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit'
+// import { createSlice, configureStore, combineReducers } from '@/libs/simple-store'
+import { persistStore, persistReducer } from 'redux-persist'
+import { getPersistConfig } from 'redux-deep-persist'
+import storage from 'redux-persist/lib/storage/session'
 import * as C from '@/libs/constants'
 import crypto from '@/libs/crypto'
 import { Button, Block, Container } from '@/components'
 import userContext from '@/libs/user-context'
 
-const { log, definePage, useSetup, goPage, getParameter, putAll } = app
+const { log, definePage, useSetup, goPage, getParameter, putAll, asType } = app
 
 const slice1 = createSlice({
   name: 'slice1',
@@ -50,15 +53,51 @@ const slice2 = createSlice({
   }
 })
 
+const config = getPersistConfig({
+  key: 'persist',
+  version: 1,
+  storage,
+  blacklist: [ ],
+  rootReducer: slice1.reducer,
+})
+
+const configwrap = asType(putAll({}, config), config)
+
+configwrap.stateReconciler = putAll((inboundState, originalState, reducedState) => {
+  log.debug('PERSIST-CONFIG:', config.stateReconciler, inboundState, originalState, reducedState)
+  let ret
+  if (config.stateReconciler) {
+    try {
+      ret = config.stateReconciler(inboundState, originalState, reducedState)
+    } catch (e) {
+      log.debug('E:', e)
+    }
+  }
+  log.debug('STATERECONCILER:', inboundState, originalState, reducedState, ret)
+  return ret
+})
+
+const preducer = persistReducer(configwrap, (state, action) => {
+  const ret = slice1.reducer(state, action)
+  log.debug('P_REDUCE:', state, action, ret)
+  return ret
+})
+
 const c = combineReducers({ c1: slice1.reducer, c2: slice2.reducer })
 const A = (state, action) => {
   const ret = c(state, action)
   // log.debug('COMBINED:', state, action, ret)
   return ret
 }
-const store1 = configureStore({ reducer: slice1.reducer })
+const store1 = configureStore({
+  reducer: preducer,
+  middleware: (middleware) => middleware({ serializableCheck: false })
+})
+  
 const store2 = configureStore({ reducer: slice2.reducer })
 const store3 = configureStore({ reducer: A })
+
+persistStore(store1)
 
 export default definePage((props) => {
   const self = useSetup({
@@ -77,23 +116,20 @@ export default definePage((props) => {
       })
     }
   })
+
   const { update, vars, ready } = self()
   const onClick = async (v) => {
     switch (v) {
     case 1: {
-      // log.debug('STATE:', store1.getState())
       store1.dispatch(slice1.actions.setState({ astate: Number(store1.getState().astate || 0) + 1 }))
     } break
     case 2: {
-      // log.debug('STATE:', store1.getState())
       store1.dispatch(slice1.actions.setState({ bstate: Number(store1.getState().bstate|| 0) + 1 }))
     } break
     case 3: {
-      // log.debug('STATE:', store1.getState())
       store2.dispatch(slice2.actions.setState({ dstate: Number(store2.getState().dstate || 0) + 1 }))
     } break
     case 4: {
-      // log.debug('STATE:', store1.getState())
       store2.dispatch(slice2.actions.setState({ estate: Number(store2.getState().estate || 0) + 1 }))
     } break
     default: }
