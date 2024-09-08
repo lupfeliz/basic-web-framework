@@ -10,14 +10,14 @@ import api from '@/libs/api'
 // import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit'
 import { createSlice, configureStore, combineReducers } from '@/libs/simple-store'
 // import { persistStore, persistReducer } from 'redux-persist'
-import { persistStore, persistReducer } from '@/libs/simple-store'
 // import { getPersistConfig } from 'redux-deep-persist'
+// import storage from 'redux-persist/lib/storage/session'
+import { persistStore, persistReducer } from '@/libs/simple-store'
 import { getPersistConfig } from '@/libs/simple-store'
-import storage from 'redux-persist/lib/storage/session'
 import * as C from '@/libs/constants'
 import crypto from '@/libs/crypto'
 import { Button, Block, Container } from '@/components'
-import userContext from '@/libs/user-context'
+// import userContext from '@/libs/user-context'
 
 const { log, definePage, useSetup, goPage, getParameter, putAll, asType } = app
 
@@ -63,10 +63,26 @@ const wreducer = (...p) => {
   return ret
 }
 
+
+
+let storage = {
+  getItem: (k) => new Promise(r => r()),
+  setItem:(k, v) => new Promise(r => r()),
+  removeItem: (k) => new Promise(r => r())
+}
+if (!app.isServer()) {
+  const ss = window.sessionStorage
+  storage = {
+    getItem: (k) => new Promise(r => r(ss.getItem(k))),
+    setItem:(k, v) => new Promise(r => r(ss.setItem(k, v))),
+    removeItem: (k) => new Promise(r => r(ss.removeItem(k)))
+  }
+}
+
 const config = getPersistConfig({
   key: 'persist',
   version: 1,
-  storage,
+  storage: storage,
   blacklist: [ ],
   rootReducer: wreducer,
   debug: true
@@ -89,7 +105,10 @@ configwrap.stateReconciler = putAll((...p) => {
   return ret
 })
 
+log.debug('--------------------------------------------------------------------------------')
+log.debug('CONFIG:', config, configwrap)
 const preducer = persistReducer(configwrap, wreducer)
+log.debug('--------------------------------------------------------------------------------')
 const pwreducer = (...p) => {
   const ret = preducer(...p)
   log.debug('PWREDUCER:', ...p, ' => ', ret)

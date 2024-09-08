@@ -5,6 +5,9 @@
  * @Description : redux 대체용 으로 간단하게 사용할 수 있는 store
  * @Site        : https://devlog.ntiple.com
  **/
+import lodash from 'lodash'
+const { debounce } = lodash
+
 type ReturnType<T extends (...args: any) => any> = T extends (...args: any) => infer R ? R : any
 type ReducerProps = {
   type?: string
@@ -182,10 +185,16 @@ const configureStore: <T>(p: StoreProps<T>) => StoreType<T> = <T>(prm: StoreProp
 }
 
 const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
+  console.log('CONFIG:', config)
+  const write = debounce((v: any) => {
+    let str = JSON.stringify(v || {})
+    console.log('WRITE:', str)
+    config.storage.setItem(`persist:${config.key}`, str)
+  }, 100)
   const ret = (state: any, action: any) => {
     let ret: T = undefined as any
     if (action.type === TYPE_PERSIST) {
-      console.log('REDUCE-TYPE:', state, action)
+      console.log('REDUCE-TYPE:', state, action, config.key)
       /** FIXME: 임시코드 */
       // action.rehydrate = (key: any, payload: any, err: any) => {
       //   let inb = {} as T
@@ -200,15 +209,23 @@ const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
       // action.register(key)
       // action.rehydrate(key, payload, err)
     } else if (action.type === TYPE_REHYDRATE) {
-      console.log('REDUCE-TYPE:', state, action)
+      console.log('REDUCE-TYPE:', state, action, config.key)
       // err: undefined
       // key: "persist"
       // payload: Object { astate: 6, bstate: 8, cstate: 0, … }
       /** FIXME: 임시코드 */
-      config.stateReconciler({ astate: 5, bstate: 0, cstate: 0 }, {}, state)
+      let pdata = {}
+      if (typeof window) {
+        config.storage.getItem(`persist:${config.key}`).then((data: any) => {
+          console.log('DATA:', `persist:${config.key}`, data)
+          if (data) { pdata = JSON.parse(data) }
+          config.stateReconciler(pdata, reducer(undefined as any, {}), state)
+        })
+      }
       ret = state
     } else {
       ret = reducer(state, action)
+      write(ret)
     }
     console.log('P_REDUCE:', state, action, ret, config)
     return ret
@@ -337,7 +354,7 @@ const persistStore = <T>(store: StoreType<T>) => {
 
 const getPersistConfig = <T>(props: PersistConfig<T>) => {
   const ret = {
-    key: "user",
+    key: props.key,
     storage: props.storage,
     version: props.version,
     stateReconciler: (inboundState: T, originalState: T, reducedState: T, config: PersistConfig<T>) => {
