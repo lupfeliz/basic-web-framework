@@ -29,7 +29,7 @@ const slice1 = createSlice({
   },
   reducers: {
     setState: (state, prm) => {
-      // log.debug('REDUCE1:', state, prm)
+      log.debug('REDUCE1:', state, prm)
       const { payload } = prm
       payload.astate !== C.UNDEFINED && (state.astate = payload.astate)
       payload.bstate !== C.UNDEFINED && (state.bstate = payload.bstate)
@@ -54,12 +54,20 @@ const slice2 = createSlice({
   }
 })
 
+log.debug('SLICE1:', slice1)
+
+const wreducer = (state, action) => {
+  const ret = slice1.reducer(state, action)
+  log.debug('WREDUCER:', state, action, ret)
+  return ret
+}
+
 const config = getPersistConfig({
   key: 'persist',
   version: 1,
   storage,
   blacklist: [ ],
-  rootReducer: slice1.reducer,
+  rootReducer: wreducer,
 })
 
 const configwrap = asType(putAll({}, config), config)
@@ -80,6 +88,11 @@ configwrap.stateReconciler = putAll((inboundState, originalState, reducedState) 
 })
 
 const preducer = persistReducer(configwrap, slice1.reducer)
+const pwreducer = (state, action) => {
+  const ret = preducer(state, action)
+  log.debug('PWREDUCER:', state, action, ret)
+  return ret
+}
 
 const c = combineReducers({ c1: slice1.reducer, c2: slice2.reducer })
 const A = (state, action) => {
@@ -88,27 +101,43 @@ const A = (state, action) => {
   return ret
 }
 const store1 = configureStore({
-  reducer: preducer,
+  reducer: pwreducer,
   middleware: (middleware) => middleware({ serializableCheck: false })
 })
   
 const store2 = configureStore({ reducer: slice2.reducer })
 const store3 = configureStore({ reducer: A })
 
-persistStore(store1)
+const STORE1 = asType(putAll({}, store1), store1)
+
+STORE1.dispatch = async (p) => {
+  const ret = store1.dispatch(p)
+  log.debug('DISPATCH:', p, ret)
+  return ret
+}
+STORE1.subscribe = (p) => {
+  const ret = store1.subscribe(p)
+  log.debug('SUBSCRIBE:', p, ret)
+  return ret
+}
+
+log.debug('PERSIST-START--------------------------------------------------------------------------------')
+
+persistStore(STORE1)
+log.debug('PERSIST-READY--------------------------------------------------------------------------------.')
 
 export default definePage((props) => {
   const self = useSetup({
     vars: {
     },
     async mounted() {
-      store1.subscribe((v) => { update(C.UPDATE_SELF) })
+      STORE1.subscribe((v) => { update(C.UPDATE_SELF) })
       store2.subscribe((v) => { update(C.UPDATE_SELF) })
       store3.subscribe((v) => { update(C.UPDATE_SELF) })
       putAll(window, {
         SLICE1: slice1,
         SLICE2: slice2,
-        STORE1: store1,
+        STORE1: STORE1,
         STORE2: store2,
         STORE3: store3,
       })
@@ -119,10 +148,10 @@ export default definePage((props) => {
   const onClick = async (v) => {
     switch (v) {
     case 1: {
-      store1.dispatch(slice1.actions.setState({ astate: Number(store1.getState().astate || 0) + 1 }))
+      STORE1.dispatch(slice1.actions.setState({ astate: Number(STORE1.getState().astate || 0) + 1 }))
     } break
     case 2: {
-      store1.dispatch(slice1.actions.setState({ bstate: Number(store1.getState().bstate|| 0) + 1 }))
+      STORE1.dispatch(slice1.actions.setState({ bstate: Number(STORE1.getState().bstate|| 0) + 1 }))
     } break
     case 3: {
       store2.dispatch(slice2.actions.setState({ dstate: Number(store2.getState().dstate || 0) + 1 }))
@@ -142,7 +171,7 @@ export default definePage((props) => {
       <Block>
         { ready() && (
         <>
-        [ASTATE: {store1.getState().astate} / BSTATE: {store1.getState().bstate}]
+        [ASTATE: {STORE1.getState().astate} / BSTATE: {STORE1.getState().bstate}]
         [DSTATE: {store2.getState().dstate} / ESTATE: {store2.getState().estate}]
         </>
         ) }
