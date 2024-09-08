@@ -9,6 +9,7 @@ type ReturnType<T extends (...args: any) => any> = T extends (...args: any) => i
 type ReducerProps = {
   type?: string
   payload?: any
+  [name: string]: any
 }
 
 type ReducerType<T> = (state: T, prm: ReducerProps) => any
@@ -185,14 +186,26 @@ const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
     let ret: T = undefined as any
     if (action.type === TYPE_PERSIST) {
       console.log('REDUCE-TYPE:', state, action)
+      /** FIXME: 임시코드 */
+      // action.rehydrate = (key: any, payload: any, err: any) => {
+      //   let inb = {} as T
+      //   let org = {} as T
+      //   let red = {} as T
+      //   inb = { astate: 10, bstate: 0, cstate: 0 } as T
+      //   red = config.stateReconciler(inb, org, red)
+      //   ret = state
+      // }
+      action.register(config.key)
+      action.rehydrate(config.key, state, undefined)
       // action.register(key)
       // action.rehydrate(key, payload, err)
-      ret = state
     } else if (action.type === TYPE_REHYDRATE) {
       console.log('REDUCE-TYPE:', state, action)
       // err: undefined
       // key: "persist"
       // payload: Object { astate: 6, bstate: 8, cstate: 0, … }
+      /** FIXME: 임시코드 */
+      config.stateReconciler({ astate: 5, bstate: 0, cstate: 0 }, {}, state)
       ret = state
     } else {
       ret = reducer(state, action)
@@ -297,8 +310,29 @@ REDUCE: {
 **/
 }
 
-const persistStore = () => {
+const persistStore = <T>(store: StoreType<T>) => {
   /** TODO: reduce(TYPE_INIT) -> reduce(TYPE_PERSIST) -> reduce(TYPE_REHYDRATE) 순서대로 수행 */
+
+  // store.dispatch({ type: TYPE_PERSIST, register: (key) => {}, rehydrate: (key, payload, err) => {} })
+  const hyinf: any = { }
+  let res: any
+  res = store.dispatch({
+    type: TYPE_PERSIST,
+    register: (key: any) => { },
+    rehydrate: (key: any, payload: any, err: any) => {
+      hyinf.key = key
+      hyinf.pay = payload
+      hyinf.err = err
+    }
+  })
+  console.log('KEY:', hyinf.key, 'PAYLOAD:', hyinf.pay)
+  res = store.dispatch({
+    type: TYPE_REHYDRATE,
+    payload: hyinf.pay,
+    err: hyinf.err,
+    key: hyinf.key
+  })
+  
 }
 
 const getPersistConfig = <T>(props: PersistConfig<T>) => {
@@ -307,6 +341,10 @@ const getPersistConfig = <T>(props: PersistConfig<T>) => {
     storage: props.storage,
     version: props.version,
     stateReconciler: (inboundState: T, originalState: T, reducedState: T, config: PersistConfig<T>) => {
+      /** FIXME: 우선 config 무시 */
+      Object.keys(originalState as any).map(k => (reducedState as any)[k] = (originalState as any)[k])
+      Object.keys(inboundState as any).map(k => (reducedState as any)[k] = (inboundState as any)[k])
+      return reducedState
     },
     transforms: [],
   }

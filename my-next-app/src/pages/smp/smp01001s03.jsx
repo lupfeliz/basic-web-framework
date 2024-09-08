@@ -9,9 +9,10 @@ import app from '@/libs/app-context'
 import api from '@/libs/api'
 // import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit'
 import { createSlice, configureStore, combineReducers } from '@/libs/simple-store'
-import { persistStore, persistReducer } from 'redux-persist'
-// import { persistStore, persistReducer } from '@/libs/simple-store'
-import { getPersistConfig } from 'redux-deep-persist'
+// import { persistStore, persistReducer } from 'redux-persist'
+import { persistStore, persistReducer } from '@/libs/simple-store'
+// import { getPersistConfig } from 'redux-deep-persist'
+import { getPersistConfig } from '@/libs/simple-store'
 import storage from 'redux-persist/lib/storage/session'
 import * as C from '@/libs/constants'
 import crypto from '@/libs/crypto'
@@ -112,6 +113,9 @@ const store3 = configureStore({ reducer: A })
 const STORE1 = asType(putAll({}, store1), store1)
 
 STORE1.dispatch = (...p) => {
+  if (p[0].type === 'persist/PERSIST') {
+
+  }
   const ret = store1.dispatch(...p)
   log.debug('DISPATCH:', ...p, ' => ', ret)
   return ret
@@ -124,7 +128,7 @@ STORE1.subscribe = (...p) => {
 
 STORE1.getState = (...p) => {
   const ret = store1.getState(...p)
-  log.debug('GETSTATE:', ret)
+  // log.debug('GETSTATE:', ret)
   return ret
 }
 
