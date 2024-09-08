@@ -7,8 +7,8 @@
  **/
 import app from '@/libs/app-context'
 import api from '@/libs/api'
-import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit'
-// import { createSlice, configureStore, combineReducers } from '@/libs/simple-store'
+// import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit'
+import { createSlice, configureStore, combineReducers } from '@/libs/simple-store'
 import { persistStore, persistReducer } from 'redux-persist'
 // import { persistStore, persistReducer } from '@/libs/simple-store'
 import { getPersistConfig } from 'redux-deep-persist'
@@ -71,6 +71,7 @@ configwrap.stateReconciler = putAll((inboundState, originalState, reducedState) 
     try {
       ret = config.stateReconciler(inboundState, originalState, reducedState, config)
     } catch (e) {
+      log.debug('E:', ret, inboundState, originalState, reducedState, config)
       log.debug('E:', e)
     }
   }

@@ -1,5 +1,3 @@
-import { ResultTypeFrom } from "@reduxjs/toolkit/query"
-
 /**
  * @File        : simple-store.ts
  * @Author      : 정재백
@@ -90,26 +88,15 @@ const createSlice: <T, N extends string>(p: SliceProps<T, N>) => SliceType<T, N>
     }
   }
   ret.reducer = (state, action) => {
-    let ret = undefined as T
+    let ret = mystate
     if (!state || String(action.type) === TYPE_INIT) {
       console.log('INIT:', action.type)
-      ret = mystate
       for (const k in prm.initialState) { ret[k] = prm.initialState[k] }
-    } else if (action.type === 'persist/PERSIST') {
-      console.log('REDUCE-TYPE:', state, action)
-      // action.register(key)
-      // action.rehydrate(key, payload, err)
-      ret = mystate
-    } else if (action.type === 'persist/REHYDRATE') {
-      console.log('REDUCE-TYPE:', state, action)
-      // err: undefined
-      // key: "persist"
-      // payload: Object { astate: 6, bstate: 8, cstate: 0, … }
-      ret = mystate
     } else {
       const names = String(action.type).split(/\//)
-      reducers[names[1]](mystate, { payload: action.payload })
-      ret = mystate 
+      if (reducers && reducers[names[1]]) {
+        reducers[names[1]](mystate, { payload: action.payload })
+      }
     }
     return ret
   }
@@ -132,33 +119,39 @@ const combineReducers: <T extends Record<string, any>, R extends CombineResultTy
       const names = String(action.type).split(/\//)
       const reducers: any = storeCtx.reducers[names[0]]
       const mystate: any = storeCtx.states[names[0]]
-      reducers[names[1]](mystate, { payload: action.payload })
+      if (reducers && reducers[names[1]]) {
+        reducers[names[1]](mystate, { payload: action.payload })
+        ret = mystate
+      }
     }
     return ret
   }) as any
   return reducer
 }
 
-const configureStore: <T>(prm: StoreProps<T>) => StoreType<T> = <T>(prm: StoreProps<T>) => {
+const configureStore: <T>(p: StoreProps<T>) => StoreType<T> = <T>(prm: StoreProps<T>) => {
   const reducer = [prm.reducer]
   const state = reducer[0](undefined, { type: TYPE_INIT })
+console.log('CONFIG-STORE:', state)
   const uid = genId()
   const subscribers = storeCtx.subscribers[uid] = { } as Record<string, Function>
   return {
     dispatch: async (prm: ReducerProps) => {
-      let ret = reducer[0](state, prm)
-      for (const k in subscribers) {
-        try {
-          if (subscribers[k]) {
-            subscribers[k]()
-          } else {
+      if (reducer[0]) {
+        reducer[0](state, prm)
+        for (const k in subscribers) {
+          try {
+            if (subscribers[k]) {
+              subscribers[k]()
+            } else {
+              delete subscribers[k]
+            }
+          } catch (e) {
             delete subscribers[k]
           }
-        } catch (e) {
-          delete subscribers[k]
         }
       }
-      return ret
+      return state
     },
     subscribe: (fnc: Function) => {
       const sid = genId()
@@ -176,7 +169,21 @@ const configureStore: <T>(prm: StoreProps<T>) => StoreType<T> = <T>(prm: StorePr
 
 const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
   const ret = (state: any, action: any) => {
-    const ret = reducer(state, action)
+    let ret: T = undefined as any
+    if (action.type === 'persist/PERSIST') {
+      console.log('REDUCE-TYPE:', state, action)
+      // action.register(key)
+      // action.rehydrate(key, payload, err)
+      ret = state
+    } else if (action.type === 'persist/REHYDRATE') {
+      console.log('REDUCE-TYPE:', state, action)
+      // err: undefined
+      // key: "persist"
+      // payload: Object { astate: 6, bstate: 8, cstate: 0, … }
+      ret = state
+    } else {
+      ret = reducer(state, action)
+    }
     console.log('P_REDUCE:', state, action, ret, config)
     return ret
   }
@@ -278,6 +285,7 @@ REDUCE: {
 }
 
 const persistStore = () => {
+  /** TODO: reduce(TYPE_INIT) -> reduce(TYPE_PERSIST) -> reduce(TYPE_REHYDRATE) 순서대로 수행 */
 }
 
 const getPersistConfig = <T>(props: PersistConfig<T>) => {
