@@ -94,12 +94,19 @@ const createSlice: <T, N extends string>(p: SliceProps<T, N>) => SliceType<T, N>
     if (!state || actionType === TYPE_INIT) {
       // console.log('INIT:', action.type)
       for (const k in prm.initialState) { ret[k] = prm.initialState[k] }
-    // } else if (action.payload && actionType === TYPE_REHYDRATE) {
-    } else if (state && actionType && action.payload) {
-      /** FIXME: 임시코드 */
-      Object.keys(action.payload).map(k => mystate[k] = action.payload[k])
+    } else if (actionType === TYPE_PERSIST) {
+      // console.log('PERSIST:', action)
+    } else if (actionType === TYPE_REHYDRATE) {
+      /** FIXME: 우선은 TYPE_REHYDRATE 에 대한 코드를 강제 입력한다 (범용성 무시) */
+      if (!action.payload) {
+        action.payload = mystate
+        action.payload._persist = { rehydrated: true }
+      } else {
+        Object.keys(action.payload).map(k => mystate[k] = action.payload[k])
+      }
+      // console.log('REHYDRATE:', mystate, state, action)
     } else {
-      console.log('REDUCE!!:', state, action)
+      // console.log('REDUCE!!:', state, action)
       const names = actionType.split(/\//)
       if (reducers && reducers[names[1]]) {
         reducers[names[1]](mystate, action)
@@ -141,45 +148,21 @@ const combineReducers: <T extends Record<string, any>, R extends CombineResultTy
 const configureStore: <T>(p: StoreProps<T>) => StoreType<T> = <T>(prm: StoreProps<T>) => {
   const reducer = [prm.reducer]
   const state = reducer[0](undefined, { type: TYPE_INIT })
-  // console.log('CONFIG-STORE:', state)
   const uid = genId()
   const subscribers = storeCtx.subscribers[uid] = { } as Record<string, Function>
   return {
     dispatch: (prm: ReducerProps) => {
-      const names = String(prm.type).split(/\//)
-      const reducers = storeCtx.reducers[names[0]]
-      // if (reducers && reducers[names[1]]) {
-      //   reducers[names[1]](state, prm)
-      //   for (const k in subscribers) {
-      //     try {
-      //       if (subscribers[k]) {
-      //         subscribers[k]()
-      //       } else {
-      //         delete subscribers[k]
-      //       }
-      //     } catch (e) {
-      //       delete subscribers[k]
-      //     }
-      //   }
-      //   ret = state
-      // } else {
-      //   ret = prm
-      // }
-      if (reducers && reducers[names[1]]) {
-        reducer[0](state, prm)
-        for (const k in subscribers) {
-          try {
-            if (subscribers[k]) {
-              subscribers[k]()
-            } else {
-              delete subscribers[k]
-            }
-          } catch (e) {
+      reducer[0](state, prm)
+      for (const k in subscribers) {
+        try {
+          if (subscribers[k]) {
+            subscribers[k]()
+          } else {
             delete subscribers[k]
           }
+        } catch (e) {
+          delete subscribers[k]
         }
-      } else {
-        reducer[0](state, prm)
       }
       return prm
     },

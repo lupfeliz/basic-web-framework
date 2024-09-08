@@ -56,9 +56,9 @@ const slice2 = createSlice({
 
 log.debug('SLICE1:', slice1)
 
-const wreducer = (state, action) => {
-  const ret = slice1.reducer(state, action)
-  log.debug('WREDUCER:', state, action, ret)
+const wreducer = (...p) => {
+  const ret = slice1.reducer(...p)
+  log.debug('WREDUCER:', ...p, ' => ', ret)
   return ret
 }
 
@@ -68,36 +68,37 @@ const config = getPersistConfig({
   storage,
   blacklist: [ ],
   rootReducer: wreducer,
+  debug: true
 })
 
 const configwrap = asType(putAll({}, config), config)
 
-configwrap.stateReconciler = putAll((inboundState, originalState, reducedState) => {
-  log.debug('PERSIST-CONFIG:', config.stateReconciler, inboundState, originalState, reducedState)
+configwrap.stateReconciler = putAll((...p) => {
+  // log.debug('PERSIST-CONFIG:', config.stateReconciler, inboundState, originalState, reducedState)
   let ret
   if (config.stateReconciler) {
     try {
-      ret = config.stateReconciler(inboundState, originalState, reducedState, config)
+      ret = config.stateReconciler(...p)
     } catch (e) {
-      log.debug('E:', ret, inboundState, originalState, reducedState, config)
+      log.debug('E:', ret, ...p)
       log.debug('E:', e)
     }
   }
-  log.debug('STATERECONCILER:', inboundState, originalState, reducedState, ret)
+  log.debug('STATERECONCILER:', ...p, ' => ', ret)
   return ret
 })
 
-const preducer = persistReducer(configwrap, slice1.reducer)
-const pwreducer = (state, action) => {
-  const ret = preducer(state, action)
-  log.debug('PWREDUCER:', state, action, ret)
+const preducer = persistReducer(configwrap, wreducer)
+const pwreducer = (...p) => {
+  const ret = preducer(...p)
+  log.debug('PWREDUCER:', ...p, ' => ', ret)
   return ret
 }
 
 const c = combineReducers({ c1: slice1.reducer, c2: slice2.reducer })
-const A = (state, action) => {
-  const ret = c(state, action)
-  // log.debug('COMBINED:', state, action, ret)
+const A = (...p) => {
+  const ret = c(...p)
+  log.debug('COMBINED:', ...p, ' => ', ret)
   return ret
 }
 const store1 = configureStore({
@@ -110,21 +111,30 @@ const store3 = configureStore({ reducer: A })
 
 const STORE1 = asType(putAll({}, store1), store1)
 
-STORE1.dispatch = async (p) => {
-  const ret = store1.dispatch(p)
-  log.debug('DISPATCH:', p, ret)
+STORE1.dispatch = (...p) => {
+  const ret = store1.dispatch(...p)
+  log.debug('DISPATCH:', ...p, ' => ', ret)
   return ret
 }
-STORE1.subscribe = (p) => {
-  const ret = store1.subscribe(p)
-  log.debug('SUBSCRIBE:', p, ret)
+STORE1.subscribe = (...p) => {
+  const ret = store1.subscribe(...p)
+  log.debug('SUBSCRIBE:', ...p, ' => ', ret)
   return ret
 }
 
-log.debug('PERSIST-START--------------------------------------------------------------------------------')
+STORE1.getState = (...p) => {
+  const ret = store1.getState(...p)
+  log.debug('GETSTATE:', ret)
+  return ret
+}
+
+STORE1.replaceReducer = (...p) => {
+  const ret = store1.replaceReducer(...p)
+  log.debug('REPLACE-REDUCER:', ...p, ' => ', ret)
+  return ret
+}
 
 persistStore(STORE1)
-log.debug('PERSIST-READY--------------------------------------------------------------------------------.')
 
 export default definePage((props) => {
   const self = useSetup({
