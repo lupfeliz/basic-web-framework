@@ -25,8 +25,6 @@ type SliceProps<T, N extends keyof any> = {
   reducers: Record<N, ReducerType<T>>
 }
 
-type CombineType<T> = (reducers: T) => T
-
 type ActionRet<T>  = (prm: T) => ReducerProps
 
 type SliceType<T, N extends keyof any> = {
@@ -54,18 +52,19 @@ type StoreType<T> = {
   replaceReducer: () => any
 }
 
-const sliceCtx: Record<string, any> = {
-}
 const storeCtx = {
   uidseq: 0,
-  subscribers: {} as Record<string, any>
+  subscribers: {} as Record<string, any>,
+  reducers: {} as any,
+  states: {} as any,
 }
 
 const genId = () => String((storeCtx.uidseq = (storeCtx.uidseq + 1) % Number.MAX_SAFE_INTEGER))
 
 const createSlice: <T, N extends string>(p: SliceProps<T, N>) => SliceType<T, N> =
   <T, N extends string>(prm: SliceProps<T, N>) => {
-  sliceCtx[prm.name] = { }
+  const mystate: any = storeCtx.states[prm.name] = { }
+  const reducers: any = storeCtx.reducers[prm.name] = prm.reducers
   const ret: SliceType<T, N> = {
     name: prm.name,
     actions: { }
@@ -81,21 +80,39 @@ const createSlice: <T, N extends string>(p: SliceProps<T, N>) => SliceType<T, N>
   ret.reducer = (state, action) => {
     let ret = undefined as T
     if (!state) {
-      ret = {} as any
+      ret = mystate
       for (const k in prm.initialState) { ret[k] = prm.initialState[k] }
     } else {
       const names = String(action.type).split(/\//)
-      prm && (prm.reducers as any)[names[1]](state, { payload: action.payload })
-      ret = state
+      reducers[names[1]](mystate, { payload: action.payload })
+      ret = mystate 
     }
     return ret
   }
   return ret
 }
 
-const combineReducers: <T extends Record<string, any>, R extends CombineResultType<T>>(p: T) => R = <T, R>(p: T) => {
-  const ret = undefined as any as R
-  return ret
+const combineReducers: <T extends Record<string, any>, R extends CombineResultType<T>>(p: T) => R = <T, R>(map: T) => {
+  const rootState= {}
+  const reducer: R = ((state: any, action: any) => {
+    let ret: any
+    if (!state) {
+      ret = rootState
+      for (const k1 in map) {
+        const prm: any = map[k1]
+        ret[k1] = prm(state, action)
+        // console.log('COMBINE-PRM:', k1, prm, ret[k1])
+      }
+    } else {
+      // console.log('REDUCE:', state, state == rootState, action)
+      const names = String(action.type).split(/\//)
+      const reducers: any = storeCtx.reducers[names[0]]
+      const mystate: any = storeCtx.states[names[0]]
+      reducers[names[1]](mystate, { payload: action.payload })
+    }
+    return ret
+  }) as any
+  return reducer
 }
 
 const configureStore: <T>(prm: StoreProps<T>) => StoreType<T> = <T>(prm: StoreProps<T>) => {

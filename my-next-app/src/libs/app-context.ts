@@ -398,6 +398,8 @@ const app = {
   tstate: (mode: number) => (appvars.astate && appvars.tstate[mode]) || 0,
   getConfig: () => appvars.config,
   isServer: () => typeof window === 'undefined',
+  asAny: (v: any) => v as any,
+  asType: <T>(v: any, _: T) => v as T,
 }
 
 export default app
