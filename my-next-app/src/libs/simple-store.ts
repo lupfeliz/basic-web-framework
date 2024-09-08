@@ -95,6 +95,17 @@ const createSlice: <T, N extends string>(p: SliceProps<T, N>) => SliceType<T, N>
       console.log('INIT:', action.type)
       ret = mystate
       for (const k in prm.initialState) { ret[k] = prm.initialState[k] }
+    } else if (action.type === 'persist/PERSIST') {
+      console.log('REDUCE-TYPE:', state, action)
+      // action.register(key)
+      // action.rehydrate(key, payload, err)
+      ret = mystate
+    } else if (action.type === 'persist/REHYDRATE') {
+      console.log('REDUCE-TYPE:', state, action)
+      // err: undefined
+      // key: "persist"
+      // payload: Object { astate: 6, bstate: 8, cstate: 0, … }
+      ret = mystate
     } else {
       const names = String(action.type).split(/\//)
       reducers[names[1]](mystate, { payload: action.payload })
@@ -164,11 +175,15 @@ const configureStore: <T>(prm: StoreProps<T>) => StoreType<T> = <T>(prm: StorePr
 }
 
 const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
-  const ret = reducer
-
+  const ret = (state: any, action: any) => {
+    const ret = reducer(state, action)
+    console.log('P_REDUCE:', state, action, ret, config)
+    return ret
+  }
   return ret 
 
 /**
+sessionStorage['persist:persist'] = '{"astate":"2","bstate":"1","cstate":"0","_persist":"{\\"version\\":1,\\"rehydrated\\":true}"}'
 ////////////////////////////////////////////////////////////////////////////////
 {
 type: "persist/PERSIST"
@@ -265,12 +280,14 @@ REDUCE: {
 const persistStore = () => {
 }
 
-const getPersistConfig = <P>(props: PersistConfig<P>) => {
+const getPersistConfig = <T>(props: PersistConfig<T>) => {
   const ret = {
     key: "user",
     storage: props.storage,
     version: props.version,
-    stateReconciler: (inboundState: any, originalState: any, reducedState: any) => {},
+    stateReconciler: (inboundState: T, originalState: T, reducedState: T, config: PersistConfig<T>) => {
+
+    },
     transforms: [],
   }
   return  ret

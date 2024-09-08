@@ -10,6 +10,7 @@ import api from '@/libs/api'
 import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit'
 // import { createSlice, configureStore, combineReducers } from '@/libs/simple-store'
 import { persistStore, persistReducer } from 'redux-persist'
+// import { persistStore, persistReducer } from '@/libs/simple-store'
 import { getPersistConfig } from 'redux-deep-persist'
 import storage from 'redux-persist/lib/storage/session'
 import * as C from '@/libs/constants'
@@ -68,7 +69,7 @@ configwrap.stateReconciler = putAll((inboundState, originalState, reducedState) 
   let ret
   if (config.stateReconciler) {
     try {
-      ret = config.stateReconciler(inboundState, originalState, reducedState)
+      ret = config.stateReconciler(inboundState, originalState, reducedState, config)
     } catch (e) {
       log.debug('E:', e)
     }
@@ -77,11 +78,7 @@ configwrap.stateReconciler = putAll((inboundState, originalState, reducedState) 
   return ret
 })
 
-const preducer = persistReducer(configwrap, (state, action) => {
-  const ret = slice1.reducer(state, action)
-  log.debug('P_REDUCE:', state, action, ret)
-  return ret
-})
+const preducer = persistReducer(configwrap, slice1.reducer)
 
 const c = combineReducers({ c1: slice1.reducer, c2: slice2.reducer })
 const A = (state, action) => {
