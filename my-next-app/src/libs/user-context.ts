@@ -3,14 +3,13 @@
  * @Author      : 정재백
  * @Since       : 2024-04-20
  * @Description : 사용자 정보 저장소
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 
-import { createSlice, configureStore } from '@reduxjs/toolkit'
-import { persistStore, persistReducer } from 'redux-persist'
-import { getPersistConfig } from 'redux-deep-persist'
+
 /** 세션스토리지 사용선언, 탭별로 영속저장이 유지된다 */
-import storage from 'redux-persist/lib/storage/session'
+import { createSlice, configureStore, persistStore, persistReducer, getPersistConfig, createSessionStorage } from '@/libs/simple-store'
+
 
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
@@ -48,7 +47,7 @@ const slice = createSlice({
 const persistConfig = getPersistConfig({
   key: 'user',
   version: 1,
-  storage,
+  storage: createSessionStorage(),
   blacklist: [ ],
   rootReducer: slice.reducer
 })
@@ -57,7 +56,7 @@ const persistConfig = getPersistConfig({
 const userStore = configureStore({
   reducer: persistReducer(persistConfig, slice.reducer),
   /** serialize 경고 방지용 */
-  middleware: (middleware) => middleware({ serializableCheck: false })
+  // middleware: (middleware) => middleware({ serializableCheck: false })
 })
 
 /** 영속저장 선언, 브라우저 리프레시 해도 정보가 남아 있다 */
@@ -74,7 +73,7 @@ const userContext = {
   },
   /** 사용자정보 출력 */
   getUserInfo() {
-    return (userStore.getState().userInfo) as typeof schema.userInfo
+    return (userStore.getState()?.userInfo) as typeof schema.userInfo
   },
   /** 사용자 정보 만료시간 체크 */
   async checkExpire() {
