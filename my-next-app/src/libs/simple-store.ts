@@ -8,6 +8,10 @@
 import lodash from 'lodash'
 const { debounce } = lodash
 
+/*******************************************************************************
+ * 타입정의
+ ******************************************************************************/
+
 type ReturnType<T extends (...args: any) => any> = T extends (...args: any) => infer R ? R : any
 type ReducerProps = {
   type?: string
@@ -68,6 +72,9 @@ type StorageType = {
   removeItem: (k: string) => Promise<void>
 }
 
+/*******************************************************************************
+ * 스토어 컨텍스트 (모듈 외부에 노출되지 않음)
+ ******************************************************************************/
 const storeCtx = {
   uidseq: 0,
   subscribers: {} as Record<string, any>,
@@ -76,8 +83,10 @@ const storeCtx = {
   storage: {} as Record<string, StorageType>
 }
 
+/** 유일키 생성 위한 카운터 */
 const genId = () => String((storeCtx.uidseq = (storeCtx.uidseq + 1) % Number.MAX_SAFE_INTEGER))
 
+/** 리듀싱 메시지 */
 const TYPE_INIT = '@@redux/INIT'
 const TYPE_PERSIST = 'persist/PERSIST'
 const TYPE_REHYDRATE = 'persist/REHYDRATE'
@@ -156,6 +165,7 @@ const combineReducers: <T extends Record<string, any>, R extends CombineResultTy
   return reducer
 }
 
+/** 스토어 생성 */
 const configureStore: <T>(p: StoreProps<T>) => StoreType<T> = <T>(prm: StoreProps<T>) => {
   const reducer = [prm.reducer]
   const state = reducer[0](undefined, { type: TYPE_INIT })
@@ -261,6 +271,7 @@ const persistStore = async <T>(store: StoreType<T>) => {
   // console.log('REHYDRATE-FINISHED')
 }
 
+/**  */
 const getPersistConfig = <T>(props: PersistConfig<T>) => {
   const ret = {
     key: props.key,
@@ -287,6 +298,7 @@ const getPersistConfig = <T>(props: PersistConfig<T>) => {
   return  ret
 }
 
+/** 로컬, 세션 저장소 생성기 */
 const createStorage: (s: Storage | false) => StorageType = (s: Storage | false) => {
   if (!s) {
     return {
@@ -303,7 +315,9 @@ const createStorage: (s: Storage | false) => StorageType = (s: Storage | false) 
   }
 }
 
+/** 세션저장소(탭별 영속저장) */
 let createSessionStorage = () => createStorage(typeof window !== 'undefined' && window.sessionStorage)
+/** 로컬저장소(브라우저별 영속저장) */
 let createLocalStorage = () => createStorage(typeof window !== 'undefined' && window.localStorage)
 
 export {
