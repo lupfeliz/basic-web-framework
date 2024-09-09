@@ -13,6 +13,7 @@ import { createSlice, configureStore, combineReducers } from '@/libs/simple-stor
 // import { getPersistConfig } from 'redux-deep-persist'
 import { persistStore, persistReducer } from '@/libs/simple-store'
 import { getPersistConfig } from '@/libs/simple-store'
+import { createSessionStorage } from '@/libs/simple-store'
 import * as C from '@/libs/constants'
 import crypto from '@/libs/crypto'
 import { Button, Block, Container } from '@/components'
@@ -63,26 +64,10 @@ const wreducer = (...p) => {
   return ret
 }
 
-
-
-let storage = {
-  getItem: (k) => new Promise(r => r()),
-  setItem:(k, v) => new Promise(r => r()),
-  removeItem: (k) => new Promise(r => r())
-}
-if (!app.isServer()) {
-  const ss = window.sessionStorage
-  storage = {
-    getItem: (k) => new Promise(r => r(ss.getItem(k))),
-    setItem:(k, v) => new Promise(r => r(ss.setItem(k, v))),
-    removeItem: (k) => new Promise(r => r(ss.removeItem(k)))
-  }
-}
-
 const config = getPersistConfig({
   key: 'persist',
   version: 1,
-  storage: storage,
+  storage: createSessionStorage(),
   blacklist: [ ],
   rootReducer: wreducer,
   debug: true
@@ -142,7 +127,6 @@ STORE1.dispatch = (...p) => {
       log.debug('DISPATCH-REHYDRATE:', k, p, e, r)
       return r
     }
-
   }
   const ret = store1.dispatch(...p)
   log.debug('DISPATCH:', ...p, ' => ', ret)

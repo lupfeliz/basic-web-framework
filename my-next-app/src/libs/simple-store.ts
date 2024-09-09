@@ -67,6 +67,8 @@ const storeCtx = {
   subscribers: {} as Record<string, any>,
   reducers: {} as any,
   states: {} as any,
+  // storage: {} as Record<string, Storage>
+  storage: {} as any
 }
 
 const genId = () => String((storeCtx.uidseq = (storeCtx.uidseq + 1) % Number.MAX_SAFE_INTEGER))
@@ -191,6 +193,7 @@ const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
     // console.log('WRITE:', str)
     config.storage.setItem(`persist:${config.key}`, str)
   }, 100)
+  storeCtx.storage[config.key] = config.storage
   const ret = (state: any, action: any) => {
     let ret: T = undefined as any
     if (action.type === TYPE_PERSIST) {
@@ -201,18 +204,8 @@ const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
     } else if (action.type === TYPE_REHYDRATE) {
       // console.log('REDUCE-TYPE:', state, action, config.key)
       /** FIXME: 임시코드 */
-      let pdata: any = {}
-      if (typeof window) {
-        config.storage.getItem(`persist:${config.key}`).then((data: any) => {
-          console.log('DATA:', `persist:${config.key}`, data)
-          if (data) {
-            const j = JSON.parse(data)
-            Object.keys(j).map((k) => pdata[k] = j[k])
-          }
-          pdata = config.stateReconciler(pdata, reducer(undefined as any, {}), state)
-        })
-      }
-      ret = reducer(pdata, action)
+      ret = config.stateReconciler(action.payload, reducer(undefined as any, {}), state)
+      ret = reducer(ret, action)
     } else {
       ret = reducer(state, action)
       write(ret)
@@ -223,7 +216,7 @@ const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
   return ret 
 }
 
-const persistStore = <T>(store: StoreType<T>) => {
+const persistStore = async <T>(store: StoreType<T>) => {
   /** TODO: reduce(TYPE_INIT) -> reduce(TYPE_PERSIST) -> reduce(TYPE_REHYDRATE) 순서대로 수행 */
   const hyinf: any = { }
   let res: any
@@ -236,16 +229,30 @@ const persistStore = <T>(store: StoreType<T>) => {
       hyinf.err = err
     }
   }
+  const getData = async (key: string) => {
+    let ret = undefined as any
+    if (typeof window) {
+      const ss = storeCtx.storage[key]
+      console.log('READ-STORAGE', key)
+      const data = await ss.getItem(`persist:${key}`)
+      console.log('DATA:', `persist:${key}`, data)
+      if (data) {
+        ret = JSON.parse(data)
+      }
+    }
+    return ret
+  }
   res = store.dispatch(persi)
-  console.log('KEY:', hyinf.key, 'PAYLOAD:', store.getState())
+  const data = await getData(hyinf.key)
+  console.log('KEY:', hyinf.key, 'PAYLOAD:', data)
   res = store.dispatch({
     type: TYPE_REHYDRATE,
-    payload: store.getState(),
+    payload: data,
     err: hyinf.err,
     key: hyinf.key
   })
   console.log('DISPATCH-FINISHED')
-  persi.rehydrate(hyinf.key, store.getState(), hyinf.err)
+  persi.rehydrate(hyinf.key, data, hyinf.err)
   console.log('REHYDRATE-FINISHED')
 }
 
@@ -275,4 +282,26 @@ const getPersistConfig = <T>(props: PersistConfig<T>) => {
   return  ret
 }
 
-export { createSlice, configureStore, configureStore as createStore, persistStore, persistReducer, getPersistConfig, combineReducers }
+const createStorage = (s: Storage | false) => {
+  if (!s) {
+    return {
+      getItem: (k: string) => new Promise<string>(r => r(null as any)),
+      setItem: (k: string, v: string) => new Promise<void>(r => r()),
+      removeItem: (k: string) => new Promise<void>(r => r())
+    }
+  } else {
+    return {
+      getItem: (k: string) => new Promise<string>(r => r(s.getItem(k) as any)),
+      setItem: (k: string, v: string) => new Promise<void>(r => r(s.setItem(k, v))),
+      removeItem: (k: string) => new Promise<void>(r => r(s.removeItem(k)))
+    }
+  }
+}
+
+let createSessionStorage = () => createStorage(typeof window !== 'undefined' && window.sessionStorage)
+let createLocalStorage = () => createStorage(typeof window !== 'undefined' && window.localStorage)
+
+export {
+  createSlice, configureStore, configureStore as createStore, persistStore, persistReducer,
+  getPersistConfig, combineReducers, createLocalStorage, createSessionStorage
+}
