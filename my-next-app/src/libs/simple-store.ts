@@ -27,7 +27,7 @@ type SliceProps<T, N extends keyof any> = {
   reducers: Record<N, ReducerType<T>>
 }
 
-type ActionRet<T>  = (prm: T) => ReducerProps
+type ActionRet<T>  = (prm: T | Record<string, any>) => ReducerProps
 
 type SliceType<T, N extends keyof any> = {
   name: string
@@ -57,9 +57,15 @@ type StoreType<T> = {
 type PersistConfig<T> = {
   key: string
   version?: number
-  storage: Storage
+  storage: StorageType
   blacklist?: Array<string>
   rootReducer: ReducerType<T>
+}
+
+type StorageType = {
+  getItem: (k: string) => Promise<string>
+  setItem: (k: string, v: string) => Promise<void>
+  removeItem: (k: string) => Promise<void>
 }
 
 const storeCtx = {
@@ -67,8 +73,7 @@ const storeCtx = {
   subscribers: {} as Record<string, any>,
   reducers: {} as any,
   states: {} as any,
-  // storage: {} as Record<string, Storage>
-  storage: {} as any
+  storage: {} as Record<string, StorageType>
 }
 
 const genId = () => String((storeCtx.uidseq = (storeCtx.uidseq + 1) % Number.MAX_SAFE_INTEGER))
@@ -233,9 +238,9 @@ const persistStore = async <T>(store: StoreType<T>) => {
     let ret = undefined as any
     if (typeof window) {
       const ss = storeCtx.storage[key]
-      console.log('READ-STORAGE', key)
+      // console.log('READ-STORAGE', key)
       const data = await ss.getItem(`persist:${key}`)
-      console.log('DATA:', `persist:${key}`, data)
+      // console.log('DATA:', `persist:${key}`, data)
       if (data) {
         ret = JSON.parse(data)
       }
@@ -244,16 +249,16 @@ const persistStore = async <T>(store: StoreType<T>) => {
   }
   res = store.dispatch(persi)
   const data = await getData(hyinf.key)
-  console.log('KEY:', hyinf.key, 'PAYLOAD:', data)
+  // console.log('KEY:', hyinf.key, 'PAYLOAD:', data)
   res = store.dispatch({
     type: TYPE_REHYDRATE,
     payload: data,
     err: hyinf.err,
     key: hyinf.key
   })
-  console.log('DISPATCH-FINISHED')
+  // console.log('DISPATCH-FINISHED')
   persi.rehydrate(hyinf.key, data, hyinf.err)
-  console.log('REHYDRATE-FINISHED')
+  // console.log('REHYDRATE-FINISHED')
 }
 
 const getPersistConfig = <T>(props: PersistConfig<T>) => {
@@ -282,7 +287,7 @@ const getPersistConfig = <T>(props: PersistConfig<T>) => {
   return  ret
 }
 
-const createStorage = (s: Storage | false) => {
+const createStorage: (s: Storage | false) => StorageType = (s: Storage | false) => {
   if (!s) {
     return {
       getItem: (k: string) => new Promise<string>(r => r(null as any)),
