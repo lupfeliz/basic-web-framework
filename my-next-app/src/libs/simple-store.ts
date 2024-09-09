@@ -194,22 +194,25 @@ const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
   const ret = (state: any, action: any) => {
     let ret: T = undefined as any
     if (action.type === TYPE_PERSIST) {
-      console.log('REDUCE-TYPE:', state, action, config.key)
+      // console.log('REDUCE-TYPE:', state, action, config.key)
       /** FIXME: 임시코드 */
       action.register(config.key)
-      action.rehydrate(config.key, state, undefined)
+      ret = reducer(state, action)
     } else if (action.type === TYPE_REHYDRATE) {
-      console.log('REDUCE-TYPE:', state, action, config.key)
+      // console.log('REDUCE-TYPE:', state, action, config.key)
       /** FIXME: 임시코드 */
-      let pdata = {}
+      let pdata: any = {}
       if (typeof window) {
         config.storage.getItem(`persist:${config.key}`).then((data: any) => {
-          // console.log('DATA:', `persist:${config.key}`, data)
-          if (data) { pdata = JSON.parse(data) }
-          config.stateReconciler(pdata, reducer(undefined as any, {}), state)
+          console.log('DATA:', `persist:${config.key}`, data)
+          if (data) {
+            const j = JSON.parse(data)
+            Object.keys(j).map((k) => pdata[k] = j[k])
+          }
+          pdata = config.stateReconciler(pdata, reducer(undefined as any, {}), state)
         })
       }
-      ret = state
+      ret = reducer(pdata, action)
     } else {
       ret = reducer(state, action)
       write(ret)
@@ -224,23 +227,26 @@ const persistStore = <T>(store: StoreType<T>) => {
   /** TODO: reduce(TYPE_INIT) -> reduce(TYPE_PERSIST) -> reduce(TYPE_REHYDRATE) 순서대로 수행 */
   const hyinf: any = { }
   let res: any
-  res = store.dispatch({
+  const persi = {
     type: TYPE_PERSIST,
-    register: (key: any) => { },
+    register: (key: any) => { hyinf.key = key },
     rehydrate: (key: any, payload: any, err: any) => {
       hyinf.key = key
       hyinf.pay = payload
       hyinf.err = err
     }
-  })
-  console.log('KEY:', hyinf.key, 'PAYLOAD:', hyinf.pay)
+  }
+  res = store.dispatch(persi)
+  console.log('KEY:', hyinf.key, 'PAYLOAD:', store.getState())
   res = store.dispatch({
     type: TYPE_REHYDRATE,
-    payload: hyinf.pay,
+    payload: store.getState(),
     err: hyinf.err,
     key: hyinf.key
   })
-  
+  console.log('DISPATCH-FINISHED')
+  persi.rehydrate(hyinf.key, store.getState(), hyinf.err)
+  console.log('REHYDRATE-FINISHED')
 }
 
 const getPersistConfig = <T>(props: PersistConfig<T>) => {
@@ -249,10 +255,20 @@ const getPersistConfig = <T>(props: PersistConfig<T>) => {
     storage: props.storage,
     version: props.version,
     stateReconciler: (inboundState: T, originalState: T, reducedState: T, config: PersistConfig<T>) => {
-      /** FIXME: 우선 config 무시 */
-      Object.keys(originalState as any).map(k => (reducedState as any)[k] = (originalState as any)[k])
-      Object.keys(inboundState as any).map(k => (reducedState as any)[k] = (inboundState as any)[k])
-      return reducedState
+      /** FIXME: 우선 config 무시, state 는 readonly 이므로 직접 접근 불가 */
+      let ret: any = {}
+      if (!reducedState) { reducedState = {}  as any }
+      ret = reducedState
+      if (reducedState) {
+        Object.keys(reducedState as any).map(k => ret[k] = (reducedState as any)[k])
+      }
+      if (originalState) {
+        Object.keys(originalState as any).map(k => ret[k] = (originalState as any)[k])
+      }
+      if (inboundState) {
+        Object.keys(inboundState as any).map(k => ret[k] = (inboundState as any)[k])
+      }
+      return ret
     },
     transforms: [],
   }

@@ -11,13 +11,13 @@ import api from '@/libs/api'
 import { createSlice, configureStore, combineReducers } from '@/libs/simple-store'
 // import { persistStore, persistReducer } from 'redux-persist'
 // import { getPersistConfig } from 'redux-deep-persist'
-// import storage from 'redux-persist/lib/storage/session'
 import { persistStore, persistReducer } from '@/libs/simple-store'
 import { getPersistConfig } from '@/libs/simple-store'
 import * as C from '@/libs/constants'
 import crypto from '@/libs/crypto'
 import { Button, Block, Container } from '@/components'
 // import userContext from '@/libs/user-context'
+// import storage from 'redux-persist/lib/storage'
 
 const { log, definePage, useSetup, goPage, getParameter, putAll, asType } = app
 
@@ -130,6 +130,18 @@ const STORE1 = asType(putAll({}, store1), store1)
 
 STORE1.dispatch = (...p) => {
   if (p[0].type === 'persist/PERSIST') {
+    const register = p[0].register
+    const rehydrate = p[0].rehydrate
+    p[0].register = (k) => {
+      const r = register(k)
+      log.debug('DISPATCH-REGISTER:', k, r)
+      return r
+    }
+    p[0].rehydrate = (k, p, e) => {
+      const r = rehydrate(k, p, e)
+      log.debug('DISPATCH-REHYDRATE:', k, p, e, r)
+      return r
+    }
 
   }
   const ret = store1.dispatch(...p)
@@ -143,7 +155,7 @@ STORE1.subscribe = (...p) => {
 }
 
 STORE1.getState = (...p) => {
-  const ret = store1.getState(...p)
+  const ret = store1.getState(...p) || {}
   // log.debug('GETSTATE:', ret)
   return ret
 }
@@ -153,7 +165,6 @@ STORE1.replaceReducer = (...p) => {
   log.debug('REPLACE-REDUCER:', ...p, ' => ', ret)
   return ret
 }
-
 persistStore(STORE1)
 
 export default definePage((props) => {
@@ -178,10 +189,10 @@ export default definePage((props) => {
   const onClick = async (v) => {
     switch (v) {
     case 1: {
-      STORE1.dispatch(slice1.actions.setState({ astate: Number(STORE1.getState().astate || 0) + 1 }))
+      STORE1.dispatch(slice1.actions.setState({ astate: Number(STORE1?.getState().astate || 0) + 1 }))
     } break
     case 2: {
-      STORE1.dispatch(slice1.actions.setState({ bstate: Number(STORE1.getState().bstate|| 0) + 1 }))
+      STORE1.dispatch(slice1.actions.setState({ bstate: Number(STORE1?.getState().bstate|| 0) + 1 }))
     } break
     case 3: {
       store2.dispatch(slice2.actions.setState({ dstate: Number(store2.getState().dstate || 0) + 1 }))
@@ -201,7 +212,7 @@ export default definePage((props) => {
       <Block>
         { ready() && (
         <>
-        [ASTATE: {STORE1.getState().astate} / BSTATE: {STORE1.getState().bstate}]
+        [ASTATE: {STORE1?.getState().astate} / BSTATE: {STORE1?.getState().bstate}]
         [DSTATE: {store2.getState().dstate} / ESTATE: {store2.getState().estate}]
         </>
         ) }
