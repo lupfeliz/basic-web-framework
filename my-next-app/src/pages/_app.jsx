@@ -3,21 +3,24 @@
  * @Author      : 정재백
  * @Since       : 2024-04-16 
  * @Description : 공통 동적 프로세스 엔트리 페이지
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 import Head from 'next/head'
 import { AnimatePresence } from 'framer-motion'
 import LayoutDefault from '@/components/layout'
 import app from '@/libs/app-context'
+
+import 'core-js/stable'
 /** 전역 스타일시트 */
 import '@/pages/global.scss'
-const { useSetup, definePage } = app
+const { useSetup, definePage, onload } = app
+
 export default definePage((props) => {
   const { Component, pageProps, router } = props
   useSetup({
     async mounted() {
       /** APP 최초구동을 수행한다 */
-      app.onload(props)
+      onload(props)
     }
   })
   /** 페이지 선언시 다른 layout 속성이 발견되면 해당 레이아웃으로 전환한다 */

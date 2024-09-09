@@ -3,13 +3,15 @@
  * @Author      : 정재백
  * @Since       : 2023-08-09
  * @Description : api 통신모듈
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 
 import * as C from '@/libs/constants'
 import app from './app-context'
 import userContext from './user-context'
 import crypto from './crypto'
+
+import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only'
 
 type OptType = {
   method?: String
