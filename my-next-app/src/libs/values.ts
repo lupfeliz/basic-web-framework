@@ -3,7 +3,7 @@
  * @Author      : 정재백
  * @Since       : 2023-08-09
  * @Description : 각종 데이터 유틸 모음
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 import * as C from './constants'
 import log from './log'

@@ -3,7 +3,7 @@
  * @Author      : 정재백
  * @Since       : 2024-04-16 
  * @Description : 편집기 컴포넌트
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 import { ComponentPropsWithRef } from 'react'
 import { useEditor, EditorContent, EditorContentProps } from '@tiptap/react'

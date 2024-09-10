@@ -3,7 +3,7 @@
  * @Author      : 정재백
  * @Since       : 2024-04-16 
  * @Description : 자주 사용되는 상수 정의
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 export const ROOT = 'ROOT'
 export const DEBUG = 'debug'

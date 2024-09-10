@@ -3,7 +3,7 @@
  * @Author      : 정재백
  * @Since       : 2024-04-16 
  * @Description : 체크박스 컴포넌트
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 import _Checkbox, { CheckboxProps as _CheckboxProps } from '@mui/material/Checkbox'
 import _Radio, { RadioProps as _RadioProps } from '@mui/material/Radio'

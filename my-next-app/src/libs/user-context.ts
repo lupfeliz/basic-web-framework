@@ -6,10 +6,11 @@
  * @Site        : https://devlog.ntiple.com
  **/
 
-
+import { createSlice, configureStore } from '@reduxjs/toolkit'
+import { persistStore, persistReducer } from 'redux-persist'
+import { getPersistConfig } from 'redux-deep-persist'
 /** 세션스토리지 사용선언, 탭별로 영속저장이 유지된다 */
-import { createSlice, configureStore, persistStore, persistReducer, getPersistConfig, createSessionStorage } from '@/libs/simple-store'
-
+import { createSessionStorage } from '@/libs/simple-store'
 
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
@@ -56,7 +57,7 @@ const persistConfig = getPersistConfig({
 const userStore = configureStore({
   reducer: persistReducer(persistConfig, slice.reducer),
   /** serialize 경고 방지용 */
-  // middleware: (middleware) => middleware({ serializableCheck: false })
+  middleware: (middleware) => middleware({ serializableCheck: false })
 })
 
 /** 영속저장 선언, 브라우저 리프레시 해도 정보가 남아 있다 */

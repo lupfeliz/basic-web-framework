@@ -17,8 +17,6 @@ export default definePage(() => {
     <Head>
       {/* 페이지 hard-loading 시 적용할 기본 transition */}
       <Content html={`
-        <script src="/assets/script/queue-microtask-0.1.0.min.js"></script>
-        <script> window.globalThis = window; </script>
         <style type="text/css">
           body { transition: opacity 0.4s 0.2s ease }
           .hide-onload { opacity: 0; }

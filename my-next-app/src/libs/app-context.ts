@@ -10,8 +10,7 @@
 import { Function1, Function2, debounce } from 'lodash'
 import $ from 'jquery'
 import getConfig from 'next/config'
-import { createSlice, configureStore } from '@/libs/simple-store'
-// import { createSlice, configureStore } from '@reduxjs/toolkit'
+import { createSlice, configureStore } from '@reduxjs/toolkit'
 import React, { useRef, forwardRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { NextRouter } from 'next/router'
@@ -400,6 +399,7 @@ const app = {
   isServer: () => typeof window === 'undefined',
   asAny: (v: any) => v as any,
   asType: <T>(v: any, _: T) => v as T,
+  getFrom: (v: any, k: string) => v && v[k]
 }
 
 export default app

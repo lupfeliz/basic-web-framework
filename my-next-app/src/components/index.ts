@@ -3,7 +3,7 @@
  * @Author      : 정재백
  * @Since       : 2024-04-16 
  * @Description : 각종 페이지에서 import 를 편하게 하기 위한 barrel 파일
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 export { default as Block } from './block'
 export { default as Button } from './button'

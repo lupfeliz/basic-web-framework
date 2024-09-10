@@ -3,7 +3,7 @@
  * @Author      : 정재백
  * @Since       : 2024-04-16 
  * @Description : Pagination 컴포넌트
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 import _Pagination, { PaginationProps as _PaginationProps } from '@mui/material/Pagination';
 import _Stack from '@mui/material/Stack';

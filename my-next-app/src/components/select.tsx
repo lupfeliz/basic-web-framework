@@ -3,7 +3,7 @@
  * @Author      : 정재백
  * @Since       : 2024-04-16 
  * @Description : 선택 컴포넌트
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 import _Select, { SelectProps as _SelectProps } from '@mui/material/Select'
 import _MenuItem from '@mui/material/MenuItem'

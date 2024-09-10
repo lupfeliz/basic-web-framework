@@ -4,7 +4,7 @@
  * @Since       : 2024-04-16 
  * @Description : 기본 레이아웃 컴포넌트
  *                페이지 트랜지션이 적용된 기본 레이아웃, Header 와 Footer 요소가 존재함.
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 import { motion, HTMLMotionProps } from 'framer-motion'
 import app from '@/libs/app-context'

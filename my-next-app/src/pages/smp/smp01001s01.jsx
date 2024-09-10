@@ -6,7 +6,7 @@
  *                컴포넌트 변경이 감지되면 자동으로 데이터를 갱신할 수 있고
  *                반대로 데이터 갱신 후 update(C.UPDATE_ENTIRE) 를 수행하여
  *                컴포넌트를 업데이트 시킬 수 있다.
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'

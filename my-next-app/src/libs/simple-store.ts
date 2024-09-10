@@ -196,7 +196,11 @@ const configureStore: <T>(p: StoreProps<T>) => StoreType<T> = <T>(prm: StoreProp
         // log.debug('REMOVE-SUBSCRIBE:', Object.keys(subscribers).length)
       }
     },
-    getState: () => state,
+    getState: () => new Proxy(state as any, {
+      set(o: any, k: any, v: any) {
+        throw Error(`NOT ALLOWED MODIFY STATE`)
+      }
+    }),
     replaceReducer: () => { }
   } as StoreType<T>
 }

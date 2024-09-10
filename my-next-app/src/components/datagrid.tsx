@@ -3,15 +3,13 @@
  * @Author      : 정재백
  * @Since       : 2024-04-16 
  * @Description : 그리드 컴포넌트
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 import { AgGridReact, AgGridReactProps, CustomDateProps } from 'ag-grid-react'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
 import $ from 'jquery'
 
-import 'ag-grid-community/styles/ag-grid.css'
-import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { CSSProperties, MutableRefObject } from 'react'
 import { ColDef, ColSpanParams, GridApi, GridReadyEvent, RowSpanParams, CellClassParams, RowDataUpdatedEvent, SortChangedEvent, GridPreDestroyedEvent } from 'ag-grid-community'
 type DataGridProps = AgGridReactProps & {
@@ -20,7 +18,7 @@ type DataGridProps = AgGridReactProps & {
   ref: MutableRefObject<HTMLDivElement>
 }
 
-const { useSetup, putAll, defineComponent, log, copyExclude, copyRef, useRef, waitmon } = app
+const { useSetup, putAll, defineComponent, log, copyExclude, copyRef, useRef, waitmon, getFrom } = app
 
 export default defineComponent((props: DataGridProps, ref: DataGridProps['ref']) => {
   const pprops = copyExclude(props, [
@@ -42,6 +40,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
         phase: 0
       },
       api: C.UNDEFINED as GridApi,
+      gridobj: C.UNDEFINED as any,
       elem: useRef<any>(),
       $gridwrap: C.UNDEFINED as JQuery<HTMLElement>,
       $gridview: C.UNDEFINED as JQuery<HTMLElement>,
@@ -103,6 +102,8 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
       update(C.UPDATE_SELF)
     } break
     default: }
+    // vars.gridobj.setGridOption('columnDefs', vars.columnDefs)
+    // vars.gridobj.setGridOption('rowData', vars.rowData) 
   }
   const afterSort = () => {
     let o: any

@@ -1,0 +1,33 @@
+module.exports = {
+  presets: [
+    'next/babel',
+    [
+      '@babel/preset-env',
+      {
+        'targets': {
+          'browsers': ['last 2 versions', 'ie >= 11']
+        },
+        'useBuiltIns': 'usage',
+        'corejs': 3
+      }
+    ]
+  ],
+  plugins: [
+    ['@babel/plugin-proposal-optional-catch-binding'],
+    [
+      '@babel/plugin-transform-nullish-coalescing-operator',
+      {
+        'assumptions': {
+          'noDocumentAll': true
+        }
+      }
+    ],
+    [
+      '@babel/plugin-transform-runtime',
+      {
+        'corejs': 3,
+        'regenerator': true
+      }
+    ]
+  ]
+}

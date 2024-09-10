@@ -5,15 +5,23 @@
  * @Description : 공통 동적 프로세스 엔트리 페이지
  * @Site        : https://devlog.ntiple.com
  **/
+
+/** POLYFILL 관련사항은 항상 _app 최상단에 위치해야 한다 */
+import 'core-js'
+import app from '@/libs/app-context'
+import getConfig from 'next/config'
 import Head from 'next/head'
 import { AnimatePresence } from 'framer-motion'
 import LayoutDefault from '@/components/layout'
-import app from '@/libs/app-context'
 
-import 'core-js/stable'
+import 'ag-grid-community/styles/ag-grid.css'
+import 'ag-grid-community/styles/ag-theme-quartz.css'
+
 /** 전역 스타일시트 */
 import '@/pages/global.scss'
-const { useSetup, definePage, onload } = app
+
+const { useSetup, definePage, onload, log } = app
+log.setLevel(getConfig()?.publicRuntimeConfig?.logLevel || 'debug')
 
 export default definePage((props) => {
   const { Component, pageProps, router } = props
