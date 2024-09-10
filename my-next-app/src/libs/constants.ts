@@ -64,6 +64,9 @@ export const TOKEN_REFRESH = 'tokenRefresh'
 export const EXTRA_TIME = 1000 * 5
 export const EXPIRE_NOTIFY_TIME = 1000 * 60 * 2
 
+export const REQUIRED = 'required'
+export const AUTO = 'auto'
+
 export const UPDATE_ENTIRE = 3
 export const UPDATE_FULL = 2
 export const UPDATE_SELF = 1
