@@ -19,7 +19,6 @@ type Levels = 'trace' | 'debug' | 'info' | 'warn' | 'error'
 type AppenderType = typeof console | {
   log?: typeof FN_NIL,
   info?: typeof FN_NIL,
-  debug?: typeof FN_NIL,
   warn?: typeof FN_NIL,
   error?: typeof FN_NIL
 }
