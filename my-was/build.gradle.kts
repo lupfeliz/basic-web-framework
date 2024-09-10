@@ -4,6 +4,7 @@
  * @Since       : 2024-04-16 
  * @Description : gradle 빌드파일
  * @Site        : https://devlog.ntiple.com/795
+ * sh gradlew cleanTest test -Dbuild.testlvl=MANUAL -i --no-watch-fs --tests "my.was.mywas.SimpleTest.testCrypto"  > test.log
  **/
 plugins {
   id("java")
@@ -94,17 +95,16 @@ task("prebuildHook") {
 }
 
 tasks {
-  withType<JavaExec> {
-    var profile = System.getProperty("spring.profiles.active")
-    if (profile == null || "".equals(profile)) { profile = "local" }
-    System.setProperty("spring.profiles.active", profile);
-    systemProperty("spring.profiles.active", profile)
-  }
   named<Test>("test") {
+    var testlvl = System.getProperty("build.testlvl")
+    if (testlvl == null || "".equals(testlvl)) { testlvl = "SIMPLE" }
+    systemProperty("build.testlvl", testlvl)
     useJUnitPlatform()
   }
   named<JavaExec>("bootRun") {
     var profile = System.getProperty("spring.profiles.active")
+    if (profile == null || "".equals(profile)) { profile = "local" }
+    systemProperty("spring.profiles.active", profile)
     println("================================================================================")
     println("데모 API")
     println("PROFILE:" + profile)
