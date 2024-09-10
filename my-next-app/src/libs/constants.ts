@@ -5,6 +5,12 @@
  * @Description : 자주 사용되는 상수 정의
  * @Site        : https://devlog.ntiple.com
  **/
+export const LOCAL = 'local'
+export const DEV   = 'dev'
+export const TEST  = 'test'
+export const PROD  = 'prod'
+export const MY = 'my'
+
 export const ROOT = 'ROOT'
 export const DEBUG = 'debug'
 export const INFO = 'info'
@@ -21,6 +27,7 @@ export const ALPHANUM = 'alphanum'
 export const ALPHASTART = 'alphastart'
 export const ALPHANUMSPC = 'alphanumspc'
 export const ASCII = 'ascii'
+export const HANGUL = 'hangul'
 export const EMAIL = 'email'
 export const PUBLIC_KEY = 'publickey'
 export const PRIVATE_KEY = 'privatekey'
@@ -74,6 +81,18 @@ export const DATE_FORMAT_DTHM = 'YYYY-MM-DD HH:mm'
 export const DATE_FORMAT_CODE = 'YYYYMMDDHHmmss'
 export const DATE_FORMAT_FULL = 'YYYY-MM-DDTHH:mm:ss.SSS'
 export const DATE_FORMAT_ISO8601 = 'YYYY-MM-DDTHH:mm:ssZ'
+
+export const USER = 'user'
+export const PAGES = 'pages'
+export const DIALOG = 'dialog'
+export const ALERT = 'alert'
+export const CONFIRM = 'confirm'
+export const FETCH = 'fetch'
+export const EVENT = 'event'
+export const VISIBLE = 'visible'
+export const TRANSPARENT = 'transparent'
+
+export const CLICK = 'click'
 
 export const ASCENDING = 'ascending'
 export const DESCENDING = 'descending'

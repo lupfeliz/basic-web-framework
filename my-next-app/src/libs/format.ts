@@ -341,4 +341,5 @@ const $f = (t: string, v: any) => {
   return ret
 }
 
-export { format, $f }
+export default format
+export { $f }

@@ -13,6 +13,7 @@ import getConfig from 'next/config'
 import Head from 'next/head'
 import { AnimatePresence } from 'framer-motion'
 import LayoutDefault from '@/components/layout'
+import DialogContainer from '@/components/dialog-container'
 
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
@@ -46,6 +47,7 @@ export default definePage((props) => {
       {/* 실제 경로에 맞는 페이지 컴포넌트 */}
       { applyLayout(<Component key={router.asPath} {...pageProps} />, router) }
     </AnimatePresence>
+    <DialogContainer />
     </>
   )
 })

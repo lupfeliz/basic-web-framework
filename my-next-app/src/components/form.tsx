@@ -10,6 +10,8 @@ import Popper from '@/components/popper'
 import hangul from '@/libs/hangul'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
+import values from '@/libs/values'
+import format from '@/libs/format'
 import $ from 'jquery'
 type FormProps = ComponentPropsWithRef<'div'> & { }
 type MessageProps = ComponentPropsWithRef<'div'> & {
@@ -103,52 +105,52 @@ const validateForm = async (vform: any, opt: any = {}) => {
   return ret
 }
 const validate = async (item: any, opt: any = {}) => new Promise((resolve) => {
-  // let ret = true
-  // let result
-  // const cctx: any = item.ctx()
-  // const cprops: any = item.props()
-  // try {
-  //   const rlist = String(item.rules).split(/\|/g)
-  //   const label = cprops.label ? cprops.label : cprops.name
-  //   for (const rule of rlist) {
-  //     const rdata = rule.split(/\:/g)
-  //     const rparm = rdata.length > 1 ? String(rdata[1]).split(/\,/g) : []
-  //     /** NULL, UNDEFINED 값 통일 */
-  //     cctx.value = values.nval(cctx.value, C.UNDEFINED)
-  //     // log.debug('RULE:', rule, rdata, cctx.value, cprops)
-  //     if (!rdata || rdata.length < 1) { continue }
-  //     const vitm  = validations()[rdata[0]]
-  //     log.trace('VITM:', rule, rdata[0], vitm ? true: false, cctx.value, rparm)
-  //     if (!vitm) { continue }
-  //     if (rule !== C.REQUIRED &&
-  //       !/^u:/.test(rule) &&
-  //       (cctx.value === '' || cctx.value === undefined)) {
-  //       result = true
-  //     } else {
-  //       result = vitm({ value: cctx.value, name: label }, rparm, cctx)
-  //     }
-  //     log.trace('RESULT:', result, typeof result)
-  //     if (typeof result === C.STRING) {
-  //       if (!opt?.noerror) {
-  //         cctx.error = true
-  //         cctx.message = result
-  //       }
-  //       if (opt) { opt.message = result }
-  //       result = false
-  //     }
-  //     if (result === false) {
-  //       ret = false
-  //       break
-  //     }
-  //   }
-  //   // log.trace('FINAL-RESULT:', pprops?.name, ret)
-  // } catch (e) {
-  //   log.debug('E:', e)
-  // }
-  // cctx.validated = true
-  // cctx.valid = ret
-  // resolve(ret)
-  // return ret;
+  let ret = true
+  let result
+  const cctx: any = item.ctx()
+  const cprops: any = item.props()
+  try {
+    const rlist = String(item.rules).split(/\|/g)
+    const label = cprops.label ? cprops.label : cprops.name
+    for (const rule of rlist) {
+      const rdata = rule.split(/\:/g)
+      const rparm = rdata.length > 1 ? String(rdata[1]).split(/\,/g) : []
+      /** NULL, UNDEFINED 값 통일 */
+      cctx.value = values.nval(cctx.value, C.UNDEFINED)
+      // log.debug('RULE:', rule, rdata, cctx.value, cprops)
+      if (!rdata || rdata.length < 1) { continue }
+      const vitm  = validations()[rdata[0]]
+      log.trace('VITM:', rule, rdata[0], vitm ? true: false, cctx.value, rparm)
+      if (!vitm) { continue }
+      if (rule !== C.REQUIRED &&
+        !/^u:/.test(rule) &&
+        (cctx.value === '' || cctx.value === undefined)) {
+        result = true
+      } else {
+        result = vitm({ value: cctx.value, name: label }, rparm, cctx)
+      }
+      log.trace('RESULT:', result, typeof result)
+      if (typeof result === C.STRING) {
+        if (!opt?.noerror) {
+          cctx.error = true
+          cctx.message = result
+        }
+        if (opt) { opt.message = result }
+        result = false
+      }
+      if (result === false) {
+        ret = false
+        break
+      }
+    }
+    // log.trace('FINAL-RESULT:', pprops?.name, ret)
+  } catch (e) {
+    log.debug('E:', e)
+  }
+  cctx.validated = true
+  cctx.valid = ret
+  resolve(ret)
+  return ret;
 })
 /** 오류메시지에서 한글 어휘에 맞게 필드명에 조사를 붙여주는 역할. */
 const { detectJosa } = hangul
@@ -160,236 +162,236 @@ const josa = (name: string, tail: string, wrap?: string) => {
 /** 사전 정의된 validation 함수들 */
 const validations = () => {
   return {
-    // 'auto': {
-    //   validate: (v: any, p: any) => {
-    //     log.trace('V-AUTO:', v, p, (v !== undefined && v !== '' && v !== false))
-    //     return true
-    //   }
-    // },
-    // 'test': {
-    //   validate: (v: any, p: any) => {
-    //     return true
-    //   },
-    //   message: (v: any, p: any) => {
-    //   }
-    // },
-    // 'required': (v: any, p: any, c?: any) => {
-    //   const value = v.value
-    //   log.trace('V-REQUIRED:', value, p, !(value !== undefined && value !== '' && value !== false))
-    //   if (!(value !== undefined && value !== null && value !== '' && value !== false)) {
-    //     if (c && c.hasOwnProperty('checked')) {
-    //       let name = josa(v.name, '에')
-    //       return String(`#(name) 반드시 체크해 주세요`)
-    //         .replace(/\#\(name\)/g, name)
-    //     } else if (c && c.hasOwnProperty('index')) {
-    //       let name = josa(v.name, '은')
-    //       return String(`#(name) 반드시 선택해 주세요`)
-    //         .replace(/\#\(name\)/g, name)
-    //     } else {
-    //       let name = josa(v.name, '은')
-    //       return String(`#(name) 반드시 입력해 주세요`)
-    //         .replace(/\#\(name\)/g, name)
-    //     }
-    //   }
-    //   return true
-    // },
-    // 'nospc': (v: any, p: any) => {
-    //   if (/ /g.test(v.value)) {
-    //     let name = josa(v.name, '은')
-    //     return String(`#(name) 공백을 입력할수 없어요`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'number': (v: any, p: any) => {
-    //   if (!format.pattern(C.NUMBER, v.value)) {
-    //     let name = josa(v.name, '은')
-    //     return String(`#(name) 숫자만 입력해 주세요`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'numeric': (v: any, p: any) => {
-    //   if (!format.pattern(C.NUMERIC, v.value)) {
-    //     let name = josa(v.name, '은')
-    //     return String(`#(name) 숫자만 입력해 주세요`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'alpha': (v: any, p: any) => {
-    //   if (!format.pattern(C.ALPHA, v.value)) {
-    //     let name = josa(v.name, '은')
-    //     return String(`#(name) 영문으로만 입력해 주세요`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'alphaspc': (v: any, p: any) => {
-    //   if (!format.pattern(C.ALPHASPC, v.value)) {
-    //     let name = josa(v.name, '은')
-    //     return String(`#(name) 영문으로만 입력해 주세요`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'alphastart': (v: any, p: any) => {
-    //   if (!(format.pattern(C.ALPHASTART, v.value))) {
-    //     let name = josa(v.name, '의')
-    //     return String(`#(name) 첫글자는 반드시 영문으로 입력해 주세요`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'alphanum': (v: any, p: any) => {
-    //   if (!(format.pattern(C.ALPHANUM, v.value))) {
-    //     let name = josa(v.name, '은')
-    //     return String(`#(name) 영문 또는 숫자로만 입력해 주세요`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'alphanumspc': (v: any, p: any) => {
-    //   if (!(format.pattern(C.ALPHANUMSPC, v.value))) {
-    //     let name = josa(v.name, '은')
-    //     return String(`#(name) 영문 또는 숫자로만 입력해 주세요`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'ascii': (v: any, p: any) => {
-    //   if (!format.pattern(C.ASCII, v.value)) {
-    //     let name = josa(v.name, '은')
-    //     return String(`#(name) 영문, 숫자 또는 기호만 입력해 주세요`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'hangul': (v: any, p: any) => {
-    //   if (!format.pattern(C.HANGUL, v.value)) {
-    //     let name = josa(v.name, '은')
-    //     return String(`#(name) 한글만 입력해 주세요`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'date': (v: any, p: any) => {
-    //   let valid = true
-    //   if (valid && !format.pattern(C.DATE, v.value)) { valid = false }
-    //   if (valid) {
-    //     const d = String(v.value).split('-')
-    //     const f = format.formatDate(format.date(d[0], d[1], d[2]), C.DATE_FORMAT_YMD)
-    //     // log.debug('CHECK-DATE:', v.value, valid, d, f);
-    //     if (v.value != f) { valid = false }
-    //   }
-    //   if (!valid) {
-    //     let name = josa(v.value, '은')
-    //     return String(`#(name) 올바른 날자 형식이 아니예요`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'date-ym': (v: any, p: any) => {
-    //   let valid = true
-    //   if (valid && !/^([0-9]{4}-[0-9]{1,2})$/.test(v.value)) { valid = false }
-    //   if (valid) {
-    //     const d = String(v.value).split('-')
-    //     const f = format.formatDate(format.date(d[0], d[1]), C.DATE_FORMAT_YM)
-    //     const check = `${values.lpad(d[0], 4, '0')}-${values.lpad(d[1], 2, '0')}`
-    //     if (check != f) { valid = false }
-    //   }
-    //   if (!valid) {
-    //     let name = josa(v.value, '은')
-    //     return String(`#(name) 올바른 날자 형식이 아니예요`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'email': (v: any, p: any) => {
-    //   let t: any
-    //   if (!format.pattern(C.EMAIL, v.value)) {
-    //     let name = josa(v.value, '은', '"')
-    //     return String(`#(name) 정상적인 이메일 형식이 아니예요`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'password': (v: any, p: any) => {
-    //   let t: any
-    //   if (!format.pattern(C.PASSWORD, v.value)) {
-    //     let name = josa(v.name, '은')
-    //     return String(`#(name) 4자리 이상, 영문자, 숫자, 기호를 반드시 섞어서 입력해 주세요.`)
-    //       .replace(/\#\(name\)/g, name)
-    //   }
-    //   return true
-    // },
-    // 'content-len': (v: any, p: any) => {
-    //   let t: any
-    //   const vmin = values.num(values.nval(p, 0), 0)
-    //   const vmax = values.num(values.nval(p, 1), 0)
-    //   const div = document.createElement(C.DIV)
-    //   div.innerHTML = v.value
-    //   const clen = String(div.innerText).trim().length
-    //   if (vmin > 0 && clen < vmin) {
-    //     let name = josa(v.name, '의')
-    //     return String(`#(name) 길이는 최소 #(min) 글자 입니다.`)
-    //       .replace(/\#\(name\)/g, name)
-    //       .replace(/\#\(min\)/g, String(vmin))
-    //   }
-    //   if (vmax > 0 && clen > vmax) {
-    //     let name = josa(v.name, '의')
-    //     return String(`#(name) 길이는 최대 #(max) 글자 입니다.`)
-    //       .replace(/\#\(name\)/g, name)
-    //       .replace(/\#\(min\)/g, String(vmin))
-    //   }
-    //   return true
-    // },
-    // 'len': (v: any, p: any, c: any) => {
-    //   let t: any
-    //   const vmin = values.num(values.item(p, 0), 0)
-    //   const vmax = values.num(values.item(p, 1), 0)
-    //   if (vmin > 0 && v.value && String(v.value || '').trim().length < vmin) {
-    //     let name = josa(v.name, '의')
-    //     return String(`#(name) 길이는 최소 #(min) 글자 입니다.`)
-    //       .replace(/\#\(name\)/g, name)
-    //       .replace(/\#\(min\)/g, String(vmin))
-    //   }
-    //   if (vmax > 0 && v.value && String(v.value).length > vmax) {
-    //     let name = josa(v.name, '의')
-    //     return String(`#(name) 길이는 최대 #(max) 글자 입니다.`)
-    //       .replace(/\#\(name\)/g, name)
-    //       .replace(/\#\(min\)/g, String(vmin))
-    //   }
-    //   return true
-    // },
-    // 'minv': (v: any, p: any, c: any) => {
-    //   let t: any
-    //   const vmin = values.num(values.item(p, 0), 0)
-    //   if (Number(v.value || 0) < vmin) {
-    //     let name = josa(v.name, '은')
-    //     return String(`#(name) #(min) 이상의 값을 입력해 주세요`)
-    //       .replace(/\#\(name\)/g, name)
-    //       .replace(/\#\(min\)/g, String(vmin))
-    //   }
-    //   return true
-    // },
-    // 'maxv': (v: any, p: any, c: any) => {
-    //   let t: any
-    //   const vmax = values.num(values.item(p, 0), 0)
-    //   if (Number(v.value || 0) > vmax) {
-    //     let name = josa(v.name, '은')
-    //     return String(`#(name) #(max) 이하의 값을 입력해 주세요`)
-    //       .replace(/\#\(name\)/g, name)
-    //       .replace(/\#\(max\)/g, String(vmax))
-    //   }
-    //   return true
-    // },
-    // 'u': (v: any, p: any, c: any) => {
-    //   // log.trace('CHECK-USER-FUNCTION:FORM:', cform.value?.userRules, p)
-    //   // if (cform.value?.userRules && p && p[0] && cform.value.userRules[p[0]]) {
-    //   //   return cform.value.userRules[p[0]](v, p, c)
-    //   // }
-    // }
+    'auto': {
+      validate: (v: any, p: any) => {
+        log.trace('V-AUTO:', v, p, (v !== undefined && v !== '' && v !== false))
+        return true
+      }
+    },
+    'test': {
+      validate: (v: any, p: any) => {
+        return true
+      },
+      message: (v: any, p: any) => {
+      }
+    },
+    'required': (v: any, p: any, c?: any) => {
+      const value = v.value
+      log.trace('V-REQUIRED:', value, p, !(value !== undefined && value !== '' && value !== false))
+      if (!(value !== undefined && value !== null && value !== '' && value !== false)) {
+        if (c && c.hasOwnProperty('checked')) {
+          let name = josa(v.name, '에')
+          return String(`#(name) 반드시 체크해 주세요`)
+            .replace(/\#\(name\)/g, name)
+        } else if (c && c.hasOwnProperty('index')) {
+          let name = josa(v.name, '은')
+          return String(`#(name) 반드시 선택해 주세요`)
+            .replace(/\#\(name\)/g, name)
+        } else {
+          let name = josa(v.name, '은')
+          return String(`#(name) 반드시 입력해 주세요`)
+            .replace(/\#\(name\)/g, name)
+        }
+      }
+      return true
+    },
+    'nospc': (v: any, p: any) => {
+      if (/ /g.test(v.value)) {
+        let name = josa(v.name, '은')
+        return String(`#(name) 공백을 입력할수 없어요`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'number': (v: any, p: any) => {
+      if (!format.pattern(C.NUMBER, v.value)) {
+        let name = josa(v.name, '은')
+        return String(`#(name) 숫자만 입력해 주세요`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'numeric': (v: any, p: any) => {
+      if (!format.pattern(C.NUMERIC, v.value)) {
+        let name = josa(v.name, '은')
+        return String(`#(name) 숫자만 입력해 주세요`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'alpha': (v: any, p: any) => {
+      if (!format.pattern(C.ALPHA, v.value)) {
+        let name = josa(v.name, '은')
+        return String(`#(name) 영문으로만 입력해 주세요`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'alphaspc': (v: any, p: any) => {
+      if (!format.pattern(C.ALPHASPC, v.value)) {
+        let name = josa(v.name, '은')
+        return String(`#(name) 영문으로만 입력해 주세요`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'alphastart': (v: any, p: any) => {
+      if (!(format.pattern(C.ALPHASTART, v.value))) {
+        let name = josa(v.name, '의')
+        return String(`#(name) 첫글자는 반드시 영문으로 입력해 주세요`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'alphanum': (v: any, p: any) => {
+      if (!(format.pattern(C.ALPHANUM, v.value))) {
+        let name = josa(v.name, '은')
+        return String(`#(name) 영문 또는 숫자로만 입력해 주세요`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'alphanumspc': (v: any, p: any) => {
+      if (!(format.pattern(C.ALPHANUMSPC, v.value))) {
+        let name = josa(v.name, '은')
+        return String(`#(name) 영문 또는 숫자로만 입력해 주세요`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'ascii': (v: any, p: any) => {
+      if (!format.pattern(C.ASCII, v.value)) {
+        let name = josa(v.name, '은')
+        return String(`#(name) 영문, 숫자 또는 기호만 입력해 주세요`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'hangul': (v: any, p: any) => {
+      if (!format.pattern(C.HANGUL, v.value)) {
+        let name = josa(v.name, '은')
+        return String(`#(name) 한글만 입력해 주세요`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'date': (v: any, p: any) => {
+      let valid = true
+      if (valid && !format.pattern(C.DATE, v.value)) { valid = false }
+      if (valid) {
+        const d = String(v.value).split('-')
+        const f = format.formatDate(format.date(d[0], d[1], d[2]), C.DATE_FORMAT_YMD)
+        // log.debug('CHECK-DATE:', v.value, valid, d, f);
+        if (v.value != f) { valid = false }
+      }
+      if (!valid) {
+        let name = josa(v.value, '은')
+        return String(`#(name) 올바른 날자 형식이 아니예요`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'date-ym': (v: any, p: any) => {
+      let valid = true
+      if (valid && !/^([0-9]{4}-[0-9]{1,2})$/.test(v.value)) { valid = false }
+      if (valid) {
+        const d = String(v.value).split('-')
+        const f = format.formatDate(format.date(d[0], d[1]), C.DATE_FORMAT_YM)
+        const check = `${values.lpad(d[0], 4, '0')}-${values.lpad(d[1], 2, '0')}`
+        if (check != f) { valid = false }
+      }
+      if (!valid) {
+        let name = josa(v.value, '은')
+        return String(`#(name) 올바른 날자 형식이 아니예요`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'email': (v: any, p: any) => {
+      let t: any
+      if (!format.pattern(C.EMAIL, v.value)) {
+        let name = josa(v.value, '은', '"')
+        return String(`#(name) 정상적인 이메일 형식이 아니예요`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'password': (v: any, p: any) => {
+      let t: any
+      if (!format.pattern(C.PASSWORD, v.value)) {
+        let name = josa(v.name, '은')
+        return String(`#(name) 4자리 이상, 영문자, 숫자, 기호를 반드시 섞어서 입력해 주세요.`)
+          .replace(/\#\(name\)/g, name)
+      }
+      return true
+    },
+    'content-len': (v: any, p: any) => {
+      let t: any
+      const vmin = values.num(values.nval(p, 0), 0)
+      const vmax = values.num(values.nval(p, 1), 0)
+      const div = document.createElement('div')
+      div.innerHTML = v.value
+      const clen = String(div.innerText).trim().length
+      if (vmin > 0 && clen < vmin) {
+        let name = josa(v.name, '의')
+        return String(`#(name) 길이는 최소 #(min) 글자 입니다.`)
+          .replace(/\#\(name\)/g, name)
+          .replace(/\#\(min\)/g, String(vmin))
+      }
+      if (vmax > 0 && clen > vmax) {
+        let name = josa(v.name, '의')
+        return String(`#(name) 길이는 최대 #(max) 글자 입니다.`)
+          .replace(/\#\(name\)/g, name)
+          .replace(/\#\(min\)/g, String(vmin))
+      }
+      return true
+    },
+    'len': (v: any, p: any, c: any) => {
+      let t: any
+      const vmin = values.num(values.item(p, 0), 0)
+      const vmax = values.num(values.item(p, 1), 0)
+      if (vmin > 0 && v.value && String(v.value || '').trim().length < vmin) {
+        let name = josa(v.name, '의')
+        return String(`#(name) 길이는 최소 #(min) 글자 입니다.`)
+          .replace(/\#\(name\)/g, name)
+          .replace(/\#\(min\)/g, String(vmin))
+      }
+      if (vmax > 0 && v.value && String(v.value).length > vmax) {
+        let name = josa(v.name, '의')
+        return String(`#(name) 길이는 최대 #(max) 글자 입니다.`)
+          .replace(/\#\(name\)/g, name)
+          .replace(/\#\(min\)/g, String(vmin))
+      }
+      return true
+    },
+    'minv': (v: any, p: any, c: any) => {
+      let t: any
+      const vmin = values.num(values.item(p, 0), 0)
+      if (Number(v.value || 0) < vmin) {
+        let name = josa(v.name, '은')
+        return String(`#(name) #(min) 이상의 값을 입력해 주세요`)
+          .replace(/\#\(name\)/g, name)
+          .replace(/\#\(min\)/g, String(vmin))
+      }
+      return true
+    },
+    'maxv': (v: any, p: any, c: any) => {
+      let t: any
+      const vmax = values.num(values.item(p, 0), 0)
+      if (Number(v.value || 0) > vmax) {
+        let name = josa(v.name, '은')
+        return String(`#(name) #(max) 이하의 값을 입력해 주세요`)
+          .replace(/\#\(name\)/g, name)
+          .replace(/\#\(max\)/g, String(vmax))
+      }
+      return true
+    },
+    'u': (v: any, p: any, c: any) => {
+      // log.trace('CHECK-USER-FUNCTION:FORM:', cform.value?.userRules, p)
+      // if (cform.value?.userRules && p && p[0] && cform.value.userRules[p[0]]) {
+      //   return cform.value.userRules[p[0]](v, p, c)
+      // }
+    }
   } as any
 }
 

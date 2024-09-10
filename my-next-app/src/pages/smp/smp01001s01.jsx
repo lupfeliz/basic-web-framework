@@ -10,9 +10,10 @@
  **/
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
+import dialog from '@/libs/dialog-context'
 import { Block, Button, Checkbox, Input, Select, Editor, Lottie, Container, Image, DataGrid } from '@/components'
 
-const { log, definePage, goPage, useSetup, clear } = app
+const { log, definePage, goPage, useSetup, clear, putAll } = app
 
 export default definePage((props) => {
   const self = useSetup({
@@ -51,6 +52,9 @@ export default definePage((props) => {
   async function mounted() {
     log.debug('MOUNTED! SMP01001S01', props)
     const fdata = vars.formdata
+    putAll(window, {
+      DIALOG: dialog
+    })
     /** 3초가 지나면 데이터 강제 업데이트를 수행한다 */
     const fnctime = async () => {
       if (vars.timer == 1) {
@@ -74,7 +78,7 @@ export default definePage((props) => {
     {
       vars.columnDefs = [
         { field: 'make', headerName: '메이커', sortable: false, groupBy: true },
-        { field: 'model', sortable: false },
+        { field: 'model', sortable: false, colSpan: (v) => v?.data.price == 33853 ? 2 : 1 },
         { field: 'price', sortable: true },
         { field: 'electric', sortable: false }
       ]
@@ -86,7 +90,7 @@ export default definePage((props) => {
         { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
         { make: 'Ford', model: 'F-Series', price: 33851, electric: false },
         { make: 'Ford', model: 'F-Series', price: 33852, electric: false },
-        { make: 'Ford', model: 'F-Series', price: 33853, electric: false },
+        { make: 'Ford', model: '합계', price: 33853, electric: false },
         { make: 'Ford', model: 'F-Series', price: 33854, electric: false },
         { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
         { make: 'Ford', model: 'F-Series', price: 33850, electric: false },

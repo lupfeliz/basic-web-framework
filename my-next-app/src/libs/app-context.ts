@@ -51,12 +51,15 @@ type ContextType<T> = {
 
 const { waitmon } = proc
 
+const { randomStr } = values
+
 /** 이 부분은 웹팩 플러그인(replace-loader)에 의해 자동으로 채워진다 */
 const encrypted = () => '{$$ENCRYPTED$$}'
 
 const ctx: ContextType<LauncherProps<any, any>> = { }
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
+
 
 /** 메소드 별도선언시 WEBPACK 난독화에 도움이 된다 */
 const decryptAES = (v: string, k: string) => JSON.parse(cjaes.decrypt(v, k).toString(cjenc.Utf8))
@@ -374,6 +377,69 @@ const app = {
     ret = key ? prm[key] : prm
     return ret
   },
+  getUri() {
+    let ret = '/'
+    if (appvars.astate) {
+      ret = String(history?.state?.url || '/').replace(/[?].*$/g, '')
+    }
+    return ret
+  },
+  window: () => (app.isServer() ? {} : window) as any,
+  setGlobalTmp(value: any) {
+    const tid = randomStr(10, C.ALPHANUM)
+    if (!app.isServer()) {
+      (window as any)[tid] = () => value
+    }
+    return tid
+  },
+  getGlobalTmp(tid: string) {
+    let ret: any = C.UNDEFINED
+    if (!app.isServer()) {
+      const win: any = window
+      if (win[tid]) {
+        ret = win[tid]
+        if (ret) { ret = ret() }
+        if ([C.LOCAL, C.MY].indexOf(app.profile()) === -1) {
+          delete win[tid]
+        }
+      }
+    }
+    return ret
+  },
+  setOpenerTmp(value: any) {
+    const tid = randomStr(10, C.ALPHANUM)
+    if (!app.isServer()) {
+      const win: any = window
+      if (win && win.opener) {
+        win.opener[tid] = () => value
+      }
+    }
+    return tid
+  },
+  getOpenerTmp(tid: string) {
+    let ret: any = C.UNDEFINED
+    if (!app.isServer()) {
+      const win: any = window
+      if (win.opener && win.opener[tid]) {
+        ret = win.opener[tid]
+        if (ret) { ret = ret() }
+        if (ret.$$POUPCTX$$) {
+          ret.$$POUPCTX$$.close = () => {
+            window.close()
+          }
+          delete ret.$$POUPCTX$$
+        }
+        if ([C.LOCAL, C.MY].indexOf(app.profile()) === -1) {
+          delete win.opener[tid]
+        }
+      } else {
+        /** 오픈주체가 없으므로 창을 닫는다 */
+        window.close()
+      }
+    }
+    return ret
+  },
+  profile: () => publicRuntimeConfig.profile,
   basepath(uri: string) {
     if (uri.startsWith('/')) { uri = `${(publicRuntimeConfig?.basePath || '').replace(/[\/]+/g, '/')}${uri}` }
     return uri
