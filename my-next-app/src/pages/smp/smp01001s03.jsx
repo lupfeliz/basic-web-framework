@@ -15,12 +15,11 @@ import { persistStore, persistReducer } from '@/libs/simple-store'
 import { getPersistConfig } from '@/libs/simple-store'
 import { createSessionStorage } from '@/libs/simple-store'
 import * as C from '@/libs/constants'
-import crypto from '@/libs/crypto'
 import { Button, Block, Container } from '@/components'
-// import userContext from '@/libs/user-context'
-// import storage from 'redux-persist/lib/storage'
 
 const { log, definePage, useSetup, goPage, getParameter, putAll, asType } = app
+
+if (app.isServer()) { log.setLevel('error') }
 
 const slice1 = createSlice({
   name: 'slice1',
