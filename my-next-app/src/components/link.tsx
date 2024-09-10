@@ -8,20 +8,23 @@
 import { ComponentPropsWithRef, createElement, MouseEvent } from 'react'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
+import { cancelEvent } from '@/libs/evdev'
+
 type LinkProps = ComponentPropsWithRef<'a'> & {
   href?: any
   param?: any
 }
+const { defineComponent, copyExclude, goPage} = app
+
 /** 기본적으로는 일반 a 태그와 같지만 SPA 방식으로 화면을 전환한다 */
-export default app.defineComponent((props: LinkProps, ref: LinkProps['ref']) => {
-  const pprops = app.copyExclude(props, ['param'])
+export default defineComponent((props: LinkProps, ref: LinkProps['ref']) => {
+  const pprops = copyExclude(props, ['param'])
   const onClick = async (e: MouseEvent) => {
     if (props.href !== C.UNDEFINED) {
       /** 입력된 이벤트 전달을 취소하고 */
-      e && e.preventDefault()
-      e && e.stopPropagation()
+      cancelEvent(e)
       /** SPA 방식(router.push) 화면이동을 시도한다 */
-      app.goPage(props.href, props.param)
+      goPage(props.href, props.param)
     }
     if (props?.onClick) { props.onClick(e as any) }
   }

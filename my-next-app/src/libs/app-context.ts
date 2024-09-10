@@ -21,6 +21,7 @@ import { AES as cjaes, enc as cjenc } from 'crypto-js'
 import * as C from '@/libs/constants'
 import values from '@/libs/values'
 import log, { getLogger } from '@/libs/log'
+import proc from '@/libs/proc'
 
 type UpdateFunction = (mode?: number) => void
 
@@ -47,6 +48,8 @@ type SetupType<V, P> = {
 type ContextType<T> = {
   [name: string]: T
 }
+
+const { waitmon } = proc
 
 /** 이 부분은 웹팩 플러그인(replace-loader)에 의해 자동으로 채워진다 */
 const encrypted = () => '{$$ENCRYPTED$$}'
@@ -98,6 +101,7 @@ const appContextStore = configureStore({ reducer: appContextSlice.reducer })
 const app = {
   /** values, log, getLogger mixin */
   ...values, log, getLogger, useRef,
+  waitmon,
   /** 앱 내 유일키 생성 */
   genId() { return `${new Date().getTime()}${String((appvars.uidseq = (appvars.uidseq + 1) % 1000) + 1000).substring(1, 4)}` },
   /**
@@ -374,32 +378,25 @@ const app = {
     if (uri.startsWith('/')) { uri = `${(publicRuntimeConfig?.basePath || '').replace(/[\/]+/g, '/')}${uri}` }
     return uri
   },
-  waitmon(check: () => any, opt?: any) {
-    if (opt === undefined) { opt = { } }
-    const ctx = {
-      __max_check: opt.maxcheck || 100,
-      __interval: opt.interval || 100
-    }
-    return new Promise<any>((resolve, _reject) => {
-      const fnexec = function() {
-        /** 조건을 만족시키면 */
-        if (check()) {
-            resolve(true)
-        } else if (ctx.__max_check > 0) {
-          ctx.__max_check--
-          setTimeout(fnexec, ctx.__interval)
-        }
-      }
-      fnexec()
-    })
-  },
   astate: () => appvars.astate,
   tstate: (mode: number) => (appvars.astate && appvars.tstate[mode]) || 0,
   getConfig: () => appvars.config,
   isServer: () => typeof window === 'undefined',
   asAny: (v: any) => v as any,
   asType: <T>(v: any, _: T) => v as T,
-  getFrom: (v: any, k: string) => v && v[k]
+  getFrom: (v: any, k: string) => v && v[k],
+  px2rem(v: any, el?: any) {
+    v = Number(String(v).replace(/[^0-9^.]+/, ''))
+    if (isNaN(v)) { v = 0 }
+    if (!el) { el = document.documentElement }
+    return v / parseFloat(getComputedStyle(el).fontSize)
+  },
+  rem2px(v: any, el?: any) {
+    v = Number(String(v).replace(/[^0-9^.]+/, ''))
+    if (isNaN(v)) { v = 0 }
+    if (!el) { el = document.documentElement }
+    return v * parseFloat(getComputedStyle(el).fontSize)
+  },
 }
 
 export default app

@@ -28,6 +28,12 @@ export const OBJECT = 'object'
 export const BOOLEAN = 'boolean'
 export const NUMBER = 'number'
 export const NUMERIC = 'numeric'
+export const PASSWORD = 'password'
+export const DATE = 'date'
+export const BYTES = 'b'
+export const KBYTES = 'kb'
+export const MBYTES = 'mb'
+export const GBYTES = 'gb'
 
 export const CONTENT_TYPE = 'content-type'
 export const CHARSET = 'charset'
@@ -52,6 +58,25 @@ export const UNDEFINED = undefined as any
 export const HIDE_PRELOAD = 'hide-preload'
 
 export const FN_NIL = (..._: any[]) => { }
+export const HREF_NIL = 'javascript:{}'
+
+export const WIDTH = 'width'
+export const HEIGHT = 'height'
+
+export const B641x1IMG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+export const B64IMG_PREFIX = 'data:image/png;base64,'
+
+export const DATE_FORMAT_YM = 'YYYY-MM'
+export const DATE_FORMAT_YMD = 'YYYY-MM-DD'
+export const DATE_FORMAT_NORM = 'YYYY-MM-DD HH:mm:ss'
+export const DATE_FORMAT_DTH = 'YYYY-MM-DD HH'
+export const DATE_FORMAT_DTHM = 'YYYY-MM-DD HH:mm'
+export const DATE_FORMAT_CODE = 'YYYYMMDDHHmmss'
+export const DATE_FORMAT_FULL = 'YYYY-MM-DDTHH:mm:ss.SSS'
+export const DATE_FORMAT_ISO8601 = 'YYYY-MM-DDTHH:mm:ssZ'
+
+export const ASCENDING = 'ascending'
+export const DESCENDING = 'descending'
 
 export const BEARER = 'Bearer'
 export const AUTHORIZATION = 'Authorization'

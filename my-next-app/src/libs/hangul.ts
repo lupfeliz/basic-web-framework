@@ -1,9 +1,9 @@
 /**
  * @File        : hangul.ts
- * @Version     : $Rev$
  * @Author      : 정재백
- * @History     : 2023-04-23 최초 작성
+ * @Since       : 2023-04-23
  * @Description : 한글 조사어미 분석 모듈
+ * @Site        : https://devlog.ntiple.com
  **/
 
 import log from './log'
