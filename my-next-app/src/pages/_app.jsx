@@ -21,15 +21,15 @@ import 'ag-grid-community/styles/ag-theme-quartz.css'
 /** 전역 스타일시트 */
 import '@/pages/global.scss'
 
-const { useSetup, definePage, onload, log } = app
+const { useSetup, definePage, onload, log, isServer } = app
 log.setLevel(getConfig()?.publicRuntimeConfig?.logLevel || 'debug')
 
 export default definePage((props) => {
   const { Component, pageProps, router } = props
+  if (!isServer()) { onload(props) }
   useSetup({
     async mounted() {
       /** APP 최초구동을 수행한다 */
-      onload(props)
     }
   })
   /** 페이지 선언시 다른 layout 속성이 발견되면 해당 레이아웃으로 전환한다 */

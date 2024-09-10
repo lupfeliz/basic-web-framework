@@ -11,9 +11,20 @@ import userContext from '@/libs/user-context'
 import crypto from '@/libs/crypto'
 import * as C from '@/libs/constants'
 import { Block, Form, Button, Input, Select, Container, Textarea } from '@/components'
+// import NodeRSA from 'encrypt-rsa'
+import { KEYUTIL, RSAKey, KJUR } from 'jsrsasign'
+// import {  } from 'jsrsasign-util'
 
 const { definePage, useSetup, log, goPage, clone, matcher } = app
 const userInfo = userContext.getUserInfo()
+
+// try {
+//   const nodeRSA = new NodeRSA();
+//   const { publicKey, privateKey } = nodeRSA.createPrivateAndPublicKeys(2048)
+//   log.debug('NODE-RSA:', nodeRSA)
+//   log.debug('PUBLIC KEY:', publicKey)
+//   log.debug('PRIVATE KEY:', privateKey)
+// } catch (e) { log.debug('E:', e) }
 
 export default definePage(() => {
   const self = useSetup({
@@ -21,59 +32,43 @@ export default definePage(() => {
     },
     async mounted() {
       try {
-        window.crypto.subtle.generateKey({
-          name: 'RSA-OAEP',
-          modulusLength: 2048,
-          publicExponent: new Uint8Array([1, 0, 1]),
-          hash: 'SHA-256'
-        }, true, ['encrypt', 'decrypt'])
-        .then((keyPair) => {
-          log.debug('KEY-PAIR:', keyPair)
-          let encoder = new TextEncoder()
-          let decoder = new TextDecoder('utf-8')
-          window.crypto.subtle.exportKey('jwk', keyPair.publicKey).then(result => {
-            // Show the public key in JSON form
-            document.querySelector('#public_key').value = JSON.stringify(result)
-          })
-          window.crypto.subtle.exportKey('jwk', keyPair.privateKey).then(result => {
-            // Show the private key in JSON form
-            document.querySelector('#private_key').value = JSON.stringify(result)
-          })
-          const encryptButton = document.querySelector('#btn_encrypt')
-          encryptButton.addEventListener('click', () => {
-            // stash the message from the input
-            const message = document.querySelector('#input_message').value
-            let encoded = new TextEncoder().encode(message)
-            // encrypt the message with the public key
-            window.crypto.subtle.encrypt(
-              { name: 'RSA-OAEP' },
-              keyPair.publicKey,
-              encoded
-            ).then(result => {
-              // stash the encrypted result for decryption later
-              cipherText = result
-              // show a base64 encoded version of the encrypted message
-              document.querySelector('#encrypted_message').value = btoa(cipherText)
-            })
-          })
-          const decryptButton = document.querySelector('#btn_decrypt')
-          decryptButton.addEventListener('click', () => {
-            // decrypt the message, with the private key
-            window.crypto.subtle.decrypt(
-              {
-                name: 'RSA-OAEP'
-              },
-              keyPair.privateKey,
-              cipherText
-            ).then(result => {
-              // after decryption, show the original message
-              document.querySelector('#decrypted_message').value = decoder.decode(result)
-            })
-          })
-        })
-      } catch (e) {
-        log.debug('E:', e)
-      }
+        const publicKey = '-----BEGIN PUBLIC KEY-----\nMIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgEzCqLqxWSiOTkWFQaPhY6X+qom8\nzzbidCpNu/zxwTieMvnBE4yPCeSRwJMFjJD2UGr7I/WunOsx+rAxYbzoMELw6TdZ\naaKygSLfkncUmbL6MQ1ZCSQQR6weaQj8VeYKNaA3QSqJYXCRPky6LI/o73brTCpE\nsWuVWp577q2PbTDbAgMBAAE=\n-----END PUBLIC KEY-----'
+        const privateKey = `-----BEGIN RSA PRIVATE KEY-----
+        MIICWwIBAAKBgEzCqLqxWSiOTkWFQaPhY6X+qom8zzbidCpNu/zxwTieMvnBE4yP
+        CeSRwJMFjJD2UGr7I/WunOsx+rAxYbzoMELw6TdZaaKygSLfkncUmbL6MQ1ZCSQQ
+        R6weaQj8VeYKNaA3QSqJYXCRPky6LI/o73brTCpEsWuVWp577q2PbTDbAgMBAAEC
+        gYAdokTrlk4aZx32nuRhdUE4M2H5POgugyxfrJT3qQl0Zza8zvpSGGK0WESlPc4v
+        pLgVJRGT5q5z6l6iqN3XxTfkI2LpvoaJzkS7Ow6ODkSfnoaeE5LsBA19BYGGgtw5
+        uD4c7YBVJoEWZelSgsfSJdUpq/4YIBDSETA2aXWuC32l4QJBAJjciW9COFow7mH7
+        lWveyrBGjGbisv/A9OzJAsjzsgqudvTMCFUrQgRcRlof45TPQzvlCerNg9/Q/Q3W
+        oUvjYXECQQCAjVSlzYWtFovvG306VXvhjgR4W5D1Eg1havbeJpdQPgulyPnyBCDR
+        6XUeGyH8fTaT0ByDxRqiQnk2r5UuZ5ELAkEAhMF7pqG3OTUnwvbxJTbfh0ot46jc
+        1ltpGz/T6Fwk8zvj2eRdFEK2Wf0dqGXri7CZbqoS+9Yywq3JKDyP5s16MQJAI04t
+        dEfosavijK3BC9dUaZMGeUO0oQnvMNUerc5tejVAH6z9sFEf7mauqrEK+XwuFBRw
+        8GOet/eHsNQyJYd+FwJAPDgogfNfjBV6bQT2UQwHdfzKG1Jfcs5Pz/fLMljsa67I
+        osWRyvZU4dRMwmNpo+m9YyKHDuQ/NwwMBhQtYlkzDw==
+        -----END RSA PRIVATE KEY-----`;
+
+        const kpair = KEYUTIL.generateKeypair('RSA', 1024)
+        log.debug('PAIR:',  kpair)
+
+        var rsa = new RSAKey()
+        rsa.readPrivateKeyFromPEMString(privateKey)
+        var hSig = rsa.signString('aaa', 'sha1')
+        log.debug('SIGN:', hSig)
+
+        // const nodeRSA = new NodeRSA(publicKey, privateKey, 2048);
+        // var rsa = new RSAKey();
+        // rsa.readPrivateKeyFromPEMString(_PEM_PRIVATE_KEY_STRING_);
+        // var hSig = rsa.signString('aaa', 'sha1'); // sign a string 'aaa' with key
+
+        // const { publicKey, privateKey } = nodeRSA.createPrivateAndPublicKeys(2048)
+        // log.debug('NODE-RSA:', nodeRSA)
+        // log.debug('PUBLIC KEY:', publicKey)
+        // log.debug('PRIVATE KEY:', privateKey)
+        // const enc = nodeRSA.encryptStringWithRsaPublicKey(publicKey, 'ABCD')
+        // log.debug('ENC:', enc)
+      } catch (e) { log.debug('E:', e) }
     }
   })
   const { update, vars, ready } = self()
