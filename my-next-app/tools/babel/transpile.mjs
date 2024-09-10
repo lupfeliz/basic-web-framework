@@ -1,3 +1,11 @@
+/**
+ * @File        : transpile.mjs
+ * @Author      : 정재백
+ * @Since       : 2024-09-10
+ * @Description : babel을 이용한 node_modules 선 transpile tool
+ *                필요한 모듈만 미리 transpile 시켜 놓는다
+ * @Site        : https://devlog.ntiple.com
+ **/
 import { existsSync, statSync, readdirSync, readFileSync, writeFileSync } from 'fs'
 import { basename, dirname, parse } from 'path'
 import { fileURLToPath } from 'url'
