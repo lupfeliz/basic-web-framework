@@ -21,5 +21,6 @@ export { default as Lottie } from './lottie'
 export { default as Page } from './page'
 export { default as Pagination } from './pagination'
 export { default as Select } from './select'
+export { default as Textarea } from './textarea'
 
 export { Fragment } from 'react'

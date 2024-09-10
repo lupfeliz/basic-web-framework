@@ -220,6 +220,7 @@ const app = {
     })
   },
   sleep(time: number) { return new Promise(r => setTimeout(r, time)) },
+  createElement: React.createElement,
   /** react 페이지 선언 */
   definePage<A, B, C extends A & B>(compo?: A, _opts?: B) {
     let ret = C.UNDEFINED

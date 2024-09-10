@@ -318,6 +318,10 @@ table.articles {
       background-color: var(--ag-row-hover-color);
     }
   }
+  .ag-cell-hover {
+    background-color: var(--ag-row-hover-color);
+  }
+
   .ag-row {
     border-bottom: var(--ag-row-border-width) var(--ag-row-border-style) var(--ag-row-border-color);
   }
