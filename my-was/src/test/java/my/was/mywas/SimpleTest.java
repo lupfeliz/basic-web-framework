@@ -6,12 +6,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
@@ -257,8 +262,7 @@ public class SimpleTest {
     };
   }
 
-  @Test
-  public void jwtSecurityDecryptTest() throws Exception {
+  @Test public void jwtSecurityDecryptTest() throws Exception {
     if (!TestUtil.isEnabled("jwtSecurityDecryptTest", TestLevel.SIMPLE)) { return; }
     String[] res = this.jwtSecurityKeyGenTest();
     String secret = res[0];
@@ -275,5 +279,139 @@ public class SimpleTest {
     log.info("TOKEN:{}", token);
     log.info("CLAIMS:{}", claims);
     assertTrue(true);
+  }
+
+  @Test public void testSimpleRSA() throws Exception {
+    if (!TestUtil.isEnabled("testSimpleRSA", TestLevel.SIMPLE)) { return; }
+    /** RSA 키 길이 설정 (예: 1024 비트) */
+    int bitlen = 1024;
+    SimpleRSAExample rsa = new SimpleRSAExample(bitlen);
+    /** 암호화할 메시지 (정수형으로 변환하여 사용) */
+    String message = "Hello world";
+    {
+      BigInteger messageBigInt = new BigInteger(message.getBytes(StandardCharsets.UTF_8));
+      /** 암호화 */
+      BigInteger encrypted = rsa.doPrivate(messageBigInt);
+      log.debug("Encrypted: {}", encrypted);
+      /** 복호화 */
+      BigInteger decrypted = rsa.doPublic(encrypted);
+      /** 복호화된 메시지 출력 */
+      String decryptedMessage = new String(decrypted.toByteArray(), StandardCharsets.UTF_8);
+      log.debug("Decrypted: {}", decryptedMessage);
+    }
+    {
+      BigInteger messageBigInt = new BigInteger(message.getBytes());
+      /** 암호화 */
+      BigInteger encrypted = rsa.doPublic(messageBigInt);
+      log.debug("Encrypted: {}", encrypted);
+      /** 복호화 */
+      BigInteger decrypted = rsa.doPrivate(encrypted);
+      /** 복호화된 메시지 출력 */
+      String decryptedMessage = new String(decrypted.toByteArray());
+      log.debug("Decrypted: {}", decryptedMessage);
+    }
+    {
+      /** 암호화할 메시지 (긴 메시지) */
+      message = "안녕하세요, RSA를 사용하여 긴 메시지를 암호화하는 예제입니다. 메시지가 너무 길면 한 번에 암호화할 수 없습니다.";
+      /** 메시지를 분할하여 암호화 */
+      List<BigInteger> encryptedChunks = rsa.encrypt(message);
+      log.debug("Encrypted Chunks:{}", encryptedChunks);
+
+      /** 분할된 메시지를 복호화하여 원래 메시지로 복원 */
+      String decryptedMessage = rsa.decrypt(encryptedChunks);
+      log.debug("Decrypted Message:{}", decryptedMessage);
+    }
+
+    log.debug("PRIVATE-KEY:{}", rsa.convertPrivateKeyToPKCS8());
+    log.debug("PUBLIC-KEY:{}", rsa.convertPublicKeyToX509());
+  }
+
+  public static class SimpleRSAExample {
+
+    private BigInteger n, d, e;
+
+    /** 키 생성자 */
+    public SimpleRSAExample(int bitlen) {
+      SecureRandom random = new SecureRandom();
+      BigInteger p = new BigInteger(bitlen / 2, 100, random);
+      BigInteger q = new BigInteger(bitlen / 2, 100, random);
+      n = p.multiply(q);
+
+      BigInteger phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
+      e = BigInteger.probablePrime(bitlen / 2, random);
+
+      /** gcd(e, phi(n)) == 1 인 e 를 찾아서 설정 */
+      while (phi.gcd(e).compareTo(BigInteger.ONE) > 0 && e.compareTo(phi) < 0) {
+        e.add(BigInteger.ONE);
+      }
+
+      d = e.modInverse(phi);
+    }
+
+    /** 공개 키 가져오기 */
+    public BigInteger getPublicKey() { return e; }
+
+    /** 모듈러스(n) 가져오기 */
+    public BigInteger getModulus() { return n; }
+
+    /** 암호화 함수 */
+    public BigInteger doPrivate(BigInteger value) { return value.modPow(e, n); }
+
+    /** 암호화 함수 (메시지 분할 적용) */
+    public List<BigInteger> encrypt(String message) {
+      byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
+       /** PKCS#1 패딩을 위한 공간을 고려한 최대 청크 크기 */
+      int chunkSize = (n.bitLength() / 8) - 11;
+      List<BigInteger> encryptedChunks = new ArrayList<>();
+      for (int i = 0; i < messageBytes.length; i += chunkSize) {
+        /** 청크 추출 */
+        int length = Math.min(chunkSize, messageBytes.length - i);
+        byte[] chunk = new byte[length];
+        System.arraycopy(messageBytes, i, chunk, 0, length);
+        /** 각 청크를 암호화, 부호가 있는 문제 방지 */
+        BigInteger chunkBigInt = new BigInteger(1, chunk);
+        BigInteger encryptedChunk = chunkBigInt.modPow(e, n);
+        encryptedChunks.add(encryptedChunk);
+      }
+      return encryptedChunks;
+    }
+
+    /** 복호화 함수 (메시지 병합 적용) */
+    public String decrypt(List<BigInteger> encryptedChunks) {
+      StringBuilder decryptedMessage = new StringBuilder();
+      for (BigInteger encryptedChunk : encryptedChunks) {
+        /** 각 청크를 복호화 */
+        BigInteger decryptedChunk = encryptedChunk.modPow(d, n);
+        byte[] chunkBytes = decryptedChunk.toByteArray();
+        /** 복호화된 청크를 문자열로 변환하여 메시지에 추가 */ 
+        decryptedMessage.append(new String(chunkBytes, StandardCharsets.UTF_8));
+      }
+      return decryptedMessage.toString();
+    }
+
+    /** 복호화 함수 */
+    public BigInteger doPublic(BigInteger value) { return value.modPow(d, n); }
+
+    /** 공개 키를 X509EncodedKeySpec 으로 변환 */
+    public String convertPublicKeyToX509() throws Exception {
+      RSAPublicKeySpec pubKeySpec = new RSAPublicKeySpec(n, e);
+      KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+      PublicKey publicKey = keyFactory.generatePublic(pubKeySpec);
+      X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(publicKey.getEncoded());
+
+      /** Base64로 인코딩하여 출력 */
+      return Base64.getEncoder().encodeToString(x509EncodedKeySpec.getEncoded());
+    }
+
+    /** 개인 키를 PKCS8EncodedKeySpec 으로 변환 */
+    public String convertPrivateKeyToPKCS8() throws Exception {
+      RSAPrivateKeySpec privKeySpec = new RSAPrivateKeySpec(n, d);
+      KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+      PrivateKey privateKey = keyFactory.generatePrivate(privKeySpec);
+      PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
+
+      /** Base64로 인코딩하여 출력 */
+      return Base64.getEncoder().encodeToString(pkcs8EncodedKeySpec.getEncoded());
+    }
   }
 }
