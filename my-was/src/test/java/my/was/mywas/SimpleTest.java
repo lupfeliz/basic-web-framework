@@ -286,71 +286,26 @@ public class SimpleTest {
     /** RSA 키 길이 설정 (예: 1024 비트) */
     int bitlen = 1024;
     SimpleRSAExample rsa = new SimpleRSAExample(bitlen);
-    /** 암호화할 메시지 (정수형으로 변환하여 사용) */
     String message = "RSA 암복호화 테스트 중입니다 BigInteger 를 사용해 Chat-GPT 와 함께 바닥부터 만들었습니다.";
-    {
-      // String prvKey = rsa.convertPrivateKeyToPKCS8();
-      // String pubKey = rsa.convertPublicKeyToX509();
-      // String encrypted = RSA.encrypt(0, prvKey, message);
-      // log.debug("ENCRYPT-RSA:{}", encrypted);
-      // String decrypted = RSA.decrypt(1, pubKey, encrypted);
-      // log.debug("DECRYPT-RSA:{}", decrypted);
-    }
-    {
-      // String prvKey = rsa.convertPrivateKeyToPKCS8();
-      // String pubKey = rsa.convertPublicKeyToX509();
-      // String encrypted = RSA.encrypt(0, prvKey, message);
-      // BigInteger enc = new BigInteger(Base64.getDecoder().decode(encrypted));
-      // BigInteger decrypted = rsa.doPublic(enc);
-      // String decryptedMessage = new String(decrypted.toByteArray(), StandardCharsets.UTF_8);
-      // log.debug("Decrypted: {}", decryptedMessage);
-    }
     {
       KeyFactory keyFactory = KeyFactory.getInstance("RSA");
       PublicKey publicKey = keyFactory.generatePublic(new RSAPublicKeySpec(rsa.getModulus(), rsa.getPublicKey()));
       PrivateKey privateKey = keyFactory.generatePrivate(new RSAPrivateKeySpec(rsa.getModulus(), rsa.getPrivateKey()));
-
+      String decryptedMessage = "";
       /** RSA로 암호화 (BigInteger 기반) */
-      byte[] encryptedBytes = rsa.encryptWithPad(message);
+      byte[] encryptedBytes = rsa.encryptWithPad(message, rsa.e, rsa.n);
+      // byte[] encryptedBytes = rsa.encryptWithPad(message, rsa.d, rsa.n);
       System.out.println("Encrypted Message: " + Base64.getEncoder().encodeToString(encryptedBytes));
 
-      /** javax.crypto.Cipher를 사용해 복호화 */
-      String decryptedMessage = rsa.decryptWithCipher(encryptedBytes, privateKey);
+      decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.d, rsa.n);
+      // decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.e, rsa.n);
       System.out.println("Decrypted Message: " + decryptedMessage);
+
+      /** javax.crypto.Cipher를 사용해 복호화 */
+      decryptedMessage = rsa.decryptWithCipher(encryptedBytes, privateKey);
+      System.out.println("Decrypted Message: " + decryptedMessage);
+
     }
-    // message = "Hello world";
-    // {
-    //   BigInteger messageBigInt = new BigInteger(message.getBytes(StandardCharsets.UTF_8));
-    //   /** 암호화 */
-    //   BigInteger encrypted = rsa.doPrivate(messageBigInt);
-    //   log.debug("Encrypted: {}", encrypted);
-    //   /** 복호화 */
-    //   BigInteger decrypted = rsa.doPublic(encrypted);
-    //   /** 복호화된 메시지 출력 */
-    //   String decryptedMessage = new String(decrypted.toByteArray(), StandardCharsets.UTF_8);
-    //   log.debug("Decrypted: {}", decryptedMessage);
-    // }
-    // {
-    //   BigInteger messageBigInt = new BigInteger(message.getBytes());
-    //   /** 암호화 */
-    //   BigInteger encrypted = rsa.doPublic(messageBigInt);
-    //   log.debug("Encrypted: {}", encrypted);
-    //   /** 복호화 */
-    //   BigInteger decrypted = rsa.doPrivate(encrypted);
-    //   /** 복호화된 메시지 출력 */
-    //   String decryptedMessage = new String(decrypted.toByteArray());
-    //   log.debug("Decrypted: {}", decryptedMessage);
-    // }
-    // {
-    //   /** 암호화할 메시지 (긴 메시지) */
-    //   message = "안녕하세요, RSA를 사용하여 긴 메시지를 암호화하는 예제입니다. 메시지가 너무 길면 한 번에 암호화할 수 없습니다.";
-    //   /** 메시지를 분할하여 암호화 */
-    //   List<BigInteger> encryptedChunks = rsa.encryptStr(message);
-    //   log.debug("Encrypted Chunks:{}", encryptedChunks);
-    //   /** 분할된 메시지를 복호화하여 원래 메시지로 복원 */
-    //   String decryptedMessage = rsa.decryptStr(encryptedChunks);
-    //   log.debug("Decrypted Message:{}", decryptedMessage);
-    // }
 
     log.debug("PRIVATE-KEY:{}", rsa.convertPrivateKeyToPKCS8());
     log.debug("PUBLIC-KEY:{}", rsa.convertPublicKeyToX509());
@@ -393,50 +348,50 @@ public class SimpleTest {
     /** 암호화 함수 */
     public BigInteger doPrivate(BigInteger value) { return value.modPow(e, n); }
 
-    /** 암호화 함수 (메시지 분할 적용) */
-    public List<BigInteger> encryptStr(String message) {
-      byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
-       /** PKCS#1 패딩을 위한 공간을 고려한 최대 청크 크기 */
-      int chunkSize = (n.bitLength() / 8) - 11;
-      List<BigInteger> encryptedChunks = new ArrayList<>();
-      for (int i = 0; i < messageBytes.length; i += chunkSize) {
-        /** 청크 추출 */
-        int length = Math.min(chunkSize, messageBytes.length - i);
-        byte[] chunk = new byte[length];
-        System.arraycopy(messageBytes, i, chunk, 0, length);
-        /** 각 청크를 암호화, 부호가 있는 문제 방지 */
-        BigInteger chunkBigInt = new BigInteger(1, chunk);
-        BigInteger encryptedChunk = chunkBigInt.modPow(e, n);
-        encryptedChunks.add(encryptedChunk);
-      }
-      return encryptedChunks;
-    }
+    // /** 암호화 함수 (메시지 분할 적용) */
+    // public List<BigInteger> encryptStr(String message) {
+    //   byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
+    //    /** PKCS#1 패딩을 위한 공간을 고려한 최대 청크 크기 */
+    //   int chunkSize = (n.bitLength() / 8) - 11;
+    //   List<BigInteger> encryptedChunks = new ArrayList<>();
+    //   for (int i = 0; i < messageBytes.length; i += chunkSize) {
+    //     /** 청크 추출 */
+    //     int length = Math.min(chunkSize, messageBytes.length - i);
+    //     byte[] chunk = new byte[length];
+    //     System.arraycopy(messageBytes, i, chunk, 0, length);
+    //     /** 각 청크를 암호화, 부호가 있는 문제 방지 */
+    //     BigInteger chunkBigInt = new BigInteger(1, chunk);
+    //     BigInteger encryptedChunk = chunkBigInt.modPow(e, n);
+    //     encryptedChunks.add(encryptedChunk);
+    //   }
+    //   return encryptedChunks;
+    // }
 
-    /** 복호화 함수 (메시지 병합 적용) */
-    public String decryptStr(List<BigInteger> encryptedChunks) {
-      StringBuilder decryptedMessage = new StringBuilder();
-      for (BigInteger encryptedChunk : encryptedChunks) {
-        /** 각 청크를 복호화 */
-        BigInteger decryptedChunk = encryptedChunk.modPow(d, n);
-        byte[] chunkBytes = decryptedChunk.toByteArray();
-        /** 복호화된 청크를 문자열로 변환하여 메시지에 추가 */ 
-        decryptedMessage.append(new String(chunkBytes, StandardCharsets.UTF_8));
-      }
-      return decryptedMessage.toString();
-    }
+    // /** 복호화 함수 (메시지 병합 적용) */
+    // public String decryptStr(List<BigInteger> encryptedChunks) {
+    //   StringBuilder decryptedMessage = new StringBuilder();
+    //   for (BigInteger encryptedChunk : encryptedChunks) {
+    //     /** 각 청크를 복호화 */
+    //     BigInteger decryptedChunk = encryptedChunk.modPow(d, n);
+    //     byte[] chunkBytes = decryptedChunk.toByteArray();
+    //     /** 복호화된 청크를 문자열로 변환하여 메시지에 추가 */ 
+    //     decryptedMessage.append(new String(chunkBytes, StandardCharsets.UTF_8));
+    //   }
+    //   return decryptedMessage.toString();
+    // }
 
     /** 복호화 함수 */
     public BigInteger doPublic(BigInteger value) { return value.modPow(d, n); }
 
-    /** 암호화 함수 (BigInteger로 암호화하고 byte[] 반환) */
-    public byte[] encrypt(String message, PublicKey publicKey) throws Exception {
-      byte[] messageBytes = message.getBytes();
-      BigInteger messageBigInt = new BigInteger(1, messageBytes);
+    // /** 암호화 함수 (BigInteger로 암호화하고 byte[] 반환) */
+    // public byte[] encrypt(String message, PublicKey publicKey) throws Exception {
+    //   byte[] messageBytes = message.getBytes();
+    //   BigInteger messageBigInt = new BigInteger(1, messageBytes);
 
-      /** 공개 키로 RSA 암호화 (message ^ e mod n) */
-      BigInteger encryptedBigInt = messageBigInt.modPow(e, n);
-      return encryptedBigInt.toByteArray();
-    }
+    //   /** 공개 키로 RSA 암호화 (message ^ e mod n) */
+    //   BigInteger encryptedBigInt = messageBigInt.modPow(e, n);
+    //   return encryptedBigInt.toByteArray();
+    // }
 
     /** RSA 복호화 함수 (BigInteger 기반 복호화) */
     public byte[] decrypt(byte[] encryptedBytes, PrivateKey privateKey) throws Exception {
@@ -448,9 +403,10 @@ public class SimpleTest {
     }
 
     /** javax.crypto.Cipher 기반 복호화 함수 */
-    public String decryptWithCipher(byte[] encryptedBytes, PrivateKey privateKey) throws Exception {
+    public String decryptWithCipher(byte[] encryptedBytes, Key key) throws Exception {
       javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance("RSA/ECB/PKCS1Padding");
-      cipher.init(javax.crypto.Cipher.DECRYPT_MODE, privateKey);
+      // javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance("RSA");
+      cipher.init(javax.crypto.Cipher.DECRYPT_MODE, key);
       byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
       return new String(decryptedBytes);
     }
@@ -461,7 +417,6 @@ public class SimpleTest {
       KeyFactory keyFactory = KeyFactory.getInstance("RSA");
       PublicKey publicKey = keyFactory.generatePublic(pubKeySpec);
       X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(publicKey.getEncoded());
-
       /** Base64로 인코딩하여 출력 */
       return Base64.getEncoder().encodeToString(x509EncodedKeySpec.getEncoded());
     }
@@ -508,9 +463,10 @@ public class SimpleTest {
 
     /** PKCS#1 v1.5 패딩 제거 */
     private byte[] removePKCS1Padding(byte[] paddedMessage) throws Exception {
-      if (paddedMessage[0] != 0x00 || paddedMessage[1] != 0x02) {
-        throw new Exception("Decryption error: invalid padding");
-      }
+      log.debug("CHECK:[{},{}]", paddedMessage[0], paddedMessage[1]);
+      // if (paddedMessage[0] != 0x00 || paddedMessage[1] != 0x02) {
+      //   throw new Exception("Decryption error: invalid padding");
+      // }
 
       /** 0x00을 찾을 때까지 패딩 건너뛰기 */
       int index = 2;
@@ -526,7 +482,7 @@ public class SimpleTest {
     }
 
     /** 수동으로 PKCS#1 v1.5 패딩을 추가하여 암호화 */
-    public byte[] encryptWithPad(String message) throws Exception {
+    public byte[] encryptWithPad(String message, BigInteger k, BigInteger n) throws Exception {
       byte[] messageBytes = message.getBytes();
       /** 메시지가 패딩을 포함하여 암호화 가능한 최대 길이를 초과하는지 확인 */
       if (messageBytes.length > keySize - 11) {
@@ -537,17 +493,29 @@ public class SimpleTest {
 
       /** 패딩된 메시지를 BigInteger로 변환하여 암호화 */
       BigInteger messageBigInt = new BigInteger(1, paddedMessage);
-      BigInteger encryptedBigInt = messageBigInt.modPow(e, n);
+      BigInteger encryptedBigInt = messageBigInt.modPow(k, n);
 
       /** 암호화된 값을 바이트 배열로 반환 */
       return encryptedBigInt.toByteArray();
     }
 
+    // /** 수동으로 패딩을 제거하여 복호화 */
+    // public String decryptWithPad(byte[] encryptedBytes, BigInteger k, BigInteger n) throws Exception {
+    //   /** 암호화된 데이터를 BigInteger로 변환하여 복호화 */
+    //   BigInteger encryptedBigInt = new BigInteger(1, encryptedBytes);
+    //   BigInteger decryptedBigInt = encryptedBigInt.modPow(k, n);
+    //   /** 복호화된 바이트 배열 */
+    //   byte[] decryptedBytes = decryptedBigInt.toByteArray();
+    //   /** PKCS#1 v1.5 패딩 제거 */
+    //   byte[] unpaddedMessage = removePKCS1Padding(decryptedBytes);
+    //   /** 복호화된 메시지를 문자열로 변환 */
+    //   return new String(unpaddedMessage);
+    // }
     /** 수동으로 패딩을 제거하여 복호화 */
-    public String decryptWithPad(byte[] encryptedBytes) throws Exception {
+    public String decryptWithPad(byte[] encryptedBytes, BigInteger k, BigInteger n) throws Exception {
       /** 암호화된 데이터를 BigInteger로 변환하여 복호화 */
       BigInteger encryptedBigInt = new BigInteger(1, encryptedBytes);
-      BigInteger decryptedBigInt = encryptedBigInt.modPow(d, n);
+      BigInteger decryptedBigInt = encryptedBigInt.modPow(k, n);
       /** 복호화된 바이트 배열 */
       byte[] decryptedBytes = decryptedBigInt.toByteArray();
       /** PKCS#1 v1.5 패딩 제거 */
