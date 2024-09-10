@@ -17,7 +17,7 @@ export { default as Image } from './image'
 export { default as Input } from './input'
 export { default as Link } from './link'
 export { default as Lottie } from './lottie'
-export { default as Main } from './main'
+export { default as Page } from './page'
 export { default as Pagination } from './pagination'
 export { default as Select } from './select'
 

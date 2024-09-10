@@ -5,7 +5,6 @@
  * @Description : popper
  * @Site        : https://devlog.ntiple.com
  **/
-'use client'
 import _Popper, { PopperProps as _PopperProps } from '@mui/material/Popper'
 import app from '@/libs/app-context'
 type PopperProps = _PopperProps & {
