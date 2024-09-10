@@ -284,10 +284,7 @@ const app = {
   },
   /** APP 최초 구동시 수행되는 프로세스 */
   async onload(props: AppProps) {
-    const router = appvars.router = props.router
-    const base = String(router.basePath)
-    const curl = String(history.state.url).substring(base.length)
-    const hurl = String(history.state.as)
+    appvars.router = props.router
     const $body = $(document.body)
     if (appvars.astate == C.APPSTATE_INIT) {
       appvars.astate = C.APPSTATE_START
@@ -295,8 +292,6 @@ const app = {
         const api = (await import('@/libs/api')).default
         const crypto = (await import('@/libs/crypto')).default
         const userContext = (await import('@/libs/user-context')).default
-        /** 웹컨테이너에서 SPA 페이지를 다이렉트로 접근할 때 URL 보정 */
-        if (curl === '/?' && hurl !== '/') { await appvars.router.push(hurl, hurl, {}) }
         const conf = decryptAES(encrypted(), C.CRYPTO_KEY)
         app.putAll(appvars.config, conf)
         log.setLevel(conf.log.level)

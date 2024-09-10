@@ -38,12 +38,12 @@ export default defineComponent(() => {
   })
   const { vars } = self()
   const fncResizePost = debounce(() => {
-    const page = $('html,body')
+    const scrollTop = $('html,body').scrollTop() || document.body.scrollTop
     /** footer sticky 기능을 위해 css 변수를 수정한다 */
     const footer = vars.elem?.current || {}
     {[
       '--screen-height', `${window.innerHeight || 0}px`,
-      '--scroll-top', `${page.scrollTop()}px`,
+      '--scroll-top', `${scrollTop}px`,
       '--footer-height', `${footer?.offsetHeight || 0}px`
     ].map((v, i, l) => (i % 2) &&
       footer?.style?.setProperty(l[i - 1], v))}

@@ -9,7 +9,6 @@ import app from '@/libs/app-context'
 import api from '@/libs/api'
 import userContext from '@/libs/user-context'
 import crypto from '@/libs/crypto'
-import rsa from 'js-crypto-rsa'
 import * as C from '@/libs/constants'
 import { Block, Form, Button, Input, Select, Container, Textarea } from '@/components'
 

@@ -26,10 +26,16 @@ log.setLevel(getConfig()?.publicRuntimeConfig?.logLevel || 'debug')
 
 export default definePage((props) => {
   const { Component, pageProps, router } = props
+  /** APP 최초구동을 수행한다 */
   if (!isServer()) { onload(props) }
   useSetup({
     async mounted() {
-      /** APP 최초구동을 수행한다 */
+      /** 웹컨테이너에서 SPA 페이지를 다이렉트로 접근할 때 URL 보정 */
+      const base = String(router.basePath)
+      const curl = String(history.state.url).substring(base.length)
+      const hurl = String(history.state.as)
+      log.debug('ON-LOAD-URL-CHECK1:', curl, hurl)
+      if (curl === '/?' && hurl !== '/') { await router.push(hurl, hurl, {}) }
     }
   })
   /** 페이지 선언시 다른 layout 속성이 발견되면 해당 레이아웃으로 전환한다 */
