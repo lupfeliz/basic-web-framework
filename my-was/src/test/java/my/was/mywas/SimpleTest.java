@@ -294,17 +294,6 @@ public class SimpleTest {
 
   @Test public void testSimpleRSA() throws Exception {
     if (!TestUtil.isEnabled("testSimpleRSA", TestLevel.SIMPLE)) { return; }
-    // {
-    //   String sig, enc, dec, pln;
-    //   String prvk = "MIIBNgIBADANBgkqhkiG9w0BAQEFAASCASAwggEcAgEAAoGBAJo+bwVoghs7lEOlXXCEJp9V0EHF7PPR1fp3/r9Cv/i1blxfYYKue+SdLje0UO6eWqpwqrKA9liL0NlpPqUoGd3EovKtf8ll55x+FPeEJ+vKaYmsDF3AQ7TrYK++/unRdOmWGv05CpM5gz7QYcsqqxfuR9Rk+sVV+ZrUCLzXUXFtAgEAAoGANoIljM0hZ18bk/JwYgDiHaAKVJZUWZS4hpJsM0BKSG4WLaHrf7R2EEAF43DPVzmHk0XVqJNUwHsmcxQnG8hsI7sLPsUw0DN+nTUILEJHqkKyPi5Nq8Yraemo6SVSsfphUI9F8Jpazx8/X14FiZKn5ClBCzPk9ifI17xDAqNnoJsCAQACAQACAQACAQACAQA=";
-    //   String pubk = "MIHdMA0GCSqGSIb3DQEBAQUAA4HLADCBxwKBgQCaPm8FaIIbO5RDpV1whCafVdBBxezz0dX6d/6/Qr/4tW5cX2GCrnvknS43tFDunlqqcKqygPZYi9DZaT6lKBndxKLyrX/JZeecfhT3hCfrymmJrAxdwEO062Cvvv7p0XTplhr9OQqTOYM+0GHLKqsX7kfUZPrFVfma1Ai811FxbQJBAOuBLXEFD+WFTUAbq+Jf/85hvOGJVC2HzfnGvlJmezf5pEnDC2GccD3qQiajD9S/5oAZBr6mzFj24I7DHxOyC2M=";
-    //   enc = "GYGvI8Pr/yIybgtnLKo85HtXQoliYvypS00WxPRUhJq/9sK5nBKrQ7ElSved7zZ6hL1sSbztSDBeKMck60OvJpzMpV33231BkBnA2QvwXDvvwesfZ6yDaixkmi/ImcfEF/UZQ5HTwYrL1PhAKMvR217waEXOucT5T50Cw369TX8=";
-    //   // enc = "NpaRR9+hzNA34tVIlwNoYWA7GWU2g/0yOzpIXyHZtojmwhBMwX5LiNuU60Jm2ycq/7ZzaBspBYlvG9spX4cewjoGKMYTRYVkaS/oGLPesfkZCjgVWPnhRkw5yeuGMZOFlhG6B2zjsvuDiU61f+pzWPj+SPl8qh/r7WriFVlxkg8=";
-    //   // enc = "NpaRR9+hzNA34tVIlwNoYWA7GWU2g/0yOzpIXyHZtojmwhBMwX5LiNuU60Jm2ycq/7ZzaBspBYlvG9spX4cewjoGKMYTRYVkaS/oGLPesfkZCjgVWPnhRkw5yeuGMZOFlhG6B2zjsvuDiU61f+pzWPj+SPl8qh/r7WriFVlxkg8=";
-    //   dec = CryptoUtil.RSA.decrypt(0, prvk, enc);
-    //   log.debug("CHECK:{}", dec);
-
-    // }
     /** RSA 키 길이 설정 (예: 1024 비트) */
     int bitlen = 2048;
     SimpleRSAExample rsa = new SimpleRSAExample(bitlen);
@@ -320,18 +309,18 @@ public class SimpleTest {
     {
       String prvk = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBALtGiOfF8bU5niMiMssH312DKh0inqEZInz5DKVtupphjK+sQat25cMtUp7z4dhOd9ZtVcWdjSFvIDldKSJfatArS5ZcuLr1U/Ltrro69+2aA3iNwT0Z8psFyLaZgRt/BNKul4tTiit9xoFsLkFqX/PlY4hPiY3/ZKjJjae5g8vtAgMBAAECgYAY0+6Vj6wOQx/Ad6m1Ogt2WcvNBghywiLM37W5/tSk3/bnWVZxdXdbi1gvQ5T2+NwxXNhotQz/WDy07jFkYbMGwPgI1imK1kOddThLE6VIBbVVbmZp9P3aeiHE8+oV7iXd9L2nAUk8KfX/waLU7WsOrf1mCsDTRf5Js0PiHFj5UQJBAOfDOgFEXhz4R/zBnzeaa1ZI3hoRW/h+K66vV+pMVMi0Y7FeKunj1dnbwCvc3v7O8Fx/d/PdCJHUCUiEtZuG92UCQQDO3EudooDxzUZ5ErFx0O4W2CqkmisiBS3MJzr0HzLAKUXD+NAv5Iy7jqhz/t408LIuviR6Sol/2H7P2WxyIo3pAkEAuFKCHWPcXbnwtsre7//2Aget7JmFxdnCsAlwKD1Q6Nbeur+j7aRv/fZRnhDpoUm/zDDsm5xdJm22fGBfdzQeKQJAXecW1EoOarWahh98OYR0cB5UzT/G0Ly1G3W7h1IaQaz6pIlwSC1hzUpnIbDSwgl5eUqLWJA5drWaa1PxrKYO8QJANNSD0e6/VSMSshZU7OddhX+UXGw4vzYE9/DCYX7XrUUb3G0J+FMpmweSr1dPveqCcz5i0Zm101kz9CFzdzMvOA==";
       String pubk = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC7RojnxfG1OZ4jIjLLB99dgyodIp6hGSJ8+QylbbqaYYyvrEGrduXDLVKe8+HYTnfWbVXFnY0hbyA5XSkiX2rQK0uWXLi69VPy7a66OvftmgN4jcE9GfKbBci2mYEbfwTSrpeLU4orfcaBbC5Bal/z5WOIT4mN/2SoyY2nuYPL7QIDAQAB";
-      String N = "bb4688e7c5f1b5399e232232cb07df5d832a1d229ea119227cf90ca56dba9a618cafac41ab76e5c32d529ef3e1d84e77d66d55c59d8d216f20395d29225f6ad02b4b965cb8baf553f2edaeba3af7ed9a03788dc13d19f29b05c8b699811b7f04d2ae978b538a2b7dc6816c2e416a5ff3e563884f898dff64a8c98da7b983cbed";
+      String N = "00bb4688e7c5f1b5399e232232cb07df5d832a1d229ea119227cf90ca56dba9a618cafac41ab76e5c32d529ef3e1d84e77d66d55c59d8d216f20395d29225f6ad02b4b965cb8baf553f2edaeba3af7ed9a03788dc13d19f29b05c8b699811b7f04d2ae978b538a2b7dc6816c2e416a5ff3e563884f898dff64a8c98da7b983cbed";
       String D = "18d3ee958fac0e431fc077a9b53a0b7659cbcd060872c222ccdfb5b9fed4a4dff6e759567175775b8b582f4394f6f8dc315cd868b50cff583cb4ee316461b306c0f808d6298ad6439d75384b13a54805b5556e6669f4fdda7a21c4f3ea15ee25ddf4bda701493c29f5ffc1a2d4ed6b0eadfd660ac0d345fe49b343e21c58f951";
       String E = "010001";
       BigInteger modv = new BigInteger(N, 16);
       BigInteger prve = new BigInteger(D, 16);
       BigInteger pube = new BigInteger(E, 16);
       
-      // KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-      // Key privateKey = keyFactory.generatePrivate(new RSAPrivateKeySpec(modv, prve));
-      // Key publicKey = keyFactory.generatePublic(new RSAPublicKeySpec(modv, pube));
-      PrivateKey privateKey = cast(CryptoUtil.RSA.key(0, prvk), privateKey = null);
-      PublicKey publicKey = cast(CryptoUtil.RSA.key(1, pubk), publicKey = null);
+      KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+      Key privateKey = keyFactory.generatePrivate(new RSAPrivateKeySpec(modv, prve));
+      Key publicKey = keyFactory.generatePublic(new RSAPublicKeySpec(modv, pube));
+      // Key privateKey = cast(CryptoUtil.RSA.key(0, prvk), privateKey = null);
+      // Key publicKey = cast(CryptoUtil.RSA.key(1, pubk), publicKey = null);
       String privateKeyStr = Base64.getEncoder().encodeToString(privateKey.getEncoded());
       String publicKeyStr = Base64.getEncoder().encodeToString(publicKey.getEncoded());
 
@@ -376,19 +365,17 @@ public class SimpleTest {
         // byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
         // log.debug("[1]Decrypted Message: {}", new String(decryptedBytes));
       }
-      {
-        decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.d, rsa.n, 0);
-        log.debug("[0]Decrypted Message: {}", decryptedMessage);
-      }
-
+      // {
+      //   decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.d, rsa.n, 0);
+      //   log.debug("[0]Decrypted Message: {}", decryptedMessage);
+      // }
       /** RSA로 암호화 (BigInteger 기반) */
-      encryptedBytes = rsa.encryptWithPad(message, rsa.e, rsa.n, 1);
-      log.debug("[0]Encrypted Message: {}", Base64.getEncoder().encodeToString(encryptedBytes));
-      {
-        decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.d, rsa.n, 0);
-        log.debug("[0]Decrypted Message: {}", decryptedMessage);
-      }
-
+      // encryptedBytes = rsa.encryptWithPad(message, rsa.e, rsa.n, 1);
+      // log.debug("[0]Encrypted Message: {}", Base64.getEncoder().encodeToString(encryptedBytes));
+      // {
+      //   decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.d, rsa.n, 0);
+      //   log.debug("[0]Decrypted Message: {}", decryptedMessage);
+      // }
       // decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.d, rsa.n);
       // decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.e, rsa.n);
       // log.debug("Decrypted Message: {}", decryptedMessage);
