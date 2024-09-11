@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -33,6 +34,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.junit.jupiter.api.Test;
 
 import com.ntiple.commons.Constants;
+import com.ntiple.commons.CryptoUtil;
 import com.ntiple.commons.CryptoUtil.AES;
 import com.ntiple.commons.CryptoUtil.RSA;
 
@@ -283,47 +285,110 @@ public class SimpleTest {
 
   @Test public void testSimpleRSA() throws Exception {
     if (!TestUtil.isEnabled("testSimpleRSA", TestLevel.SIMPLE)) { return; }
+    // {
+    //   String sig, enc, dec, pln;
+    //   String prvk = "MIIBNgIBADANBgkqhkiG9w0BAQEFAASCASAwggEcAgEAAoGBAJo+bwVoghs7lEOlXXCEJp9V0EHF7PPR1fp3/r9Cv/i1blxfYYKue+SdLje0UO6eWqpwqrKA9liL0NlpPqUoGd3EovKtf8ll55x+FPeEJ+vKaYmsDF3AQ7TrYK++/unRdOmWGv05CpM5gz7QYcsqqxfuR9Rk+sVV+ZrUCLzXUXFtAgEAAoGANoIljM0hZ18bk/JwYgDiHaAKVJZUWZS4hpJsM0BKSG4WLaHrf7R2EEAF43DPVzmHk0XVqJNUwHsmcxQnG8hsI7sLPsUw0DN+nTUILEJHqkKyPi5Nq8Yraemo6SVSsfphUI9F8Jpazx8/X14FiZKn5ClBCzPk9ifI17xDAqNnoJsCAQACAQACAQACAQACAQA=";
+    //   String pubk = "MIHdMA0GCSqGSIb3DQEBAQUAA4HLADCBxwKBgQCaPm8FaIIbO5RDpV1whCafVdBBxezz0dX6d/6/Qr/4tW5cX2GCrnvknS43tFDunlqqcKqygPZYi9DZaT6lKBndxKLyrX/JZeecfhT3hCfrymmJrAxdwEO062Cvvv7p0XTplhr9OQqTOYM+0GHLKqsX7kfUZPrFVfma1Ai811FxbQJBAOuBLXEFD+WFTUAbq+Jf/85hvOGJVC2HzfnGvlJmezf5pEnDC2GccD3qQiajD9S/5oAZBr6mzFj24I7DHxOyC2M=";
+    //   enc = "GYGvI8Pr/yIybgtnLKo85HtXQoliYvypS00WxPRUhJq/9sK5nBKrQ7ElSved7zZ6hL1sSbztSDBeKMck60OvJpzMpV33231BkBnA2QvwXDvvwesfZ6yDaixkmi/ImcfEF/UZQ5HTwYrL1PhAKMvR217waEXOucT5T50Cw369TX8=";
+    //   // enc = "NpaRR9+hzNA34tVIlwNoYWA7GWU2g/0yOzpIXyHZtojmwhBMwX5LiNuU60Jm2ycq/7ZzaBspBYlvG9spX4cewjoGKMYTRYVkaS/oGLPesfkZCjgVWPnhRkw5yeuGMZOFlhG6B2zjsvuDiU61f+pzWPj+SPl8qh/r7WriFVlxkg8=";
+    //   // enc = "NpaRR9+hzNA34tVIlwNoYWA7GWU2g/0yOzpIXyHZtojmwhBMwX5LiNuU60Jm2ycq/7ZzaBspBYlvG9spX4cewjoGKMYTRYVkaS/oGLPesfkZCjgVWPnhRkw5yeuGMZOFlhG6B2zjsvuDiU61f+pzWPj+SPl8qh/r7WriFVlxkg8=";
+    //   dec = CryptoUtil.RSA.decrypt(0, prvk, enc);
+    //   log.debug("CHECK:{}", dec);
+
+    // }
     /** RSA 키 길이 설정 (예: 1024 비트) */
     int bitlen = 1024;
     SimpleRSAExample rsa = new SimpleRSAExample(bitlen);
-    String message = "RSA 암복호화 테스트 중입니다 BigInteger 를 사용해 Chat-GPT 와 함께 바닥부터 만들었습니다.";
+    String message = "RSA 암복호화 테스트 중입니다";
+
+    String head = "";
+    for (int inx = 0; inx < 30; inx++) {
+      int v = 'a';
+      int c = 'z' - 'a';
+      head += (char) (v + new Random().nextInt(c));
+    }
+    message = head + message;
     {
       KeyFactory keyFactory = KeyFactory.getInstance("RSA");
       PublicKey publicKey = keyFactory.generatePublic(new RSAPublicKeySpec(rsa.getModulus(), rsa.getPublicKey()));
       PrivateKey privateKey = keyFactory.generatePrivate(new RSAPrivateKeySpec(rsa.getModulus(), rsa.getPrivateKey()));
+      String privateKeyStr = Base64.getEncoder().encodeToString(privateKey.getEncoded());
+      String publicKeyStr = Base64.getEncoder().encodeToString(publicKey.getEncoded());
+
+      log.debug("PRIVATEKEY:{}", privateKeyStr);
+      // log.debug("PRIVATEKEY:{}", rsa.convertPrivateKeyToPKCS8());
+      log.debug("PUBLICKEY:{}", publicKeyStr);
+      // log.debug("PUBLICKEY:{}", rsa.convertPublicKeyToX509());
+
       String decryptedMessage = "";
       byte[] encryptedBytes = null;
 
       /** javax.crypto.Cipher를 사용해 암호화 */
-      // encryptedBytes = rsa.encryptWithCipher(message.getBytes(), publicKey);
-      encryptedBytes = rsa.encryptWithCipher(message.getBytes(), privateKey);
-      log.debug("[1]Encrypted Message: {}", Base64.getEncoder().encodeToString(encryptedBytes));
+      encryptedBytes = rsa.encryptWithCipher(message.getBytes(), publicKey);
+      // encryptedBytes = rsa.encryptWithCipher(message.getBytes(), privateKey);
+      log.debug("[0]Encrypted Message: {}", Base64.getEncoder().encodeToString(encryptedBytes));
+      /** javax.crypto.Cipher를 사용해 복호화 */
       {
-        decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.e, rsa.n);
-        log.debug("[1]Decrypted Message: {}", decryptedMessage);
+        decryptedMessage = rsa.decryptWithCipher(encryptedBytes, privateKey);
+        // decryptedMessage = rsa.decryptWithCipher(encryptedBytes, publicKey);
+        log.debug("[0]Decrypted Message: {}", decryptedMessage);
+      }
+      {
+        // String enc = CryptoUtil.RSA.encrypt(1, publicKeyStr, message);
+        // String dec = CryptoUtil.RSA.decrypt(0, privateKeyStr, enc);
+        String dec = CryptoUtil.RSA.decrypt(0, privateKeyStr, Base64.getEncoder().encodeToString(encryptedBytes));
+        // String dec = CryptoUtil.RSA.decrypt(1, publicKeyStr, Base64.getEncoder().encodeToString(encryptedBytes));
+        log.debug("[0]Decrypted Message: {}", dec);
+        // Key key = CryptoUtil.RSA.key(0, privateKeyStr);
+        // javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        // javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance("RSA");
+        // cipher.init(javax.crypto.Cipher.DECRYPT_MODE, key);
+        // byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+        // log.debug("[1]Decrypted Message: {}", new String(decryptedBytes));
+      }
+      {
+        decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.d, rsa.n, 1);
+        log.debug("[0]Decrypted Message: {}", decryptedMessage);
       }
 
       /** RSA로 암호화 (BigInteger 기반) */
-      // encryptedBytes = rsa.encryptWithPad(message, rsa.e, rsa.n);
-      encryptedBytes = rsa.encryptWithPad(message, rsa.d, rsa.n);
-      log.debug("[2]Encrypted Message: {}", Base64.getEncoder().encodeToString(encryptedBytes));
+      encryptedBytes = rsa.encryptWithPad(message, rsa.e, rsa.n, 0);
+      log.debug("[0]Encrypted Message: {}", Base64.getEncoder().encodeToString(encryptedBytes));
       {
-        decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.e, rsa.n);
-        log.debug("[2]Decrypted Message: {}", decryptedMessage);
+        decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.d, rsa.n, 1);
+        log.debug("[0]Decrypted Message: {}", decryptedMessage);
       }
 
       // decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.d, rsa.n);
       // decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.e, rsa.n);
       // log.debug("Decrypted Message: {}", decryptedMessage);
 
-      /** javax.crypto.Cipher를 사용해 복호화 */
-      // decryptedMessage = rsa.decryptWithCipher(encryptedBytes, privateKey);
-      // decryptedMessage = rsa.decryptWithCipher(encryptedBytes, publicKey);
-      // log.debug("Decrypted Message: {}", decryptedMessage);
     }
+  }
 
-    log.debug("PRIVATE-KEY:{}", rsa.convertPrivateKeyToPKCS8());
-    log.debug("PUBLIC-KEY:{}", rsa.convertPublicKeyToX509());
+  @Test public void testSimpleRSA2() throws Exception {
+    String privKeyStr = "MIIBNQIBADANBgkqhkiG9w0BAQEFAASCAR8wggEbAgEAAoGAcGoKevNOQp3+kqWi/oToqae4Y8F+nqIE8KcMWaUvHtIIMKI03gM7Ig832+RWB6Na1vRQpjHsY/YL02S2ifcj3VXyCbnWpcg5+yK1RIgT6MX9GuBY29YICTo3kLn/JFxRbRhSu4QFdik2wsrtLkAirs02jfc1SqXiSBN7eSbWxk0CAQACgYBDpkusC7JDeXwTNhRFf9GiUUMd7LOSHQ/fvB2Et5juYmMqnonhc9l5fUBa4RUFfDvGRkzUcl0ocnldTQq2pIj+DLvi6Pp+ye7uKecTz0R27oe0IYOA5mtXptU7PmcDQCXmIHVfgy8WNblKrFQsrecwemfuvcWTNu8oU5rRC50lvQIBAAIBAAIBAAIBAAIBAA==";
+    String pubKeyStr =  "MIHcMA0GCSqGSIb3DQEBAQUAA4HKADCBxgKBgHBqCnrzTkKd/pKlov6E6KmnuGPBfp6iBPCnDFmlLx7SCDCiNN4DOyIPN9vkVgejWtb0UKYx7GP2C9Nkton3I91V8gm51qXIOfsitUSIE+jF/RrgWNvWCAk6N5C5/yRcUW0YUruEBXYpNsLK7S5AIq7NNo33NUql4kgTe3km1sZNAkEAyVbWQ6feX6jEzGw4IaH1Ha+zsXyDP/uT+pqRGN8jHkB9W9hx1V9kmX4qZmsyRMHuzNKI5zMoTMeLn65Gq321TQ==";
+    String pln = "", enc = "", dec = "";
+    pln = "gvqmcserjsbwopctwijjblupauxywlRSA 암복호화 테스트 중입니다";
+    {
+      /** PUBLIC-KEY-ENC */
+      enc = "X6P9/aFJDtqInxSlYsFvDfE//ZK4KY4cNoZQgOzKeeh3JhCHjNfdkjO/NLphIhVYCfHZ3ZBLIsOwuhbLxX+z0kT+HUwvVyWCoaKZ3/CriTg/6RpgLF7IB3HOYX1anzp8QbVSdtNzwGvr4775nVMStRDb3qWxxUo0kWmQBAG3BfI=";
+      dec = CryptoUtil.RSA.decrypt(1, pubKeyStr, enc);
+      log.debug("DEC:{}", dec);
+    }
+    // {
+    //   /** PRIVATE-KEY-ENC */
+    //   enc = "YtY6DkEsPlw8dhoLAPJS7885nvU1bi1phhVvy/4ooR/vuqmFYsE+NssDr0h2+wcqKs2BS/hiXj2axKKxLnZVCT5zvPjzWfjSdexf+DIYgbswzG5uQtCcFXIGQK3nN7E+BGgA+qWMVuOhXFF/pBVdpYvJPyrCBvrBhlornHub7Zc=";
+    //   dec = CryptoUtil.RSA.decrypt(0, privKeyStr, enc);
+    //   log.debug("DEC:{}", dec);
+    // }
+  }
+
+  @Test public void testSimpleRSAManyTime() throws Exception {
+    for (int inx = 0; inx < 500; inx++) {
+      this.testSimpleRSA();
+    }
   }
 
   public static class SimpleRSAExample {
@@ -380,14 +445,14 @@ public class SimpleTest {
 
 
     /** 수동으로 PKCS#1 v1.5 패딩을 추가하여 암호화 */
-    public byte[] encryptWithPad(String message, BigInteger k, BigInteger n) throws Exception {
+    public byte[] encryptWithPad(String message, BigInteger k, BigInteger n, int type) throws Exception {
       byte[] messageBytes = message.getBytes();
       /** 메시지가 패딩을 포함하여 암호화 가능한 최대 길이를 초과하는지 확인 */
       if (messageBytes.length > keySize - 11) {
         throw new IllegalArgumentException("Message too long for RSA encryption");
       }
       /** PKCS#1 v1.5 패딩 적용 */
-      byte[] paddedMessage = applyPKCS1Padding(messageBytes);
+      byte[] paddedMessage = applyPKCS1Padding(messageBytes, type);
 
       /** 패딩된 메시지를 BigInteger로 변환하여 암호화 */
       BigInteger messageBigInt = new BigInteger(1, paddedMessage);
@@ -398,20 +463,20 @@ public class SimpleTest {
     }
 
     /** 수동으로 패딩을 제거하여 복호화 */
-    public String decryptWithPad(byte[] encryptedBytes, BigInteger k, BigInteger n) throws Exception {
+    public String decryptWithPad(byte[] encryptedBytes, BigInteger k, BigInteger n, int type) throws Exception {
       /** 암호화된 데이터를 BigInteger로 변환하여 복호화 */
       BigInteger encryptedBigInt = new BigInteger(1, encryptedBytes);
       BigInteger decryptedBigInt = encryptedBigInt.modPow(k, n);
       /** 복호화된 바이트 배열 */
       byte[] decryptedBytes = decryptedBigInt.toByteArray();
       /** PKCS#1 v1.5 패딩 제거 */
-      byte[] unpaddedMessage = removePKCS1Padding(decryptedBytes);
+      byte[] unpaddedMessage = removePKCS1Padding(decryptedBytes, type);
       /** 복호화된 메시지를 문자열로 변환 */
       return new String(unpaddedMessage);
     }
 
     /** PKCS#1 v1.5 패딩 적용 */
-    private byte[] applyPKCS1Padding(byte[] messageBytes) {
+    private byte[] applyPKCS1Padding(byte[] messageBytes, int type) {
       /** RSA 키 크기에 맞게 바이트 배열 생성 */
       byte[] paddedMessage = new byte[keySize];
       SecureRandom random = new SecureRandom();
@@ -419,8 +484,11 @@ public class SimpleTest {
       /** 0x00 || 0x02 || PS || 0x00 || D 구조 생성 */
       paddedMessage[0] = 0x00;
       /** FIXME: publicKey-encrypt 이면 2, privateKey-encrypt 이면 1 인 듯함. */
-      // paddedMessage[1] = 0x02;
-      paddedMessage[1] = 0x01;
+      if (type == 0) {
+        paddedMessage[1] = 0x02;
+      } else {
+        paddedMessage[1] = 0x01;
+      }
 
       /** 패딩 부분 (PS)를 무작위 값으로 채우기 (0x00이 아닌 값으로) */
       int paddingLength = keySize - messageBytes.length - 3;
@@ -442,7 +510,7 @@ public class SimpleTest {
     }
 
     /** PKCS#1 v1.5 패딩 제거 */
-    private byte[] removePKCS1Padding(byte[] paddedMessage) throws Exception {
+    private byte[] removePKCS1Padding(byte[] paddedMessage, int type) throws Exception {
       log.debug("CHECK:[{},{}]", paddedMessage[0], paddedMessage[1]);
       // if (paddedMessage[0] != 0x00 || paddedMessage[1] != 0x02) { throw new Exception("Decryption error: invalid padding"); }
       /** FIXME: publicKey-encrypt 이면 2, privateKey-encrypt 이면 1 인 듯함. */
