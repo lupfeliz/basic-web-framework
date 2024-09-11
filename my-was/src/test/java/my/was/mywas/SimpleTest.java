@@ -6,13 +6,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -25,12 +32,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.Test;
 
 import com.ntiple.commons.Constants;
@@ -297,7 +306,7 @@ public class SimpleTest {
 
     // }
     /** RSA 키 길이 설정 (예: 1024 비트) */
-    int bitlen = 1024;
+    int bitlen = 2048;
     SimpleRSAExample rsa = new SimpleRSAExample(bitlen);
     String message = "RSA 암복호화 테스트 중입니다";
 
@@ -309,16 +318,37 @@ public class SimpleTest {
     }
     message = head + message;
     {
-      KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-      PublicKey publicKey = keyFactory.generatePublic(new RSAPublicKeySpec(rsa.getModulus(), rsa.getPublicKey()));
-      PrivateKey privateKey = keyFactory.generatePrivate(new RSAPrivateKeySpec(rsa.getModulus(), rsa.getPrivateKey()));
+      String prvk = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBALtGiOfF8bU5niMiMssH312DKh0inqEZInz5DKVtupphjK+sQat25cMtUp7z4dhOd9ZtVcWdjSFvIDldKSJfatArS5ZcuLr1U/Ltrro69+2aA3iNwT0Z8psFyLaZgRt/BNKul4tTiit9xoFsLkFqX/PlY4hPiY3/ZKjJjae5g8vtAgMBAAECgYAY0+6Vj6wOQx/Ad6m1Ogt2WcvNBghywiLM37W5/tSk3/bnWVZxdXdbi1gvQ5T2+NwxXNhotQz/WDy07jFkYbMGwPgI1imK1kOddThLE6VIBbVVbmZp9P3aeiHE8+oV7iXd9L2nAUk8KfX/waLU7WsOrf1mCsDTRf5Js0PiHFj5UQJBAOfDOgFEXhz4R/zBnzeaa1ZI3hoRW/h+K66vV+pMVMi0Y7FeKunj1dnbwCvc3v7O8Fx/d/PdCJHUCUiEtZuG92UCQQDO3EudooDxzUZ5ErFx0O4W2CqkmisiBS3MJzr0HzLAKUXD+NAv5Iy7jqhz/t408LIuviR6Sol/2H7P2WxyIo3pAkEAuFKCHWPcXbnwtsre7//2Aget7JmFxdnCsAlwKD1Q6Nbeur+j7aRv/fZRnhDpoUm/zDDsm5xdJm22fGBfdzQeKQJAXecW1EoOarWahh98OYR0cB5UzT/G0Ly1G3W7h1IaQaz6pIlwSC1hzUpnIbDSwgl5eUqLWJA5drWaa1PxrKYO8QJANNSD0e6/VSMSshZU7OddhX+UXGw4vzYE9/DCYX7XrUUb3G0J+FMpmweSr1dPveqCcz5i0Zm101kz9CFzdzMvOA==";
+      String pubk = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC7RojnxfG1OZ4jIjLLB99dgyodIp6hGSJ8+QylbbqaYYyvrEGrduXDLVKe8+HYTnfWbVXFnY0hbyA5XSkiX2rQK0uWXLi69VPy7a66OvftmgN4jcE9GfKbBci2mYEbfwTSrpeLU4orfcaBbC5Bal/z5WOIT4mN/2SoyY2nuYPL7QIDAQAB";
+      String N = "bb4688e7c5f1b5399e232232cb07df5d832a1d229ea119227cf90ca56dba9a618cafac41ab76e5c32d529ef3e1d84e77d66d55c59d8d216f20395d29225f6ad02b4b965cb8baf553f2edaeba3af7ed9a03788dc13d19f29b05c8b699811b7f04d2ae978b538a2b7dc6816c2e416a5ff3e563884f898dff64a8c98da7b983cbed";
+      String D = "18d3ee958fac0e431fc077a9b53a0b7659cbcd060872c222ccdfb5b9fed4a4dff6e759567175775b8b582f4394f6f8dc315cd868b50cff583cb4ee316461b306c0f808d6298ad6439d75384b13a54805b5556e6669f4fdda7a21c4f3ea15ee25ddf4bda701493c29f5ffc1a2d4ed6b0eadfd660ac0d345fe49b343e21c58f951";
+      String E = "010001";
+      BigInteger modv = new BigInteger(N, 16);
+      BigInteger prve = new BigInteger(D, 16);
+      BigInteger pube = new BigInteger(E, 16);
+      
+      // KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+      // Key privateKey = keyFactory.generatePrivate(new RSAPrivateKeySpec(modv, prve));
+      // Key publicKey = keyFactory.generatePublic(new RSAPublicKeySpec(modv, pube));
+      PrivateKey privateKey = cast(CryptoUtil.RSA.key(0, prvk), privateKey = null);
+      PublicKey publicKey = cast(CryptoUtil.RSA.key(1, pubk), publicKey = null);
       String privateKeyStr = Base64.getEncoder().encodeToString(privateKey.getEncoded());
       String publicKeyStr = Base64.getEncoder().encodeToString(publicKey.getEncoded());
+
+      {
+        rsa.n = ((RSAPrivateKey) privateKey).getModulus();
+        rsa.d = ((RSAPrivateKey) privateKey).getPrivateExponent();
+        rsa.e = ((RSAPublicKey) publicKey).getPublicExponent();
+      }
 
       log.debug("PRIVATEKEY:{}", privateKeyStr);
       // log.debug("PRIVATEKEY:{}", rsa.convertPrivateKeyToPKCS8());
       log.debug("PUBLICKEY:{}", publicKeyStr);
       // log.debug("PUBLICKEY:{}", rsa.convertPublicKeyToX509());
+
+      log.debug("N:{}", new String(Hex.encodeHex(rsa.n.toByteArray())));
+      log.debug("D:{}", new String(Hex.encodeHex(rsa.d.toByteArray())));
+      log.debug("E:{}", new String(Hex.encodeHex(rsa.e.toByteArray())));
 
       String decryptedMessage = "";
       byte[] encryptedBytes = null;
@@ -347,15 +377,15 @@ public class SimpleTest {
         // log.debug("[1]Decrypted Message: {}", new String(decryptedBytes));
       }
       {
-        decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.d, rsa.n, 1);
+        decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.d, rsa.n, 0);
         log.debug("[0]Decrypted Message: {}", decryptedMessage);
       }
 
       /** RSA로 암호화 (BigInteger 기반) */
-      encryptedBytes = rsa.encryptWithPad(message, rsa.e, rsa.n, 0);
+      encryptedBytes = rsa.encryptWithPad(message, rsa.e, rsa.n, 1);
       log.debug("[0]Encrypted Message: {}", Base64.getEncoder().encodeToString(encryptedBytes));
       {
-        decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.d, rsa.n, 1);
+        decryptedMessage = rsa.decryptWithPad(encryptedBytes, rsa.d, rsa.n, 0);
         log.debug("[0]Decrypted Message: {}", decryptedMessage);
       }
 
@@ -371,10 +401,22 @@ public class SimpleTest {
     String pubKeyStr =  "MIHcMA0GCSqGSIb3DQEBAQUAA4HKADCBxgKBgHBqCnrzTkKd/pKlov6E6KmnuGPBfp6iBPCnDFmlLx7SCDCiNN4DOyIPN9vkVgejWtb0UKYx7GP2C9Nkton3I91V8gm51qXIOfsitUSIE+jF/RrgWNvWCAk6N5C5/yRcUW0YUruEBXYpNsLK7S5AIq7NNo33NUql4kgTe3km1sZNAkEAyVbWQ6feX6jEzGw4IaH1Ha+zsXyDP/uT+pqRGN8jHkB9W9hx1V9kmX4qZmsyRMHuzNKI5zMoTMeLn65Gq321TQ==";
     String pln = "", enc = "", dec = "";
     pln = "gvqmcserjsbwopctwijjblupauxywlRSA 암복호화 테스트 중입니다";
+    // {
+    //   /** PUBLIC-KEY-ENC */
+    //   enc = "X6P9/aFJDtqInxSlYsFvDfE//ZK4KY4cNoZQgOzKeeh3JhCHjNfdkjO/NLphIhVYCfHZ3ZBLIsOwuhbLxX+z0kT+HUwvVyWCoaKZ3/CriTg/6RpgLF7IB3HOYX1anzp8QbVSdtNzwGvr4775nVMStRDb3qWxxUo0kWmQBAG3BfI=";
+    //   dec = CryptoUtil.RSA.decrypt(1, pubKeyStr, enc);
+    //   log.debug("DEC:{}", dec);
+    // }
     {
-      /** PUBLIC-KEY-ENC */
+      privKeyStr = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAMhfVP50PfMYry6YsMYpEdTPjWRHflvUNDhzhrgyO5gEiTIj2lK6S95XRggsU/NGTbRqRouBmFlV4+KHL9LLKhXszqlDRDWf1jZJBNdI4/GpRlQU/MkByji+2lv9894gJPXpExDLO/bM+PTZ16HMAMyZJ6DNw5hD/GMEudZk6U1lAgMBAAECgYAD/17nOrN3s6DfGZ3BPlWEPOXRv9lmBJxMGgXwi9QDiuefz/ZNmzjjRTN4+0Vrf5YSSOKCawH6mkuTG+ZY2sPKpiIBSX4SXewMIKRhbxOj19iwrNp1gBDK3s/kpHy9+x8b7tuEIITNYreuadYAvVgSMlaJVPdh7uUm39sMnn/aqwJBANRWQBpaOfw3iQ+g7jBrBJz+e5QbmsNZeNUPrk9WbMuhKQkLUP2E4U5noFKV8SZFGo48YPKsC32DxFF3e8kw2fsCQQDxk0ALLlepzdpqVkm6YQ4KtTEweug+L/RdjU5apGZLZI+AGfYIE1JIzyzgdPke92ePnw1wPqFgi0PyzyJn8DgfAkAq5M2IRUfHapSWgqT7RPMmn8XpEnZ+Ffnx2HwW7NeHfyPh/tY6kHhPNWHOrRmM6JLHvuy6uQSNM2waJO/toZ+3AkEAo4WzUl46RNztPhHOsnTEFod0Fob78ixv02u1YDHsdJhLcsEgA3NgvZxPmlhT0ZxS46scY6BhiIJ8qj1/4q9+rQJAbZj4vsQB5SrKcYNR8VVYMP9EYXnFax66QgSjGI3zPJhjAcbdyhDVshFKHcsI3R1dxegLFTbvjYKejzWfHBcBUQ==";
+      enc = "h3IfqQoLwdAaJTeE30jlesbm0UGCFRBirLFe3lXzi4KzUGpzEr7pb6L+9G4zE1YSHyf2KSUIfH6vePG/Fl8CRZoJZ6FQCC9MYzhxpGk377Z2OVBepz33wgOKKzFz9s7Bk8uxL8ubJUQPl9IZLhcVvbl4ruVc00wGa66lWeMjW1s=";
+      dec = CryptoUtil.RSA.decrypt(0, privKeyStr, enc);
+      log.debug("DEC:{}", dec);
+    }
+    {
+      privKeyStr = "MIIBNQIBADANBgkqhkiG9w0BAQEFAASCAR8wggEbAgEAAoGAcGoKevNOQp3+kqWi/oToqae4Y8F+nqIE8KcMWaUvHtIIMKI03gM7Ig832+RWB6Na1vRQpjHsY/YL02S2ifcj3VXyCbnWpcg5+yK1RIgT6MX9GuBY29YICTo3kLn/JFxRbRhSu4QFdik2wsrtLkAirs02jfc1SqXiSBN7eSbWxk0CAQACgYBDpkusC7JDeXwTNhRFf9GiUUMd7LOSHQ/fvB2Et5juYmMqnonhc9l5fUBa4RUFfDvGRkzUcl0ocnldTQq2pIj+DLvi6Pp+ye7uKecTz0R27oe0IYOA5mtXptU7PmcDQCXmIHVfgy8WNblKrFQsrecwemfuvcWTNu8oU5rRC50lvQIBAAIBAAIBAAIBAAIBAA==";
       enc = "X6P9/aFJDtqInxSlYsFvDfE//ZK4KY4cNoZQgOzKeeh3JhCHjNfdkjO/NLphIhVYCfHZ3ZBLIsOwuhbLxX+z0kT+HUwvVyWCoaKZ3/CriTg/6RpgLF7IB3HOYX1anzp8QbVSdtNzwGvr4775nVMStRDb3qWxxUo0kWmQBAG3BfI=";
-      dec = CryptoUtil.RSA.decrypt(1, pubKeyStr, enc);
+      dec = CryptoUtil.RSA.decrypt(0, privKeyStr, enc);
       log.debug("DEC:{}", dec);
     }
     // {
@@ -383,6 +425,42 @@ public class SimpleTest {
     //   dec = CryptoUtil.RSA.decrypt(0, privKeyStr, enc);
     //   log.debug("DEC:{}", dec);
     // }
+  }
+
+  @Test public void testSimpleRSA3() throws Exception {
+    String pln, enc, dec;
+    String[] keys = CryptoUtil.RSA.generateKeyStrs(1024);
+    log.debug("PRV:{}", keys[0]);
+    log.debug("PUB:{}", keys[1]);
+    pln = "테스트중입니다.";
+    enc = CryptoUtil.RSA.encrypt(1, keys[1], pln);
+    dec = CryptoUtil.RSA.decrypt(0, keys[0], enc);
+    log.debug("ENC1:{}", enc);
+    log.debug("DEC1:{}", dec);
+    enc = CryptoUtil.RSA.encrypt(0, keys[0], pln);
+    dec = CryptoUtil.RSA.decrypt(1, keys[1], enc);
+    log.debug("ENC2:{}", enc);
+    log.debug("DEC2:{}", dec);
+  }
+
+  @Test public void testSimpleRSA4() throws Exception {
+    // publicKey = GenerateRSAKeys().public;
+    // keyBytes = BinaryDecode( publicKey, "base64" );
+    // keyFactory = CreateObject( "java", "java.security.KeyFactory" ).getInstance( "RSA" );
+    // spec = CreateObject( "java", "java.security.spec.X509EncodedKeySpec" ).init( keyBytes );
+    // rsaPublicKey = keyFactory.generatePublic( spec );
+    // result.publicKeyModulus = rsaPublicKey.getModulus();
+    // result.publicKeyExponent = rsaPublicKey.getPublicExponent();
+    // dump( result );
+
+    // kpg = CreateObject( "java", "java.security.KeyPairGenerator" ).getInstance( "RSA" );
+    // kpg.initialize( 2048 );
+    // kp = kpg.genKeyPair();
+    // publicKey = kp.getPublic();
+    // rsaPublicKey = JavaCast( "java.security.interfaces.RSAPublicKey", publicKey );
+    // result.publicKeyModulus = rsaPublicKey.getModulus();
+    // result.publicKeyExponent = rsaPublicKey.getPublicExponent();
+    // dump( result );
   }
 
   @Test public void testSimpleRSAManyTime() throws Exception {
@@ -414,6 +492,7 @@ public class SimpleTest {
       d = e.modInverse(phi);
       /** RSA에서 바이트 단위의 키 크기 */
       this.keySize = bitlen / 8;
+      log.debug("KEY-SIZE:{}", this.keySize);
     }
 
     /** 공개 키 가져오기 */
@@ -442,7 +521,6 @@ public class SimpleTest {
       byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
       return new String(decryptedBytes);
     }
-
 
     /** 수동으로 PKCS#1 v1.5 패딩을 추가하여 암호화 */
     public byte[] encryptWithPad(String message, BigInteger k, BigInteger n, int type) throws Exception {
@@ -609,4 +687,276 @@ public class SimpleTest {
     // // }
 
   }
+
+  // static class RSA {
+  //   private PublicKey internalPublicKey;
+  //   private PrivateKey internalPrivateKey;
+  //   private KeyPairGenerator kpg = null;
+  //   private int SIZE = 4096;
+
+  //   public RSA(int size) {
+  //     try {
+  //       SIZE = size;
+  //       kpg = KeyPairGenerator.getInstance("RSA");
+  //       init();
+  //     } catch (Exception e) {
+  //     }
+  //   }
+
+  //   public RSA() {
+  //     this(1024);
+  //   }
+
+  //   private void init() {
+  //     kpg.initialize(SIZE, new SecureRandom());
+
+  //     KeyPair kp = kpg.genKeyPair();
+  //     internalPublicKey = kp.getPublic();
+  //     internalPrivateKey = kp.getPrivate();
+  //   }
+
+  //   public int getSize() {
+  //     return SIZE;
+  //   }
+
+  //   public PublicKey getPublic() {
+  //     return internalPublicKey;
+  //   }
+
+  //   public PrivateKey getPrivate() {
+  //     return internalPrivateKey;
+  //   }
+
+  //   public String getPublicModule() {
+  //     String s = internalPublicKey.toString();
+  //     return s.substring(s.indexOf("modulus") + 8, s.indexOf(",publicExponent"));
+  //   }
+
+  //   public String getPublicExponent() {
+  //     String s = internalPublicKey.toString();
+  //     // {
+  //     return s.substring(s.indexOf("publicExponent") + 15, s.lastIndexOf("}"));
+  //   }
+
+  //   public String getPrivateExponent() {
+  //     String s = internalPrivateKey.toString();
+  //     return s.substring(s.indexOf("privateExponent") + 16, s.indexOf(",primeP"));
+  //   }
+
+  //   public String getPrivatePrimP() {
+  //     String s = internalPrivateKey.toString();
+  //     return s.substring(s.indexOf("primeP=") + 7, s.indexOf(",primeQ"));
+  //   }
+
+  //   public String getPrivatePrimQ() {
+  //     String s = internalPrivateKey.toString();
+  //     return s.substring(s.indexOf("primeQ=") + 7, s.indexOf(",primeExponentP"));
+  //   }
+
+  //   public String getPrivatePrimExponentP() {
+  //     String s = internalPrivateKey.toString();
+  //     return s.substring(s.indexOf("primeExponentP=") + 15, s.indexOf(",primeExponentQ"));
+  //   }
+
+  //   public String getPrivatePrimExponentQ() {
+  //     String s = internalPrivateKey.toString();
+  //     return s.substring(s.indexOf("primeExponentQ=") + 15, s.indexOf(",crtCoefficient"));
+  //   }
+
+  //   public String getPrivateCrtCoefficient() {
+  //     String s = internalPrivateKey.toString();
+  //     return s.substring(s.indexOf("crtCoefficient=") + 15, s.lastIndexOf(","));
+  //   }
+
+  //   public byte[] getPublicKey() {
+  //     return internalPublicKey.getEncoded();
+  //   }
+
+  //   public byte[] getPrivateKey() {
+  //     return internalPrivateKey.getEncoded();
+  //   }
+
+  //   public String getPublicKeyAsString() {
+  //     return Base64.encodeToString(internalPublicKey.getEncoded(), Base64.DEFAULT);
+  //   }
+
+  //   public String getPrivateKeyAsString() {
+  //     return Base64.encodeToString(internalPrivateKey.getEncoded(), Base64.DEFAULT);
+  //   }
+
+  //   public byte[] getEncrypt(String plain) {
+  //     try {
+  //       // Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+  //       Cipher cipher = Cipher.getInstance("RSA");
+  //       cipher.init(Cipher.ENCRYPT_MODE, internalPublicKey);
+
+  //       return cipher.doFinal(plain.getBytes("UTF-8"));
+  //     } catch (Exception e) {
+  //       log.debug("E:{}", e);
+  //     }
+
+  //     return null;
+  //   }
+
+  //   public String getStringEncrypt(String plain) {
+  //     return new String(getEncrypt(plain), Charset.forName("UTF-8"));
+  //   }
+
+  //   public byte[] getDecrypt(byte[] encryptedBytes) {
+  //     try {
+  //       Cipher cipher = Cipher.getInstance("RSA");
+  //       cipher.init(Cipher.DECRYPT_MODE, internalPrivateKey);
+
+  //       return cipher.doFinal(encryptedBytes);
+  //     } catch (Exception e) {
+  //       log.debug("E:{}", e);
+  //     }
+
+  //     return null;
+  //   }
+
+  //   public byte[] getDecrypt(String encrypted) {
+  //     return getDecrypt(encrypted.getBytes());
+  //   }
+
+  //   public String getStringDecrypt(byte[] encryptedBytes) {
+  //     return new String(getDecrypt(encryptedBytes), Charset.forName("UTF-8"));
+  //   }
+
+  //   public String getStringDecrypt(String encrypted) {
+  //     return new String(getDecrypt(encrypted), Charset.forName("UTF-8"));
+  //   }
+
+  //   public static byte[] getEncrypt(String plain, String modulus, String exponent) {
+  //     try {
+  //       BigInteger modBigInteger = new BigInteger(modulus, 16);
+  //       BigInteger exBigInteger = new BigInteger(exponent, 16);
+  //       RSAPublicKeySpec spec = new RSAPublicKeySpec(modBigInteger, exBigInteger);
+
+  //       KeyFactory factory = KeyFactory.getInstance("RSA");
+  //       PublicKey pk = factory.generatePublic(spec);
+
+  //       Cipher cipher = Cipher.getInstance("RSA");
+  //       cipher.init(Cipher.ENCRYPT_MODE, pk);
+
+  //       return cipher.doFinal(plain.getBytes("UTF-8"));
+  //     } catch (Exception e) {
+  //       log.debug("E:{}", e);
+  //     }
+
+  //     return null;
+  //   }
+
+  //   public static String getStringEncrypt(final String plain, String modulus, String exponent) {
+  //     return Base64.encodeToString(getEncrypt(plain, modulus, exponent), Base64.DEFAULT);
+  //   }
+
+  //   public static byte[] getDecrypt(byte[] encryptedBytes, String modulus, String publicExpo, String privateExpo,
+  //       String primP, String primQ, String ePrimP, String ePrimQ, String cof) {
+  //     try {
+  //       BigInteger module = new BigInteger(modulus, 16);
+  //       BigInteger expo1 = new BigInteger(publicExpo, 16);
+  //       BigInteger expo2 = new BigInteger(privateExpo, 16);
+  //       BigInteger prim_P = new BigInteger(primP, 16);
+  //       BigInteger prim_Q = new BigInteger(primQ, 16);
+  //       BigInteger prim_EP = new BigInteger(ePrimP, 16);
+  //       BigInteger prim_EQ = new BigInteger(ePrimQ, 16);
+  //       BigInteger coefficient = new BigInteger(cof, 16);
+  //       /*
+  //       * BigInteger module = new BigInteger(1, Base64.encode(modulus.getBytes(),
+  //       * Base64.DEFAULT));
+  //       * BigInteger expo1 = new BigInteger(1, Base64.encode(publicExpo.getBytes(),
+  //       * Base64.DEFAULT));
+  //       * BigInteger expo2 = new BigInteger(1, Base64.encode(privateExpo.getBytes(),
+  //       * Base64.DEFAULT));
+  //       * BigInteger prim_P = new BigInteger(1, Base64.encode(primP.getBytes(),
+  //       * Base64.DEFAULT));
+  //       * BigInteger prim_Q = new BigInteger(1, Base64.encode(primQ.getBytes(),
+  //       * Base64.DEFAULT));
+  //       * BigInteger prim_EP = new BigInteger(1, Base64.encode(ePrimP.getBytes(),
+  //       * Base64.DEFAULT));
+  //       * BigInteger prim_EQ = new BigInteger(1, Base64.encode(ePrimQ.getBytes(),
+  //       * Base64.DEFAULT));
+  //       * BigInteger coefficient = new BigInteger(1, Base64.encode(cof.getBytes(),
+  //       * Base64.DEFAULT));
+  //       */
+
+  //       RSAPrivateCrtKeySpec spec = new RSAPrivateCrtKeySpec(module, expo1, expo2, prim_P, prim_Q, prim_EP, prim_EQ,
+  //           coefficient);
+
+  //       KeyFactory factory = KeyFactory.getInstance("RSA");
+  //       PrivateKey pk = factory.generatePrivate(spec);
+
+  //       Cipher cipher1 = Cipher.getInstance("RSA");
+  //       cipher1.init(Cipher.DECRYPT_MODE, pk);
+
+  //       // return cipher1.doFinal(Base64.decode(encryptedBytes, Base64.DEFAULT));
+  //       return cipher1.doFinal(encryptedBytes);
+  //     } catch (Exception e) {
+  //       log.debug("E:{}", e);
+  //     }
+
+  //     return null;
+  //   }
+
+  //   public static String getStringDecrypt(byte[] encryptedBytes, String modulus, String publicExpo, String privateExpo,
+  //       String primP, String primQ, String ePrimP, String ePrimQ, String cof) {
+  //     return Converter.byteToString_UTF8(
+  //         getDecrypt(encryptedBytes, modulus, publicExpo, privateExpo, primP, primQ, ePrimP, ePrimQ, cof));
+  //   }
+
+  //   public static byte[] getDecrypt(final byte[] encryptedBytes, byte[] privateKey) {
+  //     try {
+  //       KeyFactory keyFac = KeyFactory.getInstance("RSA");
+  //       KeySpec keySpec = new PKCS8EncodedKeySpec(privateKey);
+  //       PrivateKey pk = keyFac.generatePrivate(keySpec);
+
+  //       Cipher cipher1 = Cipher.getInstance("RSA");
+  //       cipher1.init(Cipher.DECRYPT_MODE, pk);
+  //       return cipher1.doFinal(encryptedBytes);
+  //     } catch (Exception e) {
+  //       log.debug("E:{}", e);
+  //     }
+
+  //     return null;
+  //   }
+
+  //   public static String getStringDecrypt(final byte[] encryptedBytes, byte[] privateKey) {
+  //     return Converter.byteToString_UTF8(getDecrypt(encryptedBytes, privateKey));
+  //   }
+
+  //   public static String sign(String plainText, PrivateKey privateKey) {
+  //     try {
+  //       Signature privateSignature = Signature.getInstance("SHA256withRSA");
+  //       privateSignature.initSign(privateKey);
+  //       privateSignature.update(plainText.getBytes());
+
+  //       byte[] signature = privateSignature.sign();
+
+  //       return Base64.encodeToString(signature, Base64.DEFAULT);
+  //     } catch (Exception e) {
+  //       log.debug("E:{}", e);
+  //     }
+
+  //     return null;
+  //   }
+
+  //   public static boolean verify(String plainText, String signature, PublicKey publicKey) {
+  //     Signature publicSignature;
+
+  //     try {
+  //       publicSignature = Signature.getInstance("SHA256withRSA");
+  //       publicSignature.initVerify(publicKey);
+  //       publicSignature.update(plainText.getBytes());
+
+  //       byte[] signatureBytes = Base64.decode(signature, Base64.DEFAULT);
+
+  //       return publicSignature.verify(signatureBytes);
+  //     } catch (Exception e) {
+  //       log.debug("E:{}", e);
+  //     }
+
+  //     return false;
+  //   }
+  // }
 }
