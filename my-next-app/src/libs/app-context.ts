@@ -145,12 +145,14 @@ const app = {
       switch (phase) {
       case 0: {
         setPhase(1)
+        log.trace('CHECK-MOUNTED:', prm?.name || uid, prm?.mounted)
         if (prm?.mounted) {
           setTimeout(async () => {
             try {
-              await app.waitmon(() => app.astate() === C.APPSTATE_USER)
-              const { releaser } = compoSubscribe(prm, uid, setState)
+              await app.waitmon(() => app.astate() >= C.APPSTATE_USER)
+              const releaser = (v: Function) => (ctx[uid]?.releaselist || []).push(v)
               res = prm?.mounted && prm.mounted({ releaser })
+              compoSubscribe(prm, uid, setState)
               if (res && res instanceof Promise) { res = await res }
             } catch (e) { log.trace('E:', e) }
             setPhase(2)
@@ -452,9 +454,8 @@ const app = {
 }
 
 const compoSubscribe = <V, P>(prm: LauncherProps<V, P>, uid: string, setState: Function) => {
-  log.trace('CHECK-HAS-UPDATE:', prm.name || uid, prm.updated)
-  const releaser = (v: Function) => (ctx[uid]?.releaselist || []).push(v)
-  if (prm.updated) {
+  log.trace('CHECK-HAS-UPDATE:', prm?.name || uid, prm?.updated)
+  if (prm?.updated) {
     setTimeout(() => {
       log.trace('REGIST-SUBSCRIBE:', prm.name || uid)
       const unsubscribe = app.subscribe(async (mode, sendid) => {
@@ -464,13 +465,12 @@ const compoSubscribe = <V, P>(prm: LauncherProps<V, P>, uid: string, setState: F
         if (res && res instanceof Promise) { res = await res }
         setState(app.state(0, uid))
       })
-      releaser(() => {
+      ctx[uid].releaselist?.push(() => {
         log.trace('UNSUBSCRIBE...', ctx[uid]?.name || uid)
         unsubscribe()
       })
     }, 1)
   }
-  return { releaser }
 }
 
 export default app
