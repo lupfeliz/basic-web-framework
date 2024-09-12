@@ -224,10 +224,13 @@ const pkcspad = (msg: any, pos: any) => {
   /** random non-zero pad */
   while (pos > 2) {
     x[0] = 0
+    /** PUBLIC-KEY ENCRYPTION 인 경우 rng 적용, PRIVATE 인 경우 255 */
     // while (x[0] == 0) { rng.nextBytes(x) }
     x[0] = 255
     buf[--pos] = x[0]
   }
+
+  /** PUBLIC-KEY ENCRYPTION 인 경우 2,  PRIVATE 인 경우 1 */
   // buf[--pos] = 2
   buf[--pos] = 1
   buf[--pos] = 0

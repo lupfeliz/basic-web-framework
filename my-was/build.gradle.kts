@@ -4,6 +4,16 @@
  * @Since       : 2024-04-16 
  * @Description : gradle 빌드파일
  * @Site        : https://devlog.ntiple.com
+ *
+ * 다음과 같이 실행 및 빌드를 수행한다.
+ *
+ * 실행 (local)
+ * > gradlew bootRun -Dspring.profiles.active=local
+ *
+ * 빌드 (dev)
+ * > gradlew build -Dspring.profiles.active=dev
+ * 
+ * 테스트
  * sh gradlew cleanTest test -Dbuild.testlvl=MANUAL -i --no-watch-fs --tests "my.was.mywas.SimpleTest.testCrypto"  > test.log
  **/
 plugins {

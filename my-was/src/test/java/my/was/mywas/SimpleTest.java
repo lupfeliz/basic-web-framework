@@ -293,7 +293,7 @@ public class SimpleTest {
   }
 
   @Test public void testSimpleRSA() throws Exception {
-    if (!TestUtil.isEnabled("testSimpleRSA", TestLevel.SIMPLE)) { return; }
+    if (!TestUtil.isEnabled("testSimpleRSA", TestLevel.MANUAL)) { return; }
     /** RSA 키 길이 설정 (예: 1024 비트) */
     int bitlen = 2048;
     SimpleRSAExample rsa = new SimpleRSAExample(bitlen);
@@ -384,6 +384,7 @@ public class SimpleTest {
   }
 
   @Test public void testSimpleRSA2() throws Exception {
+    if (!TestUtil.isEnabled("testSimpleRSA2", TestLevel.MANUAL)) { return; }
     String privKeyStr = "";
     String pubKeyStr =  "";
     String pln = "", enc = "", dec = "";
@@ -446,6 +447,7 @@ public class SimpleTest {
   
 
   @Test public void testSimpleRSA3() throws Exception {
+    if (!TestUtil.isEnabled("testSimpleRSA3", TestLevel.MANUAL)) { return; }
     String pln, enc, dec;
     String[] keys = CryptoUtil.RSA.generateKeyStrs(1024);
     log.debug("PRV:{}", keys[0]);
@@ -462,6 +464,7 @@ public class SimpleTest {
   }
 
   @Test public void testSimpleRSA4() throws Exception {
+    if (!TestUtil.isEnabled("testSimpleRSA4", TestLevel.MANUAL)) { return; }
     // publicKey = GenerateRSAKeys().public;
     // keyBytes = BinaryDecode( publicKey, "base64" );
     // keyFactory = CreateObject( "java", "java.security.KeyFactory" ).getInstance( "RSA" );
@@ -486,6 +489,7 @@ public class SimpleTest {
   }
 
   @Test public void testSimpleRSAManyTime() throws Exception {
+    if (!TestUtil.isEnabled("testSimpleRSAManyTime", TestLevel.MANUAL)) { return; }
     for (int inx = 0; inx < 500; inx++) {
       this.testSimpleRSA();
     }

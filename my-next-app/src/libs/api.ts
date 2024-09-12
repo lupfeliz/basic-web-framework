@@ -131,7 +131,7 @@ const mkres = async (r: Promise<Response>, opt?: OptType) => {
 
   /** 정상인경우 결과값 리턴처리 */
   if (!state.error) {
-    switch (hdrs.get('content-type')) {
+    switch (String(hdrs.get('content-type')).toLowerCase().split(/[ ]*;[ ]*/)[0]) {
     /** 결과 타입이 JSON 인경우 */
     case 'application/json': {
       ret = await resp.json()

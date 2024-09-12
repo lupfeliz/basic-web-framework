@@ -1,0 +1,19 @@
+## @File        : application-*.yml
+## @Author      : 정재백
+## @Since       : 2024-04-16 
+## @Description : 환경설정파일
+## @Site        : https://devlog.ntiple.com
+
+server:
+  servlet:
+    contextPath: "/study202403"
+spring:
+  datasource:
+    driverClassName: "com.mysql.jdbc.Driver"
+    url: "jdbc:mysql://localhost:3306/study202403?characterEncoding=UTF-8&serverTimezone=UTC"
+    username: 
+    password: 
+springdoc:
+  server:
+    url: '/study202403'
+    description: '기본URL'
