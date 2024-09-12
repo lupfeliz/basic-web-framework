@@ -102,18 +102,17 @@ const crypto = {
       }
       const kobj = cryptor.getKey()
       if (kobj.d) {
-        log.debug('PRV-DEC', msg)
+        // log.debug('PRV-DEC', msg)
         return cryptor.decrypt(msg)
       } else {
-        log.debug('PUB-DEC', msg)
+        // log.debug('PUB-DEC', msg)
         let ret = C.UNDEFINED
         const c = context.rsa.parseBigInt(context.rsa.b64tohex(msg), 16)
         const e = tobig(kobj.e)
-        log.debug('N:', tohex(kobj?.n))
-        log.debug('E:', tohex(kobj?.e))
-        // log.debug('KEYS:', c, kobj.n, e, e.bitLength())
         ret = c.modPow(e, kobj.n)
-        log.debug('DECRYPT:', tohex(ret))
+        // log.debug('N:', tohex(kobj?.n))
+        // log.debug('E:', tohex(kobj?.e))
+        // log.debug('DECRYPT:', tohex(ret))
         ret = pkcsunpad(ret, (kobj.n.bitLength() + 7) >> 3)
         return ret
       }
@@ -128,25 +127,20 @@ const crypto = {
       if (!kobj.d) {
         return cryptor.encrypt(msg)
       } else {
-        log.debug('PRV-ENC', msg)
+        // log.debug('PRV-ENC', msg)
         let ret = C.UNDEFINED
 
         let maxLength = (kobj.n.bitLength() + 7) >> 3
         let c = pkcspad(msg, maxLength);
-        log.debug('PADDING:', tohex(c))
-        // const c = context.rsa.parseBigInt(context.rsa.b64tohex(msg), 16)
-        log.debug('N:', tohex(kobj?.n))
-        log.debug('D:', tohex(kobj?.d))
-        // log.debug('KEYS:', c, kobj.n, e, e.bitLength())
         ret = c.modPow(tobig(kobj.d), kobj.n)
-        log.debug('ENCRYPT:', tohex(ret))
-
+        // log.debug('PADDING:', tohex(c))
+        // log.debug('N:', tohex(kobj?.n))
+        // log.debug('D:', tohex(kobj?.d))
+        // log.debug('ENCRYPT:', tohex(ret))
         ret = ret.toString(16)
         let length = ret.length
-        // fix zero before result
-        for (var i = 0; i < maxLength * 2 - length; i++) {
-          ret = '0' + ret
-        }
+        /** fix zero before result */
+        for (var inx = 0; inx < maxLength * 2 - length; inx++) { ret = '0' + ret }
         ret = context.rsa.hex2b64(ret)
         return ret
       }
@@ -181,8 +175,8 @@ const tobig = (v: any) => {
   return ret
 }
 
-const pkcsunpad = (d: any, n: any) => {
-  var buf = d.toByteArray()
+const pkcsunpad = (bint: any, len: any) => {
+  var buf = bint.toByteArray()
   var inx = 0
   while (buf[inx] != 0) {
     if (++inx >= buf.length) { return null }
@@ -203,43 +197,41 @@ const pkcsunpad = (d: any, n: any) => {
   return ret
 }
 
-function pkcspad(s: any, n: any) {
-  if (n < s.length + 11) { // TODO: fix for utf-8
-    console.error('Message too long for RSA')
-    return null
-  }
-  var ba = []
-  var i = s.length - 1
-  while (i >= 0 && n > 0) {
-    var c = s.charCodeAt(i--)
-    if (c < 128) { // encode using utf-8
-      ba[--n] = c
+const pkcspad = (msg: any, pos: any) => {
+  /** TODO: fix for utf-8 */
+  if (pos < msg.length + 11) { return (log.error('Message too long for RSA')) }
+  let buf = []
+  let inx = msg.length - 1
+  while (inx >= 0 && pos > 0) {
+    let ch = msg.charCodeAt(inx--)
+    /** encode using utf-8 */
+    if (ch < 128) {
+      buf[--pos] = ch
     }
-    else if ((c > 127) && (c < 2048)) {
-      ba[--n] = (c & 63) | 128
-      ba[--n] = (c >> 6) | 192
+    else if ((ch > 127) && (ch < 2048)) {
+      buf[--pos] = (ch & 63) | 128
+      buf[--pos] = (ch >> 6) | 192
     }
     else {
-      ba[--n] = (c & 63) | 128
-      ba[--n] = ((c >> 6) & 63) | 128
-      ba[--n] = (c >> 12) | 224
+      buf[--pos] = (ch & 63) | 128
+      buf[--pos] = ((ch >> 6) & 63) | 128
+      buf[--pos] = (ch >> 12) | 224
     }
   }
-  ba[--n] = 0
-  var rng = new context.rsa.SecureRandom()
-  var x = []
-  while (n > 2) { // random non-zero pad
+  buf[--pos] = 0
+  let rng = new context.rsa.SecureRandom()
+  let x = []
+  /** random non-zero pad */
+  while (pos > 2) {
     x[0] = 0
-    // while (x[0] == 0) {
-    //   rng.nextBytes(x)
-    // }
+    // while (x[0] == 0) { rng.nextBytes(x) }
     x[0] = 255
-    ba[--n] = x[0]
+    buf[--pos] = x[0]
   }
-  // ba[--n] = 2
-  ba[--n] = 1
-  ba[--n] = 0
-  return new context.rsa.BigInteger(ba)
+  // buf[--pos] = 2
+  buf[--pos] = 1
+  buf[--pos] = 0
+  return new context.rsa.BigInteger(buf)
 }
 
 export default crypto

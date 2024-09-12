@@ -101,6 +101,13 @@ public class SecurityConfig {
       matcher(null, "/swagger/v3/api-docs/**")
     ));
 
+
+    /** 샘플 API 추가 */
+    reqPubLst.add(
+      /** /api/smp/* (샘플API) */
+      matcher(null, "/api/smp/**")
+    );
+
     /** 기타 /api 로 시작되는 모든 리퀘스트 들은 권한 필요 */
     reqMbrLst.addAll(List.of(
       matcher(null, "/api/**")
