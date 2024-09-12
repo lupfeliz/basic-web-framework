@@ -49,6 +49,8 @@ public class SystemSettings implements ApplicationContextAware {
   @Value("${security.jwt.access.expire:0}") private Long exprAcc;
   /** refresh token expiry */
   @Value("${security.jwt.refresh.expire:0}") private Long exprRef;
+  /** datasource-driver */
+  @Value("${spring.datasource.driverClassName:}") private String dbDriver;
 
   @PostConstruct public void init() {
     log.trace("INIT:{}", SystemSettings.class);
