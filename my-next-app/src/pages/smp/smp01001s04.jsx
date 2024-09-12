@@ -5,13 +5,14 @@
  * @Description : 샘플4
  * @Site        : https://devlog.ntiple.com
  **/
+import JQ from 'jquery'
 import app from '@/libs/app-context'
 import api from '@/libs/api'
 import userContext from '@/libs/user-context'
 import crypto from '@/libs/crypto'
 import * as C from '@/libs/constants'
 import { Block, Form, Button, Input, Select, Container, Textarea } from '@/components'
-const { definePage, useSetup, log, goPage, clone, matcher, sleep } = app
+const { definePage, useSetup, log, goPage, clone, matcher, sleep, putAll } = app
 const userInfo = userContext.getUserInfo()
 
 export default definePage(() => {
@@ -24,72 +25,99 @@ export default definePage(() => {
       dec: ''
     },
     async mounted() {
+      putAll(window, {
+        JQ,
+        UPDATE: update,
+        VARS: vars
+      })
+    },
+    async updated(mode) {
+      log.debug('SMP-UPDATED..', mode)
     }
   })
   const { update, vars, ready } = self()
   const onClick = async (num) => {
     let res
-    vars.msg = 'RSA 암복호화를 테스트중입니다.'
-    vars.dec = vars.msg
     try {
       switch(num) {
       case 0: {
+        vars.msg = 'RSA 암복호화를 테스트중입니다.'
+        vars.dec = vars.msg
         /** 1: 클라PRV암호화 클라PUB복호화 */
         vars.enc = crypto.rsa.encrypt(vars.dec, vars.prvk)
         vars.dec = crypto.rsa.decrypt(vars.enc, vars.pubk)
         log.debug('ENC1:',vars.enc, ' / DEC1:',vars.dec)
-        update(C.UPDATE_SELF)
+        update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 2: 클라PUB암호화 클라PRV복호화 */
         vars.enc = crypto.rsa.encrypt(vars.dec, vars.pubk)
         vars.dec = crypto.rsa.decrypt(vars.enc, vars.prvk)
         log.debug('ENC2:', vars.enc, ' / DEC2:', vars.dec)
-        update(C.UPDATE_SELF)
+        update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 3: 서버PRV암호화 서버PUB복호화 */
         vars.enc = (await api.post(`smp01001`, { typ: 'encprv', msg: vars.dec })).result
         vars.dec = (await api.post(`smp01001`, { typ: 'decpub', msg: vars.enc })).result
         log.debug('ENC3:', vars.enc, ' / DEC3:', vars.dec)
-        update(C.UPDATE_SELF)
+        update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 4: 서버PUB암호화 서버PRV복호화 */
         vars.enc = (await api.post(`smp01001`, { typ: 'encpub', msg: vars.dec })).result
         vars.dec = (await api.post(`smp01001`, { typ: 'decprv', msg: vars.enc })).result
         log.debug('ENC4:', vars.enc, ' / DEC4:', vars.dec)
-        update(C.UPDATE_SELF)
+        update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 5: 서버PRV암호화 클라PUB복호화 */
         vars.enc = (await api.post(`smp01001`, { typ: 'encprv', msg: vars.dec })).result
         vars.dec = crypto.rsa.decrypt(vars.enc, vars.pubk)
         log.debug('ENC5:', vars.enc, ' / DEC5:', vars.dec)
-        update(C.UPDATE_SELF)
+        update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 6: 클라PRV암호화 서버PUB복호화 */
         vars.enc = crypto.rsa.encrypt(vars.dec, vars.prvk)
         vars.dec = (await api.post(`smp01001`, { typ: 'decpub', msg: vars.enc })).result
         log.debug('ENC6:', vars.enc, ' / DEC6:', vars.dec)
-        update(C.UPDATE_SELF)
+        update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 7: 서버PUB암호화 클라PRV복호화 */
         vars.enc = (await api.post(`smp01001`, { typ: 'encpub', msg: vars.dec })).result
         vars.dec = crypto.rsa.decrypt(vars.enc, vars.prvk)
         log.debug('ENC7:', vars.enc, ' / DEC7:', vars.dec)
-        update(C.UPDATE_SELF)
+        update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 8: 클라PUB암호화 서버PRV복호화 */
         vars.enc = crypto.rsa.encrypt(vars.dec, vars.pubk)
         vars.dec = (await api.post(`smp01001`, { typ: 'decprv', msg: vars.enc })).result
         log.debug('ENC8:', vars.enc, ' / DEC8:', vars.dec)
-        update(C.UPDATE_SELF)
+        update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
+      } break
+      case 1: {
+        vars.enc = ''
+        vars.dec = ''
+        update(C.UPDATE_ENTIRE)
+        await sleep(100)
+        // vars.enc = (await api.post(`smp01001`, { typ: 'encprv', msg: vars.msg })).result
+        vars.enc = crypto.rsa.encrypt(vars.msg, vars.prvk)
+        log.debug('MSG:', vars.msg, 'ENC:', vars.enc)
+        update(C.UPDATE_ENTIRE)
+      } break
+      case 2: {
+        vars.dec = ''
+        update(C.UPDATE_ENTIRE)
+        await sleep(100)
+        // vars.dec = (await api.post(`smp01001`, { typ: 'decpub', msg: vars.enc })).result
+        vars.dec = crypto.rsa.decrypt(vars.enc, vars.pubk)
+        log.debug('ENC:', vars.enc, ' / DEC:', vars.dec)
+        update(C.UPDATE_ENTIRE)
       } break
       default: }
     } catch (e) {
@@ -120,37 +148,41 @@ export default definePage(() => {
             <p>
               <label htmlFor='public_key'>PUBLIC KEY</label>
               <br/>
-              <Textarea id='public_key' text={ vars.pubk } />
+              <Textarea id='public_key' model={vars} name='pubk' />
             </p>
             <p>
               <label htmlFor='private_key'>PRIVATE KEY</label>
               <br/>
-              <Textarea id='private_key' text={ vars.prvk } />
+              <Textarea id='private_key' model={ vars } name='prvk' />
             </p>
             <p>
-              <Button id='btn_encrypt'>
+              <Button id='btn_encrypt'
+                onClick={ () => onClick(1) }
+                >
                 ENCRYPT
               </Button>
             </p>
             <p>
               <label htmlFor='input_message'>INPUT MESSAGE</label>
               <br/>
-              <Textarea id='input_message' text={ vars.msg } />
+              <Textarea id='input_message' model={ vars } name='msg' />
             </p>
             <p>
               <label htmlFor='encrypted_message'>ENCRYPTED MESSAGE</label>
               <br/>
-              <Textarea id='encrypted_message' text={ vars.enc } />
+              <Textarea id='encrypted_message' model={ vars } name='enc' />
             </p>
             <p>
-              <Button id='btn_decrypt'>
+              <Button id='btn_decrypt'
+                onClick={ () => onClick(2) }
+                >
                 DECRYPT
               </Button>
             </p>
             <p>
               <label htmlFor='decrypted_message'>DECRYPTED MESSAGE</label>
               <br/>
-              <Textarea id='decrypted_message' text={ vars.dec } />
+              <Textarea id='decrypted_message' model={ vars } name='dec' />
             </p>
           </Block>
         </article>

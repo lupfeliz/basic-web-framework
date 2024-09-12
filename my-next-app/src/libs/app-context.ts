@@ -141,6 +141,7 @@ const app = {
     React.useEffect(() => {
       let retproc: any = () => { }
       let res = C.UNDEFINED
+
       switch (phase) {
       case 0: {
         setPhase(1)
@@ -148,26 +149,14 @@ const app = {
           setTimeout(async () => {
             try {
               await app.waitmon(() => app.astate() === C.APPSTATE_USER)
-              const releaser = (v: Function) => (ctx[uid]?.releaselist || []).push(v)
+              const { releaser } = compoSubscribe(prm, uid, setState)
               res = prm?.mounted && prm.mounted({ releaser })
               if (res && res instanceof Promise) { res = await res }
-              if (prm.updated) {
-                const unsubscribe = app.subscribe(async (mode, sendid) => {
-                  const sender = ctx[sendid] || {}
-                  log.trace(`SUBSCRIBE : ${sender?.name || ''} → ${prm?.name || ''}`)
-                  let res = prm?.updated ? prm.updated(mode, sendid) : {}
-                  if (res && res instanceof Promise) { res = await res }
-                  setState(app.state(0, uid))
-                })
-                releaser(() => {
-                  log.trace('UNSUBSCRIBE...', ctx[uid]?.name || uid)
-                  unsubscribe()
-                })
-              }
             } catch (e) { log.trace('E:', e) }
             setPhase(2)
           }, 0)
         } else {
+          compoSubscribe(prm, uid, setState)
           setPhase(2)
         }
       } break
@@ -460,6 +449,28 @@ const app = {
     if (!el) { el = document.documentElement }
     return v * parseFloat(getComputedStyle(el).fontSize)
   },
+}
+
+const compoSubscribe = <V, P>(prm: LauncherProps<V, P>, uid: string, setState: Function) => {
+  log.trace('CHECK-HAS-UPDATE:', prm.name || uid, prm.updated)
+  const releaser = (v: Function) => (ctx[uid]?.releaselist || []).push(v)
+  if (prm.updated) {
+    setTimeout(() => {
+      log.trace('REGIST-SUBSCRIBE:', prm.name || uid)
+      const unsubscribe = app.subscribe(async (mode, sendid) => {
+        const sender = ctx[sendid] || {}
+        log.trace(`SUBSCRIBE : ${sender?.name || ''} → ${prm?.name || ''}`)
+        let res = prm?.updated ? prm.updated(mode, sendid) : {}
+        if (res && res instanceof Promise) { res = await res }
+        setState(app.state(0, uid))
+      })
+      releaser(() => {
+        log.trace('UNSUBSCRIBE...', ctx[uid]?.name || uid)
+        unsubscribe()
+      })
+    }, 1)
+  }
+  return { releaser }
 }
 
 export default app

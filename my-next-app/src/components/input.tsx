@@ -26,26 +26,28 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   const self = useSetup({
     name: 'input',
     props,
-    vars: { },
+    vars: {},
     async mounted() {
       copyRef(ref, elem)
       /** 최초상태 화면반영 */
-      $(elem?.current).find('input').val(modelValue(self())?.value || '')
+      inputVal(modelValue(self())?.value || '')
     },
-    async updated(mode) {
+    async updated(mode: any) {
       if (mode && vars) {
-      /** 화면 강제 업데이트 발생시 화면반영 */
-        $(elem?.current).find('input').val(modelValue(self())?.value || '')
+        /** 화면 강제 업데이트 발생시 화면반영 */
+        inputVal(modelValue(self())?.value || '')
       }
     }
   })
   const { vars, update } = self()
+
+  const inputVal = (v: any = C.UNDEFINED) => v === C.UNDEFINED ? $(elem?.current).find('input').val() : $(elem?.current).find('input').val(v)
+
   /** 입력컴포넌트 변경이벤트 처리 */
   const onChange = async (e: any) => {
     const { setValue } = modelValue(self())
-    const v = $(elem?.current).find('input').val()
     /** 변경시 데이터모델에 값전달 */
-    setValue(v, () => update(C.UPDATE_FULL))
+    setValue(inputVal(), () => update(C.UPDATE_FULL))
     if (props.onChange) { props.onChange(e as any) }
   }
   /** 입력컴포넌트 키입력 이벤트 처리 */
