@@ -132,7 +132,8 @@ const crypto = {
         let ret = C.UNDEFINED
 
         let maxLength = (kobj.n.bitLength() + 7) >> 3
-        let c = pkcs1pad2(msg, maxLength);
+        let c = pkcspad(msg, maxLength);
+        log.debug('PADDING:', tohex(c))
         // const c = context.rsa.parseBigInt(context.rsa.b64tohex(msg), 16)
         log.debug('N:', tohex(kobj?.n))
         log.debug('D:', tohex(kobj?.d))
@@ -201,33 +202,8 @@ const pkcsunpad = (d: any, n: any) => {
   }
   return ret
 }
+
 function pkcspad(s: any, n: any) {
-  if (n < s.length + 22) {
-    console.error('Message too long for RSA')
-    return null
-  }
-  var len = n - s.length - 6
-  var filler = ''
-  for (var f = 0; f < len; f += 2) {
-    filler += 'ff'
-  }
-  var m = '0001' + filler + '00' + s
-  return context.rsa.parseBigInt(m, 16)
-}
-// function pkcs1pad1(s: any, n: any) {
-//   if (n < s.length + 22) {
-//     console.error('Message too long for RSA')
-//     return null
-//   }
-//   var len = n - s.length - 6
-//   var filler = ''
-//   for (var f = 0; f < len; f += 2) {
-//     filler += 'ff'
-//   }
-//   var m = '0001' + filler + '00' + s
-//   return context.rsa.parseBigInt(m, 16)
-// }
-function pkcs1pad2(s: any, n: any) {
   if (n < s.length + 11) { // TODO: fix for utf-8
     console.error('Message too long for RSA')
     return null
@@ -254,9 +230,10 @@ function pkcs1pad2(s: any, n: any) {
   var x = []
   while (n > 2) { // random non-zero pad
     x[0] = 0
-    while (x[0] == 0) {
-      rng.nextBytes(x)
-    }
+    // while (x[0] == 0) {
+    //   rng.nextBytes(x)
+    // }
+    x[0] = 255
     ba[--n] = x[0]
   }
   // ba[--n] = 2
