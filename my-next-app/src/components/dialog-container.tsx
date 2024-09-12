@@ -5,6 +5,7 @@
  * @Description : 단순대화창 모음 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
+import $ from 'jquery'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
 import dialog from '@/libs/dialog-context'
@@ -12,7 +13,7 @@ import userContext from '@/libs/user-context'
 import format from '@/libs/format'
 import values from '@/libs/values'
 
-import { Dialog, Content, Button } from '@/components'
+import { Dialog, Content, Button, Spinner } from '@/components'
 
 const { concat } = values
 
@@ -46,7 +47,7 @@ const authConfirm = async (v: number) => {
   }
 }
 
-const { defineComponent, useSetup, useRef } = app
+const { defineComponent, useSetup, useRef, log } = app
 
 export default defineComponent((props: any, ref?: any) => {
   const self = useSetup({
@@ -100,10 +101,16 @@ export default defineComponent((props: any, ref?: any) => {
       sx={ { color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 } }
       ref={ vars.progress.element }
       open={ dstate().progress.visible }
+      onEntering={ () => { $(document.body).addClass('overflow-hidden') } }
+      onExiting={ () => { $(document.body).removeClass('overflow-hidden') } }
       onEntered={ () => { dialog.progress({ type: C.EVENT, value: 1 }) } }
       onExited={ () => { dialog.progress({ type: C.EVENT, value: 2 }) } }
       >
-      {/* <Spinner /> */}
+      <Spinner
+        color="warning"
+        size='5rem'
+        thickness={ 5 }
+        />
     </Dialog.Backdrop>
     <Dialog
       open={ dstate().authmodal.visible }
