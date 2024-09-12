@@ -3,7 +3,7 @@
  * @Author      : 정재백
  * @Since       : 2024-04-16 
  * @Description : gradle 빌드파일
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  * sh gradlew cleanTest test -Dbuild.testlvl=MANUAL -i --no-watch-fs --tests "my.was.mywas.SimpleTest.testCrypto"  > test.log
  **/
 plugins {

@@ -3,7 +3,7 @@
  * @Author      : 정재백
  * @Since       : 2024-04-16 
  * @Description : 공통 서비스, 환경정보 및 암복호화 키 교환 등을 담당한다.
- * @Site        : https://devlog.ntiple.com/795
+ * @Site        : https://devlog.ntiple.com
  **/
 package my.was.mywas.works.cmn;
 

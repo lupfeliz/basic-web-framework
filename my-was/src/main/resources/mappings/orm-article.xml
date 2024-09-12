@@ -4,7 +4,7 @@
 @Author      : 정재백
 @Since       : 2024-04-16 
 @Description : 공통사용 JPA ORM
-@Site        : https://devlog.ntiple.com/795
+@Site        : https://devlog.ntiple.com
 -->
 <entity-mappings 
   xmlns="http://java.sun.com/xml/ns/persistence/orm"
