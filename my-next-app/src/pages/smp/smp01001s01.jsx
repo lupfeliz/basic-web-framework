@@ -47,7 +47,7 @@ export default definePage((props) => {
     },
     mounted, unmount, updated
   })
-  const { update, vars } = self()
+  const { update, vars, ready } = self()
   /** 페이지 시작 이벤트처리 */
   async function mounted() {
     log.debug('MOUNTED! SMP01001S01', props)
@@ -116,6 +116,7 @@ export default definePage((props) => {
     </section>
     <hr/>
     <section>
+      { ready() && (
       <article>
         <Block className='my-1'>
         <p> GLOBAL-STATE-VALUE: { app.state() } </p>
@@ -125,6 +126,7 @@ export default definePage((props) => {
         <p> UPDATE_ENTIRE: { app.tstate(C.UPDATE_ENTIRE) } </p>
         </Block>
       </article>
+      ) }
       <article>
         <h3> 버튼 컴포넌트 </h3>
         <hr />

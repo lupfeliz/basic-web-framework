@@ -384,27 +384,53 @@ public class SimpleTest {
   }
 
   @Test public void testSimpleRSA2() throws Exception {
-    String privKeyStr = "MIIBNQIBADANBgkqhkiG9w0BAQEFAASCAR8wggEbAgEAAoGAcGoKevNOQp3+kqWi/oToqae4Y8F+nqIE8KcMWaUvHtIIMKI03gM7Ig832+RWB6Na1vRQpjHsY/YL02S2ifcj3VXyCbnWpcg5+yK1RIgT6MX9GuBY29YICTo3kLn/JFxRbRhSu4QFdik2wsrtLkAirs02jfc1SqXiSBN7eSbWxk0CAQACgYBDpkusC7JDeXwTNhRFf9GiUUMd7LOSHQ/fvB2Et5juYmMqnonhc9l5fUBa4RUFfDvGRkzUcl0ocnldTQq2pIj+DLvi6Pp+ye7uKecTz0R27oe0IYOA5mtXptU7PmcDQCXmIHVfgy8WNblKrFQsrecwemfuvcWTNu8oU5rRC50lvQIBAAIBAAIBAAIBAAIBAA==";
-    String pubKeyStr =  "MIHcMA0GCSqGSIb3DQEBAQUAA4HKADCBxgKBgHBqCnrzTkKd/pKlov6E6KmnuGPBfp6iBPCnDFmlLx7SCDCiNN4DOyIPN9vkVgejWtb0UKYx7GP2C9Nkton3I91V8gm51qXIOfsitUSIE+jF/RrgWNvWCAk6N5C5/yRcUW0YUruEBXYpNsLK7S5AIq7NNo33NUql4kgTe3km1sZNAkEAyVbWQ6feX6jEzGw4IaH1Ha+zsXyDP/uT+pqRGN8jHkB9W9hx1V9kmX4qZmsyRMHuzNKI5zMoTMeLn65Gq321TQ==";
+    String privKeyStr = "";
+    String pubKeyStr =  "";
     String pln = "", enc = "", dec = "";
     pln = "gvqmcserjsbwopctwijjblupauxywlRSA 암복호화 테스트 중입니다";
+    // {
+    //   String[] keys = CryptoUtil.RSA.generateKeyStrs(1024);
+    //   privKeyStr = keys[0];
+    //   pubKeyStr = keys[1];
+    //   log.debug("PRV:{}", privKeyStr);
+    //   log.debug("PUB:{}", pubKeyStr);
+    //   enc = CryptoUtil.RSA.encrypt(1, pubKeyStr, pln);
+    //   log.debug("ENC1:{}", enc);
+    //   dec = CryptoUtil.RSA.decrypt(0, privKeyStr, enc);
+    //   log.debug("DEC1:{}", dec);
+    //   enc = CryptoUtil.RSA.encrypt(0, privKeyStr, pln);
+    //   log.debug("ENC2:{}", enc);
+    //   dec = CryptoUtil.RSA.decrypt(1, pubKeyStr, enc);
+    //   log.debug("DEC2:{}", dec);
+    // }
     // {
     //   /** PUBLIC-KEY-ENC */
     //   enc = "X6P9/aFJDtqInxSlYsFvDfE//ZK4KY4cNoZQgOzKeeh3JhCHjNfdkjO/NLphIhVYCfHZ3ZBLIsOwuhbLxX+z0kT+HUwvVyWCoaKZ3/CriTg/6RpgLF7IB3HOYX1anzp8QbVSdtNzwGvr4775nVMStRDb3qWxxUo0kWmQBAG3BfI=";
     //   dec = CryptoUtil.RSA.decrypt(1, pubKeyStr, enc);
     //   log.debug("DEC:{}", dec);
     // }
+    // {
+    //   privKeyStr = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAMhfVP50PfMYry6YsMYpEdTPjWRHflvUNDhzhrgyO5gEiTIj2lK6S95XRggsU/NGTbRqRouBmFlV4+KHL9LLKhXszqlDRDWf1jZJBNdI4/GpRlQU/MkByji+2lv9894gJPXpExDLO/bM+PTZ16HMAMyZJ6DNw5hD/GMEudZk6U1lAgMBAAECgYAD/17nOrN3s6DfGZ3BPlWEPOXRv9lmBJxMGgXwi9QDiuefz/ZNmzjjRTN4+0Vrf5YSSOKCawH6mkuTG+ZY2sPKpiIBSX4SXewMIKRhbxOj19iwrNp1gBDK3s/kpHy9+x8b7tuEIITNYreuadYAvVgSMlaJVPdh7uUm39sMnn/aqwJBANRWQBpaOfw3iQ+g7jBrBJz+e5QbmsNZeNUPrk9WbMuhKQkLUP2E4U5noFKV8SZFGo48YPKsC32DxFF3e8kw2fsCQQDxk0ALLlepzdpqVkm6YQ4KtTEweug+L/RdjU5apGZLZI+AGfYIE1JIzyzgdPke92ePnw1wPqFgi0PyzyJn8DgfAkAq5M2IRUfHapSWgqT7RPMmn8XpEnZ+Ffnx2HwW7NeHfyPh/tY6kHhPNWHOrRmM6JLHvuy6uQSNM2waJO/toZ+3AkEAo4WzUl46RNztPhHOsnTEFod0Fob78ixv02u1YDHsdJhLcsEgA3NgvZxPmlhT0ZxS46scY6BhiIJ8qj1/4q9+rQJAbZj4vsQB5SrKcYNR8VVYMP9EYXnFax66QgSjGI3zPJhjAcbdyhDVshFKHcsI3R1dxegLFTbvjYKejzWfHBcBUQ==";
+    //   enc = "h3IfqQoLwdAaJTeE30jlesbm0UGCFRBirLFe3lXzi4KzUGpzEr7pb6L+9G4zE1YSHyf2KSUIfH6vePG/Fl8CRZoJZ6FQCC9MYzhxpGk377Z2OVBepz33wgOKKzFz9s7Bk8uxL8ubJUQPl9IZLhcVvbl4ruVc00wGa66lWeMjW1s=";
+    //   dec = CryptoUtil.RSA.decrypt(0, privKeyStr, enc);
+    //   log.debug("DEC:{}", dec);
+    // }
+    // {
+    //   privKeyStr = "MIIBNQIBADANBgkqhkiG9w0BAQEFAASCAR8wggEbAgEAAoGAcGoKevNOQp3+kqWi/oToqae4Y8F+nqIE8KcMWaUvHtIIMKI03gM7Ig832+RWB6Na1vRQpjHsY/YL02S2ifcj3VXyCbnWpcg5+yK1RIgT6MX9GuBY29YICTo3kLn/JFxRbRhSu4QFdik2wsrtLkAirs02jfc1SqXiSBN7eSbWxk0CAQACgYBDpkusC7JDeXwTNhRFf9GiUUMd7LOSHQ/fvB2Et5juYmMqnonhc9l5fUBa4RUFfDvGRkzUcl0ocnldTQq2pIj+DLvi6Pp+ye7uKecTz0R27oe0IYOA5mtXptU7PmcDQCXmIHVfgy8WNblKrFQsrecwemfuvcWTNu8oU5rRC50lvQIBAAIBAAIBAAIBAAIBAA==";
+    //   enc = "X6P9/aFJDtqInxSlYsFvDfE//ZK4KY4cNoZQgOzKeeh3JhCHjNfdkjO/NLphIhVYCfHZ3ZBLIsOwuhbLxX+z0kT+HUwvVyWCoaKZ3/CriTg/6RpgLF7IB3HOYX1anzp8QbVSdtNzwGvr4775nVMStRDb3qWxxUo0kWmQBAG3BfI=";
+    //   dec = CryptoUtil.RSA.decrypt(0, privKeyStr, enc);
+    //   log.debug("DEC:{}", dec);
+    // }
     {
-      privKeyStr = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAMhfVP50PfMYry6YsMYpEdTPjWRHflvUNDhzhrgyO5gEiTIj2lK6S95XRggsU/NGTbRqRouBmFlV4+KHL9LLKhXszqlDRDWf1jZJBNdI4/GpRlQU/MkByji+2lv9894gJPXpExDLO/bM+PTZ16HMAMyZJ6DNw5hD/GMEudZk6U1lAgMBAAECgYAD/17nOrN3s6DfGZ3BPlWEPOXRv9lmBJxMGgXwi9QDiuefz/ZNmzjjRTN4+0Vrf5YSSOKCawH6mkuTG+ZY2sPKpiIBSX4SXewMIKRhbxOj19iwrNp1gBDK3s/kpHy9+x8b7tuEIITNYreuadYAvVgSMlaJVPdh7uUm39sMnn/aqwJBANRWQBpaOfw3iQ+g7jBrBJz+e5QbmsNZeNUPrk9WbMuhKQkLUP2E4U5noFKV8SZFGo48YPKsC32DxFF3e8kw2fsCQQDxk0ALLlepzdpqVkm6YQ4KtTEweug+L/RdjU5apGZLZI+AGfYIE1JIzyzgdPke92ePnw1wPqFgi0PyzyJn8DgfAkAq5M2IRUfHapSWgqT7RPMmn8XpEnZ+Ffnx2HwW7NeHfyPh/tY6kHhPNWHOrRmM6JLHvuy6uQSNM2waJO/toZ+3AkEAo4WzUl46RNztPhHOsnTEFod0Fob78ixv02u1YDHsdJhLcsEgA3NgvZxPmlhT0ZxS46scY6BhiIJ8qj1/4q9+rQJAbZj4vsQB5SrKcYNR8VVYMP9EYXnFax66QgSjGI3zPJhjAcbdyhDVshFKHcsI3R1dxegLFTbvjYKejzWfHBcBUQ==";
-      enc = "h3IfqQoLwdAaJTeE30jlesbm0UGCFRBirLFe3lXzi4KzUGpzEr7pb6L+9G4zE1YSHyf2KSUIfH6vePG/Fl8CRZoJZ6FQCC9MYzhxpGk377Z2OVBepz33wgOKKzFz9s7Bk8uxL8ubJUQPl9IZLhcVvbl4ruVc00wGa66lWeMjW1s=";
+      privKeyStr = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIklL0trECmxNh3gBScQAGa5hqILaLXyxFg4VAh6MktDTdZbbvpHeMq4owGF0i1RWgTsudOjcT1Su6Jp+2+bQGEGdjow37qOHPuErQXtDXWxAJmnn8RBTpO/w96DZatzg9fU2Ib0fSGDlXTHaRbvSInCpbEwM5h7efnuKjA11VBXAgMBAAECgYAXeaf4zuC7YjwTLQ90ukZ3TvZ+sllAG8gEGdA4i0Iko+ak9I2whZ9lg+lTD2cEntI72ZGNaoKtroWzrVR+rCJ+uLbSVB8n0JAkrtd1eg/dbxIQNFkaFGpwkC0AtQSpgsLly7HjVQ5MrIAlP63ZiK9JdTBdXyajsLJX+R7Dyll6MQJBAKmPt/ZY0rKj21KirA8T4afW2qMVpMyIRTvbvaW7BU69pxyBwJEY3okwNCE4SK94GebVaXR2B7vANCI64NizBw0CQQDPDw9IgT9nLlZk+PRfYcm729qHotm6Uc8GrY0Iz8nkxrmszIz+/XBTsjV4na1gJ6dNMJHdg7gbR9ZsEm7I9FvzAkBsk7krKGmTNtXErqIa7ZI8FZrff4aN6lzbHbTtITse1tbhrDyRLSmjE5juBMqWggOkCtiCWOpO0Z8QpD9CxDEpAkABYXNTo3D9yiRPVg2jGS7ULtodL2vOPz9nJv8awO/ys5SHX3HNPXljRXvvyvVd/8Ww0RMX7AntPKRkYhcVBfQbAkAfups6liYVJLHON6vcVQTh0G9EaSZWDyFdxn+QVNA1BTgyqyA76VUywkiDviDbjWK1gv3UtiF19aQBlDFsvzcq";
+      pubKeyStr = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCJJS9LaxApsTYd4AUnEABmuYaiC2i18sRYOFQIejJLQ03WW276R3jKuKMBhdItUVoE7LnTo3E9Uruiaftvm0BhBnY6MN+6jhz7hK0F7Q11sQCZp5/EQU6Tv8Peg2Wrc4PX1NiG9H0hg5V0x2kW70iJwqWxMDOYe3n57iowNdVQVwIDAQAB";
+      enc = "D9ewtzaCH5QB30IjnOxhkKlmgGvSejd0LMsdRL800koXEY+b+H7NHvTfXugXYJs+WAoPvdalF5T3nTv63BTdPh/6Nkdk9avIH3q1bj0lYtp3s3wgi3obJSsmRQSqYc9FfPSb+mjWVLKBVpC0HHiPT09D6ruNijkSePjAXMXGVjw=";
+      // enc = "GwWIearfTUxjC/oBV0ySdEEy/0wPEcsNzScDGdyXc976nRLmPYXmLDbCWX1UkeMNBHdnrvre7o5kZSIZTKo+YRdAPzsekVQ2KHh0tfmQbRZ26VgYTG6+Ksnbx84RnSWuHYPzY6m01O5WQyrNQChqAzUJyl8L6OV1OyQ1TaVTp/4=";
       dec = CryptoUtil.RSA.decrypt(0, privKeyStr, enc);
+      // dec = CryptoUtil.RSA.decrypt(1, pubKeyStr, enc);
       log.debug("DEC:{}", dec);
-    }
-    {
-      privKeyStr = "MIIBNQIBADANBgkqhkiG9w0BAQEFAASCAR8wggEbAgEAAoGAcGoKevNOQp3+kqWi/oToqae4Y8F+nqIE8KcMWaUvHtIIMKI03gM7Ig832+RWB6Na1vRQpjHsY/YL02S2ifcj3VXyCbnWpcg5+yK1RIgT6MX9GuBY29YICTo3kLn/JFxRbRhSu4QFdik2wsrtLkAirs02jfc1SqXiSBN7eSbWxk0CAQACgYBDpkusC7JDeXwTNhRFf9GiUUMd7LOSHQ/fvB2Et5juYmMqnonhc9l5fUBa4RUFfDvGRkzUcl0ocnldTQq2pIj+DLvi6Pp+ye7uKecTz0R27oe0IYOA5mtXptU7PmcDQCXmIHVfgy8WNblKrFQsrecwemfuvcWTNu8oU5rRC50lvQIBAAIBAAIBAAIBAAIBAA==";
-      enc = "X6P9/aFJDtqInxSlYsFvDfE//ZK4KY4cNoZQgOzKeeh3JhCHjNfdkjO/NLphIhVYCfHZ3ZBLIsOwuhbLxX+z0kT+HUwvVyWCoaKZ3/CriTg/6RpgLF7IB3HOYX1anzp8QbVSdtNzwGvr4775nVMStRDb3qWxxUo0kWmQBAG3BfI=";
-      dec = CryptoUtil.RSA.decrypt(0, privKeyStr, enc);
-      log.debug("DEC:{}", dec);
+      enc = CryptoUtil.RSA.encrypt(0, privKeyStr, dec);
+      log.debug("ENC:{}", enc);
     }
     // {
     //   /** PRIVATE-KEY-ENC */
@@ -413,6 +439,7 @@ public class SimpleTest {
     //   log.debug("DEC:{}", dec);
     // }
   }
+  
 
   @Test public void testSimpleRSA3() throws Exception {
     String pln, enc, dec;
@@ -420,7 +447,7 @@ public class SimpleTest {
     log.debug("PRV:{}", keys[0]);
     log.debug("PUB:{}", keys[1]);
     pln = "테스트중입니다.";
-    enc = CryptoUtil.RSA.encrypt(1, keys[1], pln);
+      enc = CryptoUtil.RSA.encrypt(1, keys[1], pln);
     dec = CryptoUtil.RSA.decrypt(0, keys[0], enc);
     log.debug("ENC1:{}", enc);
     log.debug("DEC1:{}", dec);
@@ -448,6 +475,10 @@ public class SimpleTest {
     // result.publicKeyModulus = rsaPublicKey.getModulus();
     // result.publicKeyExponent = rsaPublicKey.getPublicExponent();
     // dump( result );
+    String res = "1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ed858cec8aa4ed8ab8eca491ec9e85eb8b88eb8ba42e";
+    res = "ed858cec8aa4ed8ab8eca491ec9e85eb8b88eb8ba42e";
+    byte[] buf = Hex.decodeHex(res);
+    log.debug("RESTORED:{}", new String(buf));
   }
 
   @Test public void testSimpleRSAManyTime() throws Exception {

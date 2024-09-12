@@ -147,6 +147,7 @@ const app = {
         if (prm?.mounted) {
           setTimeout(async () => {
             try {
+              await app.waitmon(() => app.astate() === C.APPSTATE_USER)
               const releaser = (v: Function) => (ctx[uid]?.releaselist || []).push(v)
               res = prm?.mounted && prm.mounted({ releaser })
               if (res && res instanceof Promise) { res = await res }

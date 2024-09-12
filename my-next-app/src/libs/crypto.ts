@@ -15,15 +15,18 @@ type WordArray = cryptojs.lib.WordArray
 const context = {
   aes: {
     defbit: 256,
-    defkey: undefined as any as WordArray,
+    defkey: C.UNDEFINED as WordArray,
     opt: {
-      iv: undefined as any as WordArray,
+      iv: C.UNDEFINED as WordArray,
       mode: cryptojs.mode.CBC,
       padding: cryptojs.pad.Pkcs7
     }
   },
   rsa: {
-    cryptor: undefined as any,
+    JSEncrypt: C.UNDEFINED,
+    parseBigInt: C.UNDEFINED,
+    b64tohex: C.UNDEFINED,
+    cryptor: C.UNDEFINED,
     defkey: ''
   }
 }
@@ -71,22 +74,54 @@ const crypto = {
   /** RSA 모듈 / JSEncrypt 에서는 private key 를 사용해야만 암/복호화가 모두 지원된다 */
   rsa: {
     init: async (keyval?: string, keytype?: string) => {
-      if (!context?.rsa?.cryptor) {
-        const JSEncrypt = (await import('jsencrypt')).default
-        context.rsa.cryptor = new JSEncrypt()
+      if (!context.rsa.JSEncrypt) {
+        context.rsa.JSEncrypt = (await import('jsencrypt')).default
+        const { parseBigInt } = (await import('jsencrypt/lib/lib/jsbn/jsbn'))
+        const { b64tohex } = (await import('jsencrypt/lib/lib/jsbn/base64'))
+        context.rsa.parseBigInt = parseBigInt
+        context.rsa.b64tohex = b64tohex
+        const cryptor = context.rsa.cryptor = new context.rsa.JSEncrypt()
         switch (keytype) {
-        case C.PRIVATE_KEY: case C.UNDEFINED: { context.rsa.cryptor.setPrivateKey(keyval) } break
-        case C.PUBLIC_KEY: { context.rsa.cryptor.setPublicKey(keyval) } break
+        case C.PRIVATE_KEY: case C.UNDEFINED: { cryptor.setPrivateKey(keyval) } break
+        case C.PUBLIC_KEY: { cryptor.setPublicKey(keyval) } break
         }
       }
     },
     decrypt: (msg: string, key?: any) => {
-      if (key) { context.rsa.cryptor.setPrivateKey(key) }
-      return context.rsa.cryptor.decrypt(msg)
+      let cryptor = context.rsa.cryptor
+      if (key) {
+        cryptor = new context.rsa.JSEncrypt()
+        cryptor.setKey(key)
+      }
+      const kobj = cryptor.getKey()
+      if (kobj.d) {
+        log.debug('PRV-DEC', msg)
+        return cryptor.decrypt(msg)
+      } else {
+        log.debug('PUB-DEC', msg)
+        let ret = C.UNDEFINED
+        const c = context.rsa.parseBigInt(context.rsa.b64tohex(msg), 16)
+        const e = tobig(kobj.e)
+        log.debug('N:', tohex(kobj?.n))
+        log.debug('E:', tohex(kobj?.e))
+        // log.debug('KEYS:', c, kobj.n, e, e.bitLength())
+        ret = c.modPow(e, kobj.n)
+        log.debug('DECRYPT:', tohex(ret))
+        ret = pkcs1unpad1(ret, (kobj.n.bitLength() + 7) >> 3)
+        return ret
+      }
     },
-    encrypt: (msg: string, key?: any) => {
-      if (key) { context.rsa.cryptor.setPrivateKey(key) }
-      return context.rsa.cryptor.encrypt(msg)
+    encrypt: (msg: string, key?: any, type?: any) => {
+      let cryptor = context.rsa.cryptor
+      if (key) {
+        cryptor = new context.rsa.JSEncrypt()
+        switch (type) {
+          case C.PUBLIC_KEY: { cryptor.setPublicKey(key) } break
+          case C.PRIVATE_KEY: { cryptor.setPrivateKey(key) } break
+          default: { cryptor.setKey(key) }
+        }
+      }
+      return cryptor.encrypt(msg)
     }
   },
   b64dec(key: string) {
@@ -99,6 +134,45 @@ const crypto = {
     try { ret = cryptojs.enc.Hex.parse(key) } catch (e) { log.debug('E:', e) }
     return ret
   },
+}
+
+const tohex = (v: any) => {
+  let ret = ''
+  if (v?.toRadix && v.toRadix instanceof Function) {
+    ret = v.toRadix(16)
+  } else if (v && typeof v === 'number') {
+    ret = v.toString(16)
+  }
+  return ret
+}
+const tobig = (v: any) => {
+  let ret = v
+  if (v && typeof v === 'number') {
+    ret = context.rsa.parseBigInt(v.toString(16), 16)
+  }
+  return ret
+}
+
+const pkcs1unpad1 = (d: any, n: any) => {
+  var buf = d.toByteArray();
+  var inx = 0;
+  while (buf[inx] != 0) {
+    if (++inx >= buf.length) { return null; }
+  }
+  var ret = "";
+  while (++inx < buf.length) {
+    var c = buf[inx] & 255;
+    if (c < 128) {
+      ret += String.fromCharCode(c);
+    } else if ((c > 191) && (c < 224)) {
+      ret += String.fromCharCode(((c & 31) << 6) | (buf[inx + 1] & 63));
+      ++inx;
+    } else {
+      ret += String.fromCharCode(((c & 15) << 12) | ((buf[inx + 1] & 63) << 6) | (buf[inx + 2] & 63));
+      inx += 2;
+    }
+  }
+  return ret;
 }
 
 export default crypto
