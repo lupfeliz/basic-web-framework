@@ -14,6 +14,7 @@ import static my.was.mywas.commons.Constants.RESCD_OK;
 
 import java.util.Date;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,12 +58,15 @@ public class CommonService {
   /** 최초 접속 환경정보 조회 */
   public InitObj cmn01001a01() throws Exception {
     long timestamp = System.currentTimeMillis();
+    JSONObject objkey = new JSONObject();
+    objkey.put("k", settings.getKeySecret());
+    objkey.put("t", timestamp);
     return InitObj.builder()
       .current(new Date(timestamp))
       .locale(KOKR)
       .encoding(UTF8)
       .expirecon(settings.getExprAcc())
-      .check(rsaEncrypt(settings.getKeySecret()))
+      .check(rsaEncrypt(String.valueOf(objkey)))
       .build();
   }
 
@@ -94,7 +98,7 @@ public class CommonService {
   /** RSA 암호화 (AES 키 전송용) */
   public String rsaEncrypt(String value) {
     try {
-      return RSA.encrypt(1, settings.getKeyPublic(), value);
+      return RSA.encrypt(0, settings.getKeyPrivate(), value);
     } catch (Exception e) {
       log.debug("E:{}", e.getMessage());
     }
@@ -104,7 +108,7 @@ public class CommonService {
   /** RSA 복호화 (AES 키 전송용) */
   public String rsaDecrypt(String value) {
     try {
-      return RSA.decrypt(1, settings.getKeyPublic(), value);
+      return RSA.decrypt(0, settings.getKeyPrivate(), value);
     } catch (Exception e) {
       log.debug("E:{}", e.getMessage());
     }

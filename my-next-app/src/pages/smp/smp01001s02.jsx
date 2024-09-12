@@ -35,9 +35,9 @@ export default definePage((props) => {
         /** 통신암호 초기화 */
         const res = await api.get(`cmn01001`, {})
         const check = res?.check || ''
-        log.debug('RES:', res?.check, app.getConfig().security.key.rsa)
-        await crypto.rsa.init(app.getConfig().security.key.rsa, C.PRIVATE_KEY)
-        vars.aeskey = crypto.rsa.decrypt(check)
+        log.debug('RES:', res?.check, app.getConfig().security.key.rsa.public)
+        await crypto.rsa.init(app.getConfig().security.key.rsa.public, C.PUBLIC_KEY)
+        vars.aeskey = JSON.parse(crypto.rsa.decrypt(check)).k
         update(C.UPDATE_SELF)
       } break
       case 1: {
@@ -45,7 +45,7 @@ export default definePage((props) => {
         await crypto.aes.init(vars.aeskey)
         const res = await api.post(`lgn01001`, {
           userId: `tester`,
-          passwd: `${crypto.aes.encrypt('test12#')}`
+          passwd: crypto.aes.encrypt(JSON.stringify({ k: 'test12#', t: new Date().getTime() }))
         })
         log.debug('RES:', res)
         vars.userInfo = userContext.getUserInfo()

@@ -76,7 +76,7 @@ const appvars = {
     api: [{ base: '', alter: '', server: '', timeout: 0 }],
     auth: { expiry: 0 },
     security: {
-      key: { rsa: '' }
+      key: { rsa: { public: '', private: '' } }
     },
     serverRuntimeConfig,
     publicRuntimeConfig
@@ -285,16 +285,21 @@ const app = {
         const crypto = (await import('@/libs/crypto')).default
         const userContext = (await import('@/libs/user-context')).default
         const conf = decryptAES(encrypted(), C.CRYPTO_KEY)
+        const clitime = new Date().getTime()
         app.putAll(appvars.config, conf)
         log.setLevel(conf.log.level)
         log.debug('CONF:', conf)
         const cres = await api.get(`cmn01001`, {})
-        await crypto.rsa.init(app.getConfig().security.key.rsa, C.PRIVATE_KEY)
-        const aeskey = crypto.rsa.decrypt(cres?.check || '')
+        await crypto.rsa.init(app.getConfig().security.key.rsa.public, C.PUBLIC_KEY)
+        const kobj = JSON.parse(crypto.rsa.decrypt(cres?.check || '{}'))
+        const svrtime = Number(kobj?.t || 0)
+        /** TODO: 서버시간과 동기화 */
+        log.debug('SERVER-TIME:', svrtime)
+        const aeskey = kobj?.k || ''
         await crypto.aes.init(aeskey)
         appvars.astate = C.APPSTATE_ENV
         const userInfo = userContext.getUserInfo()
-        if (userInfo?.userId && (userInfo.accessToken?.expireTime || 0) > new Date().getTime()) { userContext.checkExpire() }
+        if (userInfo?.userId && (userInfo.accessToken?.expireTime || 0) > clitime) { userContext.checkExpire() }
         appvars.astate = C.APPSTATE_USER
       } catch (e) {
         appvars.astate = C.APPSTATE_ERROR

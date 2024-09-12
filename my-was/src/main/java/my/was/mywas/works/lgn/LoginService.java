@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -62,8 +63,13 @@ public class LoginService {
     String password = login.getPasswd();
 
     try {
+      log.debug("CHECK-DECRYPT:{}", service.aesDecrypt(password));
+      JSONObject pobj = new JSONObject(service.aesDecrypt(password));
+      long ltime = pobj.optLong("t", 0L);
+      /** TODO: 시간차이에 의한 오류 제츠 */
+      log.debug("LOGIN-TIME:{}", ltime);
       /** 평문화 */
-      String dpassword = service.aesDecrypt(password);
+      String dpassword = pobj.optString("p", "");
       /** DB 에서 비교를 위해 재암호화 */
       String epassword = service.dbEncrypt(dpassword);
 

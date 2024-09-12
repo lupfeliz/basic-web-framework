@@ -28,7 +28,7 @@ export default definePage(() => {
 
   const submit = async () => {
     const formdata = clone (vars.formdata)
-    formdata.passwd = crypto.aes.encrypt(formdata.passwd)
+    formdata.passwd = crypto.aes.encrypt(JSON.stringify({ p: formdata.passwd, t: new Date().getTime() }))
     try {
       const res = await api.post(`lgn01001`, formdata)
       log.debug('RES:', res)
