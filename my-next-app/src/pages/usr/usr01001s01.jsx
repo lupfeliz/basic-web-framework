@@ -9,6 +9,7 @@ import app from '@/libs/app-context'
 import api from '@/libs/api'
 import values from '@/libs/values'
 import crypto from '@/libs/crypto'
+import dialog from '@/libs/dialog-context'
 import * as C from '@/libs/constants'
 import { Block, Form, Button, Input, Select, Container } from '@/components'
 
@@ -62,14 +63,14 @@ export default definePage(() => {
         .toLowerCase().replace(/[^a-zA-Z0-9]+/, '')
       const res = await api.get(`usr01001/${model.userId}`)
       if (res?.rescd !== C.RESCD_OK) {
-        alert(`"${model.userId}" 는 이미 사용중이거나 사용할수 없어요.`)
+        await dialog.alert(`"${model.userId}" 는 이미 사용중이거나 사용할수 없어요.`)
       } else {
         vars.iddupchk = true
-        alert(`"${model.userId}" 는 사용 가능해요.`)
+        await dialog.alert(`"${model.userId}" 는 사용 가능해요.`)
       }
       update(C.UPDATE_SELF)
     } else {
-      alert('아이디를 입력해 주세요')
+      await dialog.alert('아이디를 입력해 주세요')
     }
   }
   /** 회원가입, was 에 전달하기 전에 validation 부터 수행한다. */
@@ -89,7 +90,7 @@ export default definePage(() => {
     if (!msg && !model.emailId) { msg = '이메일을 입력해 주세요' }
     if (!msg && !PTN_EMAIL.test(model.email)) { msg = `"${model.email}" 는 올바른 이메일 형식이 아니예요` }
     if (msg) {
-      alert(msg)
+      await dialog.alert(msg)
     } else {
       let result = false
       // dialog.progress(true)
@@ -109,7 +110,7 @@ export default definePage(() => {
       }
       // thread(() => { dialog.progress(false) }, 500)
       if (!result) {
-        alert('회원 등록에 실패했어요 잠시후 다시 시도해 주세요')
+        await dialog.alert('회원 등록에 실패했어요 잠시후 다시 시도해 주세요')
       }
     }
   }

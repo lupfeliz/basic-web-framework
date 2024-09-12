@@ -15,6 +15,7 @@ import { createSessionStorage } from '@/libs/simple-store'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
 import api from '@/libs/api'
+import dialog from '@/libs/dialog-context'
 
 const { log, clone } = app
 
@@ -100,7 +101,7 @@ const userContext = {
     if ((accessToken?.value && accessToken?.expireTime <
       (current + C.EXPIRE_NOTIFY_TIME - C.EXTRA_TIME)) && !userInfo?.notifyExpire
       ) {
-      if (confirm(`인증이 ${Math.ceil((accessToken?.expireTime - current) / 1000 / 60)}분 안에 만료됩니다. 연장하시겠어요?`)) {
+      if (await dialog.confirm(`인증이 ${Math.ceil((accessToken?.expireTime - current) / 1000 / 60)}분 안에 만료됩니다. 연장하시겠어요?`)) {
         userContext.tokenRefresh()
       } else {
         userContext.setUserInfo({ notifyExpire: true })
@@ -111,7 +112,7 @@ const userContext = {
       if (accessToken.value && accessToken?.expireTime >= 0) {
         expired = true
         userContext.logout()
-        alert('로그아웃 되었어요')
+        await dialog.alert('로그아웃 되었어요')
         app.goPage('/')
       }
     }

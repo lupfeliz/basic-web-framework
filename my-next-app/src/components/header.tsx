@@ -8,6 +8,7 @@
 import app from '@/libs/app-context'
 import userContext from '@/libs/user-context'
 import * as C from '@/libs/constants'
+import dialog from '@/libs/dialog-context'
 import { Container, Block, Button, Link } from '@/components'
 import { Drawer } from '@mui/material'
 import { Menu as MenuIcon, ArrowBackIos as ArrowBackIcon } from '@mui/icons-material';
@@ -32,7 +33,7 @@ export default defineComponent(() => {
   }
   const logout = async () => {
     await userContext.logout()
-    alert('로그아웃 되었어요')
+    dialog.alert('로그아웃 되었어요')
     goPage('/')
   }
   return (

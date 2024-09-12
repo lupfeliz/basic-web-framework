@@ -7,6 +7,7 @@
  **/
 import app from '@/libs/app-context'
 import api from '@/libs/api'
+import dialog from '@/libs/dialog-context'
 import crypto from '@/libs/crypto'
 import * as C from '@/libs/constants'
 import { Form, Block, Button, Container, Input } from '@/components'
@@ -35,14 +36,14 @@ export default definePage(() => {
       if (res.rescd === C.RESCD_OK) {
         goPage(-1)
       } else {
-        alert('로그인이 실패했습니다')
+        await dialog.alert('로그인이 실패했습니다')
       }
     } catch (e) {
       log.debug('E:', e)
       if (e?.msgcode == 'USER_NOT_FOUND') {
-        alert('사용자 아이디 혹은 비밀번호가 잘못되었어요')
+        await dialog.alert('사용자 아이디 혹은 비밀번호가 잘못되었어요')
       } else {
-        alert(e?.message || '오류가 발생했어요')
+        await dialog.alert(e?.message || '오류가 발생했어요')
       }
     }
   }

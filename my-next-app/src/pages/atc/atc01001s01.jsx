@@ -7,6 +7,7 @@
  **/
 import app from '@/libs/app-context'
 import api from '@/libs/api'
+import dialog from '@/libs/dialog-context'
 import * as C from '@/libs/constants'
 import { Block, Button, Container, Form, Editor } from '@/components'
 import Input from '@/components/input'
@@ -37,7 +38,7 @@ export default definePage(() => {
     if (!msg && !contents) { msg = '내용을 입력해 주세요' }
     if (!msg && contents.length < 2) { msg = '내용을 2글자 이상 입력해 주세요' }
     if (msg) {
-      alert(msg)
+      await dialog.alert(msg)
     } else {
       let result = false
       try {
@@ -55,7 +56,7 @@ export default definePage(() => {
         log.debug('E:', e)
       }
       if (!result) {
-        alert(msg || '새글 쓰기에 실패했어요 잠시후 다시 시도해 주세요')
+        await dialog.alert(msg || '새글 쓰기에 실패했어요 잠시후 다시 시도해 주세요')
       }
     }
   }

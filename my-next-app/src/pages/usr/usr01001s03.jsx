@@ -8,6 +8,7 @@
 import app from '@/libs/app-context'
 import api from '@/libs/api'
 import userContext from '@/libs/user-context'
+import dialog from '@/libs/dialog-context'
 import values from '@/libs/values'
 import crypto from '@/libs/crypto'
 import * as C from '@/libs/constants'
@@ -75,7 +76,7 @@ export default definePage(() => {
     if (!msg && !model.emailId) { msg = '이메일을 입력해 주세요' }
     if (!msg && !PTN_EMAIL.test(model.email)) { msg = `"${model.email}" 는 올바른 이메일 형식이 아니예요` }
     if (msg) {
-      alert(msg)
+      await dialog.alert(msg)
     } else {
       let result = false
       try {
@@ -92,7 +93,7 @@ export default definePage(() => {
         log.debug('E:', e)
       }
       if (!result) {
-        alert('회원 정보 수정에 실패했어요 잠시후 다시 시도해 주세요')
+        await dialog.alert('회원 정보 수정에 실패했어요 잠시후 다시 시도해 주세요')
       }
     }
   }
