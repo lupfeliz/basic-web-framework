@@ -431,6 +431,10 @@ public class SimpleTest {
       log.debug("DEC:{}", dec);
       enc = CryptoUtil.RSA.encrypt(0, privKeyStr, dec);
       log.debug("ENC:{}", enc);
+
+      enc = "Swu01ewSFCpuxx4F0Ey4vlMaEi6M1Az5jP8xAyGhEYYOrJXIf5cO6EJJyul7dn1LTWTImiWHMGMoRUYtQpxmaq7umAUpuItkzIGgOR5Ao11nEfzWhemXTgdtQ7ognclVXsDbwKs2vrHHTItCxqyVnWyR/SnC0a7H4qQSYtKUrVE=";
+      dec = CryptoUtil.RSA.decrypt(1, pubKeyStr, enc);
+      log.debug("DEC:{}", dec);
     }
     // {
     //   /** PRIVATE-KEY-ENC */

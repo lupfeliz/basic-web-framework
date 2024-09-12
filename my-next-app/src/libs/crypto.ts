@@ -24,8 +24,11 @@ const context = {
   },
   rsa: {
     JSEncrypt: C.UNDEFINED,
+    BigInteger: C.UNDEFINED,
+    SecureRandom: C.UNDEFINED,
     parseBigInt: C.UNDEFINED,
     b64tohex: C.UNDEFINED,
+    hex2b64: C.UNDEFINED,
     cryptor: C.UNDEFINED,
     defkey: ''
   }
@@ -76,10 +79,14 @@ const crypto = {
     init: async (keyval?: string, keytype?: string) => {
       if (!context.rsa.JSEncrypt) {
         context.rsa.JSEncrypt = (await import('jsencrypt')).default
-        const { parseBigInt } = (await import('jsencrypt/lib/lib/jsbn/jsbn'))
-        const { b64tohex } = (await import('jsencrypt/lib/lib/jsbn/base64'))
+        const { parseBigInt, BigInteger } = (await import('jsencrypt/lib/lib/jsbn/jsbn'))
+        const { SecureRandom } = (await import('jsencrypt/lib/lib/jsbn/rng'))
+        const { b64tohex, hex2b64 } = (await import('jsencrypt/lib/lib/jsbn/base64'))
+        context.rsa.BigInteger = BigInteger
+        context.rsa.SecureRandom = SecureRandom
         context.rsa.parseBigInt = parseBigInt
         context.rsa.b64tohex = b64tohex
+        context.rsa.hex2b64 = hex2b64
         const cryptor = context.rsa.cryptor = new context.rsa.JSEncrypt()
         switch (keytype) {
         case C.PRIVATE_KEY: case C.UNDEFINED: { cryptor.setPrivateKey(keyval) } break
@@ -107,21 +114,41 @@ const crypto = {
         // log.debug('KEYS:', c, kobj.n, e, e.bitLength())
         ret = c.modPow(e, kobj.n)
         log.debug('DECRYPT:', tohex(ret))
-        ret = pkcs1unpad1(ret, (kobj.n.bitLength() + 7) >> 3)
+        ret = pkcsunpad(ret, (kobj.n.bitLength() + 7) >> 3)
         return ret
       }
     },
-    encrypt: (msg: string, key?: any, type?: any) => {
+    encrypt: (msg: string, key?: any) => {
       let cryptor = context.rsa.cryptor
       if (key) {
         cryptor = new context.rsa.JSEncrypt()
-        switch (type) {
-          case C.PUBLIC_KEY: { cryptor.setPublicKey(key) } break
-          case C.PRIVATE_KEY: { cryptor.setPrivateKey(key) } break
-          default: { cryptor.setKey(key) }
-        }
+        cryptor.setKey(key)
       }
-      return cryptor.encrypt(msg)
+      const kobj = cryptor.getKey()
+      if (!kobj.d) {
+        return cryptor.encrypt(msg)
+      } else {
+        log.debug('PRV-ENC', msg)
+        let ret = C.UNDEFINED
+
+        let maxLength = (kobj.n.bitLength() + 7) >> 3
+        let c = pkcs1pad2(msg, maxLength);
+        // const c = context.rsa.parseBigInt(context.rsa.b64tohex(msg), 16)
+        log.debug('N:', tohex(kobj?.n))
+        log.debug('D:', tohex(kobj?.d))
+        // log.debug('KEYS:', c, kobj.n, e, e.bitLength())
+        ret = c.modPow(tobig(kobj.d), kobj.n)
+        log.debug('ENCRYPT:', tohex(ret))
+
+        ret = ret.toString(16)
+        let length = ret.length
+        // fix zero before result
+        for (var i = 0; i < maxLength * 2 - length; i++) {
+          ret = '0' + ret
+        }
+        ret = context.rsa.hex2b64(ret)
+        return ret
+      }
     }
   },
   b64dec(key: string) {
@@ -153,26 +180,89 @@ const tobig = (v: any) => {
   return ret
 }
 
-const pkcs1unpad1 = (d: any, n: any) => {
-  var buf = d.toByteArray();
-  var inx = 0;
+const pkcsunpad = (d: any, n: any) => {
+  var buf = d.toByteArray()
+  var inx = 0
   while (buf[inx] != 0) {
-    if (++inx >= buf.length) { return null; }
+    if (++inx >= buf.length) { return null }
   }
-  var ret = "";
+  var ret = ''
   while (++inx < buf.length) {
-    var c = buf[inx] & 255;
+    var c = buf[inx] & 255
     if (c < 128) {
-      ret += String.fromCharCode(c);
+      ret += String.fromCharCode(c)
     } else if ((c > 191) && (c < 224)) {
-      ret += String.fromCharCode(((c & 31) << 6) | (buf[inx + 1] & 63));
-      ++inx;
+      ret += String.fromCharCode(((c & 31) << 6) | (buf[inx + 1] & 63))
+      ++inx
     } else {
-      ret += String.fromCharCode(((c & 15) << 12) | ((buf[inx + 1] & 63) << 6) | (buf[inx + 2] & 63));
-      inx += 2;
+      ret += String.fromCharCode(((c & 15) << 12) | ((buf[inx + 1] & 63) << 6) | (buf[inx + 2] & 63))
+      inx += 2
     }
   }
-  return ret;
+  return ret
+}
+function pkcspad(s: any, n: any) {
+  if (n < s.length + 22) {
+    console.error('Message too long for RSA')
+    return null
+  }
+  var len = n - s.length - 6
+  var filler = ''
+  for (var f = 0; f < len; f += 2) {
+    filler += 'ff'
+  }
+  var m = '0001' + filler + '00' + s
+  return context.rsa.parseBigInt(m, 16)
+}
+// function pkcs1pad1(s: any, n: any) {
+//   if (n < s.length + 22) {
+//     console.error('Message too long for RSA')
+//     return null
+//   }
+//   var len = n - s.length - 6
+//   var filler = ''
+//   for (var f = 0; f < len; f += 2) {
+//     filler += 'ff'
+//   }
+//   var m = '0001' + filler + '00' + s
+//   return context.rsa.parseBigInt(m, 16)
+// }
+function pkcs1pad2(s: any, n: any) {
+  if (n < s.length + 11) { // TODO: fix for utf-8
+    console.error('Message too long for RSA')
+    return null
+  }
+  var ba = []
+  var i = s.length - 1
+  while (i >= 0 && n > 0) {
+    var c = s.charCodeAt(i--)
+    if (c < 128) { // encode using utf-8
+      ba[--n] = c
+    }
+    else if ((c > 127) && (c < 2048)) {
+      ba[--n] = (c & 63) | 128
+      ba[--n] = (c >> 6) | 192
+    }
+    else {
+      ba[--n] = (c & 63) | 128
+      ba[--n] = ((c >> 6) & 63) | 128
+      ba[--n] = (c >> 12) | 224
+    }
+  }
+  ba[--n] = 0
+  var rng = new context.rsa.SecureRandom()
+  var x = []
+  while (n > 2) { // random non-zero pad
+    x[0] = 0
+    while (x[0] == 0) {
+      rng.nextBytes(x)
+    }
+    ba[--n] = x[0]
+  }
+  // ba[--n] = 2
+  ba[--n] = 1
+  ba[--n] = 0
+  return new context.rsa.BigInteger(ba)
 }
 
 export default crypto

@@ -107,16 +107,16 @@ export default definePage(() => {
           // msg = '암복호화 테스트중입니다.'
           msg = 'gvqmcserjsbwopctwijjblupauxywlRSA 암복호화 테스트 중입니다'
           {
-            enc = crypto.rsa.encrypt(msg, pubk, C.PUBLIC_KEY)
+            enc = crypto.rsa.encrypt(msg, pubk)
             log.debug('ENC1:', enc)
             dec = crypto.rsa.decrypt(enc, prvk)
             log.debug('DEC1:', dec)
           }
           {
-            enc = crypto.rsa.encrypt(msg, prvk, C.PRIVATE_KEY)
+            enc = crypto.rsa.encrypt(msg, prvk)
             log.debug('ENC2:', enc)
-            enc = 'Qgk6W4v0yDYlqiX3U2xI9iO2BnT9lqmZXVZNR8q/3SlPg2+8bbuAF+FcWkkDVyy20TcSdhtHvUdRak7lBxg6tSF+8R/ZOiw64+df3KKgNgTjl3U2p0Y8i4umfOMw7J4m9MRp94xopnkvv1O9P4+179nVmwiyVYpgVP34G00UpTU='
-            log.debug('ENC2:', enc)
+            // enc = 'Qgk6W4v0yDYlqiX3U2xI9iO2BnT9lqmZXVZNR8q/3SlPg2+8bbuAF+FcWkkDVyy20TcSdhtHvUdRak7lBxg6tSF+8R/ZOiw64+df3KKgNgTjl3U2p0Y8i4umfOMw7J4m9MRp94xopnkvv1O9P4+179nVmwiyVYpgVP34G00UpTU='
+            // log.debug('ENC2:', enc)
             dec = crypto.rsa.decrypt(enc, pubk)
             log.debug('DEC2:', dec)
           }
