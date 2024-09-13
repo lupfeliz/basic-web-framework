@@ -6,14 +6,14 @@
  * @Site        : https://devlog.ntiple.com
  **/
 const messages = {
-  CMN00000001: 'Ok',
-  CMN00000002: 'Cancel',
-  CMN00000003: `An error occurred during processing`,
-  CMN00000004: `Please log in`,
-  CMN00000005: `You do not have access permission.`,
-  CMN00000006: `This request cannot be processed.`,
-  CMN00000007: `An error occurred during processing`,
-  CMN00000008: `User authentication time has been extended.`,
+  CMN0001: 'Ok',
+  CMN0002: 'Cancel',
+  CMN0003: `An error occurred during processing`,
+  CMN0004: `Please log in`,
+  CMN0005: `You do not have access permission.`,
+  CMN0006: `This request cannot be processed.`,
+  CMN0007: `An error occurred during processing`,
+  CMN0008: `User authentication time has been extended.`,
 }
 
 export default messages

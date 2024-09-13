@@ -22,6 +22,7 @@ import * as C from '@/libs/constants'
 import values from '@/libs/values'
 import log, { getLogger } from '@/libs/log'
 import proc from '@/libs/proc'
+import $t from '@/libs/i18n'
 
 type UpdateFunction = (mode?: number) => void
 
@@ -104,7 +105,7 @@ const appContextStore = configureStore({ reducer: appContextSlice.reducer })
 const app = {
   /** values, log, getLogger mixin */
   ...values, log, getLogger, useRef,
-  waitmon,
+  waitmon, $t,
   /** 앱 내 유일키 생성 */
   genId() { return `${new Date().getTime()}${String((appvars.uidseq = (appvars.uidseq + 1) % 1000) + 1000).substring(1, 4)}` },
   /**
@@ -297,6 +298,8 @@ const app = {
         log.debug('SERVER-TIME:', svrtime)
         const aeskey = kobj?.k || ''
         await crypto.aes.init(aeskey)
+        /** TODO: 워크 페이지별 다국어 적재 */
+        await $t.init(['commons', 'mai'])
         appvars.astate = C.APPSTATE_ENV
         const userInfo = userContext.getUserInfo()
         if (userInfo?.userId && (userInfo.accessToken?.expireTime || 0) > clitime) { userContext.checkExpire() }

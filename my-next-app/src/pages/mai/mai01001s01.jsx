@@ -9,7 +9,7 @@ import app from '@/libs/app-context'
 import userContext from '@/libs/user-context'
 import { Button, Block, Container } from '@/components'
 
-const { definePage, useSetup } = app
+const { definePage, useSetup, $t } = app
 
 export default definePage(() => {
 
@@ -25,6 +25,7 @@ export default definePage(() => {
     <section>
       <p> 샘플 게시판 어플리케이션 입니다. </p>
       <p> 현재 페이지는 메인페이지 입니다. </p>
+      <p> { $t('CMN0004') } </p>
       <article>
         { ready() && !(userInfo?.userId) && (
         <Block>
