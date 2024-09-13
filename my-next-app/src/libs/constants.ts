@@ -11,6 +11,9 @@ export const TEST  = 'test'
 export const PROD  = 'prod'
 export const MY = 'my'
 
+export const KO = 'ko'
+export const EN = 'en'
+
 export const ROOT = 'ROOT'
 export const DEBUG = 'debug'
 export const INFO = 'info'
