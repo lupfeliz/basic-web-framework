@@ -647,6 +647,34 @@ const values = {
     }
     return target
   },
+  getByPath(obj: any, name: string | string[]) {
+    let ret: any = C.UNDEFINED
+    let o: any
+    let klst: string[] = []
+    if (name instanceof Array) {
+      klst = name
+    } else if (typeof name === C.STRING) {
+      klst = name.split(/[.]/)
+    }
+    o = obj
+    KLOOP: for (let inx = 0; inx < klst.length; inx++) {
+      let k: any = klst[inx]
+      if (o instanceof Array) {
+        k = Number(k)
+        if (!isNaN(k)) {
+          o = o[k]
+        } else {
+          o = C.UNDEFINED
+          break KLOOP
+        }
+      } else if (typeof o === C.OBJECT) {
+
+      } else {
+
+      }
+    }
+    return ret
+  }
 }
 
 export default values

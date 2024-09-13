@@ -515,7 +515,7 @@ export default defineComponent((props: FormProps, ref: FormProps['ref'] & any) =
       }
     }
   })
-  return (<> {pprops.children} </>)
+  return (<form> {pprops.children} </form>)
 }, {
   displayName: 'form',
   Message
