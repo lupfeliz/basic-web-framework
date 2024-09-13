@@ -31,19 +31,24 @@ public class SampleService {
     String pubk = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCJJS9LaxApsTYd4AUnEABmuYaiC2i18sRYOFQIejJLQ03WW276R3jKuKMBhdItUVoE7LnTo3E9Uruiaftvm0BhBnY6MN+6jhz7hK0F7Q11sQCZp5/EQU6Tv8Peg2Wrc4PX1NiG9H0hg5V0x2kW70iJwqWxMDOYe3n57iowNdVQVwIDAQAB";
     String type = prm.optString("typ", "");
     String msg = prm.optString("msg", "");
+    String key = prm.optString("key", "");
     String res = "";
     switch (type) {
     case "encprv": {
-      res = encrypt(0, prvk, msg);
+      if ("".equals(key)) { key = prvk; }
+      res = encrypt(0, key, msg);
     } break;
     case "decprv": {
-      res = decrypt(0, prvk, msg);
+      if ("".equals(key)) { key = prvk; }
+      res = decrypt(0, key, msg);
     } break;
     case "encpub": {
-      res = encrypt(1, pubk, msg);
+      if ("".equals(key)) { key = pubk; }
+      res = encrypt(1, key, msg);
     } break;
     case "decpub": {
-      res = decrypt(1, pubk, msg);
+      if ("".equals(key)) { key = pubk; }
+      res = decrypt(1, key, msg);
     } break;
     }
     ret.put("result", res);

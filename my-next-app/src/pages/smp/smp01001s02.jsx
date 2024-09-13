@@ -45,7 +45,7 @@ export default definePage((props) => {
         await crypto.aes.init(vars.aeskey)
         const res = await api.post(`lgn01001`, {
           userId: `tester`,
-          passwd: crypto.aes.encrypt(JSON.stringify({ k: 'test12#', t: new Date().getTime() }))
+          passwd: crypto.aes.encrypt(JSON.stringify({ p: 'test12#', t: new Date().getTime() }))
         })
         log.debug('RES:', res)
         vars.userInfo = userContext.getUserInfo()

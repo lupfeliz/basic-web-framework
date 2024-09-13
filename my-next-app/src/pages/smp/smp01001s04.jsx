@@ -80,21 +80,21 @@ export default definePage(() => {
         await sleep(1000)
 
         /** 3: 서버PRV암호화 서버PUB복호화 */
-        vars.enc = (await api.post(`smp01001`, { typ: 'encprv', msg: vars.dec })).result
-        vars.dec = (await api.post(`smp01001`, { typ: 'decpub', msg: vars.enc })).result
+        vars.enc = (await api.post(`smp01001`, { typ: 'encprv', msg: vars.dec, key: vars.prvk })).result
+        vars.dec = (await api.post(`smp01001`, { typ: 'decpub', msg: vars.enc, key: vars.pubk })).result
         log.debug('ENC3:', vars.enc, ' / DEC3:', vars.dec)
         update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 4: 서버PUB암호화 서버PRV복호화 */
-        vars.enc = (await api.post(`smp01001`, { typ: 'encpub', msg: vars.dec })).result
-        vars.dec = (await api.post(`smp01001`, { typ: 'decprv', msg: vars.enc })).result
+        vars.enc = (await api.post(`smp01001`, { typ: 'encpub', msg: vars.dec, key: vars.pubk })).result
+        vars.dec = (await api.post(`smp01001`, { typ: 'decprv', msg: vars.enc, key: vars.prvk })).result
         log.debug('ENC4:', vars.enc, ' / DEC4:', vars.dec)
         update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 5: 서버PRV암호화 클라PUB복호화 */
-        vars.enc = (await api.post(`smp01001`, { typ: 'encprv', msg: vars.dec })).result
+        vars.enc = (await api.post(`smp01001`, { typ: 'encprv', msg: vars.dec, key: vars.prvk })).result
         vars.dec = crypto.rsa.decrypt(vars.enc, vars.pubk)
         log.debug('ENC5:', vars.enc, ' / DEC5:', vars.dec)
         update(C.UPDATE_ENTIRE)
@@ -102,13 +102,13 @@ export default definePage(() => {
 
         /** 6: 클라PRV암호화 서버PUB복호화 */
         vars.enc = crypto.rsa.encrypt(vars.dec, vars.prvk)
-        vars.dec = (await api.post(`smp01001`, { typ: 'decpub', msg: vars.enc })).result
+        vars.dec = (await api.post(`smp01001`, { typ: 'decpub', msg: vars.enc, key: vars.pubk })).result
         log.debug('ENC6:', vars.enc, ' / DEC6:', vars.dec)
         update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 7: 서버PUB암호화 클라PRV복호화 */
-        vars.enc = (await api.post(`smp01001`, { typ: 'encpub', msg: vars.dec })).result
+        vars.enc = (await api.post(`smp01001`, { typ: 'encpub', msg: vars.dec, key: vars.pubk })).result
         vars.dec = crypto.rsa.decrypt(vars.enc, vars.prvk)
         log.debug('ENC7:', vars.enc, ' / DEC7:', vars.dec)
         update(C.UPDATE_ENTIRE)
@@ -116,7 +116,7 @@ export default definePage(() => {
 
         /** 8: 클라PUB암호화 서버PRV복호화 */
         vars.enc = crypto.rsa.encrypt(vars.dec, vars.pubk)
-        vars.dec = (await api.post(`smp01001`, { typ: 'decprv', msg: vars.enc })).result
+        vars.dec = (await api.post(`smp01001`, { typ: 'decprv', msg: vars.enc, key: vars.prvk })).result
         log.debug('ENC8:', vars.enc, ' / DEC8:', vars.dec)
         update(C.UPDATE_ENTIRE)
         await sleep(1000)
@@ -130,7 +130,11 @@ export default definePage(() => {
         await sleep(100)
         switch (vars.encfrom) {
         case 1: { vars.enc = crypto.rsa.encrypt(vars.msg,  vars.enctype == 1 ? vars.pubk : vars.prvk) } break
-        case 2: { vars.enc = (await api.post(`smp01001`, { typ: vars.enctype == 1 ? 'encpub' : 'encprv', msg: vars.msg })).result } break
+        case 2: { vars.enc = (await api.post(`smp01001`, {
+            typ: vars.enctype == 1 ? 'encpub' : 'encprv',
+            key: vars.enctype == 1 ? vars.pubk : vars.prvk,
+            msg: vars.msg
+          })).result } break
         }
         log.debug('MSG:', vars.msg, 'ENC:', vars.enc)
         update(C.UPDATE_ENTIRE)
@@ -141,7 +145,11 @@ export default definePage(() => {
         await sleep(100)
         switch (vars.decfrom) {
         case 1: { vars.dec = crypto.rsa.decrypt(vars.enc,  vars.enctype == 1 ? vars.prvk : vars.pubk) } break
-        case 2: { vars.dec= (await api.post(`smp01001`, { typ: vars.enctype == 1 ? 'decprv' : 'decpub', msg: vars.enc })).result } break
+        case 2: { vars.dec= (await api.post(`smp01001`, {
+            typ: vars.enctype == 1 ? 'decprv' : 'decpub',
+            key: vars.enctype == 1 ? vars.prvk : vars.pubk,
+            msg: vars.enc
+          })).result } break
         }
         log.debug('ENC:', vars.enc, ' / DEC:', vars.dec)
         update(C.UPDATE_ENTIRE)
