@@ -46,7 +46,7 @@ export default definePage(() => {
   return (
   <Container>
     <section className='title'>
-      <h2>{ vars.data?.title || '게시물 조회' }</h2>
+      <h2>{ vars.data?.title || '' }</h2>
       { ready() && (userInfo?.userId || '') == vars.data?.userId && (
         <Button
           variant='contained'
