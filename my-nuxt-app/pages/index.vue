@@ -1,29 +1,29 @@
 <template>
 <div class="text-center">
-  <MyButton
+  <Button
     class="btn-primary mx-1"
     @click="onClickProc"
     >
     게시판으로 이동
-  </MyButton>
+  </Button>
 
-  <MyButton
+  <Button
     class="btn-secondary mx-1"
     @click="dialog.alert('테스트')"
     >
     테스트(ALERT)
-  </MyButton>
+  </Button>
 
-  <MyButton
+  <Button
     class="btn-secondary mx-1"
     @click="dialog.overlay(true, 2000)"
     >
     테스트(OVERLAY)
-  </MyButton>
+  </Button>
 </div>
 </template>
 <script setup lang="ts">
-import MyButton from '@/components/commons/mybutton.vue'
+import Button from '@/components/commons/button.vue'
 import { dialog } from '@/libs/commons/dialog'
 import { log } from '@/libs/commons/log'
 import { inst } from '@/store/commons/basesystem'

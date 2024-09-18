@@ -14,26 +14,26 @@
           <p v-html="ctx.modal.current?.msg"></p>
           <div class="text-center">
             <template v-if="ctx.modal.current?.type === C.ALERT">
-              <MyButton
+              <Button
                 class="btn btn-primary"
                 @click="click(1)"
                 >
                 확인
-              </MyButton>
+              </Button>
             </template>
             <template v-if="ctx.modal.current?.type === C.CONFIRM">
-              <MyButton
+              <Button
                 class="btn btn-primary mx-1"
                 @click="click(1)"
                 >
                 확인
-              </MyButton>
-              <MyButton
+              </Button>
+              <Button
                 class="btn btn-secondary mx-1"
                 @click="click(2)"
                 >
                 취소
-              </MyButton>
+              </Button>
             </template>
           </div>
         </div>
@@ -66,7 +66,7 @@ import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'
 import { values } from '@/libs/commons/values'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
-import MyButton from '@/components/commons/mybutton.vue'
+import Button from '@/components/commons/button.vue'
 import { over } from 'lodash'
 import { dialog } from '@/libs/commons/dialog'
 

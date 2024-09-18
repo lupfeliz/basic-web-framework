@@ -41,24 +41,24 @@
         수정
       </div>
       <div class="col">
-        <MyButton
+        <Button
           class="btn-primary mx-1"
           @click="editArticle(data.id)"
           >
           수정
-        </MyButton>
-        <MyButton
+        </Button>
+        <Button
           class="btn-danger mx-1"
           @click="deleteArticle(data.id)"
           >
           삭제
-        </MyButton>
-        <MyButton
+        </Button>
+        <Button
           class="btn-secondary mx-1"
           @click="self.goPage('/board/list')"
           >
           목록보기
-        </MyButton>
+        </Button>
       </div>
     </div>
   </div>
@@ -70,7 +70,7 @@ import { log } from '@/libs/commons/log'
 import { apiDel, apiGet } from '@/libs/commons/api'
 import { $f } from '@/libs/commons/format'
 
-import MyButton from '@/components/commons/mybutton.vue'
+import Button from '@/components/commons/button.vue'
 import { dialog } from '@/libs/commons/dialog'
 
 const self = inst(getCurrentInstance())

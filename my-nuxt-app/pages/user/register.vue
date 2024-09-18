@@ -1,6 +1,6 @@
 <template>
   <div class="container input-form">
-    <MyForm ref="form">
+    <Form ref="form">
       <div class="row">
         <div class="col-2 head">
           아이디
@@ -8,7 +8,7 @@
         <div class="col row">
           <div class="col-10"
             >
-            <MyInput
+            <Input
               type="text"
               label="아이디"
               name="userId"
@@ -20,12 +20,12 @@
               <span v-if="map.dupchk >= 2">사용 가능한 아이디 입니다</span>
           </div>
           <div class="col-2 text-right">
-            <MyButton
+            <Button
               class="btn-secondary"
               @click="checkId()"
               >
               중복확인
-            </MyButton>
+            </Button>
           </div>
         </div>
       </div>
@@ -36,7 +36,7 @@
         <div
           class="col"
           >
-          <MyInput
+          <Input
             type="text"
             label="이름"
             name="userNm"
@@ -53,7 +53,7 @@
         <div
           class="col"
           >
-          <MyInput
+          <Input
             type="password"
             label="비밀번호"
             name="passwd"
@@ -70,7 +70,7 @@
         <div
           class="col"
           >
-          <MyInput
+          <Input
             type="password"
             label="비밀번호 확인"
             name="passwdCf"
@@ -85,21 +85,21 @@
           가입
         </div>
         <div class="col">
-          <MyButton
+          <Button
             class="btn-primary mx-1"
             @click="doRegister()"
             >
             가입
-          </MyButton>
-          <MyButton
+          </Button>
+          <Button
             class="btn-warning mx-1"
             @click="self.goPage(-1)"
             >
             취소
-          </MyButton>
+          </Button>
         </div>
       </div>
-    </MyForm>
+    </Form>
   </div>
 </template>
 <script setup lang="ts">
@@ -110,9 +110,9 @@ import { values } from '@/libs/commons/values'
 import { apiGet, apiPut } from '@/libs/commons/api'
 import { dialog } from '@/libs/commons/dialog'
 
-import MyButton from '@/components/commons/mybutton.vue'
-import MyInput from '@/components/commons/myinput.vue'
-import MyForm from '@/components/commons/myform.vue'
+import Button from '@/components/commons/button.vue'
+import Input from '@/components/commons/input.vue'
+import Form from '@/components/commons/form.vue'
 
 const self = inst(getCurrentInstance())
 

@@ -1,52 +1,52 @@
 <template>
   <header class="t-5 py-5 center rounded row">
     <div class="text-left col-3">
-      <MyButton
+      <Button
         :class="`btn-secondary mx-1 ${router?.options?.history?.state?.back ? '': 'disabled'}`"
         @click="self.goPage(-1)"
         >
         &lt; 이전 
-      </MyButton>
-      <MyButton
+      </Button>
+      <Button
         v-if="router.options?.history?.state?.current !== '/'"
         class="btn-secondary mx-1"
         @click="self.goPage('/')"
         >
         홈
-      </MyButton>
+      </Button>
     </div>
 
     <h1 class="text-center col-6" v-html="pageTitle"></h1>
     <div class="text-right col-3">
       <template v-if="ustore?.userId">
-        <MyButton
+        <Button
           class="btn-secondary mx-1"
           @click="logout()"
           >
           로그아웃
-        </MyButton>
+        </Button>
       </template>
       <template v-else>
-        <MyButton
+        <Button
           v-if="self.currentUri() !== '/user/login'"
           class="btn-secondary mx-1"
           @click="self.goPage('/user/login')"
           >
           로그인
-        </MyButton>
-        <MyButton
+        </Button>
+        <Button
           v-if="self.currentUri() !== '/user/register'"
           class="btn-secondary mx-1"
           @click="self.goPage('/user/register')"
           >
           회원가입
-        </MyButton>
+        </Button>
       </template>
     </div>
   </header>
 </template>
 <script setup lang="ts">
-import MyButton from '@/components/commons/mybutton.vue'
+import Button from '@/components/commons/button.vue'
 
 import * as C from '@/libs/commons/constants'
 import { log } from '@/libs/commons/log'

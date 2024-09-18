@@ -1,12 +1,12 @@
 <template>
   <div class="container board-article">
-    <MyForm ref="form">
+    <Form ref="form">
       <div class="row">
         <div class="col-2 head">
           제목
         </div>
         <div class="col">
-          <MyInput
+          <Input
             type="text"
             name="title"
             label="제목"
@@ -22,7 +22,7 @@
         <div
           class="col"
           >
-          <MyEditor
+          <Editor
             label="내용"
             name="contents"
             v-model="article.contents"
@@ -35,21 +35,21 @@
           {{ articleId ? '수정' : '작성' }}
         </div>
         <div class="col">
-          <MyButton
+          <Button
             class="btn-primary mx-1"
             @click="putArticle()"
             >
             {{ articleId ? '수정완료' : '작성완료' }}
-          </MyButton>
-          <MyButton
+          </Button>
+          <Button
             class="btn-warning mx-1"
             @click="cancelEdit()"
             >
             취소
-          </MyButton>
+          </Button>
         </div>
       </div>
-    </MyForm>
+    </Form>
   </div>
 </template>
 <script setup lang="ts">
@@ -59,10 +59,10 @@ import { log } from '@/libs/commons/log'
 import { apiGet, apiPut } from '@/libs/commons/api'
 import { dialog } from '@/libs/commons/dialog'
 
-import MyButton from '@/components/commons/mybutton.vue'
-import MyInput from '@/components/commons/myinput.vue'
-import MyEditor from '@/components/commons/myeditor.vue'
-import MyForm from '@/components/commons/myform.vue'
+import Button from '@/components/commons/button.vue'
+import Input from '@/components/commons/input.vue'
+import Editor from '@/components/commons/editor.vue'
+import Form from '@/components/commons/form.vue'
 
 const self = inst(getCurrentInstance())
 

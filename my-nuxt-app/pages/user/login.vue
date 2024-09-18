@@ -1,12 +1,12 @@
 <template>
   <div class="container input-form">
-    <MyForm ref="form">
+    <Form ref="form">
       <div class="row">
         <div class="col-2 head">
           아이디
         </div>
         <div class="col">
-          <MyInput
+          <Input
             type="text"
             label="아이디"
             name="userId"
@@ -21,7 +21,7 @@
           비밀번호
         </div>
         <div class="col">
-          <MyInput
+          <Input
             type="password"
             label="비밀번호"
             name="passwd"
@@ -36,15 +36,15 @@
           로그인
         </div>
         <div class="col">
-          <MyButton
+          <Button
             class="btn-primary mx-1"
             @click="login()"
             >
             로그인
-          </MyButton>
+          </Button>
         </div>
       </div>
-    </MyForm>
+    </Form>
   </div>
 </template>
 <script setup lang="ts">
@@ -55,9 +55,9 @@ import { log } from '@/libs/commons/log'
 import { values } from '@/libs/commons/values'
 import { apiGet, apiPost } from '@/libs/commons/api'
 
-import MyButton from '@/components/commons/mybutton.vue'
-import MyInput from '@/components/commons/myinput.vue'
-import MyForm from '@/components/commons/myform.vue'
+import Button from '@/components/commons/button.vue'
+import Input from '@/components/commons/input.vue'
+import Form from '@/components/commons/form.vue'
 
 import { useUserInfo } from '@/store/commons/userinfo'
 import { dialog } from '@/libs/commons/dialog'

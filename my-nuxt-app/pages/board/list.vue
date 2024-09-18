@@ -43,62 +43,62 @@
       </div>
     </template>
     <div class="mt-2">
-      <MyButton
+      <Button
         class="btn-primary"
         @click="newArticle()"
         >
         새글작성
-      </MyButton>
+      </Button>
     </div>
   </div>
   <div class="mt-3 text-center pagination">
     <nav>
       <ul class="pagination">
         <li class="page-item">
-          <MyButton flat
+          <Button flat
             class="page-link"
             :disabled="Number(boardData.page) < 5"
             @click="search({ page: Number(boardData.page) - Number(boardData.pages) }, true)"
             >
             &lt;&lt;
-          </MyButton>
+          </Button>
         </li>
         <li class="page-item">
-          <MyButton flat
+          <Button flat
             class="page-link"
             :disabled="Number(boardData.page) <= 1"
             @click="search({ page: Number(boardData.page) - 1 }, true)"
             >
             &lt;
-          </MyButton>
+          </Button>
         </li>
         <template v-for="inx in range(paging.pnums(boardData.page))">
           <li :class="{ 'page-item': true, active: boardData.page == String(inx) }">
-            <MyButton flat
+            <Button flat
               @click="search({ page: inx }, true)"
               class="page-link"
               >
               {{ inx }}
-            </MyButton>
+            </Button>
           </li>
         </template>
         <li class="page-item">
-          <MyButton flat
+          <Button flat
             class="page-link"
             :disabled="Number(boardData.page) >= Number(boardData.totp)"
             @click="search({ page: Number(boardData.page) + 1 }, true)"
             >
             &gt;
-          </MyButton>
+          </Button>
         </li>
         <li class="page-item">
-          <MyButton flat
+          <Button flat
             class="page-link"
             :disabled="Number(boardData.page) >= (Number(boardData.totp) - Number(boardData.pages) + 1)"
             @click="search({ page: Number(boardData.page) + Number(boardData.pages) }, true)"
             >
             &gt;&gt;
-          </MyButton>
+          </Button>
         </li>
       </ul>
     </nav>
@@ -114,7 +114,7 @@ import { $f } from '@/libs/commons/format'
 import { values } from '@/libs/commons/values'
 import { Paging } from '@/libs/commons/paging'
 
-import MyButton from '@/components/commons/mybutton.vue'
+import Button from '@/components/commons/button.vue'
 import { dialog } from '@/libs/commons/dialog'
 
 const self = inst(getCurrentInstance())

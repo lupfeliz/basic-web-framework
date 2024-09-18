@@ -1,8 +1,12 @@
 import env from 'dotenv'
+import path from 'path'
+import fs from 'fs'
 
 const log = { debug: console.log }
 
 env.config()
+const distdir = path.join(__dirname, 'dist')
+if (!fs.existsSync(distdir)) { fs.mkdirSync(distdir) }
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -24,6 +28,9 @@ export default defineNuxtConfig({
         }
       }
     },
+  },
+  nitro: {
+    output: { publicDir: distdir }
   },
   css: [
     '@/assets/css/globals.scss',
