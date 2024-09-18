@@ -280,24 +280,6 @@ const app = {
     appvars.router = props.router
     if (appvars.astate == C.APPSTATE_INIT) {
       appvars.astate = C.APPSTATE_START
-      // {
-      //   const body = document.body
-      //   const fnunload = async () => {
-      //     window.removeEventListener('beforeunload', fnunload)
-      //     body.classList.add('hide-onload')
-      //   }
-      //   const fnload = async () => {
-      //     window.addEventListener('beforeunload', fnunload)
-      //     document.removeEventListener('DOMContentLoaded', fnload)
-      //     body.classList.remove('hide-onload')
-      //   }
-      //   // if (document.readyState !== 'complete') {
-      //   //   document.addEventListener('DOMContentLoaded', fnload)
-      //   // } else {
-      //   //   fnload()
-      //   // }
-      //   fnload()
-      // }
       try {
         const api = (await import('@/libs/api')).default
         const crypto = (await import('@/libs/crypto')).default

@@ -41,7 +41,7 @@ export default definePage((props) => {
   })
   /** 페이지 선언시 다른 layout 속성이 발견되면 해당 레이아웃으로 전환한다 */
   const applyLayout = Component.layout || ((page, router) => (
-    <LayoutDefault key={ router.route }> { page } </LayoutDefault>
+    <LayoutDefault key={ router.asPath }> { page } </LayoutDefault>
   ))
   return (
     <>
@@ -52,7 +52,7 @@ export default definePage((props) => {
     {/* 트랜지션감지 */}
     <AnimatePresence mode='wait' initial={ false }>
       {/* 실제 경로에 맞는 페이지 컴포넌트 */}
-      { applyLayout(<Component key={router.asPath} {...pageProps} />, router) }
+      { applyLayout(<Component key={ router.asPath } { ...pageProps } />, router) }
     </AnimatePresence>
     <DialogContainer />
     </>
