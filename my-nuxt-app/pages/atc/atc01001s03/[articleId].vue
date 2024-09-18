@@ -80,7 +80,7 @@ const getArticle = async () => {
   const id = Number(self.getParameter('articleId'))
   if (!isNaN(id)) {
     articleId.value = id
-    const res = await apiGet({ act: `board/${id}` })
+    const res = await apiGet({ act: `atc/atc01001/${id}` })
     if (res?.status === C.SC_OK) {
       article.value = res.data
     }
@@ -93,7 +93,7 @@ const putArticle = async () => {
   /** form-validate */
   if (await form.value.validate()) {
     const res = await apiPut({
-      act: 'board',
+      act: 'atc/atc01001',
       data: article.value
     })
     /** 업데이트 이후 히스토리 삭제 */

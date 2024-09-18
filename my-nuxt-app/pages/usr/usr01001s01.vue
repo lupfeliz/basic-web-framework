@@ -156,7 +156,7 @@ const user = ref({
 
 const checkId = async () => {
   if (user.value.userId) {
-    const res = await apiGet({ act: `user/check/${ user.value.userId }` })
+    const res = await apiGet({ act: `usr/usr01001/${ user.value.userId }` })
     if (res?.data?.check === true) {
       map.value.dupchk = 2
     } else {
@@ -172,7 +172,7 @@ const doRegister = async () => {
   if (await form.value.validate()) {
     const data = values.clone(user.value)
     data.passwd = values.enc(data.passwd)
-    const res = await apiPut({ act: 'user', data: data })
+    const res = await apiPut({ act: 'usr/usr01001', data: data })
     if (res?.status === C.SC_OK) {
       if (await dialog.confirm(`"${user.value.userNm}" 님의 가입이 완료되었어요.<br/> 로그인 하시겠어요?`)) {
         await self.removeHist(1, '/user/login')

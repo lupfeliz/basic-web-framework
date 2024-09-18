@@ -125,20 +125,36 @@ const paging = ref(new Paging())
 const sys = useBaseSystem()
 
 watch(() => sys.$state?.popstate, (e: any) => {
-  let data = { page: 1 }
+  let data = {
+    currentPage: 1,
+    rowCount: 10,
+    rowStart: 0,
+    rowTotal: 0,
+    keyword: '',
+    searchType: '',
+    orderType: ''
+  }
   if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
   search(data)
 }, { deep: true })
 
 onMounted(async () => {
-  let data = { page: 1 }
+  let data = {
+    currentPage: 1,
+    rowCount: 10,
+    rowStart: 0,
+    rowTotal: 0,
+    keyword: '',
+    searchType: '',
+    orderType: ''
+  }
   if (history?.state?.histdata) { data = JSON.parse(history.state.histdata) }
   search(data)
 })
 
 const search = async (req: any, save?: boolean) => {
   const res = await apiPost({
-    act: 'board',
+    act: 'atc/atc01001',
     data: req
   })
   if (res?.status === C.SC_OK) {
@@ -151,11 +167,11 @@ const search = async (req: any, save?: boolean) => {
 }
 
 const viewArticle = async (item: any) => {
-  self.goPage(`/board/${item?.id}`)
+  self.goPage(`/atc/atc01001s02/${item?.id}`)
 }
 
 const newArticle = async () => {
-  self.goPage(`/board/edit/_`)
+  self.goPage(`/atc/atc01001s03/_`)
 }
 
 defineExpose({ pageTitle })

@@ -28,16 +28,16 @@
       </template>
       <template v-else>
         <Button
-          v-if="self.currentUri() !== '/user/login'"
+          v-if="self.currentUri() !== '/lgn/lgn01001s01'"
           class="btn-secondary mx-1"
-          @click="self.goPage('/user/login')"
+          @click="self.goPage('/lgn/lgn01001s01')"
           >
           로그인
         </Button>
         <Button
-          v-if="self.currentUri() !== '/user/register'"
+          v-if="self.currentUri() !== '/usr/usr01001s01'"
           class="btn-secondary mx-1"
-          @click="self.goPage('/user/register')"
+          @click="self.goPage('/usr/usr01001s01')"
           >
           회원가입
         </Button>

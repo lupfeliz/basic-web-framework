@@ -55,7 +55,7 @@
         </Button>
         <Button
           class="btn-secondary mx-1"
-          @click="self.goPage('/board/list')"
+          @click="self.goPage('/atc/atc01001s04/1')"
           >
           목록보기
         </Button>
@@ -85,19 +85,19 @@ onMounted(async() => {
 
 const getArticle = async () => {
   const id = self.getParameter('articleId')
-  const res = await apiGet({ act: `board/${id}` })
+  const res = await apiGet({ act: `atc/atc01001/${id}` })
   if (res?.status === C.SC_OK) {
     data.value = res.data
   }
 }
 
 const editArticle = async (id: string) => {
-  self.goPage(`/board/edit/${id}`)
+  self.goPage(`/atc/atc01001s03/${id}`)
 }
 
 const deleteArticle = async (id: string) => {
   if (await dialog.confirm(`"${data.value.title || ''}" 게시글을 삭제하시겠습니까?`)) {
-    await apiDel({ act: `board/${id}`})
+    await apiDel({ act: `atc/atc01001/${id}`})
     await dialog.alert('삭제가 완료되었습니다')
     await self.removeHist()
   }

@@ -81,7 +81,7 @@ const login = async () => {
     data.passwd = values.enc(data.passwd)
 
     const res = await apiPost({
-      act: 'user/login',
+      act: 'lgn/lgn01001',
       data: data
     }, { noerr })
     if (res?.status === C.SC_OK) {
