@@ -13,19 +13,34 @@ const { definePage } = app
 
 export default definePage(() => {
   return (
-  <Html>
+  <Html id='my-first-app'>
     <Head>
       {/* 페이지 hard-loading 시 적용할 기본 transition */}
       <Content html={`
         <style type="text/css">
-          body { transition: opacity 0.4s 0.2s ease }
+          body { transition: opacity 0.4s 0.2s ease; display: block !important; }
           .hide-onload { opacity: 0; }
-        </style>`}
-        />
+        </style>
+        ` } />
     </Head>
     {/* hide-onload 클래스가 사라지면 트랜지션이 시작된다. */}
     <body className='hide-onload'>
       <Main />
+      <Content html={`
+        <script>
+        var body = document.body
+        function fnunload() {
+          window.removeEventListener('beforeunload', fnunload)
+          body.classList.add('hide-onload')
+        }
+        function fnload() {
+          window.addEventListener('beforeunload', fnunload)
+          document.removeEventListener('DOMContentLoaded', fnload)
+          body.classList.remove('hide-onload')
+        }
+        fnload()
+        </script>
+        ` } />
       <NextScript />
     </body>
   </Html>

@@ -206,6 +206,7 @@ export default definePage(() => {
                 model={ vars }
                 name='enctype'
                 options={ vars.encopt }
+                onChange={ () => { vars.enc = vars.dec = ''; update(C.UPDATE_ENTIRE) } }
                 />
               <Select
                 size='small'
@@ -230,6 +231,7 @@ export default definePage(() => {
                 model={ vars }
                 name='enctype'
                 options={ vars.decopt }
+                onChange={ () => { vars.enc = vars.dec = ''; update(C.UPDATE_ENTIRE) } }
                 />
               <Select
                 size='small'

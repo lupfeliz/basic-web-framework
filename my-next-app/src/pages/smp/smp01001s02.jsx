@@ -116,17 +116,19 @@ export default definePage((props) => {
           게시물조회
         </Button>
       </Block>
-      <Block>
-        AES 암호화 키 : { vars.aeskey }
-      </Block>
-      <Block>
-        로그인정보 : { JSON.stringify(vars.userInfo) }
-      </Block>
-      <Block>
-        게시물목록 : { JSON.stringify(vars.articles) }
-      </Block>
-      <Block>
-        메시지 : <span style={{ color: '#f00' }}>{vars.message}</span>
+      <Block className='overflow-x-auto' >
+        <Block>
+          AES 암호화 키 : { vars.aeskey }
+        </Block>
+        <Block>
+          로그인정보 : { JSON.stringify(vars.userInfo) }
+        </Block>
+        <Block>
+          게시물목록 : { JSON.stringify(vars.articles) }
+        </Block>
+        <Block>
+          메시지 : <span style={{ color: '#f00' }}>{vars.message}</span>
+        </Block>
       </Block>
     </section>
   </Container>

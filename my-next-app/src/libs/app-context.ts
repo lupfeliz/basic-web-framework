@@ -278,9 +278,26 @@ const app = {
   /** APP 최초 구동시 수행되는 프로세스 */
   async onload(props: AppProps) {
     appvars.router = props.router
-    const $body = $(document.body)
     if (appvars.astate == C.APPSTATE_INIT) {
       appvars.astate = C.APPSTATE_START
+      // {
+      //   const body = document.body
+      //   const fnunload = async () => {
+      //     window.removeEventListener('beforeunload', fnunload)
+      //     body.classList.add('hide-onload')
+      //   }
+      //   const fnload = async () => {
+      //     window.addEventListener('beforeunload', fnunload)
+      //     document.removeEventListener('DOMContentLoaded', fnload)
+      //     body.classList.remove('hide-onload')
+      //   }
+      //   // if (document.readyState !== 'complete') {
+      //   //   document.addEventListener('DOMContentLoaded', fnload)
+      //   // } else {
+      //   //   fnload()
+      //   // }
+      //   fnload()
+      // }
       try {
         const api = (await import('@/libs/api')).default
         const crypto = (await import('@/libs/crypto')).default
@@ -308,22 +325,7 @@ const app = {
         appvars.astate = C.APPSTATE_ERROR
         log.debug('E:', e)
       }
-      const fnunload = async () => {
-        window.removeEventListener('beforeunload', fnunload)
-        $body.addClass('hide-onload')
-      }
-      const fnload = async () => {
-        window.addEventListener('beforeunload', fnunload)
-        document.removeEventListener('DOMContentLoaded', fnload)
-        $body.removeClass('hide-onload')
-        /** 트랜지션시간 300ms */
-        setTimeout(() => appvars.astate = C.APPSTATE_READY, 300)
-      }
-      if (document.readyState !== 'complete') {
-        document.addEventListener('DOMContentLoaded', fnload)
-      } else {
-        fnload()
-      }
+      appvars.astate = C.APPSTATE_READY
     }
   },
   /** 입력성 컴포넌트 (input 등)에서 자동으로 값을 입력하도록 수행하는 메소드 */

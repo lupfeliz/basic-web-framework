@@ -20,6 +20,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.css'
 
 /** 전역 스타일시트 */
 import '@/pages/global.scss'
+import '@/pages/util.scss'
 
 const { useSetup, definePage, onload, log, isServer } = app
 log.setLevel(getConfig()?.publicRuntimeConfig?.logLevel || 'debug')

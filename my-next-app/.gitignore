@@ -39,3 +39,4 @@ dist
 env/env-my.yml
 tools/**/node_modules
 /babel.config.js
+nohup.out

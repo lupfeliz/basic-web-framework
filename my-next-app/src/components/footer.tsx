@@ -52,7 +52,7 @@ export default defineComponent(() => {
     }
   }, 50)
   const fncHide = (e: any) => {
-    if (e?.target === vars.elem.current || vars.elem.current.contains(e?.target)) {
+    if (e?.target === vars.elem?.current || vars.elem?.current?.contains(e?.target)) {
       log.debug('FNC-HIDE:', e)
     } else {
       vars.hndTouch = setTimeout(() => {
