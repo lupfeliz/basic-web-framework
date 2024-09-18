@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
-import * as C from '@/libs/commons/constants'
-import { log } from '@/libs/commons/log'
+import * as C from '@/libs/constants'
+import log from '@/libs/log'
 import { navigateTo } from 'nuxt/app'
 import bootstrap from 'bootstrap'
-import { dialogContext } from '@/libs/commons/dialog'
+import { dialogContext } from '@/libs/dialog'
 
 /** [ 타입 및 인터페이스 정의 */
 const map: any = {} as any

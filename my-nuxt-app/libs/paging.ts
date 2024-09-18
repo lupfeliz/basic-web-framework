@@ -1,4 +1,4 @@
-import { log } from '@/libs/commons/log'
+import log from '@/libs/log'
 
 const ROWS_DEF = 10
 const PAGES_DEF = 5

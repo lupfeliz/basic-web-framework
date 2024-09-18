@@ -9,8 +9,8 @@
   </button>
 </template>
 <script setup lang="ts">
-import * as C from '@/libs/commons/constants'
-import { log } from '@/libs/commons/log'
+import * as C from '@/libs/constants'
+import log from '@/libs/log'
 
 const props = defineProps({
   flat: {

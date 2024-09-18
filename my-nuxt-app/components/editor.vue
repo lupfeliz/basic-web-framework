@@ -1,27 +1,27 @@
 <template>
-  <input
-    class="form-control"
+  <editor-content
     :name="props.name"
-    :type="props.type"
     v-bind="attrs"
-    v-model="value"
     @keyup="emitUpdate"
+    :editor="editor"
     />
   <span class="err-msg" v-if="vmeta.validated && errorMessage" v-html="errorMessage"></span>
 </template>
 <script setup lang="ts">
-import * as C from '@/libs/commons/constants'
-import { useBaseSystem, inst } from '@/store/commons/basesystem'
-import { log } from '@/libs/commons/log'
-import { useField, FieldContext } from 'vee-validate'
+import * as C from '@/libs/constants'
+import log from '@/libs/log'
+import { inst } from '@/store/commons/basesystem'
+import { useField, FieldContext } from 'vee-validate';
+import { useEditor, EditorContent } from '@tiptap/vue-3'
+import StarterKit from '@tiptap/starter-kit'
+
+import lodash from 'lodash'
 
 const self = inst(getCurrentInstance())
-const sys = useBaseSystem()
 
 const props = defineProps({
-  type: String,
-  name: String,
   label: String,
+  name: String,
   validrules: {} as any,
   modelValue: String
 })
@@ -33,11 +33,21 @@ const vfield = props.name ?
     { label: ref(props.label), validateOnValueUpdate: false }) :
   { value: ref(''), errorMessage: {}, meta: {} } as FieldContext
 const { value, errorMessage } = vfield
-const vmeta: any  = vfield.meta
+const vmeta: any = vfield.meta
+const { debounce } = lodash
 
-watch(() => props.modelValue, (v: any) => { value.value = v })
+const editor = useEditor({
+  content: '',
+  extensions: [StarterKit],
+})
 
-const emitUpdate = async (e: any) => {
+watch(() => props.modelValue, (v: any) => {
+  editor.value?.commands?.setContent(v)
+  value.value = v
+})
+
+const emitUpdate = debounce(async (e?: any) => {
+  value.value = editor.value?.getHTML()
   emit(C.UPDATE_MODEL_VALUE, value.value)
-}
+}, 300)
 </script>

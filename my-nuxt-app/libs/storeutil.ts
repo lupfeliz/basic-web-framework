@@ -1,6 +1,6 @@
-import * as C from '@/libs/commons/constants'
-import { log } from '@/libs/commons/log'
-import { values } from '@/libs/commons/values'
+import * as C from '@/libs/constants'
+import log from '@/libs/log'
+import { values } from '@/libs/values'
 
 import { PiniaPluginContext } from 'pinia'
 

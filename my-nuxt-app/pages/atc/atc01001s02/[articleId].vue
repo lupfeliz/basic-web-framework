@@ -64,14 +64,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import * as C from '@/libs/commons/constants'
+import * as C from '@/libs/constants'
 import { inst } from '@/store/commons/basesystem'
-import { log } from '@/libs/commons/log'
-import { apiDel, apiGet } from '@/libs/commons/api'
-import { $f } from '@/libs/commons/format'
+import log from '@/libs/log'
+import { apiDel, apiGet } from '@/libs/api'
+import { $f } from '@/libs/format'
 
-import Button from '@/components/commons/button.vue'
-import { dialog } from '@/libs/commons/dialog'
+import Button from '@/components/button.vue'
+import { dialog } from '@/libs/dialog'
 
 const self = inst(getCurrentInstance())
 

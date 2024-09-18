@@ -2,21 +2,21 @@
   <template v-if="(sys?.m?.libinit)">
     <main>
       <div class="container">
-        <Header></Header>
-        <slot></slot>
-        <Footer></Footer>
+        <Header />
+        <slot/>
+        <Footer />
       </div>
     </main>
     <Dialog></Dialog>
   </template>
 </template>
 <script setup lang="ts">
-import Header from '@/components/commons/header.vue'
-import Footer from '@/components/commons/footer.vue'
-import Dialog from '@/components/commons/dialog.vue'
-import * as C from '@/libs/commons/constants'
+import Header from '@/components/header.vue'
+import Footer from '@/components/footer.vue'
+import Dialog from '@/components/dialog.vue'
+import * as C from '@/libs/constants'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
-import { log } from '@/libs/commons/log'
+import log from '@/libs/log'
 import $ from 'jquery'
 
 const self = inst(getCurrentInstance())

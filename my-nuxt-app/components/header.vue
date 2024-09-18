@@ -46,14 +46,14 @@
   </header>
 </template>
 <script setup lang="ts">
-import Button from '@/components/commons/button.vue'
+import Button from '@/components/button.vue'
 
-import * as C from '@/libs/commons/constants'
-import { log } from '@/libs/commons/log'
-import { apiPost } from '@/libs/commons/api'
+import * as C from '@/libs/constants'
+import log from '@/libs/log'
+import { apiPost } from '@/libs/api'
 import { useBaseSystem, inst, ComponentType } from '@/store/commons/basesystem'
 import { useUserInfo } from '@/store/commons/userinfo'
-import { dialog } from '@/libs/commons/dialog'
+import { dialog } from '@/libs/dialog'
 
 const self = inst(getCurrentInstance())
 

@@ -1,5 +1,5 @@
-import * as C from '@/libs/commons/constants'
-import { log } from '@/libs/commons/log'
+import * as C from '@/libs/constants'
+import log from '@/libs/log'
 import CryptoJS from 'crypto-js'
 
 const values = {

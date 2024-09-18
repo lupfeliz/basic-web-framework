@@ -2,8 +2,8 @@
   <slot></slot>
 </template>
 <script setup lang="ts">
-import * as C from '@/libs/commons/constants'
-import { log } from '@/libs/commons/log'
+import * as C from '@/libs/constants'
+import log from '@/libs/log'
 import { useForm } from 'vee-validate'
 import { defineRule } from 'vee-validate'
 import vrules from '@vee-validate/rules'

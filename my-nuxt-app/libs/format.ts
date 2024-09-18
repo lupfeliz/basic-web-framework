@@ -1,4 +1,4 @@
-import { log } from '@/libs/commons/log'
+import log from '@/libs/log'
 import moment from 'moment'
 
 const DF_DEF = 'YYYYMMDDhhmmss'

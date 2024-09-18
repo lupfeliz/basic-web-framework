@@ -1,6 +1,6 @@
-import { dialogContext } from '@/libs/commons/dialog';
-import * as C from '@/libs/commons/constants'
-import { log } from '@/libs/commons/log'
+import { dialogContext } from '@/libs/dialog';
+import * as C from '@/libs/constants'
+import log from '@/libs/log'
 
 const ctx = reactive({
   modal: {

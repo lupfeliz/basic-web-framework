@@ -48,19 +48,18 @@
   </div>
 </template>
 <script setup lang="ts">
-import * as C from '@/libs/commons/constants'
-import { noerr } from '@/libs/commons/constants'
+import * as C from '@/libs/constants'
 import { inst } from '@/store/commons/basesystem'
-import { log } from '@/libs/commons/log'
-import { values } from '@/libs/commons/values'
-import { apiGet, apiPost } from '@/libs/commons/api'
+import log from '@/libs/log'
+import { values } from '@/libs/values'
+import { apiGet, apiPost } from '@/libs/api'
 
-import Button from '@/components/commons/button.vue'
-import Input from '@/components/commons/input.vue'
-import Form from '@/components/commons/form.vue'
+import Button from '@/components/button.vue'
+import Input from '@/components/input.vue'
+import Form from '@/components/form.vue'
 
 import { useUserInfo } from '@/store/commons/userinfo'
-import { dialog } from '@/libs/commons/dialog'
+import { dialog } from '@/libs/dialog'
 
 const self = inst(getCurrentInstance())
 const pageTitle = '로그인'
@@ -83,7 +82,7 @@ const login = async () => {
     const res = await apiPost({
       act: 'lgn/lgn01001',
       data: data
-    }, { noerr })
+    }, { noerr: true })
     if (res?.status === C.SC_OK) {
       ustore.userId = userInfo.value.userId
       ustore.userNm = res.data.userNm

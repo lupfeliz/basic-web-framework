@@ -103,16 +103,16 @@
   </div>
 </template>
 <script setup lang="ts">
-import * as C from '@/libs/commons/constants'
+import * as C from '@/libs/constants'
 import { inst } from '@/store/commons/basesystem'
-import { log } from '@/libs/commons/log'
-import { values } from '@/libs/commons/values'
-import { apiGet, apiPut } from '@/libs/commons/api'
-import { dialog } from '@/libs/commons/dialog'
+import log from '@/libs/log'
+import { values } from '@/libs/values'
+import { apiGet, apiPut } from '@/libs/api'
+import { dialog } from '@/libs/dialog'
 
-import Button from '@/components/commons/button.vue'
-import Input from '@/components/commons/input.vue'
-import Form from '@/components/commons/form.vue'
+import Button from '@/components/button.vue'
+import Input from '@/components/input.vue'
+import Form from '@/components/form.vue'
 
 const self = inst(getCurrentInstance())
 

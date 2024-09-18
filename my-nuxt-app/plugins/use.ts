@@ -1,5 +1,5 @@
-import * as C from '@/libs/commons/constants'
-import { log } from '@/libs/commons/log'
+import * as C from '@/libs/constants'
+import log from '@/libs/log'
 import { useBaseSystem, mixin, ComponentType  } from '@/store/commons/basesystem'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'

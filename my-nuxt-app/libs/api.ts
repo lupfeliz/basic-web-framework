@@ -1,7 +1,6 @@
-import { nodim } from './constants';
-import { log } from '@/libs/commons/log'
-import * as C from '@/libs/commons/constants'
-import { dialog } from '@/libs/commons/dialog'
+import log from '@/libs/log'
+import * as C from '@/libs/constants'
+import { dialog } from '@/libs/dialog'
 import axios, { AxiosRequestConfig } from 'axios'
 
 const API_PREFIX = '/api/'
@@ -10,7 +9,7 @@ const API_BASE = ''
 const headers = JSON.parse(`{ "${C.CONTENT_TYPE}": "${C.CTYPE_JSON}; ${C.CHARSET}=${C.UTF8}" }`)
 const dconf = {
   headers,
-  responseType: C.JSONV,
+  responseType: 'json',
   responseEncoding: C.UTF8,
   timeout: C.REQUEST_TIMEOUT,
   maxRedirects: 0
@@ -48,7 +47,7 @@ const errproc = async (e: any, opt: any) => {
 }
 
 const postproc = async (opt?: any) => {
-  if (!opt?.nodim) {
+  if (!opt?.noprogress) {
     dialog.overlay(true)
   }
 }
@@ -57,7 +56,7 @@ const afterproc = async (opt?: any) => {
     const { useUserInfo } = await import('@/store/commons/userinfo')
     useUserInfo().expandTimeout()
   } catch (ignore) { }
-  if (!opt?.nodim) {
+  if (!opt?.noprogress) {
     dialog.overlay(false)
   }
 }

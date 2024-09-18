@@ -62,13 +62,13 @@
 </template>
 <script setup lang="ts">
 
-import * as C from '@/libs/commons/constants'
-import { log } from '@/libs/commons/log'
-import { values } from '@/libs/commons/values'
+import * as C from '@/libs/constants'
+import log from '@/libs/log'
+import { values } from '@/libs/values'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
-import Button from '@/components/commons/button.vue'
+import Button from '@/components/button.vue'
 import { over } from 'lodash'
-import { dialog } from '@/libs/commons/dialog'
+import { dialog } from '@/libs/dialog'
 
 const M_SHOWN = 'shown.bs.modal'
 const M_HIDDEN = 'hidden.bs.modal'

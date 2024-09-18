@@ -106,16 +106,16 @@
 </template>
 <script setup lang="ts">
 
-import * as C from '@/libs/commons/constants'
-import { log } from '@/libs/commons/log'
+import * as C from '@/libs/constants'
+import log from '@/libs/log'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
-import { apiPost } from '@/libs/commons/api'
-import { $f } from '@/libs/commons/format'
-import { values } from '@/libs/commons/values'
-import { Paging } from '@/libs/commons/paging'
+import { apiPost } from '@/libs/api'
+import { $f } from '@/libs/format'
+import { values } from '@/libs/values'
+import { Paging } from '@/libs/paging'
 
-import Button from '@/components/commons/button.vue'
-import { dialog } from '@/libs/commons/dialog'
+import Button from '@/components/button.vue'
+import { dialog } from '@/libs/dialog'
 
 const self = inst(getCurrentInstance())
 const pageTitle = '게시판'
