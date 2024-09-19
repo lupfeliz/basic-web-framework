@@ -28,15 +28,27 @@ export default definePage(() => {
       <Main />
       <Content html={`
         <script>
-        var body = document.body
+        var body = document.body;
         function fnunload() {
-          window.removeEventListener('beforeunload', fnunload)
-          body.classList.add('hide-onload')
+          window.removeEventListener('beforeunload', fnunload);
+          body.classList.add('hide-onload');
         }
+        /** CSS가 적재될때 까지 대기 (깨짐방지) */
         function fnload() {
-          window.addEventListener('beforeunload', fnunload)
-          document.removeEventListener('DOMContentLoaded', fnload)
-          body.classList.remove('hide-onload')
+          var o = false;
+          for (var inx = document.styleSheets.length; inx >= 0; inx--) {
+            if ((o = document.styleSheets[inx]) && (o = o.rules) && (o = o[0]) && String(o.selectorText).startsWith('html#my-first-app')) {
+              o = true;
+              break;
+            }
+          }
+          if (o === true) {
+            window.addEventListener('beforeunload', fnunload)
+            document.removeEventListener('DOMContentLoaded', fnload)
+            body.classList.remove('hide-onload')
+          } else {
+            setTimeout(fnload, 50);
+          }
         }
         fnload()
         </script>
