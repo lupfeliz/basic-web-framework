@@ -20,6 +20,7 @@ export default defineNuxtConfig({
       },
     },
   },
+  srcDir: 'src',
   runtimeConfig: {
     proxy: {
       options: {
@@ -34,8 +35,8 @@ export default defineNuxtConfig({
     output: { publicDir: distdir }
   },
   css: [
-    '@/assets/css/globals.scss',
     'bootstrap/dist/css/bootstrap.css',
+    '@/assets/css/globals.scss',
   ],
   pinia: {
     autoImports: [
