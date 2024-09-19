@@ -37,5 +37,8 @@
     "sass": "^1.64.2",
     "vee-validate": "^4.11.1",
     "vue": "^3.3.4"
+  },
+  "dependencies": {
+    "nuxt-proxy": "^0.4.1"
   }
 }

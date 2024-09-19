@@ -11,23 +11,24 @@ if (!fs.existsSync(distdir)) { fs.mkdirSync(distdir) }
 export default defineNuxtConfig({
   devtools: { enabled: true },
   components: false,
-  modules: ['@pinia/nuxt'],
+  modules: ['@pinia/nuxt', 'nuxt-proxy'],
   vite: {
     server: {
       hmr: {
         path: '/hmr',
         clientPort: Number(String(process.env['VITE_HMR_CLIENT_PORT'] || '24678'))
       },
-      proxy: {
-        '^/api/.*': {
-          target: 'http://localhost:8080',
-          changeOrigin: true,
-          // rewrite: (path) => {
-          //   return path.replace(/^\/api\//g, '/');
-          // }
-        }
-      }
     },
+  },
+  runtimeConfig: {
+    proxy: {
+      options: {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        pathRewrite: { '^/api': '/api' },
+        pathFilter: ['/api',]
+      }
+    }
   },
   nitro: {
     output: { publicDir: distdir }
