@@ -3,7 +3,11 @@
     <main>
       <div class="container">
         <Header />
-        <slot/>
+        <router-view v-slot="{ Component }">
+          <transition name="slide-fade">
+            <component :is="Component" />
+          </transition>
+        </router-view>
         <Footer />
       </div>
     </main>

@@ -95,3 +95,17 @@ span.err-msg {
     transform: none !important;
   }
 }
+
+.slide-fade-enter-active {
+  transition: all 0.25s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.25s ease-out;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(5%);
+  opacity: 0;
+}
