@@ -9,7 +9,7 @@ const ctx = reactive({
     current: {} as any,
     queue: [] as any[]
   },
-  overlay: {
+  progress: {
     element: {} as any as Element,
     instance: {} as any,
     current: {} as any,
@@ -32,9 +32,9 @@ const dialog = {
       resolve
     })
   }),
-  overlay: (vis?: boolean, timeout?: number) => new Promise<void>((resolve) => {
+  progress: (vis?: boolean, timeout?: number) => new Promise<void>((resolve) => {
     if (vis === undefined) { vis = true }
-    ctx.overlay.queue.push({
+    ctx.progress.queue.push({
       vis: vis,
       timeout: timeout,
       resolve
@@ -42,4 +42,5 @@ const dialog = {
   }),
 }
 
-export { dialog, ctx as dialogContext }
+export default dialog
+export { ctx as dialogContext }

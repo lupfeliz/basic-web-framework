@@ -23,22 +23,20 @@
     "@types/node": "^18.17.1",
     "@vee-validate/rules": "^4.11.1",
     "autoprefixer": "^10.4.14",
-    "axios": "^1.7.7",
     "bootstrap": "^5.3.1",
     "crypto-js": "^4.1.1",
     "jquery": "^3.7.0",
     "jquery-ui": "^1.13.2",
+    "jsencrypt": "^3.3.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "nuxt": "^3.6.5",
+    "nuxt-proxy": "^0.4.1",
     "pinia": "^2.1.6",
     "pinia-plugin-persistedstate": "^3.2.0",
     "postcss": "^8.4.27",
     "sass": "^1.64.2",
     "vee-validate": "^4.11.1",
     "vue": "^3.3.4"
-  },
-  "dependencies": {
-    "nuxt-proxy": "^0.4.1"
   }
 }

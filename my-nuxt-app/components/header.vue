@@ -50,10 +50,10 @@ import Button from '@/components/button.vue'
 
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
-import { apiPost } from '@/libs/api'
+import api from '@/libs/api'
 import { useBaseSystem, inst, ComponentType } from '@/store/commons/basesystem'
 import { useUserInfo } from '@/store/commons/userinfo'
-import { dialog } from '@/libs/dialog'
+import dialog from '@/libs/dialog'
 
 const self = inst(getCurrentInstance())
 
@@ -91,13 +91,11 @@ const titleChanged = (title: any) => {
 }
 
 const logout = async () => {
-  const res = await apiPost({
-    act: 'user/logout',
-  })
-  log.debug('RES:', res)
-  if (res?.status === C.SC_OK) {
-    ustore.clear()
-  }
+  // const res = await api.post('usr/logout', { })
+  // log.debug('RES:', res)
+  // if (res?.status === C.SC_OK) {
+  //   ustore.clear()
+  // }
   await dialog.alert('로그아웃 되었습니다')
 }
 

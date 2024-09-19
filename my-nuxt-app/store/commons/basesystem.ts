@@ -51,7 +51,7 @@ const mixin  = {
       }
     },
     getParameter(key?: string) {
-      const route = useRoute()
+      const route = useRouter().currentRoute.value
       if (key) {
         return route.params[key]
       } else {

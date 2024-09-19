@@ -17,7 +17,7 @@
 
   <Button
     class="btn-secondary mx-1"
-    @click="dialog.overlay(true, 2000)"
+    @click="dialog.progress(true, 2000)"
     >
     테스트(OVERLAY)
   </Button>
@@ -25,7 +25,7 @@
 </template>
 <script setup lang="ts">
 import Button from '@/components/button.vue'
-import { dialog } from '@/libs/dialog'
+import dialog from '@/libs/dialog'
 import log from '@/libs/log'
 import { inst } from '@/store/commons/basesystem'
 

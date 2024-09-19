@@ -41,8 +41,8 @@
     </div>
   </div>
   <div
-    ref="overlay"
-    class="modal fade no-tran com-overlay"
+    ref="progress"
+    class="modal fade no-tran com-progress"
     data-bs-backdrop="static"
     data-bs-keyboard="false"
     tabindex="-1"
@@ -64,11 +64,10 @@
 
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
-import { values } from '@/libs/values'
+import values from '@/libs/values'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
 import Button from '@/components/button.vue'
-import { over } from 'lodash'
-import { dialog } from '@/libs/dialog'
+import dialog from '@/libs/dialog'
 
 const M_SHOWN = 'shown.bs.modal'
 const M_HIDDEN = 'hidden.bs.modal'
@@ -78,13 +77,13 @@ const sys = useBaseSystem()
 const ctx = sys.dialogContext
 
 const modal = ref()
-const overlay = ref()
+const progress = ref()
 
 watch(() => sys.dialogContext.modal.queue.length, (n, o) => {
   if (o == 0 && n > 0) { doModal() }
 })
 
-watch(() => sys.dialogContext.overlay.queue.length, (n, o) => {
+watch(() => sys.dialogContext.progress.queue.length, (n, o) => {
   if (o == 0 && n > 0) { doOverlay() }
 })
 
@@ -92,26 +91,26 @@ onBeforeMount(async () => {
   const bootstrap = await import ('bootstrap')
 
   ctx.modal.element = modal.value
-  ctx.overlay.element = overlay.value
+  ctx.progress.element = progress.value
 
   ctx.modal.instance = new bootstrap.Modal(modal.value)
-  ctx.overlay.instance = new bootstrap.Modal(overlay.value)
+  ctx.progress.instance = new bootstrap.Modal(progress.value)
 
-  overlay.value.addEventListener(M_SHOWN, overlayVisibleHandler)
-  overlay.value.addEventListener(M_HIDDEN, overlayVisibleHandler)
+  progress.value.addEventListener(M_SHOWN, progressVisibleHandler)
+  progress.value.addEventListener(M_HIDDEN, progressVisibleHandler)
   modal.value.addEventListener(M_HIDDEN, doModal)
   doOverlay()
   doModal()
 })
 
 onBeforeUnmount(async () => {
-  overlay.value.removeEventListener(M_SHOWN, overlayVisibleHandler)
-  overlay.value.removeEventListener(M_HIDDEN, overlayVisibleHandler)
+  progress.value.removeEventListener(M_SHOWN, progressVisibleHandler)
+  progress.value.removeEventListener(M_HIDDEN, progressVisibleHandler)
   modal.value.removeEventListener(M_HIDDEN, doModal)
 })
 
-const overlayVisibleHandler = (e: any) => {
-  const current = ctx.overlay.current
+const progressVisibleHandler = (e: any) => {
+  const current = ctx.progress.current
   if (current?.resolve) {
     current.resolve()
     values.clear(current)
@@ -136,27 +135,27 @@ const click = async (cmd: any) => {
 
 const doOverlay = () => {
   nextTick(() => {
-    const overlay = ctx.overlay
-    if (!overlay.instance.show) { return }
-    if (overlay.current.resolve) { return }
-    if (overlay.queue.length > 0) {
-      const item: any = overlay.queue.splice(0, 1)[0]
+    const progress = ctx.progress
+    if (!progress.instance.show) { return }
+    if (progress.current.resolve) { return }
+    if (progress.queue.length > 0) {
+      const item: any = progress.queue.splice(0, 1)[0]
       if (
-        (overlay.current.state == M_SHOWN && item.vis) ||
-        (overlay.current.state == M_HIDDEN && !item.vis)) {
+        (progress.current.state == M_SHOWN && item.vis) ||
+        (progress.current.state == M_HIDDEN && !item.vis)) {
         nextTick(doOverlay)
         return
       }
-      overlay.current = item
+      progress.current = item
       if (item.vis) {
         if (!isNaN(Number(item.timeout))) {
           setTimeout(() => {
-            dialog.overlay(false)
+            dialog.progress(false)
           }, Number(item.timeout))
         }
-        overlay.instance.show()
+        progress.instance.show()
       } else {
-        overlay.instance.hide()
+        progress.instance.hide()
       }
     }
   })

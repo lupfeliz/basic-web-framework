@@ -109,13 +109,13 @@
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
-import { apiPost } from '@/libs/api'
+import api from '@/libs/api'
 import { $f } from '@/libs/format'
-import { values } from '@/libs/values'
+import values from '@/libs/values'
 import { Paging } from '@/libs/paging'
 
 import Button from '@/components/button.vue'
-import { dialog } from '@/libs/dialog'
+import dialog from '@/libs/dialog'
 
 const self = inst(getCurrentInstance())
 const pageTitle = '게시판'
@@ -139,6 +139,7 @@ watch(() => sys.$state?.popstate, (e: any) => {
 }, { deep: true })
 
 onMounted(async () => {
+  const pagenum = self.getParameter('pagenum')
   let data = {
     currentPage: 1,
     rowCount: 10,
@@ -153,17 +154,11 @@ onMounted(async () => {
 })
 
 const search = async (req: any, save?: boolean) => {
-  const res = await apiPost({
-    act: 'atc/atc01001',
-    data: req
-  })
-  if (res?.status === C.SC_OK) {
-    if (save) { self.saveHist(req) }
-    const data = res.data
-    paging.value = new Paging(data.rows, data.pages, data.cnt)
-    data.totp = Math.ceil(Number(data.cnt) / Number(data.rows))
-    boardData.value = data
-  }
+  const data = await api.post('atc01001', req)
+  if (save) { self.saveHist(req) }
+  paging.value = new Paging(data.rows, data.pages, data.cnt)
+  data.totp = Math.ceil(Number(data.cnt) / Number(data.rows))
+  boardData.value = data
 }
 
 const viewArticle = async (item: any) => {

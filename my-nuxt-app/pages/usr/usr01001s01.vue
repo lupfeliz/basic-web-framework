@@ -106,9 +106,9 @@
 import * as C from '@/libs/constants'
 import { inst } from '@/store/commons/basesystem'
 import log from '@/libs/log'
-import { values } from '@/libs/values'
-import { apiGet, apiPut } from '@/libs/api'
-import { dialog } from '@/libs/dialog'
+import values from '@/libs/values'
+import api from '@/libs/api'
+import dialog from '@/libs/dialog'
 
 import Button from '@/components/button.vue'
 import Input from '@/components/input.vue'
@@ -156,8 +156,8 @@ const user = ref({
 
 const checkId = async () => {
   if (user.value.userId) {
-    const res = await apiGet({ act: `usr/usr01001/${ user.value.userId }` })
-    if (res?.data?.check === true) {
+    const data = await api.get(`usr01001/${user.value.userId}`, {})
+    if (data?.check === true) {
       map.value.dupchk = 2
     } else {
       map.value.dupchk = 1
@@ -171,14 +171,13 @@ const idChanged = async (e: any) => { map.value.dupchk = 0 }
 const doRegister = async () => {
   if (await form.value.validate()) {
     const data = values.clone(user.value)
-    data.passwd = values.enc(data.passwd)
-    const res = await apiPut({ act: 'usr/usr01001', data: data })
-    if (res?.status === C.SC_OK) {
-      if (await dialog.confirm(`"${user.value.userNm}" 님의 가입이 완료되었어요.<br/> 로그인 하시겠어요?`)) {
-        await self.removeHist(1, '/user/login')
-      } else {
-        await self.removeHist(1, '/')
-      }
+    // data.passwd = values.enc(data.passwd)
+    data.passwd = ''
+    const res = await api.put('usr01001', data)
+    if (await dialog.confirm(`"${user.value.userNm}" 님의 가입이 완료되었어요.<br/> 로그인 하시겠어요?`)) {
+      await self.removeHist(1, '/user/login')
+    } else {
+      await self.removeHist(1, '/')
     }
   }
 }

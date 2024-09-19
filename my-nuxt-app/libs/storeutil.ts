@@ -1,6 +1,6 @@
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
-import { values } from '@/libs/values'
+import values from '@/libs/values'
 
 import { PiniaPluginContext } from 'pinia'
 
@@ -34,18 +34,18 @@ const storeutil = {
   crypto: {
     serialize: (obj: any) => {
       let ret = ''
-      try {
-          const str = JSON.stringify(obj)
-          ret = values.enc(str)
-      } catch (ignore) { }
+      // try {
+      //     const str = JSON.stringify(obj)
+      //     ret = values.enc(str)
+      // } catch (ignore) { }
       return ret
     },
     deserialize: (enc: any) => {
       let ret = {}
-      try {
-          const dec = values.dec(enc)
-          ret = JSON.parse(dec)
-      } catch (ignore) { }
+      // try {
+      //     const dec = values.dec(enc)
+      //     ret = JSON.parse(dec)
+      // } catch (ignore) { }
       return ret
     }
   }

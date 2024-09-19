@@ -56,8 +56,8 @@
 import * as C from '@/libs/constants'
 import { inst } from '@/store/commons/basesystem'
 import log from '@/libs/log'
-import { apiGet, apiPut } from '@/libs/api'
-import { dialog } from '@/libs/dialog'
+import api from '@/libs/api'
+import dialog from '@/libs/dialog'
 
 import Button from '@/components/button.vue'
 import Input from '@/components/input.vue'
@@ -80,10 +80,7 @@ const getArticle = async () => {
   const id = Number(self.getParameter('articleId'))
   if (!isNaN(id)) {
     articleId.value = id
-    const res = await apiGet({ act: `atc/atc01001/${id}` })
-    if (res?.status === C.SC_OK) {
-      article.value = res.data
-    }
+    article.value = await api.get(`atc01001/${id}`, {})
   } else {
     articleId.value = undefined
   }
@@ -92,14 +89,9 @@ const getArticle = async () => {
 const putArticle = async () => {
   /** form-validate */
   if (await form.value.validate()) {
-    const res = await apiPut({
-      act: 'atc/atc01001',
-      data: article.value
-    })
+    await api.put('atc01001', article.value)
     /** 업데이트 이후 히스토리 삭제 */
-    if (res?.status === C.SC_OK) {
-      await dialog.alert('업데이트가 완료되었습니다')
-    }
+    await dialog.alert('업데이트가 완료되었습니다')
     await self.removeHist()
   }
 }

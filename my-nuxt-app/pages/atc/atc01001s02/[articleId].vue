@@ -67,11 +67,12 @@
 import * as C from '@/libs/constants'
 import { inst } from '@/store/commons/basesystem'
 import log from '@/libs/log'
-import { apiDel, apiGet } from '@/libs/api'
+import api from '@/libs/api'
+import proc from '@/libs/proc'
 import { $f } from '@/libs/format'
 
 import Button from '@/components/button.vue'
-import { dialog } from '@/libs/dialog'
+import dialog from '@/libs/dialog'
 
 const self = inst(getCurrentInstance())
 
@@ -84,11 +85,9 @@ onMounted(async() => {
 })
 
 const getArticle = async () => {
+  log.debug('GET-ARTICLE...')
   const id = self.getParameter('articleId')
-  const res = await apiGet({ act: `atc/atc01001/${id}` })
-  if (res?.status === C.SC_OK) {
-    data.value = res.data
-  }
+  data.value = await api.get(`atc01001/${id}`, {})
 }
 
 const editArticle = async (id: string) => {
@@ -97,7 +96,7 @@ const editArticle = async (id: string) => {
 
 const deleteArticle = async (id: string) => {
   if (await dialog.confirm(`"${data.value.title || ''}" 게시글을 삭제하시겠습니까?`)) {
-    await apiDel({ act: `atc/atc01001/${id}`})
+    await api.delete(`atc01001/${id}`, {})
     await dialog.alert('삭제가 완료되었습니다')
     await self.removeHist()
   }
