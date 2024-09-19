@@ -37,9 +37,14 @@ export default definePage(() => {
         function fnload() {
           var o = false;
           for (var inx = document.styleSheets.length; inx >= 0; inx--) {
-            if ((o = document.styleSheets[inx]) && (o = o.rules) && (o = o[0]) && String(o.selectorText).startsWith('html#my-first-app')) {
-              o = true;
-              break;
+            if ((o = document.styleSheets[inx]) && (
+              String(o.href).endsWith('/pages/_app.css') || (
+                (o = o.rules) && (o = o[0]) && (String(o.selectorText).startsWith('html#my-first-app'))
+              ))
+            ) {
+              o = true; break;
+            } else {
+              o = false;
             }
           }
           if (o === true) {
