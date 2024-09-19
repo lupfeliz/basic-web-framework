@@ -6,7 +6,7 @@ import * as C from '@/libs/constants'
 import log from '@/libs/log'
 import { useForm } from 'vee-validate'
 import { defineRule } from 'vee-validate'
-import vrules from '@vee-validate/rules'
+import { all as vrules } from '@vee-validate/rules'
 
 const vform = useForm()
 
