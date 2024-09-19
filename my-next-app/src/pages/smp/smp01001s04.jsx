@@ -61,62 +61,102 @@ export default definePage(() => {
     try {
       switch(num) {
       case 0: {
+        const msg = `RSA 암복호화를 테스트중입니다.`
+        vars.msg = msg
         vars.prvk = PRIVATE_KEY
         vars.pubk = PUBLIC_KEY
-        vars.msg = 'RSA 암복호화를 테스트중입니다.'
-        vars.dec = vars.msg
+        vars.dec = ''
         /** 1: 클라PRV암호화 클라PUB복호화 */
-        vars.enc = crypto.rsa.encrypt(vars.dec, vars.prvk)
+        vars.msg = `${msg} ${new Date().getTime()}`
+        vars.dec = ''
+        vars.enctype = vars.encopt[1].value
+        vars.encfrom = vars.prcopt[0].value
+        vars.decfrom = vars.prcopt[0].value
+        vars.enc = crypto.rsa.encrypt(vars.msg, vars.prvk)
         vars.dec = crypto.rsa.decrypt(vars.enc, vars.pubk)
         log.debug('ENC1:',vars.enc, ' / DEC1:',vars.dec)
         update(C.UPDATE_ENTIRE)
         await sleep(1000)
-
         /** 2: 클라PUB암호화 클라PRV복호화 */
-        vars.enc = crypto.rsa.encrypt(vars.dec, vars.pubk)
+        vars.msg = `${msg} ${new Date().getTime()}`
+        vars.dec = ''
+        vars.enctype = vars.encopt[0].value
+        vars.encfrom = vars.prcopt[0].value
+        vars.decfrom = vars.prcopt[0].value
+        vars.enc = crypto.rsa.encrypt(vars.msg, vars.pubk)
         vars.dec = crypto.rsa.decrypt(vars.enc, vars.prvk)
         log.debug('ENC2:', vars.enc, ' / DEC2:', vars.dec)
         update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 3: 서버PRV암호화 서버PUB복호화 */
-        vars.enc = (await api.post(`smp01001`, { typ: 'encprv', msg: vars.dec, key: vars.prvk })).result
+        vars.msg = `${msg} ${new Date().getTime()}`
+        vars.dec = ''
+        vars.enctype = vars.encopt[1].value
+        vars.encfrom = vars.prcopt[1].value
+        vars.decfrom = vars.prcopt[1].value
+        vars.enc = (await api.post(`smp01001`, { typ: 'encprv', msg: vars.msg, key: vars.prvk })).result
         vars.dec = (await api.post(`smp01001`, { typ: 'decpub', msg: vars.enc, key: vars.pubk })).result
         log.debug('ENC3:', vars.enc, ' / DEC3:', vars.dec)
         update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 4: 서버PUB암호화 서버PRV복호화 */
-        vars.enc = (await api.post(`smp01001`, { typ: 'encpub', msg: vars.dec, key: vars.pubk })).result
+        vars.msg = `${msg} ${new Date().getTime()}`
+        vars.dec = ''
+        vars.enctype = vars.encopt[0].value
+        vars.encfrom = vars.prcopt[1].value
+        vars.decfrom = vars.prcopt[1].value
+        vars.enc = (await api.post(`smp01001`, { typ: 'encpub', msg: vars.msg, key: vars.pubk })).result
         vars.dec = (await api.post(`smp01001`, { typ: 'decprv', msg: vars.enc, key: vars.prvk })).result
         log.debug('ENC4:', vars.enc, ' / DEC4:', vars.dec)
         update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 5: 서버PRV암호화 클라PUB복호화 */
-        vars.enc = (await api.post(`smp01001`, { typ: 'encprv', msg: vars.dec, key: vars.prvk })).result
+        vars.msg = `${msg} ${new Date().getTime()}`
+        vars.dec = ''
+        vars.enctype = vars.encopt[1].value
+        vars.encfrom = vars.prcopt[1].value
+        vars.decfrom = vars.prcopt[0].value
+        vars.enc = (await api.post(`smp01001`, { typ: 'encprv', msg: vars.msg, key: vars.prvk })).result
         vars.dec = crypto.rsa.decrypt(vars.enc, vars.pubk)
         log.debug('ENC5:', vars.enc, ' / DEC5:', vars.dec)
         update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 6: 클라PRV암호화 서버PUB복호화 */
-        vars.enc = crypto.rsa.encrypt(vars.dec, vars.prvk)
+        vars.msg = `${msg} ${new Date().getTime()}`
+        vars.dec = ''
+        vars.enctype = vars.encopt[1].value
+        vars.encfrom = vars.prcopt[0].value
+        vars.decfrom = vars.prcopt[1].value
+        vars.enc = crypto.rsa.encrypt(vars.msg, vars.prvk)
         vars.dec = (await api.post(`smp01001`, { typ: 'decpub', msg: vars.enc, key: vars.pubk })).result
         log.debug('ENC6:', vars.enc, ' / DEC6:', vars.dec)
         update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 7: 서버PUB암호화 클라PRV복호화 */
-        vars.enc = (await api.post(`smp01001`, { typ: 'encpub', msg: vars.dec, key: vars.pubk })).result
+        vars.msg = `${msg} ${new Date().getTime()}`
+        vars.dec = ''
+        vars.enctype = vars.encopt[0].value
+        vars.encfrom = vars.prcopt[1].value
+        vars.decfrom = vars.prcopt[0].value
+        vars.enc = (await api.post(`smp01001`, { typ: 'encpub', msg: vars.msg, key: vars.pubk })).result
         vars.dec = crypto.rsa.decrypt(vars.enc, vars.prvk)
         log.debug('ENC7:', vars.enc, ' / DEC7:', vars.dec)
         update(C.UPDATE_ENTIRE)
         await sleep(1000)
 
         /** 8: 클라PUB암호화 서버PRV복호화 */
+        vars.msg = `${msg} ${new Date().getTime()}`
+        vars.dec = ''
+        vars.enctype = vars.encopt[0].value
+        vars.encfrom = vars.prcopt[0].value
+        vars.decfrom = vars.prcopt[1].value
         vars.enc = crypto.rsa.encrypt(vars.dec, vars.pubk)
-        vars.dec = (await api.post(`smp01001`, { typ: 'decprv', msg: vars.enc, key: vars.prvk })).result
+        vars.dec = (await api.post(`smp01001`, { typ: 'decprv', msg: vars.msg, key: vars.prvk })).result
         log.debug('ENC8:', vars.enc, ' / DEC8:', vars.dec)
         update(C.UPDATE_ENTIRE)
         await sleep(1000)
