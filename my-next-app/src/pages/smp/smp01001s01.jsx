@@ -180,6 +180,11 @@ export default definePage((props) => {
             model={ vars?.formdata }
             name='input01'
             size='small'
+            type='number'
+            maxLength={ 10 }
+            minLength={ 2 }
+            minValue={ 10 }
+            maxValue={ 100 }
             />
           <span className='mx-1 my-1'>
           [VALUE: { vars?.formdata?.input01 }]

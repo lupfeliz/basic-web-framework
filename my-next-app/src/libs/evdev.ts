@@ -6,7 +6,14 @@
  * @Site        : https://devlog.ntiple.com
  **/
 
-const KEYCODES = {
+type KeycodeType = typeof _KEYCODES & {
+  [name: string]: number
+}
+type KeyRevcodeType = typeof _KEYCODES & {
+  [name: number]: string
+}
+
+const _KEYCODES = {
   /** 특수문자 키보드 */
   SEMICOLON           : 186,
   EQUAL               : 187,
@@ -23,6 +30,7 @@ const KEYCODES = {
   ESC                 : 27,
   ENTER               : 13,
   DEL                 : 46,
+  INSERT              : 45,
   TAB                 : 9,
   BS                  : 8,
   SPACE               : 32,
@@ -62,6 +70,7 @@ const KEYCODES = {
   KP8                 : 104,
   KP9                 : 105,
 }
+const KEYCODES = _KEYCODES as KeycodeType
 
 const INPUT_TYPES = {
   deleteContentBackward      : 'deleteContentBackward',
@@ -70,20 +79,24 @@ const INPUT_TYPES = {
 
 /** A ~ Z 까지 키코드 */
 for (let inx = 'A'.charCodeAt(0); inx <= 'Z'.charCodeAt(0); inx++) {
-  (KEYCODES as any)[String.fromCharCode(inx)] = inx;
+  KEYCODES[String.fromCharCode(inx)] = inx;
 }
 /** 0 ~ 9 까지 키코드 */
 for (let inx = '0'.charCodeAt(0); inx <= '9'.charCodeAt(0); inx++) {
-  (KEYCODES as any)[String.fromCharCode(inx)] = inx;
+  KEYCODES[String.fromCharCode(inx)] = inx;
 }
 
 /** 키코드 -> 코드명 역색인 */
-const KEYRVCODES = { } as any
-for (const key in KEYCODES) KEYRVCODES[(KEYCODES as any)[key]] = key;
+const KEYRVCODES = {} as KeyRevcodeType
+for (const key in KEYCODES) KEYRVCODES[KEYCODES[key]] = key;
+
+const isEvent = (e: any) => {
+  return e && e.preventDefault && e.stopPropagation
+}
 
 const cancelEvent = (e: any) => {
   e.preventDefault()
   e.stopPropagation()
 }
 
-export { KEYCODES, KEYRVCODES, INPUT_TYPES, cancelEvent };
+export { KEYCODES, KEYRVCODES, INPUT_TYPES, cancelEvent, isEvent }
