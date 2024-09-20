@@ -41,6 +41,7 @@ export const useBaseSystem = defineStore('baseSystem', {
 const mixin  = {
   methods: {
     goPage(uri: string | number, opt?: any) {
+      log.debug('GO-PAGE:', uri)
       switch(typeof uri) {
       case C.STRING:
         navigateTo(String(uri), opt)
@@ -51,7 +52,7 @@ const mixin  = {
       }
     },
     getParameter(key?: string) {
-      const route = useRouter().currentRoute.value
+      const route = useRouter().resolve(location.pathname)
       if (key) {
         return route.params[key]
       } else {
