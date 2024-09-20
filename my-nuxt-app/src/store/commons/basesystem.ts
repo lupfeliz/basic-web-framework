@@ -44,6 +44,7 @@ const mixin  = {
       log.debug('GO-PAGE:', uri)
       switch(typeof uri) {
       case C.STRING:
+        // useRouter().push(String(uri))
         navigateTo(String(uri), opt)
         break
       case C.NUMBER:

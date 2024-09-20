@@ -3,15 +3,15 @@
     <main>
       <div class="container">
         <Header />
-        <router-view v-slot="{ Component }">
-          <transition name="slide-fade">
-            <component :is="Component" />
-          </transition>
-        </router-view>
+        <RouterView v-slot="{ Component, route }">
+          <Transition name="slide-fade">
+            <Component :key="route.fullPath" :is="Component" />
+          </Transition>
+        </RouterView>
         <Footer />
       </div>
     </main>
-    <Dialog></Dialog>
+    <Dialog />
   </template>
 </template>
 <script setup lang="ts">

@@ -60,6 +60,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   components: false,
   modules: ['@pinia/nuxt', 'nuxt-proxy'],
+  // app: { pageTransition: { name: 'page', mode: 'out-in' } },
+  experimental: { viewTransition: true },
   vite: {
     server: {
       hmr: {
