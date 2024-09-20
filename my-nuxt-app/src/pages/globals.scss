@@ -104,8 +104,12 @@ span.err-msg {
   transition: all 0.25s ease-out;
 }
 
-.slide-fade-enter-from,
-.slide-fade-leave-to {
+.slide-fade-enter-from {
   transform: translateX(5%);
+  opacity: 0;
+}
+
+.slide-fade-leave-to {
+  transform: translateX(-5%);
   opacity: 0;
 }
