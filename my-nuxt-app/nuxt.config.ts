@@ -67,20 +67,22 @@ function testPlugin() {
         // if (/^\/src\//.test(path)) {
         //   // log.debug('TRANSFORM:', path)
         // }
-        if (String(id).startsWith(`${dir}/src/`)) {
+        if (String(id).startsWith(`${dir}/src/`) && (
+            String(id).indexOf('/libs/constants.ts') !== -1 ||
+            String(id).indexOf('/libs/app-context.ts') !== -1
+          )) {
           // log.debug('TRANSFORM:', path)
+          return {
+            code: ReplaceLoader(src),
+            map: null,
+          }
         }
       } catch (e) {
         log.debug('E:', e)
       }
-      return {
-        code: src,
-        map: null,
-      }
     },
   }
 }
-
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -88,15 +90,9 @@ export default defineNuxtConfig({
   modules: ['@pinia/nuxt', 'nuxt-proxy'],
   experimental: { viewTransition: true },
   vite: {
+    plugins: [ testPlugin() ],
     build: {
-      rollupOptions: {
-        plugins: [ testPlugin() ],
-        // output: {
-        //   chunkFileNames: "chunk/[hash].js",
-        //   entryFileNames: 'entry/[hash].js',
-        //   assetFileNames: '[ext]/[hash].[ext]'
-        // }
-      }
+      rollupOptions: { }
     },
     server: {
       hmr: {

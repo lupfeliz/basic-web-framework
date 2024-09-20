@@ -78,7 +78,7 @@ const crypto = {
   rsa: {
     init: async (keyval?: string, keytype?: string) => {
       if (!context.rsa.JSEncrypt) {
-        context.rsa.JSEncrypt = (await import('jsencrypt/lib/JSEncrypt')).default
+        context.rsa.JSEncrypt = (await import('jsencrypt/lib/index')).default
         const { parseBigInt, BigInteger } = (await import('jsencrypt/lib/lib/jsbn/jsbn'))
         const { SecureRandom } = (await import('jsencrypt/lib/lib/jsbn/rng'))
         const { b64tohex, hex2b64 } = (await import('jsencrypt/lib/lib/jsbn/base64'))

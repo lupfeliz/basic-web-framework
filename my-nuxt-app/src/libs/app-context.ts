@@ -48,6 +48,8 @@ const { randomStr } = values
 /** 이 부분은 웹팩 플러그인(replace-loader)에 의해 자동으로 채워진다 */
 const encrypted = () => '{$$ENCRYPTED$$}'
 
+// log.debug('ENCRYPTED:', encrypted())
+
 /** 메소드 별도선언시 WEBPACK 난독화에 도움이 된다 */
 const decryptAES = (v: string, k: string) => JSON.parse(cjaes.decrypt(v, k).toString(cjenc.Utf8))
 
