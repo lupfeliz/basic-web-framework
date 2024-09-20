@@ -1,4 +1,4 @@
-<template><Atc01001S04 /></template>
-<script setup lang="ts">
+<script>
 import Atc01001S04 from './[pagenum].vue'
+export default Atc01001S04
 </script>
