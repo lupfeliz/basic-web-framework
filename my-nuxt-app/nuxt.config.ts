@@ -13,12 +13,13 @@ import cryptojs from 'crypto-js'
 import { copyFileSync, readFileSync, existsSync, rmSync } from 'fs'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
+import ReplaceLoader from './env/replace-loader'
 
 const dir = dirname(fileURLToPath(import.meta.url))
 const log = { debug: console.log }
 
 env.config()
-const distdir = path.join(__dirname, 'dist')
+const distdir = path.join(dir, 'dist')
 if (!fs.existsSync(distdir)) { fs.mkdirSync(distdir) }
 /** 커맨드 : npm run dev 했을경우 : dev */
 const cmd = String(process.env.npm_lifecycle_event)
@@ -56,12 +57,47 @@ const apiproxy = [] as any[]
   })
 })
 
+function testPlugin() {
+  return {
+    name: 'transform-file',
+    transform(src: any, id: any) {
+      let path = String(id).substring(dir.length)
+      let o: any
+      try {
+        // if (/^\/src\//.test(path)) {
+        //   // log.debug('TRANSFORM:', path)
+        // }
+        if (String(id).startsWith(`${dir}/src/`)) {
+          // log.debug('TRANSFORM:', path)
+        }
+      } catch (e) {
+        log.debug('E:', e)
+      }
+      return {
+        code: src,
+        map: null,
+      }
+    },
+  }
+}
+
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
   components: false,
   modules: ['@pinia/nuxt', 'nuxt-proxy'],
   experimental: { viewTransition: true },
   vite: {
+    build: {
+      rollupOptions: {
+        plugins: [ testPlugin() ],
+        // output: {
+        //   chunkFileNames: "chunk/[hash].js",
+        //   entryFileNames: 'entry/[hash].js',
+        //   assetFileNames: '[ext]/[hash].[ext]'
+        // }
+      }
+    },
     server: {
       hmr: {
         path: '/hmr',

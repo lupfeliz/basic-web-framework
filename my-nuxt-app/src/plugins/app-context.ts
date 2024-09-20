@@ -9,7 +9,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Function1, Function2, debounce } from 'lodash'
 import { Router } from '#vue-router' 
-import { AES as cjaes, enc as cjenc } from 'crypto-js'
+import CryptoJS from 'crypto-js'
 import * as C from '@/libs/constants'
 import values from '@/libs/values'
 import log, { getLogger } from '@/libs/log'
@@ -41,8 +41,8 @@ type ContextType<T> = {
   [name: string]: T
 }
 
+const { AES: cjaes, enc: cjenc } = CryptoJS
 const { waitmon } = proc
-
 const { randomStr } = values
 
 /** 이 부분은 웹팩 플러그인(replace-loader)에 의해 자동으로 채워진다 */
