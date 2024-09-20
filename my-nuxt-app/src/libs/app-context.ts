@@ -74,9 +74,11 @@ const appvars = {
 const app = {
   /** values, log, getLogger mixin */
   ...values, log, getLogger,
-  setEntrypoint(uri: string) {
-    log.debug('USE-PLUGINS...', location.pathname, history.state)
-    appvars.entrypoint = uri
+  setEntrypoint() {
+    if (!app.isServer()) {
+      log.debug('USE-PLUGINS...', location.pathname, history.state)
+      appvars.entrypoint = location.pathname
+    }
   },
   async onload(props: any) {
     if (appvars.astate == C.APPSTATE_INIT) {
