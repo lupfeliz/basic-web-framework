@@ -101,18 +101,18 @@ const app = {
         log.debug('CONF:', conf)
         const cres = await api.get(`cmn01001`, {})
         await crypto.rsa.init(app.getConfig().security.key.rsa.public, C.PUBLIC_KEY)
-        // const kobj = JSON.parse(crypto.rsa.decrypt(cres?.check || '{}'))
-        // const svrtime = Number(kobj?.t || 0)
-        // /** TODO: 서버시간과 동기화 */
-        // log.debug('SERVER-TIME:', svrtime)
-        // const aeskey = kobj?.k || ''
-        // await crypto.aes.init(aeskey)
-        // /** TODO: 워크 페이지별 다국어 적재 */
+        const kobj = JSON.parse(crypto.rsa.decrypt(cres?.check || '{}'))
+        const svrtime = Number(kobj?.t || 0)
+        /** TODO: 서버시간과 동기화 */
+        log.debug('SERVER-TIME:', svrtime)
+        const aeskey = kobj?.k || ''
+        await crypto.aes.init(aeskey)
+        /** TODO: 워크 페이지별 다국어 적재 */
         // await $t.init(['commons', 'mai'])
         // appvars.astate = C.APPSTATE_ENV
         // const userInfo = userContext.getUserInfo()
         // if (userInfo?.userId && (userInfo.accessToken?.expireTime || 0) > clitime) { userContext.checkExpire() }
-        // appvars.astate = C.APPSTATE_USER
+        appvars.astate = C.APPSTATE_USER
       } catch (e) {
         appvars.astate = C.APPSTATE_ERROR
         log.debug('E:', e)

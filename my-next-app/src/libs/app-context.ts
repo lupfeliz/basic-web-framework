@@ -61,7 +61,6 @@ const ctx: ContextType<LauncherProps<any, any>> = { }
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
 
-
 /** 메소드 별도선언시 WEBPACK 난독화에 도움이 된다 */
 const decryptAES = (v: string, k: string) => JSON.parse(cjaes.decrypt(v, k).toString(cjenc.Utf8))
 
