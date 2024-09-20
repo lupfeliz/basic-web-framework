@@ -1,16 +1,17 @@
 <template>
   <template v-if="(sys?.m?.libinit)">
-    <main>
-      <div class="container">
-        <Header />
-        <RouterView v-slot="{ Component, route }">
-          <Transition name="slide-fade">
-            <Component :key="route.fullPath" :is="Component" />
-          </Transition>
-        </RouterView>
-        <Footer />
-      </div>
-    </main>
+    <Header />
+    <RouterView v-slot="{ Component, route }">
+      <Transition name="slide-fade" mode="out-in">
+        <main
+          class="container"
+          :key="route.fullPath"
+          >
+          <Component :is="Component" />
+        </main>
+      </Transition>
+    </RouterView>
+    <Footer />
     <Dialog />
   </template>
 </template>

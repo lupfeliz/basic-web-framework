@@ -1,4 +1,5 @@
 <template>
+<div class="container">
   <header class="t-5 py-5 center rounded row">
     <div class="text-left col-3">
       <Button
@@ -44,6 +45,7 @@
       </template>
     </div>
   </header>
+</div>
 </template>
 <script setup lang="ts">
 import Button from '@/components/button.vue'
