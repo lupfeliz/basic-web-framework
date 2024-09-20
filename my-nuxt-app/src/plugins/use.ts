@@ -1,8 +1,11 @@
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
+import app from '@/libs/app-context'
 import { useBaseSystem, mixin, ComponentType  } from '@/store/commons/basesystem'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+
+if (typeof window !== 'undefined') { app.setEntrypoint(location.pathname) }
 
 const plugin = defineNuxtPlugin(nuxtApp => {
   const vueApp = nuxtApp.vueApp

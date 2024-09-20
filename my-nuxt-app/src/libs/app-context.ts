@@ -70,23 +70,23 @@ const appvars = {
     // publicRuntimeConfig
   }
 }
-if (typeof window !== 'undefined') {
-  log.debug('USE-PLUGINS...', location.pathname, history.state)
-  appvars.entrypoint = location.pathname
-}
 
 const app = {
   /** values, log, getLogger mixin */
   ...values, log, getLogger,
+  setEntrypoint(uri: string) {
+    log.debug('USE-PLUGINS...', location.pathname, history.state)
+    appvars.entrypoint = uri
+  },
   async onload(props: any) {
     if (appvars.astate == C.APPSTATE_INIT) {
       appvars.astate = C.APPSTATE_START
       try {
-        log.debug('CHECK-URL:', location.pathname, history.state, useRouter().resolve(appvars.entrypoint))
+        // log.debug('CHECK-URL:', location.pathname, history.state, useRouter().resolve(appvars.entrypoint))
         if (appvars.entrypoint != location.pathname) {
           history.replaceState({}, '', appvars.entrypoint)
         }
-        log.debug('CHECK-URL:', location.pathname, history.state, useRouter(), useRoute())
+        // log.debug('CHECK-URL:', location.pathname, history.state, useRouter(), useRoute())
         const api = (await import('@/libs/api')).default
         const crypto = (await import('@/libs/crypto')).default
         // const userContext = (await import('@/libs/user-context')).default

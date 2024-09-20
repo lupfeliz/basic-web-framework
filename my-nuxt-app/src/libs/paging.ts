@@ -1,4 +1,12 @@
-import log from '@/libs/log'
+/**
+ * @File        : paging.ts
+ * @Author      : 정재백
+ * @Since       : 2023-09-08
+ * @Description : 페이징 계산 모듈
+ * @Site        : https://devlog.ntiple.com
+ **/
+
+import log from './log'
 
 const ROWS_DEF = 10
 const PAGES_DEF = 5
