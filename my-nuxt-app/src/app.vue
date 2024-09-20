@@ -7,6 +7,5 @@
 import DefaultLayout from '@/components/layout.vue'
 import log from '@/libs/log'
 if (typeof window !== 'undefined') {
-  log.debug('OK')
 }
 </script>

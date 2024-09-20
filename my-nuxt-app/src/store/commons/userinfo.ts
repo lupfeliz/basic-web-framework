@@ -34,10 +34,15 @@ export const useUserInfo = defineStore('userInfo', {
     }, 300),
   },
   persist: {
-    paths: ['userId', 'userNm', 'expireTime'],
+    pick: ['userId', 'userNm', 'expireTime'],
     serializer: util.crypto,
-    beforeRestore: util.checkExpire,
-    afterRestore() { },
+    beforeHydrate: util.checkExpire,
+    afterHydrate() { },
     debug: false
+    // paths: ['userId', 'userNm', 'expireTime'],
+    // serializer: util.crypto,
+    // beforeRestore: util.checkExpire,
+    // afterRestore() { },
+    // debug: false
   }
 })
