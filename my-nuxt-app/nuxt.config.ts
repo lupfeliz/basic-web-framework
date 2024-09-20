@@ -60,7 +60,6 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   components: false,
   modules: ['@pinia/nuxt', 'nuxt-proxy'],
-  // app: { pageTransition: { name: 'page', mode: 'out-in' } },
   experimental: { viewTransition: true },
   vite: {
     server: {
@@ -72,24 +71,14 @@ export default defineNuxtConfig({
   },
   srcDir: 'src',
   runtimeConfig: {
-    proxy: {
-      // options: [
-      //   {
-      //     target: 'http://localhost:8080',
-      //     changeOrigin: true,
-      //     pathRewrite: { '^/api': '/api' },
-      //     pathFilter: ['/api',]
-      //   }
-      // ]
-      options: apiproxy
-    }
+    proxy: { options: apiproxy }
   },
   nitro: {
     output: { publicDir: distdir }
   },
   css: [
     'bootstrap/dist/css/bootstrap.css',
-    '@/assets/css/globals.scss',
+    '@/pages/globals.scss',
   ],
   pinia: {
     autoImports: [
