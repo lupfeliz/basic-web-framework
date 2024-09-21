@@ -1,3 +1,70 @@
+<script setup lang="ts">
+
+import * as C from '@/libs/constants'
+import log from '@/libs/log'
+import { useBaseSystem, inst } from '@/store/commons/basesystem'
+import api from '@/libs/api'
+import { $f } from '@/libs/format'
+import values from '@/libs/values'
+import { Paging } from '@/libs/paging'
+
+import Button from '@/components/button.vue'
+import dialog from '@/libs/dialog-context'
+
+const self = inst(getCurrentInstance())
+const pageTitle = '게시판'
+const boardData = ref({ list: [] as any[] } as any)
+const { range } = values
+const paging = ref(new Paging())
+const sys = useBaseSystem()
+
+watch(() => sys.$state?.popstate, (e: any) => {
+  let data = {
+    currentPage: 1,
+    rowCount: 10,
+    rowStart: 0,
+    rowTotal: 0,
+    keyword: '',
+    searchType: '',
+    orderType: ''
+  }
+  if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
+  search(data)
+}, { deep: true })
+
+onMounted(async () => {
+  const pagenum = self.getParameter('pagenum')
+  let data = {
+    currentPage: 1,
+    rowCount: 10,
+    rowStart: 0,
+    rowTotal: 0,
+    keyword: '',
+    searchType: '',
+    orderType: ''
+  }
+  if (history?.state?.histdata) { data = JSON.parse(history.state.histdata) }
+  search(data)
+})
+
+const search = async (req: any, save?: boolean) => {
+  const data = await api.post('atc01001', req)
+  if (save) { self.saveHist(req) }
+  paging.value = new Paging(data.rows, data.pages, data.cnt)
+  data.totp = Math.ceil(Number(data.cnt) / Number(data.rows))
+  boardData.value = data
+}
+
+const viewArticle = async (item: any) => {
+  self.goPage(`/atc/atc01001s02/${item?.id}`)
+}
+
+const newArticle = async () => {
+  self.goPage(`/atc/atc01001s03/_`)
+}
+
+defineExpose({ pageTitle })
+</script>
 <template>
   <div class="container board-list">
     <div class="row head">
@@ -104,70 +171,3 @@
     </nav>
   </div>
 </template>
-<script setup lang="ts">
-
-import * as C from '@/libs/constants'
-import log from '@/libs/log'
-import { useBaseSystem, inst } from '@/store/commons/basesystem'
-import api from '@/libs/api'
-import { $f } from '@/libs/format'
-import values from '@/libs/values'
-import { Paging } from '@/libs/paging'
-
-import Button from '@/components/button.vue'
-import dialog from '@/libs/dialog-context'
-
-const self = inst(getCurrentInstance())
-const pageTitle = '게시판'
-const boardData = ref({ list: [] as any[] } as any)
-const { range } = values
-const paging = ref(new Paging())
-const sys = useBaseSystem()
-
-watch(() => sys.$state?.popstate, (e: any) => {
-  let data = {
-    currentPage: 1,
-    rowCount: 10,
-    rowStart: 0,
-    rowTotal: 0,
-    keyword: '',
-    searchType: '',
-    orderType: ''
-  }
-  if (e?.state?.histdata) { data = JSON.parse(e.state.histdata) }
-  search(data)
-}, { deep: true })
-
-onMounted(async () => {
-  const pagenum = self.getParameter('pagenum')
-  let data = {
-    currentPage: 1,
-    rowCount: 10,
-    rowStart: 0,
-    rowTotal: 0,
-    keyword: '',
-    searchType: '',
-    orderType: ''
-  }
-  if (history?.state?.histdata) { data = JSON.parse(history.state.histdata) }
-  search(data)
-})
-
-const search = async (req: any, save?: boolean) => {
-  const data = await api.post('atc01001', req)
-  if (save) { self.saveHist(req) }
-  paging.value = new Paging(data.rows, data.pages, data.cnt)
-  data.totp = Math.ceil(Number(data.cnt) / Number(data.rows))
-  boardData.value = data
-}
-
-const viewArticle = async (item: any) => {
-  self.goPage(`/atc/atc01001s02/${item?.id}`)
-}
-
-const newArticle = async () => {
-  self.goPage(`/atc/atc01001s03/_`)
-}
-
-defineExpose({ pageTitle })
-</script>

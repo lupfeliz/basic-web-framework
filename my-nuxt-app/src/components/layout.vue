@@ -1,20 +1,3 @@
-<template>
-  <template v-if="(sys?.m?.libinit)">
-    <Header />
-    <RouterView v-slot="{ Component, route }">
-      <Transition name="slide-fade" mode="out-in">
-        <main
-          class="container"
-          :key="route.fullPath"
-          >
-          <Component :is="Component" />
-        </main>
-      </Transition>
-    </RouterView>
-    <Footer />
-    <DialogContainer />
-  </template>
-</template>
 <script setup lang="ts">
 import Header from '@/components/header.vue'
 import Footer from '@/components/footer.vue'
@@ -107,3 +90,20 @@ onUnmounted(async () => {
   window.removeEventListener(C.POPSTATE, () => { })
 })
 </script>
+<template>
+  <template v-if="(sys?.m?.libinit)">
+    <Header />
+    <RouterView v-slot="{ Component, route }">
+      <Transition name="slide-fade" mode="out-in">
+        <main
+          class="container"
+          :key="route.fullPath"
+          >
+          <Component :is="Component" />
+        </main>
+      </Transition>
+    </RouterView>
+    <Footer />
+    <DialogContainer />
+  </template>
+</template>

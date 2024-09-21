@@ -1,6 +1,3 @@
-<template>
-  <slot></slot>
-</template>
 <script setup lang="ts">
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
@@ -80,3 +77,6 @@ const addValidRules = (rules: any) => {
 
 defineExpose({ validate, validateField, reset, resetField, addValidRules, _VFORM_: vform })
 </script>
+<template>
+  <slot></slot>
+</template>

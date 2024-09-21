@@ -1,3 +1,44 @@
+<script setup lang="ts">
+import * as C from '@/libs/constants'
+import { inst } from '@/store/commons/basesystem'
+import log from '@/libs/log'
+import api from '@/libs/api'
+import proc from '@/libs/proc'
+import { $f } from '@/libs/format'
+
+import Button from '@/components/button.vue'
+import dialog from '@/libs/dialog-context'
+
+const self = inst(getCurrentInstance())
+
+const pageTitle = ref('상세보기')
+
+const data = ref({} as any)
+
+onMounted(async() => {
+  await getArticle()
+})
+
+const getArticle = async () => {
+  log.debug('GET-ARTICLE...')
+  const id = self.getParameter('articleId')
+  data.value = await api.get(`atc01001/${id}`, {})
+}
+
+const editArticle = async (id: string) => {
+  self.goPage(`/atc/atc01001s03/${id}`)
+}
+
+const deleteArticle = async (id: string) => {
+  if (await dialog.confirm(`"${data.value.title || ''}" 게시글을 삭제하시겠습니까?`)) {
+    await api.delete(`atc01001/${id}`, {})
+    await dialog.alert('삭제가 완료되었습니다')
+    await self.removeHist()
+  }
+}
+
+defineExpose({ pageTitle })
+</script>
 <template>
   <div class="container board-article">
     <div class="row">
@@ -63,44 +104,3 @@
     </div>
   </div>
 </template>
-<script setup lang="ts">
-import * as C from '@/libs/constants'
-import { inst } from '@/store/commons/basesystem'
-import log from '@/libs/log'
-import api from '@/libs/api'
-import proc from '@/libs/proc'
-import { $f } from '@/libs/format'
-
-import Button from '@/components/button.vue'
-import dialog from '@/libs/dialog-context'
-
-const self = inst(getCurrentInstance())
-
-const pageTitle = ref('상세보기')
-
-const data = ref({} as any)
-
-onMounted(async() => {
-  await getArticle()
-})
-
-const getArticle = async () => {
-  log.debug('GET-ARTICLE...')
-  const id = self.getParameter('articleId')
-  data.value = await api.get(`atc01001/${id}`, {})
-}
-
-const editArticle = async (id: string) => {
-  self.goPage(`/atc/atc01001s03/${id}`)
-}
-
-const deleteArticle = async (id: string) => {
-  if (await dialog.confirm(`"${data.value.title || ''}" 게시글을 삭제하시겠습니까?`)) {
-    await api.delete(`atc01001/${id}`, {})
-    await dialog.alert('삭제가 완료되었습니다')
-    await self.removeHist()
-  }
-}
-
-defineExpose({ pageTitle })
-</script>

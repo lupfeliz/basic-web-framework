@@ -1,3 +1,48 @@
+<script setup lang="ts">
+import * as C from '@/libs/constants'
+import { inst } from '@/store/commons/basesystem'
+import log from '@/libs/log'
+import values from '@/libs/values'
+import api from '@/libs/api'
+
+import Button from '@/components/button.vue'
+import Input from '@/components/input.vue'
+import Form from '@/components/form.vue'
+
+import { useUserInfo } from '@/store/commons/userinfo'
+import dialog from '@/libs/dialog-context'
+
+const self = inst(getCurrentInstance())
+const pageTitle = '로그인'
+
+const form = ref()
+
+const userInfo = ref({
+  userId: '',
+  userNm: '',
+  passwd: ''
+})
+
+const ustore = useUserInfo()
+
+const login = async () => {
+  if (await form.value.validate()) {
+    const data = values.clone(userInfo.value)
+    // data.passwd = values.enc(data.passwd)
+    data.passwd = ''
+
+    const res = await api.post('lgn01001', data, { noerr: true })
+    ustore.userId = userInfo.value.userId
+    ustore.userNm = res.userNm
+    ustore.expireTime = new Date().getTime() + C.SESSION_TIMEOUT
+    await dialog.alert('로그인 되었습니다')
+    await self.removeHist()
+    // await dialog.alert('로그인에 실패하였습니다')
+  }
+}
+
+defineExpose({ pageTitle })
+</script>
 <template>
   <div class="container input-form">
     <Form ref="form">
@@ -47,48 +92,3 @@
     </Form>
   </div>
 </template>
-<script setup lang="ts">
-import * as C from '@/libs/constants'
-import { inst } from '@/store/commons/basesystem'
-import log from '@/libs/log'
-import values from '@/libs/values'
-import api from '@/libs/api'
-
-import Button from '@/components/button.vue'
-import Input from '@/components/input.vue'
-import Form from '@/components/form.vue'
-
-import { useUserInfo } from '@/store/commons/userinfo'
-import dialog from '@/libs/dialog-context'
-
-const self = inst(getCurrentInstance())
-const pageTitle = '로그인'
-
-const form = ref()
-
-const userInfo = ref({
-  userId: '',
-  userNm: '',
-  passwd: ''
-})
-
-const ustore = useUserInfo()
-
-const login = async () => {
-  if (await form.value.validate()) {
-    const data = values.clone(userInfo.value)
-    // data.passwd = values.enc(data.passwd)
-    data.passwd = ''
-
-    const res = await api.post('lgn01001', data, { noerr: true })
-    ustore.userId = userInfo.value.userId
-    ustore.userNm = res.userNm
-    ustore.expireTime = new Date().getTime() + C.SESSION_TIMEOUT
-    await dialog.alert('로그인 되었습니다')
-    await self.removeHist()
-    // await dialog.alert('로그인에 실패하였습니다')
-  }
-}
-
-defineExpose({ pageTitle })
-</script>

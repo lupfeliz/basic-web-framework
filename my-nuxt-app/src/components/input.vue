@@ -1,14 +1,3 @@
-<template>
-  <input
-    class="form-control"
-    :name="props.name"
-    :type="props.type"
-    v-bind="attrs"
-    v-model="value"
-    @keyup="emitUpdate"
-    />
-  <span class="err-msg" v-if="vmeta.validated && errorMessage" v-html="errorMessage"></span>
-</template>
 <script setup lang="ts">
 import * as C from '@/libs/constants'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
@@ -41,3 +30,14 @@ const emitUpdate = async (e: any) => {
   emit(C.UPDATE_MODEL_VALUE, value.value)
 }
 </script>
+<template>
+  <input
+    class="form-control"
+    :name="props.name"
+    :type="props.type"
+    v-bind="attrs"
+    v-model="value"
+    @keyup="emitUpdate"
+    />
+  <span class="err-msg" v-if="vmeta.validated && errorMessage" v-html="errorMessage"></span>
+</template>

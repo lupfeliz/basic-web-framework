@@ -14,6 +14,8 @@ import log from './log'
 import crypto from './crypto'
 import values from './values'
 import dialog from './dialog-context'
+import app from './app-context'
+import proc from './proc'
 
 type OptType = {
   method?: String
@@ -178,6 +180,7 @@ const api = {
   /** POST 메소드 처리 */
   async post(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
+      await proc.waitmon(() => app.ready())
       await api.ping(opt)
       const { method, url, body, headers, signal } = await init(C.POST, apicd, data, opt)
       const r = fetch(url, { method, body, headers, signal, keepalive })
@@ -187,6 +190,7 @@ const api = {
   /** GET 메소드 처리 */
   async get(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
+      if (apicd !== 'cmn01001') { await proc.waitmon(() => app.ready()) }
       await api.ping(opt)
       const { method, url, headers, signal } = await init(C.GET, apicd, data, opt)
       const r = fetch(url, { method, headers, signal, keepalive })
@@ -196,6 +200,7 @@ const api = {
   /** PUT 메소드 처리 */
   async put(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
+      await proc.waitmon(() => app.ready())
       await api.ping(opt)
       const { method, url, body, headers, signal } = await init(C.PUT, apicd, data, opt)
       const r = fetch(url, { method, body, headers, signal, keepalive })
@@ -205,6 +210,7 @@ const api = {
   /** DELETE 메소드 처리 */
   async delete(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
+      await proc.waitmon(() => app.ready())
       await api.ping(opt)
       const { method, headers, signal, url } = await init(C.DELETE, apicd, data, opt)
       const r = fetch(url, { method, headers, signal, keepalive })
@@ -214,12 +220,12 @@ const api = {
   /** URL 을 형태에 맞게 조립해 준다 */
   mkuri(apicd: string) {
     const mat: any = apicd && /^([a-z]+)([0-9a-zA-Z]+)([/].*){0,1}$/g.exec(apicd) || {}
-    // if (mat && mat[1]) {
-    //   return `${(app.getConfig()?.api[0] || {})?.base || '/api'}/${mat[1]}/${mat[0]}`
-    // } else {
-    //   return apicd
-    // }
-    return `${'/api'}/${mat[1]}/${mat[0]}`
+    if (mat && mat[1]) {
+      return `${(app.getConfig()?.api[0] || {})?.base || '/api'}/${mat[1]}/${mat[0]}`
+    } else {
+      return apicd
+    }
+    // return `${'/api'}/${mat[1]}/${mat[0]}`
   }
 }
 

@@ -1,12 +1,3 @@
-<template>
-  <editor-content
-    :name="props.name"
-    v-bind="attrs"
-    @keyup="emitUpdate"
-    :editor="editor"
-    />
-  <span class="err-msg" v-if="vmeta.validated && errorMessage" v-html="errorMessage"></span>
-</template>
 <script setup lang="ts">
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
@@ -51,3 +42,12 @@ const emitUpdate = debounce(async (e?: any) => {
   emit(C.UPDATE_MODEL_VALUE, value.value)
 }, 300)
 </script>
+<template>
+  <editor-content
+    :name="props.name"
+    v-bind="attrs"
+    @keyup="emitUpdate"
+    :editor="editor"
+    />
+  <span class="err-msg" v-if="vmeta.validated && errorMessage" v-html="errorMessage"></span>
+</template>

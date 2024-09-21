@@ -1,65 +1,3 @@
-<template>
-  <div
-    ref="modal"
-    class="modal fade no-tran com-dialog"
-    data-bs-backdrop="static"
-    data-bs-keyboard="false"
-    tabindex="-1"
-    aria-labelledby="staticBackdropLabel"
-    aria-hidden="true"
-    >
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-body">
-          <p v-html="ctx.modal.current?.msg"></p>
-          <div class="text-center">
-            <template v-if="ctx.modal.current?.type === C.ALERT">
-              <Button
-                class="btn btn-primary"
-                @click="click(1)"
-                >
-                확인
-              </Button>
-            </template>
-            <template v-if="ctx.modal.current?.type === C.CONFIRM">
-              <Button
-                class="btn btn-primary mx-1"
-                @click="click(1)"
-                >
-                확인
-              </Button>
-              <Button
-                class="btn btn-secondary mx-1"
-                @click="click(2)"
-                >
-                취소
-              </Button>
-            </template>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div
-    ref="progress"
-    class="modal fade no-tran com-progress"
-    data-bs-backdrop="static"
-    data-bs-keyboard="false"
-    tabindex="-1"
-    aria-hidden="true"
-    >
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden"></span>
-        </div>
-        <div>
-          잠시만 기다려 주세요...
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
 <script setup lang="ts">
 
 import * as C from '@/libs/constants'
@@ -173,3 +111,65 @@ const doModal = () => {
   })
 }
 </script>
+<template>
+  <div
+    ref="modal"
+    class="modal fade no-tran com-dialog"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+    >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+          <p v-html="ctx.modal.current?.msg"></p>
+          <div class="text-center">
+            <template v-if="ctx.modal.current?.type === C.ALERT">
+              <Button
+                class="btn btn-primary"
+                @click="click(1)"
+                >
+                확인
+              </Button>
+            </template>
+            <template v-if="ctx.modal.current?.type === C.CONFIRM">
+              <Button
+                class="btn btn-primary mx-1"
+                @click="click(1)"
+                >
+                확인
+              </Button>
+              <Button
+                class="btn btn-secondary mx-1"
+                @click="click(2)"
+                >
+                취소
+              </Button>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    ref="progress"
+    class="modal fade no-tran com-progress"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-hidden="true"
+    >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden"></span>
+        </div>
+        <div>
+          잠시만 기다려 주세요...
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

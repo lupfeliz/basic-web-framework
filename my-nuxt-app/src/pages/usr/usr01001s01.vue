@@ -1,3 +1,85 @@
+<script setup lang="ts">
+import * as C from '@/libs/constants'
+import { inst } from '@/store/commons/basesystem'
+import log from '@/libs/log'
+import values from '@/libs/values'
+import api from '@/libs/api'
+import dialog from '@/libs/dialog-context'
+
+import Button from '@/components/button.vue'
+import Input from '@/components/input.vue'
+import Form from '@/components/form.vue'
+
+const self = inst(getCurrentInstance())
+
+const pageTitle = '회원가입'
+
+const form = ref()
+
+onMounted(async () => {
+})
+
+watch(form, _ => {
+  form.value.addValidRules({
+    passchk: () => {
+      if (user.value.passwd !== map.value.passwdCf) {
+        return '비밀번호가 맞지 않습니다'
+      }
+      return true
+    },
+    dupchk: () => {
+      switch (map.value.dupchk) {
+        case 2: break
+        case 1: return `"${user.value.userId}" 는 중복된 아이디 입니다`
+        case undefined: case 0: default: return '중복확인 버튼을 클릭해 주세요'
+      }
+      return true
+    }
+  })
+})
+
+
+const map = ref({
+  dupchk: 0,
+  passwdCf: ''
+})
+
+const user = ref({
+  userId: '',
+  userNm: '',
+  passwd: ''
+})
+
+const checkId = async () => {
+  if (user.value.userId) {
+    const data = await api.get(`usr01001/${user.value.userId}`, {})
+    if (data?.check === true) {
+      map.value.dupchk = 2
+    } else {
+      map.value.dupchk = 1
+    }
+  }
+  await form.value.validateField('userId')
+}
+
+const idChanged = async (e: any) => { map.value.dupchk = 0 }
+
+const doRegister = async () => {
+  if (await form.value.validate()) {
+    const data = values.clone(user.value)
+    // data.passwd = values.enc(data.passwd)
+    data.passwd = ''
+    const res = await api.put('usr01001', data)
+    if (await dialog.confirm(`"${user.value.userNm}" 님의 가입이 완료되었어요.<br/> 로그인 하시겠어요?`)) {
+      await self.removeHist(1, '/user/login')
+    } else {
+      await self.removeHist(1, '/')
+    }
+  }
+}
+
+defineExpose({ pageTitle })
+</script>
 <template>
   <div class="container input-form">
     <Form ref="form">
@@ -102,85 +184,3 @@
     </Form>
   </div>
 </template>
-<script setup lang="ts">
-import * as C from '@/libs/constants'
-import { inst } from '@/store/commons/basesystem'
-import log from '@/libs/log'
-import values from '@/libs/values'
-import api from '@/libs/api'
-import dialog from '@/libs/dialog-context'
-
-import Button from '@/components/button.vue'
-import Input from '@/components/input.vue'
-import Form from '@/components/form.vue'
-
-const self = inst(getCurrentInstance())
-
-const pageTitle = '회원가입'
-
-const form = ref()
-
-onMounted(async () => {
-})
-
-watch(form, _ => {
-  form.value.addValidRules({
-    passchk: () => {
-      if (user.value.passwd !== map.value.passwdCf) {
-        return '비밀번호가 맞지 않습니다'
-      }
-      return true
-    },
-    dupchk: () => {
-      switch (map.value.dupchk) {
-        case 2: break
-        case 1: return `"${user.value.userId}" 는 중복된 아이디 입니다`
-        case undefined: case 0: default: return '중복확인 버튼을 클릭해 주세요'
-      }
-      return true
-    }
-  })
-})
-
-
-const map = ref({
-  dupchk: 0,
-  passwdCf: ''
-})
-
-const user = ref({
-  userId: '',
-  userNm: '',
-  passwd: ''
-})
-
-const checkId = async () => {
-  if (user.value.userId) {
-    const data = await api.get(`usr01001/${user.value.userId}`, {})
-    if (data?.check === true) {
-      map.value.dupchk = 2
-    } else {
-      map.value.dupchk = 1
-    }
-  }
-  await form.value.validateField('userId')
-}
-
-const idChanged = async (e: any) => { map.value.dupchk = 0 }
-
-const doRegister = async () => {
-  if (await form.value.validate()) {
-    const data = values.clone(user.value)
-    // data.passwd = values.enc(data.passwd)
-    data.passwd = ''
-    const res = await api.put('usr01001', data)
-    if (await dialog.confirm(`"${user.value.userNm}" 님의 가입이 완료되었어요.<br/> 로그인 하시겠어요?`)) {
-      await self.removeHist(1, '/user/login')
-    } else {
-      await self.removeHist(1, '/')
-    }
-  }
-}
-
-defineExpose({ pageTitle })
-</script>
