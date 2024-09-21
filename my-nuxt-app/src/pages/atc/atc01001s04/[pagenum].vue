@@ -115,7 +115,7 @@ import values from '@/libs/values'
 import { Paging } from '@/libs/paging'
 
 import Button from '@/components/button.vue'
-import dialog from '@/libs/dialog'
+import dialog from '@/libs/dialog-context'
 
 const self = inst(getCurrentInstance())
 const pageTitle = '게시판'

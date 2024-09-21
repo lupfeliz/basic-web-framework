@@ -4,7 +4,7 @@ import * as C from '@/libs/constants'
 import log from '@/libs/log'
 import { navigateTo } from 'nuxt/app'
 import bootstrap from 'bootstrap'
-import { dialogContext } from '@/libs/dialog'
+import { dialogContext } from '@/libs/dialog-context'
 
 /** [ 타입 및 인터페이스 정의 */
 const map: any = {} as any

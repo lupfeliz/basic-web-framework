@@ -1,4 +1,4 @@
-import { dialogContext } from '@/libs/dialog';
+import { dialogContext } from '@/libs/dialog-context';
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
 

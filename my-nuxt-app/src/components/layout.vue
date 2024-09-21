@@ -12,13 +12,13 @@
       </Transition>
     </RouterView>
     <Footer />
-    <Dialog />
+    <DialogContainer />
   </template>
 </template>
 <script setup lang="ts">
 import Header from '@/components/header.vue'
 import Footer from '@/components/footer.vue'
-import Dialog from '@/components/dialog.vue'
+import DialogContainer from '@/components/dialog-container.vue'
 import * as C from '@/libs/constants'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
 import log from '@/libs/log'

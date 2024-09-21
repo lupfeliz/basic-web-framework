@@ -72,7 +72,7 @@ import proc from '@/libs/proc'
 import { $f } from '@/libs/format'
 
 import Button from '@/components/button.vue'
-import dialog from '@/libs/dialog'
+import dialog from '@/libs/dialog-context'
 
 const self = inst(getCurrentInstance())
 

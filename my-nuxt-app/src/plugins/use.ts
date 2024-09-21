@@ -1,3 +1,4 @@
+import 'core-js'
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
 import app from '@/libs/app-context'

@@ -67,7 +67,7 @@ import log from '@/libs/log'
 import values from '@/libs/values'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
 import Button from '@/components/button.vue'
-import dialog from '@/libs/dialog'
+import dialog from '@/libs/dialog-context'
 
 const M_SHOWN = 'shown.bs.modal'
 const M_HIDDEN = 'hidden.bs.modal'

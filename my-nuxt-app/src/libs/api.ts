@@ -6,15 +6,14 @@
  * @Site        : https://devlog.ntiple.com
  **/
 
+import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only'
 import * as C from '@/libs/constants'
 import log from './log'
 // import app from './app-context'
 // import userContext from './user-context'
 import crypto from './crypto'
 import values from './values'
-import dialog from './dialog'
-
-// import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only'
+import dialog from './dialog-context'
 
 type OptType = {
   method?: String

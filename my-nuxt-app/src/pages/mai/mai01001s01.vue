@@ -25,7 +25,7 @@
 </template>
 <script setup lang="ts">
 import Button from '@/components/button.vue'
-import dialog from '@/libs/dialog'
+import dialog from '@/libs/dialog-context'
 import log from '@/libs/log'
 import { inst } from '@/store/commons/basesystem'
 

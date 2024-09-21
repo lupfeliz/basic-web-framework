@@ -48,6 +48,7 @@
     "@types/lodash": "^4.14.197",
     "@types/moment": "^2.13.0",
     "@types/node": "^18.17.1",
+    "abortcontroller-polyfill": "^1.7.5",
     "autoprefixer": "^10.4.14",
     "core-js": "^3.38.1",
     "crypto-js": "^4.1.1",

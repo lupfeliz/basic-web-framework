@@ -57,7 +57,7 @@ import * as C from '@/libs/constants'
 import { inst } from '@/store/commons/basesystem'
 import log from '@/libs/log'
 import api from '@/libs/api'
-import dialog from '@/libs/dialog'
+import dialog from '@/libs/dialog-context'
 
 import Button from '@/components/button.vue'
 import Input from '@/components/input.vue'

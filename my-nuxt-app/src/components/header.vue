@@ -55,7 +55,7 @@ import log from '@/libs/log'
 import api from '@/libs/api'
 import { useBaseSystem, inst, ComponentType } from '@/store/commons/basesystem'
 import { useUserInfo } from '@/store/commons/userinfo'
-import dialog from '@/libs/dialog'
+import dialog from '@/libs/dialog-context'
 
 const self = inst(getCurrentInstance())
 

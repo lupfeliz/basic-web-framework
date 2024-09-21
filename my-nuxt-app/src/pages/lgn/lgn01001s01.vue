@@ -59,7 +59,7 @@ import Input from '@/components/input.vue'
 import Form from '@/components/form.vue'
 
 import { useUserInfo } from '@/store/commons/userinfo'
-import dialog from '@/libs/dialog'
+import dialog from '@/libs/dialog-context'
 
 const self = inst(getCurrentInstance())
 const pageTitle = '로그인'

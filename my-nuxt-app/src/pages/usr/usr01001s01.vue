@@ -108,7 +108,7 @@ import { inst } from '@/store/commons/basesystem'
 import log from '@/libs/log'
 import values from '@/libs/values'
 import api from '@/libs/api'
-import dialog from '@/libs/dialog'
+import dialog from '@/libs/dialog-context'
 
 import Button from '@/components/button.vue'
 import Input from '@/components/input.vue'
