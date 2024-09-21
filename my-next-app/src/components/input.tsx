@@ -24,7 +24,7 @@ type InputProps = _TextFieldProps & {
 
 const { copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue } = app
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
-  const pprops = copyExclude(props, ['model', 'onEnter', 'maxLength', 'pattern'])
+  const pprops = copyExclude(props, ['model', 'onEnter', 'minLength', 'maxLength', 'minValue', 'maxValue', 'pattern'])
   const iprops = copyExclude(props?.slotProps?.htmlInput || {}, []) as any
   const elem: any = useRef()
   const self = useSetup({
