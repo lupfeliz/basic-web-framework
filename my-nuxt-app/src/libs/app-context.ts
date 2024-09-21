@@ -69,7 +69,8 @@ const appvars = {
       key: { rsa: { public: '', private: '' } }
     },
     runtime: {} as any
-  }
+  },
+  libs: { } as any
 }
 
 const app = {
@@ -93,13 +94,16 @@ const app = {
         // log.debug('CHECK-URL:', location.pathname, history.state, useRouter(), useRoute())
         const api = (await import('@/libs/api')).default
         const crypto = (await import('@/libs/crypto')).default
+
+        appvars.libs['bootstrap'] = (await import ('bootstrap')).default
+        appvars.astate = C.APPSTATE_LIBS
         // const userContext = (await import('@/libs/user-context')).default
         const conf = decryptAES(encrypted(), C.CRYPTO_KEY)
         const clitime = new Date().getTime()
         app.putAll(appvars.config, conf)
         log.setLevel(conf.log.level)
         log.debug('CONF:', conf)
-        const cres = await api.get(`cmn01001`, {})
+        const cres = await api.get(`cmn01001`, {}, { noprogress: true })
         await crypto.rsa.init(app.getConfig().security.key.rsa.public, C.PUBLIC_KEY)
         const kobj = JSON.parse(crypto.rsa.decrypt(cres?.check || '{}'))
         const svrtime = Number(kobj?.t || 0)
@@ -234,7 +238,7 @@ const app = {
     return uri
   },
   astate: () => appvars.astate,
-  ready: (astate: number = C.APPSTATE_READY) => appvars.astate >= astate,
+  ready: (astate: number = C.APPSTATE_READY) => appvars.astate >= astate ? true : false,
   tstate: (mode: number) => (appvars.astate && appvars.tstate[mode]) || 0,
   getConfig: () => appvars.config,
   isServer: () => typeof window === 'undefined',

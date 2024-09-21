@@ -4,8 +4,9 @@ import Button from '@/components/button.vue'
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
 import api from '@/libs/api'
+import app from '@/libs/app-context'
 import { useBaseSystem, inst, ComponentType } from '@/store/commons/basesystem'
-import { useUserInfo } from '@/store/commons/userinfo'
+import { useUserInfo, type UserInfoType } from '@/store/commons/userinfo'
 import dialog from '@/libs/dialog-context'
 
 const self = inst(getCurrentInstance())
@@ -14,7 +15,7 @@ const pageTitleDef = '샘플프로젝트'
 const pageTitle = ref(pageTitleDef)
 const router = useRouter()
 const sys = useBaseSystem()
-const ustore = useUserInfo()
+const ustore = ref({} as UserInfoType)
 
 watch(() => sys.$state?.pageInstance, (e: any) => {
   onPageMount(e as ComponentType)
@@ -23,6 +24,10 @@ watch(() => sys.$state?.pageInstance, (e: any) => {
 watch(() => sys.$state?.pageInstance?.pageTitle, (e: any) => {
   titleChanged(sys.pageTitle)
 }, { deep: true })
+
+onMounted(async () => {
+  ustore.value = useUserInfo()
+})
 
 const onPageMount = (page: ComponentType) => {
   titleChanged(page?.pageTitle)
@@ -74,7 +79,7 @@ const logout = async () => {
 
     <h1 class="text-center col-6" v-html="pageTitle"></h1>
     <div class="text-right col-3">
-      <template v-if="ustore?.userId">
+      <template v-if="app.ready() && ustore?.userId">
         <Button
           class="btn-secondary mx-1"
           @click="logout()"

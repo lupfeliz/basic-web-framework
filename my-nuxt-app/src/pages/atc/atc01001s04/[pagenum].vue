@@ -10,6 +10,8 @@ import { Paging } from '@/libs/paging'
 
 import Button from '@/components/button.vue'
 import dialog from '@/libs/dialog-context'
+import app from '@/libs/app-context'
+import proc from '@/libs/proc'
 
 const self = inst(getCurrentInstance())
 const pageTitle = '게시판'
@@ -33,6 +35,7 @@ watch(() => sys.$state?.popstate, (e: any) => {
 }, { deep: true })
 
 onMounted(async () => {
+  log.debug('ATC01001S04 INIT..')
   const pagenum = self.getParameter('pagenum')
   let data = {
     currentPage: 1,
@@ -48,7 +51,9 @@ onMounted(async () => {
 })
 
 const search = async (req: any, save?: boolean) => {
+  log.debug('SEARCH-API..', app.astate())
   const data = await api.post('atc01001', req)
+  log.debug('SEARCH-RESULT..', data)
   if (save) { self.saveHist(req) }
   paging.value = new Paging(data.rows, data.pages, data.cnt)
   data.totp = Math.ceil(Number(data.cnt) / Number(data.rows))

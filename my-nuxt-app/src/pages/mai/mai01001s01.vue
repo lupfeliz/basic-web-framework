@@ -16,9 +16,6 @@ defineExpose({ pageTitle })
 </script>
 <template>
 <div class="text-center">
-  <ClientOnly>
-    <div v-html="app.profile()"></div>
-  </ClientOnly>
   <Button
     class="btn-primary mx-1"
     @click="onClickProc"

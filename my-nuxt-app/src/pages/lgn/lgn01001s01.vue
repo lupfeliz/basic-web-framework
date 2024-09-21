@@ -9,7 +9,7 @@ import Button from '@/components/button.vue'
 import Input from '@/components/input.vue'
 import Form from '@/components/form.vue'
 
-import { useUserInfo } from '@/store/commons/userinfo'
+import { useUserInfo, type UserInfoType } from '@/store/commons/userinfo'
 import dialog from '@/libs/dialog-context'
 
 const self = inst(getCurrentInstance())
@@ -23,9 +23,8 @@ const userInfo = ref({
   passwd: ''
 })
 
-const ustore = useUserInfo()
-
 const login = async () => {
+  const ustore = useUserInfo()
   if (await form.value.validate()) {
     const data = values.clone(userInfo.value)
     // data.passwd = values.enc(data.passwd)

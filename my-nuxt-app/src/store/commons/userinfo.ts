@@ -1,20 +1,24 @@
 import { defineStore } from 'pinia'
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
+import values from '@/libs/values'
 import { storeutil as util } from '@/libs/storeutil'
 import lodash from 'lodash'
 
 const { debounce } = lodash
+const { putAll } = values
+
+const schema = {
+  userId: '',
+  userNm: '',
+  passwd: '',
+  expireTime: 0
+}
+
+export type UserInfoType = typeof schema
 
 export const useUserInfo = defineStore('userInfo', {
-  state: () => {
-    return {
-      userId: '',
-      userNm: '',
-      passwd: '',
-      expireTime: 0
-    }
-  },
+  state: () => putAll({}, schema) as typeof schema,
   actions: {
     clear() {
       ((e: any) => {

@@ -73,6 +73,8 @@ const proc = {
         } else if (ctx.__max_check > 0) {
           ctx.__max_check--
           setTimeout(fnexec, ctx.__interval)
+        } else {
+          resolve(false)
         }
       }
       fnexec()

@@ -97,7 +97,7 @@ const mixin  = {
       return undefined
     },
     currentUri() {
-      return history?.state?.current
+      return typeof window !== 'undefined' && history?.state?.current
     }
   }
 }
