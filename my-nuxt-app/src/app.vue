@@ -1,4 +1,7 @@
 <template>
+  <script v-html="`
+    console.log('OK!!!!')
+  `"/>
   <DefaultLayout>
     <NuxtPage />
   </DefaultLayout>
