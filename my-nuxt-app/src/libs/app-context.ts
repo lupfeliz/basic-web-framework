@@ -13,6 +13,7 @@ import * as C from '@/libs/constants'
 import values from '@/libs/values'
 import log, { getLogger } from '@/libs/log'
 import proc from '@/libs/proc'
+import { RuntimeConfig } from 'nuxt/schema'
 
 type UpdateFunction = (mode?: number) => void
 
@@ -67,8 +68,7 @@ const appvars = {
     security: {
       key: { rsa: { public: '', private: '' } }
     },
-    // serverRuntimeConfig,
-    // publicRuntimeConfig
+    runtime: {} as any
   }
 }
 
@@ -85,6 +85,7 @@ const app = {
     if (appvars.astate == C.APPSTATE_INIT) {
       appvars.astate = C.APPSTATE_START
       try {
+        appvars.config.runtime = props.config.public
         // log.debug('CHECK-URL:', location.pathname, history.state, useRouter().resolve(appvars.entrypoint))
         if (appvars.entrypoint != location.pathname) {
           history.replaceState({}, '', appvars.entrypoint)
@@ -108,7 +109,7 @@ const app = {
         await crypto.aes.init(aeskey)
         /** TODO: 워크 페이지별 다국어 적재 */
         // await $t.init(['commons', 'mai'])
-        // appvars.astate = C.APPSTATE_ENV
+        appvars.astate = C.APPSTATE_ENV
         // const userInfo = userContext.getUserInfo()
         // if (userInfo?.userId && (userInfo.accessToken?.expireTime || 0) > clitime) { userContext.checkExpire() }
         appvars.astate = C.APPSTATE_USER
@@ -227,13 +228,13 @@ const app = {
     }
     return ret
   },
-  // profile: () => publicRuntimeConfig.profile,
-  profile: () => appvars.config.app.profile,
+  profile: () => String(appvars.config.runtime.profile),
   basepath(uri: string) {
-    // if (uri.startsWith('/')) { uri = `${(publicRuntimeConfig?.basePath || '').replace(/[\/]+/g, '/')}${uri}` }
+    if (uri.startsWith('/')) { uri = `${String(appvars.config.runtime?.basePath || '').replace(/[\/]+/g, '/')}${uri}` }
     return uri
   },
   astate: () => appvars.astate,
+  ready: (astate: number = C.APPSTATE_READY) => appvars.astate >= astate,
   tstate: (mode: number) => (appvars.astate && appvars.tstate[mode]) || 0,
   getConfig: () => appvars.config,
   isServer: () => typeof window === 'undefined',

@@ -1,6 +1,9 @@
 
 <template>
 <div class="text-center">
+  <ClientOnly>
+    <div v-html="app.profile()"></div>
+  </ClientOnly>
   <Button
     class="btn-primary mx-1"
     @click="onClickProc"
@@ -27,6 +30,7 @@
 import Button from '@/components/button.vue'
 import dialog from '@/libs/dialog-context'
 import log from '@/libs/log'
+import app from '@/libs/app-context'
 import { inst } from '@/store/commons/basesystem'
 
 const self = inst(getCurrentInstance())

@@ -7,10 +7,9 @@
  **/
 import env from 'dotenv'
 import path from 'path'
-import fs from 'fs'
 import yaml from 'js-yaml'
 import cryptojs from 'crypto-js'
-import { copyFileSync, readFileSync, existsSync, rmSync } from 'fs'
+import { copyFileSync, readFileSync, existsSync, rmSync, mkdirSync } from 'fs'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import ReplaceLoader from './env/replace-loader'
@@ -20,7 +19,7 @@ const log = { debug: console.log }
 
 env.config()
 const distdir = path.join(dir, 'dist')
-if (!fs.existsSync(distdir)) { fs.mkdirSync(distdir) }
+if (!existsSync(distdir)) { mkdirSync(distdir) }
 /** 커맨드 : npm run dev 했을경우 : dev */
 const cmd = String(process.env.npm_lifecycle_event)
 /** 개발모드로 실행중인지 여부 */
@@ -57,30 +56,18 @@ const apiproxy = [] as any[]
   })
 })
 
-function testPlugin() {
+const ReplaceLoaderPlugin = () => {
   return {
-    name: 'transform-file',
+    name: 'replace-loader',
     transform(src: any, id: any) {
-      let path = String(id).substring(dir.length)
-      let o: any
       try {
-        // if (/^\/src\//.test(path)) {
-        //   // log.debug('TRANSFORM:', path)
-        // }
-        if (String(id).startsWith(`${dir}/src/`) && (
-            String(id).indexOf('/libs/constants.ts') !== -1 ||
-            String(id).indexOf('/libs/app-context.ts') !== -1
-          )) {
-          // log.debug('TRANSFORM:', path)
-          return {
-            code: ReplaceLoader(src),
-            map: null,
-          }
+        if (id.startsWith(`${dir}/src/`) && (
+            id.indexOf('/libs/constants.ts') !== -1 ||
+            id.indexOf('/libs/app-context.ts') !== -1)) {
+          return { code: ReplaceLoader(src), map: null }
         }
-      } catch (e) {
-        log.debug('E:', e)
-      }
-    },
+      } catch (ignore) { }
+    }
   }
 }
 
@@ -90,7 +77,7 @@ export default defineNuxtConfig({
   modules: ['@pinia/nuxt', 'nuxt-proxy'],
   experimental: { viewTransition: true },
   vite: {
-    plugins: [ testPlugin() ],
+    plugins: [ ReplaceLoaderPlugin() ],
     build: {
       rollupOptions: { }
     },
@@ -103,7 +90,11 @@ export default defineNuxtConfig({
   },
   srcDir: 'src',
   runtimeConfig: {
-    proxy: { options: apiproxy }
+    proxy: { options: apiproxy },
+    public: {
+      profile: PROFILE,
+      basePath: ''
+    }
   },
   nitro: {
     output: { publicDir: distdir }
