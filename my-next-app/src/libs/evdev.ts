@@ -69,6 +69,7 @@ const _KEYCODES = {
   KP7                 : 103,
   KP8                 : 104,
   KP9                 : 105,
+  VKBD                : 229,
 }
 const KEYCODES = _KEYCODES as KeycodeType
 

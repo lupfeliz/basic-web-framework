@@ -10,28 +10,37 @@ import $ from 'jquery'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
 import { KEYCODES, isEvent, cancelEvent } from '@/libs/evdev'
+import { Function1 } from 'lodash'
 
-type InputProps = _TextFieldProps & {
-  model?: any
-  onEnter?: Function
-  maxLength?: number
-  minLength?: number
-  maxValue?: number
-  minValue?: number
-  type?: string
-  pattern?: string
+const InputPropsSchema = {
+  model: {} as any,
+  onEnter: (() => '') as (Function1<any, void> | undefined),
+  onKeyDown: (() => '') as (Function1<any, void> | undefined),
+  onKeyUp: (() => '') as (Function1<any, void> | undefined),
+  onFocus: (() => '') as (Function1<any, void> | undefined),
+  onBlur: (() => '') as (Function1<any, void> | undefined),
+  maxLength: 0 as (number | undefined),
+  minLength: 0 as (number | undefined),
+  maxValue: 0 as (number | undefined),
+  minValue: 0 as (number | undefined),
+  type: '' as (string | undefined),
+  pattern: '' as (string | undefined)
 }
 
-const { copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue } = app
+type InputProps = _TextFieldProps & typeof InputPropsSchema
+
+const { log, copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue } = app
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
-  const pprops = copyExclude(props, ['model', 'onEnter', 'minLength', 'maxLength', 'minValue', 'maxValue', 'pattern'])
+  const pprops = copyExclude(props, Object.keys(InputPropsSchema))
   const iprops = copyExclude(props?.slotProps?.htmlInput || {}, []) as any
   const elem: any = useRef()
+  const equeue = [] as any[]
   const self = useSetup({
     name: 'input',
     props,
     vars: {
-      itype: props.type
+      itype: props.type,
+      avail: true
     },
     async mounted() {
       copyRef(ref, elem)
@@ -46,7 +55,15 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     }
   })
   const { vars, update } = self()
-  if (pprops?.type === 'number') { pprops.type = 'text' }
+  if (props?.type === 'number') {
+    pprops.type = 'text'
+    pprops.pattern = '[0-9]*'
+    pprops.inputMode = 'numeric'
+  } else {
+    pprops.type = props.type
+    pprops.pattern = props.pattern
+    pprops.inputMode = props.inputMode
+  }
 
   const inputVal = (v: any = C.UNDEFINED) => v === C.UNDEFINED ? $(elem?.current).find('input').val() : $(elem?.current).find('input').val(v) && v
 
@@ -67,6 +84,39 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   //   }
   // }
   const onKeyDown = async (e: any) => {
+    // equeue.push(e)
+    // cancelEvent(e)
+    if (vars.avail) {
+      onKeyDownProc(e)
+      if (props?.onKeyDown) { props.onKeyDown(e) }
+    } else {
+      cancelEvent(e)
+    }
+  }
+  const onKeyUp = async (e: any) => {
+    if (vars.avail) {
+      if (props?.onKeyUp) { props.onKeyUp(e) }
+    } else {
+      cancelEvent(e)
+    }
+  }
+  const onFocus = async (e: any) => {
+    if (props?.onFocus) { props.onFocus(e) }
+  }
+  const onBlur = async (e: any) => {
+    const { setValue } = modelValue(self())
+    if (vars?.itype === 'number') {
+      let v = inputVal()
+      const minv = Number(props?.minValue)
+      if (props?.minValue !== C.UNDEFINED && v < minv) { v = minv }
+      setValue(inputVal(v))
+      update(C.UPDATE_FULL)
+    }
+    if (props?.onBlur) { props.onBlur(e) }
+  }
+  const onKeyDownProc = (e: any) => {
+    // const e = equeue.pop()
+    vars.avail = false
     const props = self().props
     const { setValue } = modelValue(self())
     if (props?.onKeyDown instanceof Function) { props.onKeyDown(e) }
@@ -76,6 +126,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     if (isEvent(e)) {
       /** 허용키 : ctrl+c ctrl+v 방향키 bs delete tab enter space */
       if (vars?.itype === 'number') {
+        let v = 0
         switch (kcode) {
         case KEYCODES.ESC:
         case KEYCODES.ENTER:
@@ -92,16 +143,12 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         case KEYCODES.SUPER: { /** NO-OP */ } break
         case C.UNDEFINED: { /** NO-OP */ } break
         case KEYCODES.UP: {
-          let v = Number(inputVal() || 0) - 1
-          const minv = Number(props?.minValue)
-          if (props?.minValue !== C.UNDEFINED && v < minv) { v = minv }
+          v = Number(inputVal() || 0) - 1
           setValue(inputVal(v))
           cancelEvent(e)
         } break
         case KEYCODES.DOWN: {
-          let v = Number(inputVal() || 0) + 1
-          const maxv = Number(props?.maxValue)
-          if (props?.maxValue !== C.UNDEFINED && v > maxv) { v = maxv }
+          v = Number(inputVal() || 0) + 1
           setValue(inputVal(v))
           cancelEvent(e)
         } break
@@ -120,23 +167,36 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           }
         } }
       }
-      if (e?.keyCode === KEYCODES.ENTER && props?.onEnter instanceof Function) { props.onEnter(e) }
+      setTimeout(() => {
+        if (vars?.itype === 'number') {
+          let v = inputVal()
+          const maxv = Number(props?.maxValue)
+          if (props?.maxValue !== C.UNDEFINED && v > maxv) { v = maxv }
+          setValue(inputVal(v))
+        }
+        if (e?.keyCode === KEYCODES.ENTER && props?.onEnter instanceof Function) { props.onEnter(e) }
+        vars.avail = true
+        update(C.UPDATE_FULL)
+      }, 1)
     }
-    // update(C.UPDATE_FULL)
   }
   return (
   <_TextField ref={ elem }
-    onChange={ onChange }
-    onKeyDown={ onKeyDown }
     hiddenLabel
     slotProps={{
       htmlInput: {
         maxLength: props?.maxLength || iprops?.maxLength,
         type: pprops?.type || iprops?.type,
-        pattern: props?.pattern || iprops?.pattern
+        inputMode: pprops?.inputMode || iprops?.inputMode,
+        pattern: pprops?.pattern || iprops?.pattern,
       }
     }}
     { ...pprops }
+    onChange={ onChange }
+    onKeyUp={ onKeyUp }
+    onBlur={ onBlur }
+    onFocus={ onFocus }
+    onKeyDown={ onKeyDown }
     />
   )
 })
