@@ -11,6 +11,7 @@ import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
 import { KEYCODES, isEvent, cancelEvent } from '@/libs/evdev'
 import { Function1 } from 'lodash'
+import { nextTick } from 'process'
 
 const InputPropsSchema = {
   model: {} as any,
@@ -169,7 +170,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           }
         } }
       }
-      setTimeout(() => {
+      nextTick(() => {
         // const sel = document.getSelection()
         // if (Number(sel?.rangeCount) > 0) {
         //   const range = sel?.getRangeAt(0)
@@ -185,16 +186,16 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           let st = Number(el.selectionStart || 1)
           let ed = Number(el.selectionEnd || 0)
           let ch = String(v).substring(st - 1, ed)
-          log.debug('CHAR:', ch)
+          log.debug('CHAR:', `'${ch}'`, kcode)
         }
         if (vars?.itype === 'number') {
         }
         if (e?.keyCode === KEYCODES.ENTER && props?.onEnter instanceof Function) { props.onEnter(e) }
-        setTimeout(() => {
+        nextTick(() => {
           vars.avail = true
           update(C.UPDATE_FULL)
-        }, 1)
-      }, 1)
+        })
+      })
     }
   }
   return (
