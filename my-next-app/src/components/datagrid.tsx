@@ -7,11 +7,12 @@
  **/
 import { AgGridReact, AgGridReactProps, CustomDateProps } from 'ag-grid-react'
 import app from '@/libs/app-context'
+import values from '@/libs/values'
 import * as C from '@/libs/constants'
 import $ from 'jquery'
 
 import { CSSProperties, MutableRefObject } from 'react'
-import { ColDef, ColSpanParams, GridApi, GridReadyEvent, RowSpanParams, CellClassParams, RowDataUpdatedEvent, SortChangedEvent, GridPreDestroyedEvent } from 'ag-grid-community'
+import { ColDef, ColSpanParams, GridApi, GridReadyEvent, RowSpanParams, CellClassParams, RowDataUpdatedEvent, SortChangedEvent, GridPreDestroyedEvent, CellMouseOverEvent } from 'ag-grid-community'
 type DataGridProps = AgGridReactProps & {
   gridClass: string
   gridStyle: CSSProperties
@@ -168,6 +169,9 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     vars.api.setGridOption('columnDefs', vars.columnDefs)
     if (props?.onSortChanged) { props.onSortChanged(e) }
   }
+  const onCellMouseOver = async (e: CellMouseOverEvent) => {
+    log.trace('MOUSE-OVER:', e)
+  }
   return (
   <>
   { ready() && (
@@ -185,6 +189,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
         onGridPreDestroyed={ onGridPreDestroyed }
         onRowDataUpdated={ onRowDataUpdated }
         onSortChanged={ onSortChanged }
+        onCellMouseOver={ onCellMouseOver }
         { ...(pprops as any) }
         />
     </div>

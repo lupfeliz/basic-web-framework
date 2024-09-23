@@ -9,10 +9,11 @@ import _TextField, { TextFieldProps as _TextFieldProps } from '@mui/material/Tex
 import $ from 'jquery'
 import app from '@/libs/app-context'
 import format from '@/libs/format'
+import proc from '@/libs/proc'
+import values from '@/libs/values'
 import * as C from '@/libs/constants'
 import { KEYCODES, isEvent, cancelEvent } from '@/libs/evdev'
 import { Function1 } from 'lodash'
-import { nextTick } from 'process'
 
 const InputPropsSchema = {
   model: {} as any,
@@ -31,10 +32,11 @@ const InputPropsSchema = {
 
 type InputProps = _TextFieldProps & typeof InputPropsSchema
 
+const { merge } = values
 const { log, copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue } = app
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
-  const pprops = copyExclude(props, Object.keys(InputPropsSchema))
-  const iprops = copyExclude(props?.slotProps?.htmlInput || {}, []) as any
+  const pprops = copyExclude(props, merge(Object.keys(InputPropsSchema), []))
+  const iprops = copyExclude(props?.slotProps?.htmlInput || {}, merge([])) as any
   const elem = useRef<any>()
   const equeue = [] as any[]
   const self = useSetup({
@@ -181,22 +183,32 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         //   if (st != -1 && ed != -1) {
         //   }
         // }
+        const el = $(elem.current).find('input')[0]
         {
-          const el = $(elem.current).find('input')[0]
           let v = el.value
           let st = Number(el.selectionStart || 1)
           let ed = Number(el.selectionEnd || 1)
           let ch = String(v).substring(st - 1, ed)
           log.debug('CHAR:', `'${ch}'`, st, ed, kcode, v)
-          inputVal(format.numeric(inputVal()))
-        }
-        if (vars?.itype === 'number') {
+          if (vars?.itype === 'number') {
+            /** FIXME: formatter 테스트 */
+            v = format.numeric(el.value)
+            const l1 = String(el.value).length
+            const l2 = v.length
+            el.value = v
+            await proc.sleep(1)
+            /** TODO 기존에 선택상태였는지 체크, 삭제의 경우, 붙여넣기의 경우 */
+            if (l2 > l1) {
+              st ++;
+              ed ++;
+            }
+            el.selectionStart = st
+            el.selectionEnd = ed
+          }
         }
         if (e?.keyCode === KEYCODES.ENTER && props?.onEnter instanceof Function) { props.onEnter(e) }
-        setTimeout(() => {
-          vars.avail = true
-          update(C.UPDATE_FULL)
-        }, 1)
+        vars.avail = true
+        update(C.UPDATE_FULL)
       }, 1)
     }
   }

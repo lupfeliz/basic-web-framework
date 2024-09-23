@@ -59,7 +59,7 @@ const proc = {
     return ret
   },
 
-  until(check: () => any, opt?: any) {
+  until(check: () => any, opt?: { maxcheck?: number, interval?: number }) {
     if (opt === undefined) { opt = { } }
     const ctx = {
       __max_check: opt.maxcheck || 100,
