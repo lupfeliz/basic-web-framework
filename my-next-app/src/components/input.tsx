@@ -33,7 +33,7 @@ const { log, copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
   const pprops = copyExclude(props, Object.keys(InputPropsSchema))
   const iprops = copyExclude(props?.slotProps?.htmlInput || {}, []) as any
-  const elem: any = useRef()
+  const elem = useRef<any>()
   const equeue = [] as any[]
   const self = useSetup({
     name: 'input',
@@ -108,7 +108,9 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     if (vars?.itype === 'number') {
       let v = inputVal()
       const minv = Number(props?.minValue)
+      const maxv = Number(props?.maxValue)
       if (props?.minValue !== C.UNDEFINED && v < minv) { v = minv }
+      if (props?.maxValue !== C.UNDEFINED && v > maxv) { v = maxv }
       setValue(inputVal(v))
       update(C.UPDATE_FULL)
     }
@@ -158,8 +160,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
             (kcode >= KEYCODES.NK0 && kcode <= KEYCODES.NK9) ) {
             /** NO-OP */
           } else if ((
-            /** Ctrl+C, Ctrl+V 허용 */
-            (kcode == KEYCODES['C'] || kcode == KEYCODES['V']) &&
+            /** Ctrl+C, Ctrl+V, Ctrl+R 허용 */
+            ([KEYCODES['C'], KEYCODES['V'], KEYCODES['R']].indexOf(kcode) !== -1) &&
             e.ctrlKey)) {
             /** NO-OP */
           } else {
@@ -168,15 +170,30 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         } }
       }
       setTimeout(() => {
+        // const sel = document.getSelection()
+        // if (Number(sel?.rangeCount) > 0) {
+        //   const range = sel?.getRangeAt(0)
+        //   const st = range?.startOffset || -1
+        //   const ed = range?.endOffset || -1
+        //   log.debug('CHECK:', sel?.anchorNode, range, st, ed, sel?.anchorOffset)
+        //   if (st != -1 && ed != -1) {
+        //   }
+        // }
+        {
+          const el = $(elem.current).find('input')[0]
+          let v = el.value
+          let st = Number(el.selectionStart || 1)
+          let ed = Number(el.selectionEnd || 0)
+          let ch = String(v).substring(st - 1, ed)
+          log.debug('CHAR:', ch)
+        }
         if (vars?.itype === 'number') {
-          let v = inputVal()
-          const maxv = Number(props?.maxValue)
-          if (props?.maxValue !== C.UNDEFINED && v > maxv) { v = maxv }
-          setValue(inputVal(v))
         }
         if (e?.keyCode === KEYCODES.ENTER && props?.onEnter instanceof Function) { props.onEnter(e) }
-        vars.avail = true
-        update(C.UPDATE_FULL)
+        setTimeout(() => {
+          vars.avail = true
+          update(C.UPDATE_FULL)
+        }, 1)
       }, 1)
     }
   }
