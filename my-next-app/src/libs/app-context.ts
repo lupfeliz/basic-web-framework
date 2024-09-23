@@ -50,7 +50,7 @@ type ContextType<T> = {
   [name: string]: T
 }
 
-const { waitmon } = proc
+const { until } = proc
 
 const { randomStr } = values
 
@@ -104,7 +104,7 @@ const appContextStore = configureStore({ reducer: appContextSlice.reducer })
 const app = {
   /** values, log, getLogger mixin */
   ...values, log, getLogger, useRef,
-  waitmon, $t,
+  until, $t,
   /** 앱 내 유일키 생성 */
   genId() { return `${new Date().getTime()}${String((appvars.uidseq = (appvars.uidseq + 1) % 1000) + 1000).substring(1, 4)}` },
   /**
@@ -149,7 +149,7 @@ const app = {
         if (prm?.mounted) {
           setTimeout(async () => {
             try {
-              await app.waitmon(() => app.astate() >= C.APPSTATE_USER)
+              await app.until(() => app.astate() >= C.APPSTATE_USER, { maxcheck: 1000, interval: 10 })
               const releaser = (v: Function) => (ctx[uid]?.releaselist || []).push(v)
               res = prm?.mounted && prm.mounted({ releaser })
               compoSubscribe(prm, uid, setState)

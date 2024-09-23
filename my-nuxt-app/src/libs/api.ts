@@ -180,7 +180,7 @@ const api = {
   /** POST 메소드 처리 */
   async post(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
-      await proc.waitmon(() => app.ready())
+      await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 })
       await api.ping(opt)
       const { method, url, body, headers, signal } = await init(C.POST, apicd, data, opt)
       const r = fetch(url, { method, body, headers, signal, keepalive })
@@ -190,7 +190,7 @@ const api = {
   /** GET 메소드 처리 */
   async get(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
-      if (apicd !== 'cmn01001') { await proc.waitmon(() => app.ready()) }
+      if (apicd !== 'cmn01001') { await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 }) }
       await api.ping(opt)
       const { method, url, headers, signal } = await init(C.GET, apicd, data, opt)
       const r = fetch(url, { method, headers, signal, keepalive })
@@ -200,7 +200,7 @@ const api = {
   /** PUT 메소드 처리 */
   async put(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
-      await proc.waitmon(() => app.ready())
+      await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 })
       await api.ping(opt)
       const { method, url, body, headers, signal } = await init(C.PUT, apicd, data, opt)
       const r = fetch(url, { method, body, headers, signal, keepalive })
@@ -210,7 +210,7 @@ const api = {
   /** DELETE 메소드 처리 */
   async delete(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
-      await proc.waitmon(() => app.ready())
+      await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 })
       await api.ping(opt)
       const { method, headers, signal, url } = await init(C.DELETE, apicd, data, opt)
       const r = fetch(url, { method, headers, signal, keepalive })

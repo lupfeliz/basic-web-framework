@@ -17,7 +17,7 @@ import lodash from 'lodash'
 
 const { debounce } = lodash
 const { clone } = values
-const { waitmon } = proc
+const { until } = proc
 
 type OptionType = {
   width?: number,
@@ -218,7 +218,7 @@ const dialogContext = {
     if (!resolved) { resolve() }
   }),
   progress: (val?: any, timeout?: number) => new Promise<void>((resolve: Function) => {
-    waitmon(() => {
+    until(() => {
       let ret = false
       let payload: any = { }
       if (val === undefined || val === true) {
@@ -248,7 +248,7 @@ const dialogContext = {
       }
       if (ret) { resolve() }
       return ret
-    })
+    }, { maxcheck: 1000, interval: 10 })
   }),
   winpopup(url: string, data: any, option: OptionType) {
     /** 이전에 열린 팝업들을 제거한다 */

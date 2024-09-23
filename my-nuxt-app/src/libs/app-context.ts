@@ -42,7 +42,7 @@ type ContextType<T> = {
 }
 
 const { AES: cjaes, enc: cjenc } = CryptoJS
-const { waitmon } = proc
+const { until } = proc
 const { randomStr } = values
 
 /** 이 부분은 웹팩 플러그인(replace-loader)에 의해 자동으로 채워진다 */

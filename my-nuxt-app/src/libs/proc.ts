@@ -59,7 +59,7 @@ const proc = {
     return ret
   },
 
-  waitmon(check: () => any, opt?: any) {
+  until(check: () => any, opt?: any) {
     if (opt === undefined) { opt = { } }
     const ctx = {
       __max_check: opt.maxcheck || 100,
@@ -146,7 +146,7 @@ const proc = {
       const map = ctxProc.throttleMap[hash]
       if (!(map?.handle)) {
         /** 이전에 걸린 throttle 이 있다면 대기. */
-        if (!map?.complete) { await proc.waitmon(() => map.complete); }
+        if (!map?.complete) { await proc.until(() => map.complete, { maxcheck:1000, interval: 10 }); }
         map.complete = false
         map.handle = setTimeout(() => { map.handle = undefined }, time)
         try {
@@ -169,7 +169,7 @@ const proc = {
       } else {
         if (failproc && failproc instanceof Function) { failproc(); }
         log.trace('THROTTLE FUNCTION CANCELED WITH HASH:', hash)
-        await proc.waitmon(() => map.complete)
+        await proc.until(() => map.complete, { maxcheck: 1000, interval: 10 })
         if (map.error) {
           reject(map.error)
         } else {

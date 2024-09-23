@@ -8,6 +8,7 @@
 import _TextField, { TextFieldProps as _TextFieldProps } from '@mui/material/TextField'
 import $ from 'jquery'
 import app from '@/libs/app-context'
+import format from '@/libs/format'
 import * as C from '@/libs/constants'
 import { KEYCODES, isEvent, cancelEvent } from '@/libs/evdev'
 import { Function1 } from 'lodash'
@@ -161,8 +162,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
             (kcode >= KEYCODES.NK0 && kcode <= KEYCODES.NK9) ) {
             /** NO-OP */
           } else if ((
-            /** Ctrl+C, Ctrl+V, Ctrl+R 허용 */
-            ([KEYCODES['C'], KEYCODES['V'], KEYCODES['R']].indexOf(kcode) !== -1) &&
+            /** Ctrl+C, Ctrl+V, Ctrl-A, Ctrl+R 허용 */
+            ([KEYCODES['A'], KEYCODES['C'], KEYCODES['V'], KEYCODES['R']].indexOf(kcode) !== -1) &&
             e.ctrlKey)) {
             /** NO-OP */
           } else {
@@ -170,7 +171,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           }
         } }
       }
-      nextTick(() => {
+      setTimeout(async () => {
         // const sel = document.getSelection()
         // if (Number(sel?.rangeCount) > 0) {
         //   const range = sel?.getRangeAt(0)
@@ -184,18 +185,19 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           const el = $(elem.current).find('input')[0]
           let v = el.value
           let st = Number(el.selectionStart || 1)
-          let ed = Number(el.selectionEnd || 0)
+          let ed = Number(el.selectionEnd || 1)
           let ch = String(v).substring(st - 1, ed)
-          log.debug('CHAR:', `'${ch}'`, kcode)
+          log.debug('CHAR:', `'${ch}'`, st, ed, kcode, v)
+          inputVal(format.numeric(inputVal()))
         }
         if (vars?.itype === 'number') {
         }
         if (e?.keyCode === KEYCODES.ENTER && props?.onEnter instanceof Function) { props.onEnter(e) }
-        nextTick(() => {
+        setTimeout(() => {
           vars.avail = true
           update(C.UPDATE_FULL)
-        })
-      })
+        }, 1)
+      }, 1)
     }
   }
   return (

@@ -183,6 +183,7 @@ const format = {
     let minus: boolean = /^[-]/.test(str)
     let dpoint = ''
     // str = str.replace(/^[0.]+/g, '')
+    str = str.replace(/[^0-9.]/g, '')
     if (!str) { str = '' }
     /** 앞자리 0 제거 */
     if (str.length > 1) { str = str.replace(/^[0]+([1-9]+)/g, '$1') }

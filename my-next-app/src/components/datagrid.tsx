@@ -18,7 +18,7 @@ type DataGridProps = AgGridReactProps & {
   ref: MutableRefObject<HTMLDivElement>
 }
 
-const { useSetup, putAll, defineComponent, log, copyExclude, copyRef, useRef, waitmon, getFrom } = app
+const { useSetup, putAll, defineComponent, log, copyExclude, copyRef, useRef, until, getFrom } = app
 
 export default defineComponent((props: DataGridProps, ref: DataGridProps['ref']) => {
   const pprops = copyExclude(props, [
@@ -65,7 +65,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     vars.ctx.phase = phase
     vars.columnDefs = putAll([], props?.columnDefs)
     vars.rowData = putAll([], props?.rowData)
-    await waitmon(() => ready())
+    await until(() => ready())
     switch (phase) {
     case 1: {
       afterSort()
@@ -163,7 +163,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     if (props?.onRowDataUpdated) { props.onRowDataUpdated(e) }
   }
   const onSortChanged = async (e: SortChangedEvent) => {
-    await waitmon(() => vars.api)
+    await until(() => vars.api, { maxcheck: 1000, interval: 10 })
     afterSort()
     vars.api.setGridOption('columnDefs', vars.columnDefs)
     if (props?.onSortChanged) { props.onSortChanged(e) }
