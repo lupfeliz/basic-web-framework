@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation'
 import { NextRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 import { AppProps } from 'next/app'
-import { AES as cjaes, enc as cjenc } from 'crypto-js'
+import CryptoJS from 'crypto-js'
 
 import * as C from '@/libs/constants'
 import values from '@/libs/values'
@@ -49,9 +49,8 @@ type SetupType<V, P> = {
 type ContextType<T> = {
   [name: string]: T
 }
-
+const { AES: cjaes, enc: cjenc } = CryptoJS
 const { until } = proc
-
 const { randomStr } = values
 
 /** 이 부분은 웹팩 플러그인(replace-loader)에 의해 자동으로 채워진다 */
@@ -59,7 +58,7 @@ const encrypted = () => '{$$ENCRYPTED$$}'
 
 const ctx: ContextType<LauncherProps<any, any>> = { }
 
-const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
+const { publicRuntimeConfig: runtime } = getConfig()
 
 /** 메소드 별도선언시 WEBPACK 난독화에 도움이 된다 */
 const decryptAES = (v: string, k: string) => JSON.parse(cjaes.decrypt(v, k).toString(cjenc.Utf8))
@@ -78,8 +77,7 @@ const appvars = {
     security: {
       key: { rsa: { public: '', private: '' } }
     },
-    serverRuntimeConfig,
-    publicRuntimeConfig
+    runtime
   }
 }
 
@@ -282,13 +280,14 @@ const app = {
       try {
         const api = (await import('@/libs/api')).default
         const crypto = (await import('@/libs/crypto')).default
+        appvars.astate = C.APPSTATE_LIBS
         const userContext = (await import('@/libs/user-context')).default
         const conf = decryptAES(encrypted(), C.CRYPTO_KEY)
         const clitime = new Date().getTime()
         app.putAll(appvars.config, conf)
         log.setLevel(conf.log.level)
         log.debug('CONF:', conf)
-        const cres = await api.get(`cmn01001`, {})
+        const cres = await api.get(`cmn01001`, {}, { noprogress: true })
         await crypto.rsa.init(app.getConfig().security.key.rsa.public, C.PUBLIC_KEY)
         const kobj = JSON.parse(crypto.rsa.decrypt(cres?.check || '{}'))
         const svrtime = Number(kobj?.t || 0)
@@ -418,12 +417,13 @@ const app = {
     }
     return ret
   },
-  profile: () => publicRuntimeConfig.profile,
+  profile: () => String(appvars.config.runtime.profile),
   basepath(uri: string) {
-    if (uri.startsWith('/')) { uri = `${(publicRuntimeConfig?.basePath || '').replace(/[\/]+/g, '/')}${uri}` }
+    if (uri.startsWith('/')) { uri = `${String(appvars.config.runtime?.basePath || '').replace(/[\/]+/g, '/')}${uri}` }
     return uri
   },
   astate: () => appvars.astate,
+  ready: (astate: number = C.APPSTATE_READY) => appvars.astate >= astate ? true : false,
   tstate: (mode: number) => (appvars.astate && appvars.tstate[mode]) || 0,
   getConfig: () => appvars.config,
   isServer: () => typeof window === 'undefined',

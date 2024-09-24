@@ -13,7 +13,6 @@ import * as C from '@/libs/constants'
 import values from '@/libs/values'
 import log, { getLogger } from '@/libs/log'
 import proc from '@/libs/proc'
-import { RuntimeConfig } from 'nuxt/schema'
 
 type UpdateFunction = (mode?: number) => void
 
@@ -76,6 +75,9 @@ const appvars = {
 const app = {
   /** values, log, getLogger mixin */
   ...values, log, getLogger,
+  until,
+  /** 앱 내 유일키 생성 */
+  genId() { return `${new Date().getTime()}${String((appvars.uidseq = (appvars.uidseq + 1) % 1000) + 1000).substring(1, 4)}` },
   setEntrypoint() {
     if (!app.isServer()) {
       log.debug('USE-PLUGINS...', location.pathname, history.state)
@@ -124,6 +126,7 @@ const app = {
       appvars.astate = C.APPSTATE_READY
     }
   },
+  /** 입력성 컴포넌트 (input 등)에서 자동으로 값을 입력하도록 수행하는 메소드 */
   modelValue<V, P>(self: SetupType<V, P>) {
     const props = self?.props || {} as any
     const model = props?.model
