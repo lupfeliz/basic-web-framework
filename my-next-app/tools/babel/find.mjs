@@ -8,13 +8,13 @@
 import { readFileSync, readdirSync, statSync, } from 'fs'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
-
+/** 현재 폴더 위치 */
 const dir = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
-
-const FIND = 'ownerState'
-
+/** 찾을 단어 */
+const FIND = (process?.argv?.at && process.argv.at(2)) || ''
+/** 폴더 탐색 한계 */
 const MAX_DEPTH = 10
-
+/** 찾기 함수 */
 const findFiles = (dir, depth = 0) => {
   const list = readdirSync(`${dir}`)
   for (const file of list) {
@@ -33,4 +33,9 @@ const findFiles = (dir, depth = 0) => {
   }
 }
 
-findFiles(`${dir}/node_modules`)
+if (FIND) {
+  /** node_modules 폴더의 내용을 확인한다 */
+  findFiles(`${dir}/node_modules`)
+} else {
+  console.log('USAGE: node find.mjs {word}')
+}

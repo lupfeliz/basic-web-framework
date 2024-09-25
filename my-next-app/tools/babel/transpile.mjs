@@ -12,9 +12,11 @@ import { fileURLToPath } from 'url'
 import md5 from 'md5'
 import babel from '@babel/core'
 
+/** 현재폴더위치 */
 const dir = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
-
+/** 최대 탐색 깊이 */
 const MAX_DEPTH = 10
+/** 작업할 파일목록 */
 const WORKLIST = []
 
 const findFiles = (dir, depth = 0) => {
@@ -26,12 +28,13 @@ const findFiles = (dir, depth = 0) => {
     if (isdir && depth < MAX_DEPTH) {
       if ([ ].indexOf(file) !== -1) { continue }
       findFiles(fpath, depth + 1)
+      /** js, cjs, mjs 파일만 작업목록에 입력 */
     } else if (/(\.js|\.cjs|\.mjs)$/.test(file)) {
       WORKLIST.push(fpath)
     }
   }
 }
-
+/** 소스변환(transpile) */
 const convert = (path) => {
   let doTrans = true
   try {

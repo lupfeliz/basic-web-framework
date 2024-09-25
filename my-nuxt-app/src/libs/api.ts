@@ -5,7 +5,7 @@
  * @Description : api 통신모듈
  * @Site        : https://devlog.ntiple.com
  **/
-
+/** 구형브라우저 지원용 polyfill */
 import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only'
 import * as C from '@/libs/constants'
 import app from './app-context'
@@ -19,6 +19,7 @@ type OptType = {
   apicd?: String
   resolve?: Function
   reject?: Function
+  /** timeout abort 취소용메소드 */
   abortclr: Function
   [name: string]: any
 }
@@ -31,10 +32,11 @@ const init = async (method: string, apicd: string, data?: any, opt?: any) => {
   if (!opt?.noprogress) { await dialog.progress(true) }
   const headers = putAll({}, opt?.headers || {})
   const timeout = opt?.timeout || (getConfig()?.api[0] || {})?.timeout || 10000
+  /** timeout 구현을 위해 AbortController 생성 (구형 브라우저 지원용) */
   const abortctl = new AbortController()
   const signal = abortctl.signal
   const url = api.mkuri(apicd)
-  
+
   let body: any = ''
   if (!headers[C.CONTENT_TYPE]) {
     headers[C.CONTENT_TYPE] = C.CTYPE_JSON
@@ -56,7 +58,9 @@ const init = async (method: string, apicd: string, data?: any, opt?: any) => {
   //   } break
   //   }
   // }
+  /** timeout 시간동안 request 가 처리되지 않으면 abort signal 발생 */
   const hndtimeout = setTimeout(abortctl.abort, timeout)
+  /** 정상처리되어 abort signal 이 발생하지 않도록 clear 한다. */
   const abortclr = () => clearTimeout(hndtimeout)
   return { method, url, body, headers, signal, abortclr }
 }
@@ -67,6 +71,7 @@ const mkres = async (r: Promise<Response>, opt?: OptType) => {
   let t: any = ''
   const resp = await r
   const hdrs = resp?.headers || { get: (v: any) => {} }
+  /** 정상처리 되었으므로 abort signal 취소 */
   opt?.abortclr && opt.abortclr()
   try {
     /** 통신결과 헤더에서 로그인 JWT 토큰이 발견된 경우 토큰저장소에 저장 */
