@@ -6,6 +6,7 @@
  * @Site        : https://devlog.ntiple.com
  **/
 module.exports = function(source) {
+  // console.log('SRCPATH:', this.resourcePath)
   let result = String(source || '')
   let mat
   /** 치환데이터 저장소를 초기화 한다 */
