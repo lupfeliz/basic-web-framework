@@ -431,13 +431,13 @@ const app = {
   asType: <T>(v: any, _: T) => v as T,
   getFrom: (v: any, k: string) => v && v[k],
   px2rem(v: any, el?: any) {
-    v = Number(String(v).replace(/[^0-9^.]+/, ''))
+    v = Number(String(v).replace(/[^0-9^.]+/g, ''))
     if (isNaN(v)) { v = 0 }
     if (!el) { el = document.documentElement }
     return v / parseFloat(getComputedStyle(el).fontSize)
   },
   rem2px(v: any, el?: any) {
-    v = Number(String(v).replace(/[^0-9^.]+/, ''))
+    v = Number(String(v).replace(/[^0-9^.]+/g, ''))
     if (isNaN(v)) { v = 0 }
     if (!el) { el = document.documentElement }
     return v * parseFloat(getComputedStyle(el).fontSize)
