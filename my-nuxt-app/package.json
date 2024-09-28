@@ -40,7 +40,7 @@
     "vue": "^3.5.6"
   },
   "devDependencies": {
-    "@nuxt/devtools": "latest",
+    "@nuxt/devtools": "1.5.1",
     "@types/bootstrap": "^5.2.6",
     "@types/crypto-js": "^4.1.1",
     "@types/jquery": "^3.5.16",
