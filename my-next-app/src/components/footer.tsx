@@ -20,7 +20,8 @@ export default defineComponent(() => {
     vars: {
       hndTouch: C.UNDEFINED,
       elem: useRef({} as HTMLDivElement),
-      isScrolling: false
+      isScrolling: false,
+      forceHide: false
     },
     async mounted({ releaser }) {
       evtlst.map(v => window.addEventListener(v, fncResize))
@@ -36,7 +37,7 @@ export default defineComponent(() => {
       vars.elem?.current && vars.elem.current.removeEventListener('touchstart', fncHide)
     }
   })
-  const { vars } = self()
+  const { vars, update } = self()
   const fncResizePost = debounce(() => {
     const scrollTop = $('html,body').scrollTop() || document.body.scrollTop
     /** footer sticky 기능을 위해 css 변수를 수정한다 */
@@ -67,14 +68,36 @@ export default defineComponent(() => {
     vars.isScrolling = false
   }
   const fncResize = () => {
+    let o = C.UNDEFINED
     vars.elem?.current?.classList?.add('sticky', 'hide')
     fncResizePost()
+    if (!vars.forceHide && (o = document.getSelection()?.anchorNode)) {
+      const inp: HTMLInputElement = $(o).find('> input')[0] as any
+      if (inp) {
+        vars.forceHide = true
+        update(C.UPDATE_SELF)
+        const fncBlur = () => {
+          log.debug('INPUT-BLUR:', inp)
+          vars.forceHide = false
+          inp.removeEventListener('blur', fncBlur)
+          update(C.UPDATE_SELF)
+        }
+        inp.addEventListener('blur', fncBlur)
+        log.debug('INPUT:', inp)
+      }
+    }
   }
   return (
-    <footer ref={ vars.elem }>
-    <Container>
-      FOOTER
-    </Container>
+    <>
+    <footer
+      ref={vars.elem}
+      // className={`${vars?.forceHide ? 'hidden' : ''}`}
+      style={{ display: vars.forceHide ? 'none' : 'block' }}
+      >
+      <Container>
+        FOOTER [{vars?.forceHide ? '1' : '2'}]
+      </Container>
     </footer>
+    </>
   )
 })
