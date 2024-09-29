@@ -90,6 +90,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   const onKeyDown = async (e: any) => {
     // equeue.push(e)
     // cancelEvent(e)
+    // log.debug('ON-KEY-DOWN:', e)
     if (vars.avail) {
       onKeyDownProc(e)
       if (props?.onKeyDown) { props.onKeyDown(e) }
@@ -173,6 +174,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           }
         } }
       }
+      const el = $(elem.current).find('input')[0]
+      let v = el.value
       setTimeout(async () => {
         // const sel = document.getSelection()
         // if (Number(sel?.rangeCount) > 0) {
@@ -183,9 +186,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         //   if (st != -1 && ed != -1) {
         //   }
         // }
-        const el = $(elem.current).find('input')[0]
         {
-          let v = el.value
           let st = Number(el.selectionStart || 1)
           let ed = Number(el.selectionEnd || 1)
           let ch = String(v).substring(st - 1, ed)
@@ -204,12 +205,13 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
             }
             el.selectionStart = st
             el.selectionEnd = ed
+            setValue(inputVal(v))
           }
         }
         if (e?.keyCode === KEYCODES.ENTER && props?.onEnter instanceof Function) { props.onEnter(e) }
-        vars.avail = true
         update(C.UPDATE_FULL)
-      }, 1)
+        vars.avail = true
+      }, 10)
     }
   }
   return (
