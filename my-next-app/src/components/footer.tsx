@@ -72,7 +72,7 @@ export default defineComponent(() => {
     vars.elem?.current?.classList?.add('sticky', 'hide')
     fncResizePost()
     if (!vars.forceHide && (o = document.getSelection()?.anchorNode)) {
-      const inp: HTMLInputElement = $(o).find('> input')[0] as any
+      const inp: HTMLInputElement = o?.nodeName === 'INPUT' ? o : $(o).find('> input')[0] as any
       if (inp) {
         vars.forceHide = true
         update(C.UPDATE_SELF)
@@ -95,7 +95,7 @@ export default defineComponent(() => {
       style={{ display: vars.forceHide ? 'none' : 'block' }}
       >
       <Container>
-        FOOTER [{vars?.forceHide ? '1' : '2'}]
+        FOOTER
       </Container>
     </footer>
     </>
