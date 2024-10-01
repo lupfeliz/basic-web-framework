@@ -5,7 +5,8 @@
  * @Description : 입력 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-import _TextField, { TextFieldProps as _TextFieldProps } from '@mui/material/TextField'
+// import _TextField, { TextFieldProps as _TextFieldProps } from '@mui/material/TextField'
+import { ChangeEvent, ComponentPropsWithRef, KeyboardEvent, FocusEvent } from 'react'
 import $ from 'jquery'
 import app from '@/libs/app-context'
 import format from '@/libs/format'
@@ -17,26 +18,28 @@ import { Function1 } from 'lodash'
 
 const InputPropsSchema = {
   model: {} as any,
-  onEnter: (() => '') as (Function1<any, void> | undefined),
-  onKeyDown: (() => '') as (Function1<any, void> | undefined),
-  onKeyUp: (() => '') as (Function1<any, void> | undefined),
-  onFocus: (() => '') as (Function1<any, void> | undefined),
-  onBlur: (() => '') as (Function1<any, void> | undefined),
-  maxLength: 0 as (number | undefined),
-  minLength: 0 as (number | undefined),
-  maxValue: 0 as (number | undefined),
-  minValue: 0 as (number | undefined),
-  type: '' as (string | undefined),
-  pattern: '' as (string | undefined)
+  onEnter: (() => '') as Function1<any, any>,
+  onChange: (() => '') as Function1<any, any>,
+  onKeyDown: (() => '') as Function1<any, any>,
+  onKeyUp: (() => '') as Function1<any, any>,
+  onFocus: (() => '') as Function1<any, any>,
+  onBlur: (() => '') as Function1<any, any>,
+  maxLength: 0 as number,
+  minLength: 0 as number,
+  maxValue: 0 as number,
+  minValue: 0 as number,
+  type: '' as string,
+  pattern: '' as string
 }
 
-type InputProps = _TextFieldProps & typeof InputPropsSchema
+// type InputProps = _TextFieldProps & typeof InputPropsSchema
+type InputProps = ComponentPropsWithRef<'input'> & Record<string, any> & Partial<typeof InputPropsSchema>
 
 const { merge } = values
 const { log, copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue } = app
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
   const pprops = copyExclude(props, merge(Object.keys(InputPropsSchema), []))
-  const iprops = copyExclude(props?.slotProps?.htmlInput || {}, merge([])) as any
+  // const iprops = copyExclude(props?.slotProps?.htmlInput || {}, merge([])) as any
   const elem = useRef<any>()
   const equeue = [] as any[]
   const self = useSetup({
@@ -58,7 +61,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       }
     }
   })
-  const { vars, update } = self()
+  const { uid, vars, update, ready } = self()
   if (props?.type === 'number') {
     pprops.type = 'text'
     pprops.pattern = '[0-9]*'
@@ -69,10 +72,11 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     pprops.inputMode = props.inputMode
   }
 
-  const inputVal = (v: any = C.UNDEFINED) => v === C.UNDEFINED ? $(elem?.current).find('input').val() : $(elem?.current).find('input').val(v) && v
+  // const inputVal = (v: any = C.UNDEFINED) => v === C.UNDEFINED ? $(elem?.current).find('input').val() : $(elem?.current).find('input').val(v) && v
+  const inputVal = (v: any = C.UNDEFINED) => v === C.UNDEFINED ? $(elem?.current).val() : $(elem?.current).val(v) && v
 
   /** 입력컴포넌트 변경이벤트 처리 */
-  const onChange = async (e: any) => {
+  const onChange = async (e: ChangeEvent) => {
     const { setValue } = modelValue(self())
     /** 변경시 데이터모델에 값전달 */
     setValue(inputVal(), () => update(C.UPDATE_FULL))
@@ -87,10 +91,10 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   //   } break
   //   }
   // }
-  const onKeyDown = async (e: any) => {
+  const onKeyDown = async (e: KeyboardEvent) => {
     // equeue.push(e)
     // cancelEvent(e)
-    // log.debug('ON-KEY-DOWN:', e)
+    log.debug('ON-KEY-DOWN:', e)
     if (vars.avail) {
       onKeyDownProc(e)
       if (props?.onKeyDown) { props.onKeyDown(e) }
@@ -98,17 +102,17 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       cancelEvent(e)
     }
   }
-  const onKeyUp = async (e: any) => {
+  const onKeyUp = async (e: KeyboardEvent) => {
     if (vars.avail) {
       if (props?.onKeyUp) { props.onKeyUp(e) }
     } else {
       cancelEvent(e)
     }
   }
-  const onFocus = async (e: any) => {
+  const onFocus = async (e: FocusEvent) => {
     if (props?.onFocus) { props.onFocus(e) }
   }
-  const onBlur = async (e: any) => {
+  const onBlur = async (e: FocusEvent) => {
     const { setValue } = modelValue(self())
     if (vars?.itype === 'number') {
       let v = inputVal()
@@ -121,12 +125,13 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     }
     if (props?.onBlur) { props.onBlur(e) }
   }
-  const onKeyDownProc = (e: any) => {
+  const onKeyDownProc = (e: KeyboardEvent) => {
     // const e = equeue.pop()
     vars.avail = false
     const props = self().props
     const { setValue } = modelValue(self())
     if (props?.onKeyDown instanceof Function) { props.onKeyDown(e) }
+    const cdnm = e.code
     const kcode = Number(e?.keyCode || 0)
 
     /** 이벤트가 존재하면 */
@@ -162,7 +167,15 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         default: {
           if (
             (kcode >= KEYCODES.KP0 && kcode <= KEYCODES.KP9) ||
-            (kcode >= KEYCODES.NK0 && kcode <= KEYCODES.NK9) ) {
+            (kcode >= KEYCODES.NK0 && kcode <= KEYCODES.NK9) ||
+            ( cdnm === 'Key1' || cdnm === 'Key2' || cdnm === 'Key3' ||
+              cdnm === 'Key4' || cdnm === 'Key5' || cdnm === 'Key6' ||
+              cdnm === 'Key7' || cdnm === 'Key8' || cdnm === 'Key9' ||
+              cdnm === 'Key0') ||
+            ( cdnm === 'Digit1' || cdnm === 'Digit2' || cdnm === 'Digit3' ||
+              cdnm === 'Digit4' || cdnm === 'Digit5' || cdnm === 'Digit6' ||
+              cdnm === 'Digit7' || cdnm === 'Digit8' || cdnm === 'Digit9' ||
+              cdnm === 'Digit0')) {
             /** NO-OP */
           } else if ((
             /** Ctrl+C, Ctrl+V, Ctrl-A, Ctrl+R 허용 */
@@ -174,7 +187,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           }
         } }
       }
-      const el = $(elem.current).find('input')[0]
+      // const el = $(elem.current).find('input')[0]
+      const el = $(elem.current)[0]
       let v = el.value
       setTimeout(async () => {
         // const sel = document.getSelection()
@@ -215,6 +229,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     }
   }
   return (
+  <>
+  {/*
   <_TextField ref={ elem }
     hiddenLabel
     slotProps={{
@@ -231,6 +247,28 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     onBlur={ onBlur }
     onFocus={ onFocus }
     onKeyDown={ onKeyDown }
-    />
+    /> 
+  */}
+  <div
+    // className='form-floating form-floating-outlined'
+    >
+    <input
+      ref={ elem }
+      className='form-control'
+      { ...pprops }
+      id={ ready() ? uid : C.UNDEFINED }
+      maxLength={ props?.maxLength }
+      type={ pprops?.type }
+      inputMode={ pprops.inputMode }
+      pattern={ pprops.pattern }
+      onChange={ onChange }
+      onKeyUp={ onKeyUp }
+      onBlur={ onBlur }
+      onFocus={ onFocus }
+      onKeyDown={ onKeyDown }
+      />
+    {/* <label htmlFor={ uid }></label> */}
+  </div>
+  </>
   )
 })

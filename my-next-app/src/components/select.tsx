@@ -5,8 +5,10 @@
  * @Description : 선택 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-import _Select, { SelectProps as _SelectProps } from '@mui/material/Select'
-import _MenuItem from '@mui/material/MenuItem'
+// import _Select, { SelectProps as _SelectProps } from '@mui/material/Select'
+// import _MenuItem from '@mui/material/MenuItem'
+import { Dropdown , DropdownProps } from 'react-bootstrap'
+
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
 
@@ -17,12 +19,12 @@ type OptionType = {
   selected?: boolean
 }
 /** mui 선택기 타입 상속 */
-type InputProps = _SelectProps & {
+type InputProps = DropdownProps & Record<string, any> & {
   model?: any
   options?: OptionType[]
 }
 
-const { useRef, copyExclude, clear, copyRef, useSetup, defineComponent, modelValue } = app
+const { log, useRef, copyExclude, clear, copyRef, useSetup, defineComponent, modelValue } = app
 
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model', 'options', 'onChange'])
@@ -33,6 +35,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     vars: {
       index: 0,
       value: '',
+      text: '',
       options: [] as OptionType[],
     },
     async mounted() {
@@ -56,33 +59,63 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       vars.options.push({ name: name, value: value, selected: value == mvalue })
     }
     if (mvalue === undefined) { vars.index = 0 }
+    vars.text = vars.options[vars.index].name || ''
   }
 
   const onChange = async (e: any, v: any) => {
+    log.debug('CHANGE..', e?.target, v)
     const { setValue } = modelValue(self())
     let options: OptionType[] = vars.options as any
-    const inx = v?.props?.value || 0
+    // const inx = v?.props?.value || 0
+    const inx = Number(v || 0)
     setValue(options[inx].value, () => update(C.UPDATE_FULL))
     /** 변경시 데이터모델에 값전달 */
-    if (props.onChange) { props.onChange(e as any, v) }
+    if (props.onChange) { props.onChange(e as any) }
   }
+  // return (
+  // <_Select
+  //   ref={ elem }
+  //   onChange={ onChange }
+  //   value={vars?.index || (vars?.options?.length > 0 ? 0 : '')}
+  //   { ...pprops }
+  //   >
+  //   {/* 선택목록 생성*/}
+  //   { vars?.options?.length > 0 && vars.options.map((itm, inx) => (
+  //   <_MenuItem
+  //     key={ inx }
+  //     value={ inx }
+  //     selected={ itm?.selected || false }
+  //     >
+  //     { `${itm?.name}` }
+  //   </_MenuItem>
+  //   ))}
+  // </_Select>
+  // )
   return (
-  <_Select
+  <Dropdown
     ref={ elem }
-    onChange={ onChange }
-    value={vars?.index || (vars?.options?.length > 0 ? 0 : '')}
-    { ...pprops }
+    onSelect={ (v, e) => onChange(e, v) }
     >
-    {/* 선택목록 생성*/}
-    { vars?.options?.length > 0 && vars.options.map((itm, inx) => (
-    <_MenuItem
-      key={ inx }
-      value={ inx }
-      selected={ itm?.selected || false }
+    <Dropdown.Toggle
+      // { ...pprops }
       >
-      { `${itm?.name}` }
-    </_MenuItem>
-    ))}
-  </_Select>
+      { vars.text || props.children }
+    </Dropdown.Toggle>
+    {/* 선택목록 생성*/}
+    <Dropdown.Menu
+      // onClick={ onChange as any }
+      >
+      { vars?.options?.length > 0 && vars.options.map((itm, inx) => (
+      <Dropdown.Item
+        key={ inx }
+        eventKey={ inx }
+        // value={ inx }
+        active={ itm?.selected || false }
+        >
+        { `${itm?.name}` }
+      </Dropdown.Item>
+      ))}
+    </Dropdown.Menu>
+  </Dropdown>
   )
 })

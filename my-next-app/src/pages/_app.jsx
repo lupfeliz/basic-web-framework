@@ -14,7 +14,11 @@ import Head from 'next/head'
 import { AnimatePresence } from 'framer-motion'
 import LayoutDefault from '@/components/layout'
 import DialogContainer from '@/components/dialog-container'
+import { MDCRipple } from '@material/ripple'
 
+import 'bootstrap/dist/css/bootstrap.min.css'
+import '@fortawesome/fontawesome-free/css/all.min.css'
+import '@materialstyle/materialstyle/scss/materialstyle.scss'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 
@@ -28,7 +32,9 @@ log.setLevel(getConfig()?.publicRuntimeConfig?.logLevel || 'debug')
 export default definePage((props) => {
   const { Component, pageProps, router } = props
   /** APP 최초구동을 수행한다 */
-  if (!isServer()) { onload(props) }
+  if (!isServer()) {
+    onload(props)
+  }
   useSetup({
     async mounted() {
       /** 웹컨테이너에서 SPA 페이지를 다이렉트로 접근할 때 URL 보정 */
@@ -37,6 +43,7 @@ export default definePage((props) => {
       const hurl = String(history.state.as)
       log.debug('ON-LOAD-URL-CHECK1:', curl, hurl)
       if (curl === '/?' && hurl !== '/') { await router.push(hurl, hurl, {}) }
+      Array.prototype.slice.call(document.querySelectorAll('.ripple-surface')).map(s => new MDCRipple(s))
     }
   })
   /** 페이지 선언시 다른 layout 속성이 발견되면 해당 레이아웃으로 전환한다 */

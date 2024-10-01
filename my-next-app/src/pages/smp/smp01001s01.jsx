@@ -50,6 +50,7 @@ export default definePage((props) => {
   const { update, vars, ready } = self()
   /** 페이지 시작 이벤트처리 */
   async function mounted() {
+    // putAll(window, { DIALOG: dialog })
     log.debug('MOUNTED! SMP01001S01', props)
     const fdata = vars.formdata
     putAll(window, {

@@ -5,6 +5,7 @@
  * @Description : 전역 스타일시트
  * @Site        : https://devlog.ntiple.com
  **/
+// @import url('/assets/fonts/bootstrap-icons.min.css');
 html#my-first-app {
   body {
     font-family: Arial, Helvetica, sans-serif;
@@ -258,6 +259,41 @@ html#my-first-app {
 
     .ag-row {
       border-bottom: var(--ag-row-border-width) var(--ag-row-border-style) var(--ag-row-border-color);
+    }
+  }
+}
+html.my-first-app-new {
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+
+    div.progress-spinner[role='dialog'] {
+      > .modal-dialog {
+        padding: 0;
+        margin: 0;
+        > .modal-content {
+          background: none;
+          box-shadow: none;
+          border: none;
+          width: 100vw;
+          height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          > span {
+            > svg {
+              color: #fff;
+            }
+          }
+        }
+      }
+    }
+    .modal.no-tran {
+      z-index: 10054;
+      > .modal-dialog {
+        transition: none !important;
+        transform: none !important;
+      }
     }
   }
 }

@@ -5,14 +5,15 @@
  * @Description : Pagination 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-import _Pagination, { PaginationProps as _PaginationProps } from '@mui/material/Pagination';
-import _Stack from '@mui/material/Stack';
+// import _Pagination, { PaginationProps as _PaginationProps } from '@mui/material/Pagination';
+// import _Stack from '@mui/material/Stack';
+import _Pagination, { PaginationProps as _PaginationProps } from 'react-bootstrap/Pagination'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
 
 const { defineComponent, copyExclude, useSetup, copyRef, useRef } = app
 
-type PaginationProps = _PaginationProps & {
+type PaginationProps = _PaginationProps & Record<string, any> & {
   onChange?: Function
   model?: {
     currentPage?: number
@@ -54,26 +55,34 @@ export default defineComponent((props: PaginationProps, ref: PaginationProps['re
       (props as any).onChange()
     }
   }
+  // return (
+  //   <>
+  //   { (vars.pageCount || 0) > 0 && (
+  //     <_Stack
+  //       spacing={2}
+  //       >
+  //       <_Pagination
+  //         ref={ elem }
+  //         count={ vars.pageCount }
+  //         page={ Number(vars?.currentPage || 1) }
+  //         siblingCount={ props.siblingCount || 3 }
+  //         boundaryCount={ props.boundaryCount || 2 }
+  //         onChange={ onChange }
+  //         showFirstButton
+  //         showLastButton
+  //         size='small'
+  //         { ...pprops }
+  //         />
+  //     </_Stack>
+  //   ) }
+  //   </>
+  // )
   return (
-    <>
-    { (vars.pageCount || 0) > 0 && (
-      <_Stack
-        spacing={2}
-        >
-        <_Pagination
-          ref={ elem }
-          count={ vars.pageCount }
-          page={ Number(vars?.currentPage || 1) }
-          siblingCount={ props.siblingCount || 3 }
-          boundaryCount={ props.boundaryCount || 2 }
-          onChange={ onChange }
-          showFirstButton
-          showLastButton
-          size='small'
-          { ...pprops }
-          />
-      </_Stack>
-    ) }
-    </>
+  <>
+  <div>
+    <_Pagination
+      />
+  </div>
+  </>
   )
 })

@@ -6,7 +6,7 @@
  * @Site        : https://devlog.ntiple.com
  **/
 import { ComponentPropsWithRef } from 'react'
-import Popper from '@/components/popper'
+// import Popper from '@/components/popper'
 import hangul from '@/libs/hangul'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
@@ -15,7 +15,7 @@ import format from '@/libs/format'
 import $ from 'jquery'
 type FormProps = ComponentPropsWithRef<'div'> & { }
 type MessageProps = ComponentPropsWithRef<'div'> & {
-  popper?: any
+  // popper?: any
   anchor?: any
   open?: any
 }
@@ -475,7 +475,7 @@ const Message = defineComponent((props: MessageProps, ref: MessageProps['ref']) 
   const { vars, update } = self()
   return (
     <>
-    {!isServer() && vars.anchor && vars.visible ? (
+    {/* {!isServer() && vars.anchor && vars.visible ? (
       <>
       { props.popper ? (
       <Popper
@@ -498,7 +498,7 @@ const Message = defineComponent((props: MessageProps, ref: MessageProps['ref']) 
       </div>
       ) }
       </>
-    ) : '' }
+    ) : '' } */}
     </>
   )
 })

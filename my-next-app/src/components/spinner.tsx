@@ -6,11 +6,12 @@
  * @Site        : https://devlog.ntiple.com
  **/
 'use client'
-import CircularProgress, { CircularProgressProps } from '@mui/material/CircularProgress'
+// import CircularProgress, { CircularProgressProps } from '@mui/material/CircularProgress'
+import _Spinner, { SpinnerProps as _SpinnerProps } from 'react-bootstrap/Spinner';
 import values from '@/libs/values'
 import app from '@/libs/app-context'
 const { copyExclude } = values
-type SpinnerProps = CircularProgressProps & {
+type SpinnerProps = _SpinnerProps & Record<string, any> & {
   text?: string
 }
 
@@ -19,7 +20,7 @@ export default defineComponent((props: SpinnerProps, ref: SpinnerProps['ref'] & 
   const pprops = copyExclude(props, ['text'])
   if (!pprops.text) { pprops.text = 'Loading...' }
   return (
-    <CircularProgress
+    <_Spinner
       ref={ref}
       {...pprops}
     />

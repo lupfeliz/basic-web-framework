@@ -77,15 +77,21 @@ export default defineComponent((props: any, ref?: any) => {
     <>
     <Dialog
       className='modal_alert'
-      open={ dstate().modal.visible }
-      onClosed={ () => { dialog.modal({ type: C.EVENT, value: 2 }) } }
+      // open={ dstate().modal.visible }
+      // onClosed={ () => { dialog.modal({ type: C.EVENT, value: 2 }) } }
+      show={ dstate().modal.visible }
+      // className={ 'no-tran dialog-modal' }
+      onEntered={ () => { dialog.modal({ type: C.EVENT, value: 1 }) } }
+      onExited={ () => { dialog.modal({ type: C.EVENT, value: 2 }) } }
+      animation={ true }
+      // ref = { mod.modal.element }
       >
-      <Dialog.Content>
+      <Dialog.Body>
         <Content
           html={ dstate().modal.message }
           />
-      </Dialog.Content>
-      <Dialog.Actions>
+      </Dialog.Body>
+      <Dialog.Footer>
         { dstate().modal.buttons.map((itm: any, inx: number) => (
           <Button
             className={ concat(' ', 0, 'btn', inx == 0 ? 'primary' : '') }
@@ -95,9 +101,9 @@ export default defineComponent((props: any, ref?: any) => {
             { itm.text }
           </Button>
         )) }
-      </Dialog.Actions>
+      </Dialog.Footer>
     </Dialog>
-    <Dialog.Backdrop
+    {/* <Dialog.Backdrop
       sx={ { color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 } }
       ref={ vars.progress.element }
       open={ dstate().progress.visible }
@@ -111,13 +117,23 @@ export default defineComponent((props: any, ref?: any) => {
         size='5rem'
         thickness={ 5 }
         />
-    </Dialog.Backdrop>
+    </Dialog.Backdrop> */}
+    <Dialog
+      show={ dstate().progress.visible }
+      className={ 'no-tran progress-spinner' }
+      onEntered={ () => { dialog.progress({ type: C.EVENT, value: 1 }) } }
+      onExited={ () => { dialog.progress({ type: C.EVENT, value: 2 }) } }
+      animation={ true }
+      // ref = { mod.progress.element }
+      >
+      <Spinner/>
+    </Dialog>
     <Dialog
       open={ dstate().authmodal.visible }
       className={ 'no-tran auth-modal modal_alert' }
       // ref = { ctx.authmodal.element }
       >
-      <Dialog.Content>
+      <Dialog.Body>
         <Content
           html={ `<h4>사용자 인증이 #(min)분 안에 종료됩니다 <br/> 연장하시겠어요?</h4>`
             .replace(/\#\(min\)/g, formatTime(C.EXPIRE_NOTIFY_TIME, 'mm')) }
@@ -125,8 +141,8 @@ export default defineComponent((props: any, ref?: any) => {
         <p>
           남은시간 { formatTime(userContext.getUserInfo().accessToken.expireTime - new Date().getTime()) }
         </p>
-      </Dialog.Content>
-      <Dialog.Actions>
+      </Dialog.Body>
+      <Dialog.Footer>
         <Button
           className='btn primary'
           onClick={ () => authConfirm(1) }
@@ -139,7 +155,7 @@ export default defineComponent((props: any, ref?: any) => {
           >
           아니오
         </Button>
-      </Dialog.Actions>
+      </Dialog.Footer>
     </Dialog>
     </>
   )

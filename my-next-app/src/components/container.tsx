@@ -5,9 +5,10 @@
  * @Description : 컨테이너 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-import _Container, { ContainerProps as _ContainerProps } from '@mui/material/Container'
+// import _Container, { ContainerProps as _ContainerProps } from '@mui/material/Container'
+import { ComponentPropsWithRef } from 'react'
 import app from '@/libs/app-context'
-type ContainerProps = _ContainerProps & { }
+type ContainerProps = ComponentPropsWithRef<'div'> & { }
 export default app.defineComponent((props: ContainerProps, ref: ContainerProps['ref']) => {
-  return ( <_Container ref={ ref } { ...props }> { props.children } </_Container> )
+  return ( <div className='container' ref={ ref } { ...props }> { props.children } </div> )
 })
