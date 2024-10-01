@@ -15,7 +15,7 @@ import { AnimatePresence } from 'framer-motion'
 import LayoutDefault from '@/components/layout'
 import DialogContainer from '@/components/dialog-container'
 
-import 'bootstrap/dist/css/bootstrap.min.css'
+// import 'bootstrap/dist/css/bootstrap.min.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import '@materialstyle/materialstyle/scss/materialstyle.scss'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -53,7 +53,7 @@ export default definePage((props) => {
     <>
     <Head>
       {/* meta head 선언은 _app 에서 선언한다, script 등 리소스성 head 선언은 _document.jsx 에서 선언 */}
-      <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+      <meta name='viewport' content='width=device-width, initial-scale=1.0, shrink-to-fit=no'/>
     </Head>
     {/* 트랜지션감지 */}
     <AnimatePresence mode='wait' initial={ false }>

@@ -10,9 +10,10 @@ import userContext from '@/libs/user-context'
 import * as C from '@/libs/constants'
 import dialog from '@/libs/dialog-context'
 import { Container, Block, Button, Link } from '@/components'
+import { nextTick } from 'process'
 // import { Drawer } from '@mui/material'
 // import { Menu as MenuIcon, ArrowBackIos as ArrowBackIcon } from '@mui/icons-material';
-const { defineComponent, useSetup, goPage } = app
+const { log, defineComponent, useSetup, goPage, strm } = app
 export default defineComponent(() => {
   const self = useSetup({
     name: 'header',
@@ -30,6 +31,16 @@ export default defineComponent(() => {
   const openAside = (visible: boolean) => {
     if (visible) {
       vars.aside = 'show'
+      // log.debug('OPENASIDE..')
+      nextTick(() => {
+        const fnc = () => {
+          log.debug('OPENASIDE-CLICK..')
+          document.removeEventListener('mouseup', fnc)
+          openAside(false)
+          return true
+        }
+        document.addEventListener('mouseup', fnc)
+      })
     } else {
       vars.aside = 'show hiding'
     }
@@ -63,25 +74,18 @@ export default defineComponent(() => {
         <Button
           size='small'
           onClick={ () => openAside(true) }
-          data-bs-toggle='offcanvas'
-          data-bs-target='#drawer'
           >
           <i className='bi bi-list'></i>
-          {/* <MenuIcon /> */}
         </Button>
       </Block>
     </Container>
-
-    {/* offcanvas offcanvas-end offcanvas-light show */}
     {/* [ */}
     <aside
-      className={String(`offcanvas offcanvas-end offcanvas-light ${ vars.aside }`).replace(/[ ]+/, ' ').trim()}
+      className={ strm(`offcanvas offcanvas-end offcanvas-light ${ vars.aside }`) }
       tabIndex={ -1 }
       >
       <Block className='offcanvas-header'>
         <Button
-          className='btn-close btn-close-white'
-          aria-label='Close'
           onClick={ () => openAside(false) }
           >
         </Button>
@@ -176,69 +180,6 @@ export default defineComponent(() => {
       </div>
     </aside>
     {/* ] */}
-
-
-    {/* <Drawer
-      className='header-aside'
-      anchor='right'
-      open={ vars.aside }
-      onClick={ () => openAside(false) }
-      >
-      { ready() && (userInfo?.userId) && (
-        <>
-          <Block className='text-center my-1'>
-            { userInfo.userNm }
-          </Block>
-          <Block className='text-center my-1'>
-            { userInfo.timelabel }
-          </Block>
-        </>
-      ) }
-      <Block>
-        <Button
-          href={'/'}
-          >
-          홈
-        </Button>
-        { ready() && !(userInfo?.userId) ? (
-        <>
-          <Button
-            href={'/lgn/lgn01001s01'}
-            >
-            로그인
-          </Button>
-          <Button
-            href={'/usr/usr01001s01'}
-            >
-            회원가입
-          </Button>
-        </>
-        ) : (
-        <>
-          <Button
-            onClick={ userContext.tokenRefresh }
-            >
-            로그인연장
-          </Button>
-          <Button
-            onClick={ logout }
-            >
-            로그아웃
-          </Button>
-          <Button
-            href='/usr/usr01001s03'
-            >
-            마이페이지
-          </Button>
-        </>
-        ) }
-        <Button
-          href='/atc/atc01001s04/1'
-          >
-          게시판
-        </Button>
-      </Block>
-    </Drawer> */}
     </header>
   )
 })

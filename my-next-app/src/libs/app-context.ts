@@ -79,7 +79,8 @@ const appvars = {
       key: { rsa: { public: '', private: '' } }
     },
     runtime
-  }
+  },
+  MaterialStyle: {} as any
 }
 
 /** 전역 STORE 저장소 (serializable 객체) */
@@ -101,14 +102,14 @@ const appContextSlice = createSlice({
 /** 전역 STORE 선언 */
 const appContextStore = configureStore({ reducer: appContextSlice.reducer })
 /** Ripple Effect */
-const applyRipple = debounce(async () => {
+const applyRipple = debounce(() => {
   if (!app.isServer()) {
-    setTimeout(() => {
-      Array.prototype.slice.call(document.querySelectorAll('.ripple-surface')).map(s => new MDCRipple(s))
-      log.debug('APPLY-RIPPLE')
+    setTimeout(async () => {
+      await until(() => app.ready())
+      $('.ripple-surface').each((_, e) => { !e.classList.contains('mdc-ripple-upgraded') && new MDCRipple(e) })
     }, 1)
   }
-}, 100)
+}, 300)
 const app = {
   /** values, log, getLogger mixin */
   ...values, log, getLogger, useRef,
@@ -290,6 +291,9 @@ const app = {
       try {
         const api = (await import('@/libs/api')).default
         const crypto = (await import('@/libs/crypto')).default
+        log.debug('APP-ONLOAD-LIBS')
+        /* @ts-ignore */
+        appvars.MaterialStyle = await import('@materialstyle/materialstyle/dist/js/materialstyle.esm')
         appvars.astate = C.APPSTATE_LIBS
         const userContext = (await import('@/libs/user-context')).default
         const conf = decryptAES(encrypted(), C.CRYPTO_KEY)
@@ -452,6 +456,8 @@ const app = {
     if (!el) { el = document.documentElement }
     return v * parseFloat(getComputedStyle(el).fontSize)
   },
+  strm: (v?: any) => String(v || '').replace(/[ ]+/g, ' ').trim(),
+  MaterialStyle: (fnc: Function1<any, any>) => fnc(appvars.MaterialStyle),
 }
 
 const compoSubscribe = <V, P>(prm: LauncherProps<V, P>, uid: string, setState: Function) => {

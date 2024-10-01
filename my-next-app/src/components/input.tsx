@@ -36,21 +36,21 @@ const InputPropsSchema = {
 type InputProps = ComponentPropsWithRef<'input'> & Record<string, any> & Partial<typeof InputPropsSchema>
 
 const { merge } = values
-const { log, copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue } = app
+const { log, copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue, isServer, until, strm } = app
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
   const pprops = copyExclude(props, merge(Object.keys(InputPropsSchema), []))
-  // const iprops = copyExclude(props?.slotProps?.htmlInput || {}, merge([])) as any
-  const elem = useRef<any>()
-  const equeue = [] as any[]
   const self = useSetup({
     name: 'input',
     props,
     vars: {
       itype: props.type,
-      avail: true
+      avail: true,
+      material: false,
+      elem: useRef<any>(),
+      wrap: useRef<any>(),
     },
     async mounted() {
-      copyRef(ref, elem)
+      copyRef(ref, vars?.elem)
       /** 최초상태 화면반영 */
       inputVal(modelValue(self())?.value || '')
     },
@@ -62,6 +62,24 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     }
   })
   const { uid, vars, update, ready } = self()
+  if (!isServer() && !vars.material) {
+    vars.material = true
+    setTimeout(async () => {
+      await until(() => app.ready(C.APPSTATE_LIBS), { maxcheck: 1000, interval: 10 })
+      app.MaterialStyle((v) => {
+        new v.TextField(vars?.elem.current)
+        setTimeout(() => {
+          /** FIXME: placeholder 가 아닌 label 로 적용할것 */
+          if (!props.placeholder) {
+            $(vars.wrap.current).find('.m-notch-between').css({ display: 'none' })
+          } else {
+            $(vars.wrap.current).find('.m-notch-between').css({ display: 'inherit' })
+          }
+        }, 100)
+      })
+      update(C.UPDATE_SELF)
+    }, 1)
+  }
   if (props?.type === 'number') {
     pprops.type = 'text'
     pprops.pattern = '[0-9]*'
@@ -72,8 +90,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     pprops.inputMode = props.inputMode
   }
 
-  // const inputVal = (v: any = C.UNDEFINED) => v === C.UNDEFINED ? $(elem?.current).find('input').val() : $(elem?.current).find('input').val(v) && v
-  const inputVal = (v: any = C.UNDEFINED) => v === C.UNDEFINED ? $(elem?.current).val() : $(elem?.current).val(v) && v
+  const inputVal = (v: any = C.UNDEFINED) => v === C.UNDEFINED ? $(vars?.elem?.current).val() : $(vars?.elem?.current).val(v) && v
 
   /** 입력컴포넌트 변경이벤트 처리 */
   const onChange = async (e: ChangeEvent) => {
@@ -83,18 +100,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     if (props.onChange) { props.onChange(e as any) }
   }
   /** 입력컴포넌트 키입력 이벤트 처리 */
-  // const onKeyDown = async (e: any) => {
-  //   const keycode = e?.keyCode || 0
-  //   switch (keycode) {
-  //   case 13: {
-  //     if (props.onEnter) { props.onEnter(e) }
-  //   } break
-  //   }
-  // }
   const onKeyDown = async (e: KeyboardEvent) => {
-    // equeue.push(e)
-    // cancelEvent(e)
-    log.debug('ON-KEY-DOWN:', e)
     if (vars.avail) {
       onKeyDownProc(e)
       if (props?.onKeyDown) { props.onKeyDown(e) }
@@ -188,18 +194,9 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         } }
       }
       // const el = $(elem.current).find('input')[0]
-      const el = $(elem.current)[0]
+      const el = $(vars?.elem.current)[0]
       let v = el.value
       setTimeout(async () => {
-        // const sel = document.getSelection()
-        // if (Number(sel?.rangeCount) > 0) {
-        //   const range = sel?.getRangeAt(0)
-        //   const st = range?.startOffset || -1
-        //   const ed = range?.endOffset || -1
-        //   log.debug('CHECK:', sel?.anchorNode, range, st, ed, sel?.anchorOffset)
-        //   if (st != -1 && ed != -1) {
-        //   }
-        // }
         {
           let st = Number(el.selectionStart || 1)
           let ed = Number(el.selectionEnd || 1)
@@ -230,33 +227,20 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   }
   return (
   <>
-  {/*
-  <_TextField ref={ elem }
-    hiddenLabel
-    slotProps={{
-      htmlInput: {
-        maxLength: props?.maxLength || iprops?.maxLength,
-        type: pprops?.type || iprops?.type,
-        inputMode: pprops?.inputMode || iprops?.inputMode,
-        pattern: pprops?.pattern || iprops?.pattern,
-      }
-    }}
-    { ...pprops }
-    onChange={ onChange }
-    onKeyUp={ onKeyUp }
-    onBlur={ onBlur }
-    onFocus={ onFocus }
-    onKeyDown={ onKeyDown }
-    /> 
-  */}
   <div
-    // className='form-floating form-floating-outlined'
+    // className={ strm(`form-floating form-floating-outlined`) }
+    ref={ vars?.wrap }
+    /** FIXME: 하드코딩 SSR 에서부터 border 유지여부 */
+    // style={ app.ready(C.APPSTATE_LIBS) ? {} : {
+    //   border: `var(--bs-form-field-border-width) var(--bs-border-style) var(--bs-form-field-border-color)`,
+    //   borderRadius: `var(--bs-form-field-border-radius)`
+    // } }
     >
     <input
-      ref={ elem }
-      className='form-control'
+      ref={ vars?.elem }
+      className={ strm(`form-control`) }
       { ...pprops }
-      id={ ready() ? uid : C.UNDEFINED }
+      id={ app.ready() ? uid : C.UNDEFINED }
       maxLength={ props?.maxLength }
       type={ pprops?.type }
       inputMode={ pprops.inputMode }
@@ -266,8 +250,9 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       onBlur={ onBlur }
       onFocus={ onFocus }
       onKeyDown={ onKeyDown }
+      placeholder={ pprops.placeholder }
       />
-    {/* <label htmlFor={ uid }></label> */}
+    {/* <label htmlFor={ app.ready() ? uid : C.UNDEFINED }> { pprops.placeholder } </label> */}
   </div>
   </>
   )

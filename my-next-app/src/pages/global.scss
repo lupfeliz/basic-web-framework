@@ -271,6 +271,7 @@ html.my-first-app-new {
       > .modal-dialog {
         padding: 0;
         margin: 0;
+        --bs-modal-width: 100vw;
         > .modal-content {
           background: none;
           box-shadow: none;
@@ -289,7 +290,7 @@ html.my-first-app-new {
       }
     }
     .modal.no-tran {
-      z-index: 10054;
+      // z-index: 10054;
       > .modal-dialog {
         transition: none !important;
         transform: none !important;
