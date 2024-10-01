@@ -5,8 +5,6 @@
  * @Description : 체크박스 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-// import _Checkbox, { CheckboxProps as _CheckboxProps } from '@mui/material/Checkbox'
-// import _Radio, { RadioProps as _RadioProps } from '@mui/material/Radio'
 import { FormCheck as _Checkbox, FormCheckProps as _CheckboxProps } from 'react-bootstrap'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
@@ -66,7 +64,6 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
         checked={ vars.checked || false }
         onChange={ onChange as any }
         />
-      {/* <_Radio ref={ elem } checked={ vars.checked || false } onChange={ onChange } { ...pprops } /> */}
     </>
   ) : (
     <>
@@ -79,7 +76,6 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
         checked={ vars.checked || false }
         onChange={ onChange as any }
         />
-      {/* <_Checkbox ref={ elem } checked={ vars.checked || false } onChange={ onChange } { ...pprops } /> */}
     </>
   ) }
   </span>

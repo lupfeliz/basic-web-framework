@@ -5,7 +5,6 @@
  * @Description : 입력 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-// import _TextField, { TextFieldProps as _TextFieldProps } from '@mui/material/TextField'
 import { ChangeEvent, ComponentPropsWithRef, KeyboardEvent, FocusEvent } from 'react'
 import $ from 'jquery'
 import app from '@/libs/app-context'
@@ -32,7 +31,6 @@ const InputPropsSchema = {
   pattern: '' as string
 }
 
-// type InputProps = _TextFieldProps & typeof InputPropsSchema
 type InputProps = ComponentPropsWithRef<'input'> & Record<string, any> & Partial<typeof InputPropsSchema>
 
 const { merge } = values

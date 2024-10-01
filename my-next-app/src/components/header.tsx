@@ -11,14 +11,13 @@ import * as C from '@/libs/constants'
 import dialog from '@/libs/dialog-context'
 import { Container, Block, Button, Link } from '@/components'
 import { nextTick } from 'process'
-// import { Drawer } from '@mui/material'
-// import { Menu as MenuIcon, ArrowBackIos as ArrowBackIcon } from '@mui/icons-material';
+import proc from '@/libs/proc'
 const { log, defineComponent, useSetup, goPage, strm } = app
 export default defineComponent(() => {
   const self = useSetup({
     name: 'header',
     vars: {
-      aside: ''
+      clsAside: ''
     },
     async mounted({ releaser }) {
       /** 사용자 로그인 만료시간 모니터링 */
@@ -28,12 +27,13 @@ export default defineComponent(() => {
   const { vars, update, ready } = self()
   const userInfo = userContext.getUserInfo()
   /** aside 메뉴 오픈 */
-  const openAside = (visible: boolean) => {
+  const openAside = async (visible: boolean) => {
     if (visible) {
-      vars.aside = 'show'
+      vars.clsAside = 'show'
+      update(C.UPDATE_FULL)
       // log.debug('OPENASIDE..')
       nextTick(() => {
-        const fnc = () => {
+        const fnc = async () => {
           log.debug('OPENASIDE-CLICK..')
           document.removeEventListener('mouseup', fnc)
           openAside(false)
@@ -42,9 +42,12 @@ export default defineComponent(() => {
         document.addEventListener('mouseup', fnc)
       })
     } else {
-      vars.aside = 'show hiding'
+      vars.clsAside = 'show hiding'
+      update(C.UPDATE_FULL)
+      // await proc.sleep(300)
+      // vars.clsAside = ''
+      // update(C.UPDATE_FULL)
     }
-    update(C.UPDATE_FULL)
   }
   const logout = async () => {
     await userContext.logout()
@@ -52,6 +55,7 @@ export default defineComponent(() => {
     goPage('/')
   }
   return (
+    <>
     <header>
     <Container className='flex'>
       <Block>
@@ -79,18 +83,13 @@ export default defineComponent(() => {
         </Button>
       </Block>
     </Container>
+    </header>
     {/* [ */}
     <aside
-      className={ strm(`offcanvas offcanvas-end offcanvas-light ${ vars.aside }`) }
+      className={ strm(`offcanvas offcanvas-end offcanvas-light ${ vars.clsAside }`) }
       tabIndex={ -1 }
       >
-      <Block className='offcanvas-header'>
-        <Button
-          onClick={ () => openAside(false) }
-          >
-        </Button>
-      </Block>
-      <Block>
+      <Block className='mt-3'>
       { ready() && (userInfo?.userId) && (
         <>
           <Block className='text-center my-1'>
@@ -160,26 +159,10 @@ export default defineComponent(() => {
             게시판
           </Button>
           </li>
-          {/* <li className='nav-item'>
-            <div className='collapse' id='menuA'>
-              <ul className='nav flex-column'>
-                <li className='nav-item'>
-                  <a className='nav-link ps-4' href='javascript:'>
-                    Menu Item
-                  </a>
-                </li>
-                <li className='nav-item'>
-                  <a className='nav-link ps-4' href='javascript:'>
-                    Menu Item
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </li> */}
         </ul>
       </div>
     </aside>
     {/* ] */}
-    </header>
+    </>
   )
 })

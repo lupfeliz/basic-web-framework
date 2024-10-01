@@ -5,8 +5,6 @@
  * @Description : 선택 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-// import _Select, { SelectProps as _SelectProps } from '@mui/material/Select'
-// import _MenuItem from '@mui/material/MenuItem'
 import { Dropdown , DropdownProps } from 'react-bootstrap'
 
 import * as C from '@/libs/constants'
@@ -72,38 +70,16 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     /** 변경시 데이터모델에 값전달 */
     if (props.onChange) { props.onChange(e as any) }
   }
-  // return (
-  // <_Select
-  //   ref={ elem }
-  //   onChange={ onChange }
-  //   value={vars?.index || (vars?.options?.length > 0 ? 0 : '')}
-  //   { ...pprops }
-  //   >
-  //   {/* 선택목록 생성*/}
-  //   { vars?.options?.length > 0 && vars.options.map((itm, inx) => (
-  //   <_MenuItem
-  //     key={ inx }
-  //     value={ inx }
-  //     selected={ itm?.selected || false }
-  //     >
-  //     { `${itm?.name}` }
-  //   </_MenuItem>
-  //   ))}
-  // </_Select>
-  // )
   return (
   <Dropdown
     ref={ elem }
     onSelect={ (v, e) => onChange(e, v) }
     >
-    <Dropdown.Toggle
-      // { ...pprops }
-      >
+    <Dropdown.Toggle>
       { vars.text || props.children }
     </Dropdown.Toggle>
     {/* 선택목록 생성*/}
     <Dropdown.Menu
-      // onClick={ onChange as any }
       >
       { vars?.options?.length > 0 && vars.options.map((itm, inx) => (
       <Dropdown.Item

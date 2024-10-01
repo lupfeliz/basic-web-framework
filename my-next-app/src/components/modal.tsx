@@ -6,24 +6,17 @@
  * @Site        : https://devlog.ntiple.com
  **/
 'use client'
-// import _Dialog, { DialogProps as _DialogProps } from '@mui/material/Dialog'
-// import _DialogTitle from '@mui/material/DialogTitle'
-// import _DialogContent from '@mui/material/DialogContent'
-// import _DialogContentText from '@mui/material/DialogContentText'
-// import _DialogActions from '@mui/material/DialogActions'
-// import _Backdrop from '@mui/material/Backdrop'
-
-import _Modal from 'react-bootstrap/Modal'
+import _Modal, { ModalProps as _ModalProps } from 'react-bootstrap/Modal'
 
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
-type DialogProps = {
+type ModalProps = _ModalProps & Record<string, any> & {
   onClosed?: Function
-} & any
+}
 
 const { defineComponent, copyExclude, useSetup } = app
-export default defineComponent((props: DialogProps, ref: DialogProps['ref']) => {
-  const pprops = copyExclude(props, ['onClosed']) as DialogProps
+export default defineComponent((props: ModalProps, ref: ModalProps['ref']) => {
+  const pprops = copyExclude(props, ['onClosed']) as ModalProps
 
   const self = useSetup({
     async updated() {
@@ -52,11 +45,6 @@ export default defineComponent((props: DialogProps, ref: DialogProps['ref']) => 
   )
 }, {
   displayName: 'modal',
-  // Title: _Modal.Title,
-  // Content: _Modal.Body,
-  // ContentText: _Modal.Body,
-  // Actions: _Modal.Footer,
-  // Backdrop: _Modal.Body,
   Body: _Modal.Body,
   Header: _Modal.Header,
   Title: _Modal.Title,

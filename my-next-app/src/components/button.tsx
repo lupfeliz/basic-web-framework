@@ -25,7 +25,7 @@ type ButtonProps = Record<string, any> & Partial<typeof ButtonPropsSchema>
 
 const { throttle } = lodash
 const { merge } = values
-const { defineComponent, copyExclude, goPage} = app
+const { defineComponent, copyExclude, goPage, strm } = app
 
 export default defineComponent((props: ButtonProps, ref: ButtonProps['ref']) => {
   const pprops = copyExclude(props, merge(Object.keys(ButtonPropsSchema), []))
@@ -52,7 +52,7 @@ export default defineComponent((props: ButtonProps, ref: ButtonProps['ref']) => 
       ref={ ref }
       type='button'
       { ...pprops }
-      className={ String(`btn ${clssize(props)} ${clscolor(props)}`).replace(/[ \t\r\n]+/g, ' ').trim() }
+      className={ strm(`btn ${clssize(props)} ${clscolor(props)}`) }
       onClick={ onClick }
       >
       { props.children }
