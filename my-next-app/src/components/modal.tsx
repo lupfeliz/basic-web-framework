@@ -51,7 +51,7 @@ export default defineComponent((props: DialogProps, ref: DialogProps['ref']) => 
     </>
   )
 }, {
-  displayName: 'dialog',
+  displayName: 'modal',
   // Title: _Modal.Title,
   // Content: _Modal.Body,
   // ContentText: _Modal.Body,

@@ -13,7 +13,7 @@ const { definePage } = app
 
 export default definePage(() => {
   return (
-  <Html id='my-first-app' class='my-first-app-new' lang='ko'>
+  <Html id='my-first-app' className='my-first-app-new' lang='ko'>
     <Head>
       {/* 페이지 hard-loading 시 적용할 기본 transition */}
       <Content html={`

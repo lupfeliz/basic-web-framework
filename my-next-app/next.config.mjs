@@ -59,8 +59,8 @@ return {
     cfg.cache = /dev/.test(cmd) ? false : true
     // cfg.infrastructureLogging = { debug: /PackFileCache/ },
     cfg.module.rules.push(
-      { test: /\.(js)$/, generator: { filename: '[name].[ext]' } },
-      { test: /\.(woff2)$/, generator: { filename: '[name].[ext]' } },
+      // { test: /\.(js)$/, generator: { filename: '[name].[ext]' } },
+      // { test: /\.(woff2|woff)$/, generator: { filename: '[name].[ext]' } },
     )
     cfg.output.filename = cfg.output.filename.replace('-[chunkhash]', '')
     cfg.output.chunkFilename = cfg.output.chunkFilename.replace('.[contenthash]', '')

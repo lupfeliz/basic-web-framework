@@ -13,7 +13,7 @@ import userContext from '@/libs/user-context'
 import format from '@/libs/format'
 import values from '@/libs/values'
 
-import { Dialog, Content, Button, Spinner } from '@/components'
+import { Modal, Content, Button, Spinner } from '@/components'
 
 const { concat } = values
 
@@ -75,7 +75,7 @@ export default defineComponent((props: any, ref?: any) => {
   vars.authmodal.element = useRef<HTMLElement>(null)
   return (
     <>
-    <Dialog
+    <Modal
       className='modal_alert'
       // open={ dstate().modal.visible }
       // onClosed={ () => { dialog.modal({ type: C.EVENT, value: 2 }) } }
@@ -86,12 +86,12 @@ export default defineComponent((props: any, ref?: any) => {
       animation={ true }
       // ref = { mod.modal.element }
       >
-      <Dialog.Body>
+      <Modal.Body>
         <Content
           html={ dstate().modal.message }
           />
-      </Dialog.Body>
-      <Dialog.Footer>
+      </Modal.Body>
+      <Modal.Footer>
         { dstate().modal.buttons.map((itm: any, inx: number) => (
           <Button
             className={ concat(' ', 0, 'btn', inx == 0 ? 'primary' : '') }
@@ -101,8 +101,8 @@ export default defineComponent((props: any, ref?: any) => {
             { itm.text }
           </Button>
         )) }
-      </Dialog.Footer>
-    </Dialog>
+      </Modal.Footer>
+    </Modal>
     {/* <Dialog.Backdrop
       sx={ { color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 } }
       ref={ vars.progress.element }
@@ -118,7 +118,7 @@ export default defineComponent((props: any, ref?: any) => {
         thickness={ 5 }
         />
     </Dialog.Backdrop> */}
-    <Dialog
+    <Modal
       show={ dstate().progress.visible }
       className={ 'no-tran progress-spinner' }
       onEntered={ () => { dialog.progress({ type: C.EVENT, value: 1 }) } }
@@ -127,13 +127,13 @@ export default defineComponent((props: any, ref?: any) => {
       // ref = { mod.progress.element }
       >
       <Spinner/>
-    </Dialog>
-    <Dialog
+    </Modal>
+    <Modal
       open={ dstate().authmodal.visible }
       className={ 'no-tran auth-modal modal_alert' }
       // ref = { ctx.authmodal.element }
       >
-      <Dialog.Body>
+      <Modal.Body>
         <Content
           html={ `<h4>사용자 인증이 #(min)분 안에 종료됩니다 <br/> 연장하시겠어요?</h4>`
             .replace(/\#\(min\)/g, formatTime(C.EXPIRE_NOTIFY_TIME, 'mm')) }
@@ -141,8 +141,8 @@ export default defineComponent((props: any, ref?: any) => {
         <p>
           남은시간 { formatTime(userContext.getUserInfo().accessToken.expireTime - new Date().getTime()) }
         </p>
-      </Dialog.Body>
-      <Dialog.Footer>
+      </Modal.Body>
+      <Modal.Footer>
         <Button
           className='btn primary'
           onClick={ () => authConfirm(1) }
@@ -155,8 +155,8 @@ export default defineComponent((props: any, ref?: any) => {
           >
           아니오
         </Button>
-      </Dialog.Footer>
-    </Dialog>
+      </Modal.Footer>
+    </Modal>
     </>
   )
 })

@@ -14,13 +14,13 @@ import Head from 'next/head'
 import { AnimatePresence } from 'framer-motion'
 import LayoutDefault from '@/components/layout'
 import DialogContainer from '@/components/dialog-container'
-import { MDCRipple } from '@material/ripple'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import '@materialstyle/materialstyle/scss/materialstyle.scss'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
+// import '@/assets/fonts/bootstrap-icons.min.css'
 
 /** 전역 스타일시트 */
 import '@/pages/global.scss'
@@ -43,7 +43,6 @@ export default definePage((props) => {
       const hurl = String(history.state.as)
       log.debug('ON-LOAD-URL-CHECK1:', curl, hurl)
       if (curl === '/?' && hurl !== '/') { await router.push(hurl, hurl, {}) }
-      Array.prototype.slice.call(document.querySelectorAll('.ripple-surface')).map(s => new MDCRipple(s))
     }
   })
   /** 페이지 선언시 다른 layout 속성이 발견되면 해당 레이아웃으로 전환한다 */

@@ -17,6 +17,7 @@ import { NextRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 import { AppProps } from 'next/app'
 import CryptoJS from 'crypto-js'
+import { MDCRipple } from '@material/ripple'
 
 import * as C from '@/libs/constants'
 import values from '@/libs/values'
@@ -99,6 +100,15 @@ const appContextSlice = createSlice({
 })
 /** 전역 STORE 선언 */
 const appContextStore = configureStore({ reducer: appContextSlice.reducer })
+/** Ripple Effect */
+const applyRipple = debounce(async () => {
+  if (!app.isServer()) {
+    setTimeout(() => {
+      Array.prototype.slice.call(document.querySelectorAll('.ripple-surface')).map(s => new MDCRipple(s))
+      log.debug('APPLY-RIPPLE')
+    }, 1)
+  }
+}, 100)
 const app = {
   /** values, log, getLogger mixin */
   ...values, log, getLogger, useRef,
@@ -139,11 +149,11 @@ const app = {
     React.useEffect(() => {
       let retproc: any = () => { }
       let res = C.UNDEFINED
-
       switch (phase) {
       case 0: {
         setPhase(1)
         log.trace('CHECK-MOUNTED:', prm?.name || uid, prm?.mounted)
+        applyRipple()
         if (prm?.mounted) {
           setTimeout(async () => {
             try {
