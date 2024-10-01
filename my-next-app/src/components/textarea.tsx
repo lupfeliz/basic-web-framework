@@ -6,7 +6,6 @@
  * @Site        : https://devlog.ntiple.com
  **/
 import { ComponentPropsWithRef } from 'react'
-import parse from 'html-react-parser'
 import $ from 'jquery'
 import lodash from 'lodash'
 import * as C from '@/libs/constants'

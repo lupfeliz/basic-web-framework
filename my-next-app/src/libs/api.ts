@@ -157,7 +157,7 @@ const mkres = async (r: Promise<Response>, opt?: OptType) => {
       default: }
       if (opt?.resolve) { opt.resolve(ret) }
     } else {
-      return opt?.reject && opt.reject(state) || {}
+      ret = opt?.reject && opt.reject(state) || {}
     }
   } catch(e) { }
   if (!opt?.noprogress) { await dialog.progress(false) }

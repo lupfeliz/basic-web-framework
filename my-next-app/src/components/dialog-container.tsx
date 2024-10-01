@@ -14,6 +14,7 @@ import format from '@/libs/format'
 import values from '@/libs/values'
 
 import { Modal, Content, Button, Spinner } from '@/components'
+import { RefObject } from 'react'
 
 const { concat } = values
 
@@ -53,13 +54,13 @@ export default defineComponent((props: any, ref?: any) => {
   const self = useSetup({
     vars: {
       modal: {
-        element: {} as any
+        element: C.UNDEFINED as RefObject<HTMLElement>
       },
       progress: {
-        element: {} as any
+        element: C.UNDEFINED as RefObject<HTMLElement>
       },
       authmodal: {
-        element: {} as any
+        element: C.UNDEFINED as RefObject<HTMLElement>
       },
     },
     async mounted({ releaser }) {
@@ -77,14 +78,11 @@ export default defineComponent((props: any, ref?: any) => {
     <>
     <Modal
       className='modal_alert'
-      // open={ dstate().modal.visible }
-      // onClosed={ () => { dialog.modal({ type: C.EVENT, value: 2 }) } }
       show={ dstate().modal.visible }
-      // className={ 'no-tran dialog-modal' }
       onEntered={ () => { dialog.modal({ type: C.EVENT, value: 1 }) } }
       onExited={ () => { dialog.modal({ type: C.EVENT, value: 2 }) } }
       animation={ true }
-      // ref = { mod.modal.element }
+      ref={ vars.modal.element }
       >
       <Modal.Body>
         <Content
@@ -103,35 +101,20 @@ export default defineComponent((props: any, ref?: any) => {
         )) }
       </Modal.Footer>
     </Modal>
-    {/* <Dialog.Backdrop
-      sx={ { color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 } }
-      ref={ vars.progress.element }
-      open={ dstate().progress.visible }
-      onEntering={ () => { $(document.body).addClass('overflow-hidden') } }
-      onExiting={ () => { $(document.body).removeClass('overflow-hidden') } }
-      onEntered={ () => { dialog.progress({ type: C.EVENT, value: 1 }) } }
-      onExited={ () => { dialog.progress({ type: C.EVENT, value: 2 }) } }
-      >
-      <Spinner
-        color="warning"
-        size='5rem'
-        thickness={ 5 }
-        />
-    </Dialog.Backdrop> */}
     <Modal
       show={ dstate().progress.visible }
       className={ 'no-tran progress-spinner' }
       onEntered={ () => { dialog.progress({ type: C.EVENT, value: 1 }) } }
       onExited={ () => { dialog.progress({ type: C.EVENT, value: 2 }) } }
       animation={ true }
-      // ref = { mod.progress.element }
+      ref={vars.progress.element}
       >
       <Spinner/>
     </Modal>
     <Modal
       open={ dstate().authmodal.visible }
       className={ 'no-tran auth-modal modal_alert' }
-      // ref = { ctx.authmodal.element }
+      ref={vars.authmodal.element}
       >
       <Modal.Body>
         <Content

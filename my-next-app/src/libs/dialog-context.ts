@@ -60,12 +60,12 @@ const schema = {
 }
 
 /** resolve 함수는 serialize 할 수 없으므로 별도로 저장해 준다 */
-const globalctx = {
-  currentId: 0,
+const dialogvars = {
+  maxuid: 0,
   list: { } as any,
   nextId: (resolve?: Function) => {
-    const ret = globalctx.currentId = (globalctx.currentId + 1) % Number.MAX_SAFE_INTEGER
-    if (resolve) { globalctx.list[ret] = resolve }
+    const ret = dialogvars.maxuid = (dialogvars.maxuid + 1) % Number.MAX_SAFE_INTEGER
+    if (resolve) { dialogvars.list[ret] = resolve }
     return ret
   },
   winpopups: {
@@ -108,11 +108,11 @@ const slice = createSlice({
         } break
         case 2: /** exited */ {
         } break
-        default: { }}
+        default: }
       } break
       case C.CLICK: {
         let pid = modal.resolveId
-        if(o = globalctx.list[pid]) {
+        if(o = dialogvars.list[pid]) {
           /** 버튼인덱스 값에 있는 결과값을 리턴한다. */
           o(modal.buttons[payload?.value]?.value)
         }
@@ -121,9 +121,9 @@ const slice = createSlice({
           setTimeout(() => store.dispatch(slice.actions.modal({ type: C.FETCH })), 0)
         }
         modal.visible = false
-        delete globalctx.list[pid]
+        delete dialogvars.list[pid]
       } break
-      default: { }}
+      default: }
     },
     progress: (state, action) => {
       let o: any
@@ -142,7 +142,7 @@ const slice = createSlice({
             } else {
               /** 이미 progress 중인경우 stack 쌓고 종료 */
               progress.stack = progress.stack + 1
-              if (itm.resolveId && (o = globalctx.list[itm.resolveId])) { o(true) }
+              if (itm.resolveId && (o = dialogvars.list[itm.resolveId])) { o(true) }
             }
           } break
           case false: {
@@ -150,7 +150,7 @@ const slice = createSlice({
               /** progress stack 갯수가 0 이상인 경우 stack 만큼 감산되어야 종료 */
               if (progress.stack > 0) {
                 progress.stack = progress.stack - 1
-                if (itm.resolveId && (o = globalctx.list[itm.resolveId])) { o(true) }
+                if (itm.resolveId && (o = dialogvars.list[itm.resolveId])) { o(true) }
               } else {
                 /** 모든 stack 이 종료된 경우 progress 해제 */
                 progress.resolveId = itm.resolveId
@@ -158,26 +158,26 @@ const slice = createSlice({
               }
             } else {
               /** progress 중이 아닌 경우 그냥 종료 */
-              if (itm.resolveId && (o = globalctx.list[itm.resolveId])) { o(true) }
+              if (itm.resolveId && (o = dialogvars.list[itm.resolveId])) { o(true) }
             }
           } break
-          default: { }}
+          default: }
         }
       } break
       case C.EVENT: {
         let pid = progress.resolveId
         switch (payload.value) {
         case 1: /** entered */ {
-          if(o = globalctx.list[pid]) { o(true) }
-          delete globalctx.list[pid]
+          if(o = dialogvars.list[pid]) { o(true) }
+          delete dialogvars.list[pid]
         } break
         case 2: /** exited */ {
-          if(o = globalctx.list[pid]) { o(true) }
-          delete globalctx.list[pid]
+          if(o = dialogvars.list[pid]) { o(true) }
+          delete dialogvars.list[pid]
         } break
-        default: { }}
+        default: }
       } break
-      default: { }}
+      default: }
     },
     authModal(state, action) {
       const p = action.payload
@@ -200,7 +200,7 @@ const dialogContext = {
       if (type === undefined) { type = C.ALERT }
       payload = {
         type: type,
-        resolveId: globalctx.nextId(resolve),
+        resolveId: dialogvars.nextId(resolve),
         message: val
       }
       resolved = true
@@ -208,10 +208,10 @@ const dialogContext = {
       if (type !== undefined) { val.type = type }
       switch (val.type) {
       case C.ALERT: case C.CONFIRM: {
-        payload.resolveId = globalctx.nextId(resolve)
+        payload.resolveId = dialogvars.nextId(resolve)
         resolved = true
       } break
-      default: { } }
+      default: }
       payload = val
     }
     store.dispatch(slice.actions.modal(payload))
@@ -224,7 +224,7 @@ const dialogContext = {
       if (val === undefined || val === true) {
         payload = {
           type: C.VISIBLE,
-          resolveId: globalctx.nextId(resolve),
+          resolveId: dialogvars.nextId(resolve),
           visible: true,
           timeout: timeout
         }
@@ -232,13 +232,13 @@ const dialogContext = {
       } else if (val === false) {
         payload = {
           type: C.VISIBLE,
-          resolveId: globalctx.nextId(resolve),
+          resolveId: dialogvars.nextId(resolve),
           visible: false
         }
         ret = true
       } else if (typeof val === C.OBJECT) {
         if (val.type === C.VISIBLE) {
-          val.resolveId = globalctx.nextId(resolve)
+          val.resolveId = dialogvars.nextId(resolve)
           ret = true
         }
         payload = val
@@ -252,11 +252,11 @@ const dialogContext = {
   }),
   winpopup(url: string, data: any, option: OptionType) {
     /** 이전에 열린 팝업들을 제거한다 */
-    for (let tid in globalctx.winpopups) {
-      const pctx: any = globalctx.winpopups[tid]
+    for (let tid in dialogvars.winpopups) {
+      const pctx: any = dialogvars.winpopups[tid]
       if (pctx?.close) {
         pctx.close()
-        delete globalctx.winpopups[tid]
+        delete dialogvars.winpopups[tid]
       }
     }
     const tid = app.setGlobalTmp(data)
@@ -275,27 +275,27 @@ const dialogContext = {
     let location = option?.location || 'no'
     let resizable = option?.resizable || 'yes'
     if (data) {
-      globalctx.winpopups[tid] = { }
-      data.$$POUPCTX$$ = globalctx.winpopups[tid]
+      dialogvars.winpopups[tid] = { }
+      data.$$POUPCTX$$ = dialogvars.winpopups[tid]
     }
     const hnd = window.open(`${url}?tid=${tid}`, `${target}`,
       `popup=true,width=${width},height=${height},left=${left},top=${top},menubar=${menubar},` +
       `scrollbars=${scrollbars},status=${status},location=${location},resizable=${resizable}`);
 
     if ([C.LOCAL, C.MY].indexOf(app.profile()) === -1) {
-      if (!globalctx.closeListener) {
+      if (!dialogvars.closeListener) {
         /** window가 리프레시되기 전에 열려있는 모든 창을 닫는다 */
-        globalctx.closeListener = async () => {
+        dialogvars.closeListener = async () => {
           log.debug('CLOSE....')
-          for (let tid in globalctx.winpopups) {
-            const pctx: any = globalctx.winpopups[tid]
+          for (let tid in dialogvars.winpopups) {
+            const pctx: any = dialogvars.winpopups[tid]
             if (pctx?.close) {
               pctx.close()
-              delete globalctx.winpopups[tid]
+              delete dialogvars.winpopups[tid]
             }
           }
         }
-        window.addEventListener('beforeunload', globalctx.closeListener)
+        window.addEventListener('beforeunload', dialogvars.closeListener)
       }
     }
     return hnd
