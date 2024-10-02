@@ -191,13 +191,13 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         } }
       }
       const el = $(vars?.elem.current)[0]
-      let v = el.value
       setTimeout(async () => {
         {
+          let v = el.value
           let st = Number(el.selectionStart || 1)
           let ed = Number(el.selectionEnd || 1)
           let ch = String(v).substring(st - 1, ed)
-          log.debug('CHAR:', `'${ch}'`, st, ed, kcode, v)
+          log.debug('CHAR:', `'${ch}'`, st, ed, v.length, kcode, v)
           if (vars?.itype === 'number') {
             /** FIXME: formatter 테스트 */
             v = format.numeric(el.value)
@@ -218,7 +218,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         if (e?.keyCode === KEYCODES.ENTER && props?.onEnter instanceof Function) { props.onEnter(e) }
         update(C.UPDATE_FULL)
         vars.avail = true
-      }, 10)
+      }, 50)
     }
   }
   return (
