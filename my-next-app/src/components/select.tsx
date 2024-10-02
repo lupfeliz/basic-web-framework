@@ -9,6 +9,7 @@ import { Dropdown , DropdownProps } from 'react-bootstrap'
 
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
+import { isEvent, cancelEvent, KEYCODES } from '@/libs/evdev'
 
 /** 선택목록 타입 */
 type OptionType = {
@@ -35,6 +36,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       value: '',
       text: '',
       options: [] as OptionType[],
+      menuvisb: false,
     },
     async mounted() {
       copyRef(ref, elem)
@@ -61,19 +63,54 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   }
 
   const onChange = async (e: any, v: any) => {
-    log.debug('CHANGE..', e?.target, v)
+    // log.debug('CHANGE..', e?.target, v)
     const { setValue } = modelValue(self())
     let options: OptionType[] = vars.options as any
     // const inx = v?.props?.value || 0
-    const inx = Number(v || 0)
+    const inx = vars.index = Number(v || 0)
     setValue(options[inx].value, () => update(C.UPDATE_FULL))
     /** 변경시 데이터모델에 값전달 */
     if (props.onChange) { props.onChange(e as any) }
   }
+
+  const onKeyDown = async (e: KeyboardEvent) => {
+    // log.debug('E:', e)
+    const { setValue } = modelValue(self())
+    if (!vars.menuvisb) {
+      vars.menuvisb = true
+    } else {
+      /** FIXME: evdev 완성후 수정할것 */
+      switch (e.keyCode) {
+      case KEYCODES.UP: {
+        if (vars.index > 0) { vars.index -= 1 }
+        // log.debug('UP', vars.index)
+      } break
+      case KEYCODES.DOWN: {
+        if (vars.index < vars.options.length - 1) { vars.index += 1 }
+        // log.debug('DOWN', vars.index)
+      } break
+      case KEYCODES.ENTER: {
+        vars.menuvisb = false
+      } break
+      }
+      vars.options[vars.index].selected = true
+      setValue(vars.options[vars.index].value)
+    }
+    update(C.UPDATE_SELF)
+    if (isEvent(e)) { cancelEvent(e) }
+  }
+
+  const onToggle = async (v: boolean) => {
+    // log.debug('TOGGLED!', v)
+    vars.menuvisb = v
+  }
+
   return (
   <Dropdown
     ref={ elem }
     onSelect={ (v, e) => onChange(e, v) }
+    onKeyDown={ onKeyDown as any }
+    onToggle={ onToggle }
     >
     <Dropdown.Toggle
       variant='light'
@@ -84,13 +121,14 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       { vars.text || props.children }
     </Dropdown.Toggle>
     {/* 선택목록 생성*/}
-    <Dropdown.Menu>
+    <Dropdown.Menu show={ vars.menuvisb }>
       { vars?.options?.length > 0 && vars.options.map((itm, inx) => (
       <Dropdown.Item
         key={ inx }
         eventKey={ inx }
         // value={ inx }
         active={ itm?.selected || false }
+        // active={ vars.index == inx }
         >
         { `${itm?.name}` }
       </Dropdown.Item>

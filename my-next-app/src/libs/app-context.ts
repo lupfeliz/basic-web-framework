@@ -21,6 +21,7 @@ import { MDCRipple } from '@material/ripple'
 
 import * as C from '@/libs/constants'
 import values from '@/libs/values'
+import dialog from '@/libs/dialog-context'
 import log, { getLogger } from '@/libs/log'
 import proc from '@/libs/proc'
 import $t from '@/libs/i18n'
@@ -52,7 +53,7 @@ type ContextType<T> = {
 }
 const { AES: cjaes, enc: cjenc } = CryptoJS
 const { until } = proc
-const { randomStr } = values
+const { randomStr, putAll } = values
 
 /** 이 부분은 웹팩 플러그인(replace-loader)에 의해 자동으로 채워진다 */
 const encrypted = () => '{$$ENCRYPTED$$}'
@@ -133,7 +134,7 @@ const app = {
     const [uid] = React.useState(app.genId())
     const [phase, setPhase] = React.useState(0)
     const [, setState] = React.useState(0)
-    ctx[uid] = app.putAll(ctx[uid] || { uid, name: prm?.name, vars: prm?.vars || {}, releaselist: [] }, { props: prm?.props || {}, phase })
+    ctx[uid] = putAll(ctx[uid] || { uid, name: prm?.name, vars: prm?.vars || {}, releaselist: [] }, { props: prm?.props || {}, phase })
     const self = (vars?: any, props?: any) => {
       let ret = {
         uid,
@@ -145,7 +146,7 @@ const app = {
       if (vars) { for (const k in vars) { (ret.vars as any)[k] = vars[k] } }
       return ret as SetupType<V, P>
     }
-    app.putAll(self, self())
+    putAll(self, self())
     if (!appvars?.router) { appvars.router = router as any }
     React.useEffect(() => {
       let retproc: any = () => { }
@@ -229,7 +230,7 @@ const app = {
     if (compo) {
       ret = compo
       if (opts) {
-        app.putAll(ret, opts)
+        putAll(ret, opts)
         if (opts.nossr) {
           ret = dynamic(() => Promise.resolve(compo as any), { ssr: false }) as any
         }
@@ -255,7 +256,7 @@ const app = {
       }
       if (opts) {
         delete opts['nossr']
-        app.putAll(ret, opts)
+        putAll(ret, opts)
       }
     }
     return ret as any as C
@@ -289,16 +290,19 @@ const app = {
     if (appvars.astate == C.APPSTATE_INIT) {
       appvars.astate = C.APPSTATE_START
       try {
+        putAll(window, { jQuery: $ })
         const api = (await import('@/libs/api')).default
         const crypto = (await import('@/libs/crypto')).default
         log.debug('APP-ONLOAD-LIBS')
         /* @ts-ignore */
         appvars.MaterialStyle = await import('@materialstyle/materialstyle/dist/js/materialstyle.esm')
+        /** window.jQuery 를 사용하는 객체 바인딩 후 삭제 */
+        values.delete(window, 'jQuery')
         appvars.astate = C.APPSTATE_LIBS
         const userContext = (await import('@/libs/user-context')).default
         const conf = decryptAES(encrypted(), C.CRYPTO_KEY)
         const clitime = new Date().getTime()
-        app.putAll(appvars.config, conf)
+        putAll(appvars.config, conf)
         log.setLevel(conf.log.level)
         log.debug('CONF:', conf)
         const cres = await api.get(`cmn01001`, {}, { noprogress: true })
@@ -315,6 +319,26 @@ const app = {
         const userInfo = userContext.getUserInfo()
         if (userInfo?.userId && (userInfo.accessToken?.expireTime || 0) > clitime) { userContext.checkExpire() }
         appvars.astate = C.APPSTATE_USER
+
+        /** FIXME: 임시코드 */
+        {
+          putAll(window, {
+            $,
+            APPPROPS: props,
+            DIALOG: dialog,
+            APPVARS: appvars,
+          })
+          const errhandler = (e: any) => {
+            log.debug('E:', e)
+            // e.preventDefault()
+            // e.stopPropagation()
+            // return false
+          }
+          window.addEventListener('error', errhandler)
+          window.addEventListener('unhandledrejection', errhandler)
+          $('#__next')[0].addEventListener('error', errhandler)
+          $('#__next')[0].addEventListener('unhandledrejection', errhandler)
+        }
       } catch (e) {
         appvars.astate = C.APPSTATE_ERROR
         log.debug('E:', e)

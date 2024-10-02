@@ -16,11 +16,10 @@ import LayoutDefault from '@/components/layout'
 import DialogContainer from '@/components/dialog-container'
 
 // import 'bootstrap/dist/css/bootstrap.min.css'
-import '@fortawesome/fontawesome-free/css/all.min.css'
 import '@materialstyle/materialstyle/scss/materialstyle.scss'
+import '@fortawesome/fontawesome-free/css/all.min.css'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-// import '@/assets/fonts/bootstrap-icons.min.css'
 
 /** 전역 스타일시트 */
 import '@/pages/global.scss'
@@ -32,9 +31,7 @@ log.setLevel(getConfig()?.publicRuntimeConfig?.logLevel || 'debug')
 export default definePage((props) => {
   const { Component, pageProps, router } = props
   /** APP 최초구동을 수행한다 */
-  if (!isServer()) {
-    onload(props)
-  }
+  if (!isServer()) { onload(props) }
   useSetup({
     async mounted() {
       /** 웹컨테이너에서 SPA 페이지를 다이렉트로 접근할 때 URL 보정 */

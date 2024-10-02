@@ -10,7 +10,6 @@
  **/
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
-import dialog from '@/libs/dialog-context'
 import { Block, Button, Checkbox, Input, Select, Editor, Lottie, Container, Image, DataGrid } from '@/components'
 
 const { log, definePage, goPage, useSetup, clear, putAll } = app
@@ -53,9 +52,6 @@ export default definePage((props) => {
     // putAll(window, { DIALOG: dialog })
     log.debug('MOUNTED! SMP01001S01', props)
     const fdata = vars.formdata
-    putAll(window, {
-      DIALOG: dialog
-    })
     /** 3초가 지나면 데이터 강제 업데이트를 수행한다 */
     const fnctime = async () => {
       if (vars.timer == 1) {
