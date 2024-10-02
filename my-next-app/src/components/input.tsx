@@ -130,14 +130,13 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     if (props?.onBlur) { props.onBlur(e) }
   }
   const onKeyDownProc = (e: KeyboardEvent) => {
-    // const e = equeue.pop()
     vars.avail = false
     const props = self().props
     const { setValue } = modelValue(self())
     if (props?.onKeyDown instanceof Function) { props.onKeyDown(e) }
     const cdnm = e.code
     const kcode = Number(e?.keyCode || 0)
-
+    log.debug('E:', e.code, e.keyCode)
     /** 이벤트가 존재하면 */
     if (isEvent(e)) {
       /** 허용키 : ctrl+c ctrl+v 방향키 bs delete tab enter space */
@@ -191,7 +190,6 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           }
         } }
       }
-      // const el = $(elem.current).find('input')[0]
       const el = $(vars?.elem.current)[0]
       let v = el.value
       setTimeout(async () => {

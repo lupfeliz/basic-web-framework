@@ -75,12 +75,16 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     ref={ elem }
     onSelect={ (v, e) => onChange(e, v) }
     >
-    <Dropdown.Toggle>
+    <Dropdown.Toggle
+      variant='light'
+      style={{
+        border: '1px solid #ccc'
+      }}
+      >
       { vars.text || props.children }
     </Dropdown.Toggle>
     {/* 선택목록 생성*/}
-    <Dropdown.Menu
-      >
+    <Dropdown.Menu>
       { vars?.options?.length > 0 && vars.options.map((itm, inx) => (
       <Dropdown.Item
         key={ inx }

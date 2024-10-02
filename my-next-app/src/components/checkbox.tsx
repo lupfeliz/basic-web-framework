@@ -7,6 +7,7 @@
  **/
 import { FormCheck as _Checkbox, FormCheckProps as _CheckboxProps } from 'react-bootstrap'
 import app from '@/libs/app-context'
+import values from '@/libs/values'
 import * as C from '@/libs/constants'
 
 const CheckboxPropsSchema = {
@@ -53,31 +54,30 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
   return (
   <span className='form-check inline-block'>
   {/* 표현타입에 따라 체크박스 또는 라디오버튼 으로 표현된다 */}
-  { props.type === 'radio' ? (
-    <>
-      <input
-        ref={ elem as any }
-        id={ ready() ? uid : C.UNDEFINED }
-        type='radio'
-        className='form-check-input'
-        { ...pprops }
-        checked={ vars.checked || false }
-        onChange={ onChange as any }
-        />
-    </>
-  ) : (
-    <>
-      <input
-        ref={ elem as any }
-        id={ ready() ? uid : C.UNDEFINED }
-        type='checkbox'
-        className='form-check-input'
-        { ...pprops }
-        checked={ vars.checked || false }
-        onChange={ onChange as any }
-        />
-    </>
-  ) }
+  { values.matcher(props.type, 'checkbox',
+    'checkbox', (
+    <input
+      ref={ elem as any }
+      id={ ready() ? uid : C.UNDEFINED }
+      type='checkbox'
+      className='form-check-input'
+      { ...pprops }
+      checked={ vars.checked || false }
+      onChange={ onChange as any }
+      />
+    ),
+    'radio', (
+    <input
+      ref={ elem as any }
+      id={ ready() ? uid : C.UNDEFINED }
+      type='radio'
+      className='form-check-input'
+      { ...pprops }
+      checked={ vars.checked || false }
+      onChange={ onChange as any }
+      />
+    )
+  )}
   </span>
   )
 })

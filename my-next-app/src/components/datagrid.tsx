@@ -13,19 +13,27 @@ import $ from 'jquery'
 
 import { CSSProperties, MutableRefObject } from 'react'
 import { ColDef, ColSpanParams, GridApi, GridReadyEvent, RowSpanParams, CellClassParams, RowDataUpdatedEvent, SortChangedEvent, GridPreDestroyedEvent, CellMouseOverEvent } from 'ag-grid-community'
-type DataGridProps = AgGridReactProps & {
-  gridClass: string
-  gridStyle: CSSProperties
-  ref: MutableRefObject<HTMLDivElement>
+
+type DataGridProps = AgGridReactProps & Record<string, any> & Partial<typeof DataGridPropsSchema> & { }
+
+const DataGridPropsSchema = {
+  gridClass: '',
+  gridStyle: {},
+  ref: C.UNDEFINED as MutableRefObject<HTMLDivElement>,
+  suppressPropertyNamesCheck: true,
+  suppressRowTransform: true,
+  columnDefs: [] as ColDef[],
+  rowData: [] as any[],
+  onGridReady: async (e: GridReadyEvent) => ({} as any),
+  onGridPreDestroyed: async (e: GridPreDestroyedEvent) => ({} as any),
+  onRowDataUpdated: async (e: RowDataUpdatedEvent) => ({} as any),
+  onSortChanged: async (e: SortChangedEvent) => ({} as any),
 }
 
 const { useSetup, putAll, defineComponent, log, copyExclude, copyRef, useRef, until, getFrom } = app
 
 export default defineComponent((props: DataGridProps, ref: DataGridProps['ref']) => {
-  const pprops = copyExclude(props, [
-    'suppressPropertyNamesCheck', 'suppressRowTransform', 'columnDefs', 'rowData', 
-    'onGridReady', 'onGridPreDestroyed', 'onRowDataUpdated', 'onSortChanged',
-  ])
+  const pprops = copyExclude(props, values.merge(Object.keys(DataGridPropsSchema), [ ]))
   const self = useSetup({
     name: 'datagrid',
     props,
@@ -178,7 +186,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     <div 
       ref={ vars?.elem }
       className={ props.gridClass || 'ag-theme-quartz' }
-      style={ props.gridStyle }
+      style={ props.gridStyle || {} }
       >
       <AgGridReact
         suppressPropertyNamesCheck={ true }

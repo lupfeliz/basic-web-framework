@@ -13,5 +13,5 @@ import app from '@/libs/app-context'
 type ContentProps = ComponentPropsWithRef<'div'> & { html?: string }
 export default app.defineComponent((props: ContentProps) => {
   const content = parse(String(props.children || props?.html || ''))
-  return (<> {content} </>)
+  return (<> { content } </>)
 })
