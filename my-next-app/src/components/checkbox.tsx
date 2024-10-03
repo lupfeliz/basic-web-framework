@@ -23,15 +23,15 @@ const { useRef, copyExclude, copyRef, useSetup, defineComponent, modelValue, log
 
 export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model'])
-  const elem = useRef<HTMLInputElement>()
   const self = useSetup({
     name: 'checkbox',
     props,
     vars: {
       checked: false,
+      elem: useRef<HTMLInputElement>()
     },
     async mounted() {
-      copyRef(ref, elem)
+      copyRef(ref, vars.elem)
       /** 초기 데이터 화면반영 */
       const { props, value } = modelValue(self())
       vars.checked = props?.value == value
@@ -47,8 +47,8 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
   const onChange = async (e: InputEvent) => {
     // log.debug('ON-CHANGE:', e)
     const { props, setValue } = modelValue(self())
-    setValue(elem?.current?.checked ? props?.value : '')
-    vars.checked = elem?.current?.checked || false
+    setValue(vars?.elem?.current?.checked ? props?.value : '')
+    vars.checked = vars?.elem?.current?.checked || false
     update(C.UPDATE_FULL)
   }
   return (
@@ -57,7 +57,7 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
   { values.matcher(props.type, 'checkbox',
     'checkbox', (
     <input
-      ref={ elem as any }
+      ref={ vars?.elem as any }
       id={ ready() ? uid : C.UNDEFINED }
       type='checkbox'
       className='form-check-input'
@@ -68,7 +68,7 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
     ),
     'radio', (
     <input
-      ref={ elem as any }
+      ref={ vars?.elem as any }
       id={ ready() ? uid : C.UNDEFINED }
       type='radio'
       className='form-check-input'

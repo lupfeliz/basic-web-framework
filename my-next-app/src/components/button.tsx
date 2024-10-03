@@ -25,19 +25,28 @@ type ButtonProps = Record<string, any> & Partial<typeof ButtonPropsSchema>
 
 const { throttle } = lodash
 const { merge } = values
-const { defineComponent, copyExclude, goPage, strm } = app
+const { defineComponent, useSetup, copyExclude, goPage, strm, useRef, copyRef } = app
 
 export default defineComponent((props: ButtonProps, ref: ButtonProps['ref']) => {
   const pprops = copyExclude(props, merge(Object.keys(ButtonPropsSchema), []))
-  const clssize = (props: ButtonProps) => {
-    switch (props.size) {
-    case 'small': case 'sm': return 'btn-sm'
-    case 'large': case 'lg': return 'btn-lg'
-    default: return 'btn-md'
+  const self = useSetup({
+    vars: { elem: useRef<any>() },
+    async mounted() { copyRef(ref, vars.elem) }
+  })
+  const { vars, update } = self()
+  const getClasses = (props: ButtonProps) => {
+    let ret = ''
+    if (props.size) {
+      switch (props.size) {
+      case 'small': case 'sm': { ret = `${ret} btn-sm` } break
+      case 'large': case 'lg': { ret = `${ret} btn-lg` } break
+      default: ret = `${ret} btn-md`
+      }
     }
-  }
-  const clscolor = (props: ButtonProps) => {
-    return `btn-${props.color}`
+    if (props.color) {
+      ret = `${ret} btn-${props.color}`
+    }
+    return ret
   }
   const onClick = throttle(async (e: any) => {
     /** 버튼이지만 href 속성이 있다면 a 태그처럼 작동한다 */
@@ -49,10 +58,10 @@ export default defineComponent((props: ButtonProps, ref: ButtonProps['ref']) => 
   }, 300)
   return (
     <button
-      ref={ ref }
+      ref={ vars?.elem }
       type='button'
       { ...pprops }
-      className={ strm(`btn ${clssize(props)} ${clscolor(props)}`) }
+      className={ strm(`btn ${getClasses(props)}`) }
       onClick={ onClick }
       >
       { props.children }
