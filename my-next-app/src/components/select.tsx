@@ -7,7 +7,6 @@
  **/
 import { Dropdown , DropdownProps } from 'react-bootstrap'
 
-import $ from 'jquery'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
 import { isEvent, cancelEvent, KEYCODES } from '@/libs/evdev'
@@ -70,7 +69,6 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     // log.debug('CHANGE..', e?.target, v)
     const { setValue } = modelValue(self())
     let options: OptionType[] = vars.options as any
-    // const inx = v?.props?.value || 0
     const inx = vars.index = Number(v || 0)
     setValue(options[inx].value, () => update(C.UPDATE_FULL))
     /** 변경시 데이터모델에 값전달 */
@@ -78,14 +76,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   }
 
   const onKeyDown = async (e: KeyboardEvent) => {
-    // log.debug('E:', e.keyCode, KEYCODES.ENTER, vars.menuvisb)
     const { setValue } = modelValue(self())
-    if (!vars.menuvisb) {
-      // vars.menuvisb = true
-      // $(vars.elem.current).trigger('click')
-      // if (isEvent(e)) { cancelEvent(e) }
-      // update(C.UPDATE_SELF)
-    } else {
+    if (vars.menuvisb) {
       /** FIXME: evdev 완성후 수정할것 */
       switch (Number(e.keyCode)) {
       case KEYCODES.UP: {
@@ -98,22 +90,13 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         if (isEvent(e)) { cancelEvent(e) }
         update(C.UPDATE_SELF)
       } break 
-      // case KEYCODES.ENTER: {
-      //   vars.menuvisb = false
-      //   $(vars.elem.current).trigger('click')
-      //   if (isEvent(e)) { cancelEvent(e) }
-      //   update(C.UPDATE_SELF)
-      // } break
       default: }
       vars.options[vars.index].selected = true
       setValue(vars.options[vars.index].value)
     }
   }
 
-  const onToggle = async (v: boolean) => {
-    // log.debug('TOGGLED!', v)
-    vars.menuvisb = v
-  }
+  const onToggle = async (v: boolean) => { vars.menuvisb = v }
 
   return (
   <Dropdown
@@ -136,9 +119,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       <Dropdown.Item
         key={ inx }
         eventKey={ inx }
-        // value={ inx }
         active={ itm?.selected || false }
-        // active={ vars.index == inx }
         >
         { `${itm?.name}` }
       </Dropdown.Item>
