@@ -224,7 +224,7 @@ const app = {
   sleep(time: number) { return new Promise(r => setTimeout(r, time)) },
   createElement: React.createElement,
   /** react 페이지 선언 */
-  definePage<A, B, C extends A & B>(compo?: A, _opts?: B) {
+  definePage<A extends Function1<AppProps, any>, B, C extends A & B>(compo?: A, _opts?: B) {
     let ret = C.UNDEFINED
     let opts: any = _opts
     if (compo) {
@@ -482,6 +482,7 @@ const app = {
   },
   strm: (v?: any) => String(v || '').replace(/[ ]+/g, ' ').trim(),
   MaterialStyle: (fnc: Function1<any, any>) => fnc(appvars.MaterialStyle),
+  router: () => appvars.router,
 }
 
 const compoSubscribe = <V, P>(prm: LauncherProps<V, P>, uid: string, setState: Function) => {

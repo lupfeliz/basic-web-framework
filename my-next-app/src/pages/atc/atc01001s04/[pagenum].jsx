@@ -66,6 +66,7 @@ export default definePage(() => {
       vars.data = res
       if (vars.data.list.length != 0) {
         vars.state = 1
+        values.copyExists(vars.pdata, res)
         vars.pdata.currentPage = pagenum
       } else {
         vars.state = 2

@@ -5,13 +5,13 @@
  * @Description : Pagination 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-// import _Pagination, { PaginationProps as _PaginationProps } from '@mui/material/Pagination';
-// import _Stack from '@mui/material/Stack';
 import _Pagination, { PaginationProps as _PaginationProps } from 'react-bootstrap/Pagination'
 import * as C from '@/libs/constants'
+import Paging from '@/libs/paging'
 import app from '@/libs/app-context'
+import values from '@/libs/values'
 
-const { defineComponent, copyExclude, useSetup, copyRef, useRef, log } = app
+const { defineComponent, copyExclude, useSetup, copyRef, useRef, log, modelValue, putAll } = app
 
 type PaginationProps = _PaginationProps & Record<string, any> & {
   onChange?: Function
@@ -28,45 +28,59 @@ export default defineComponent((props: PaginationProps, ref: PaginationProps['re
   const elem = useRef({} as HTMLDivElement)
   const self = useSetup({
     name: 'pagination',
-    vars: props.model || { },
+    vars: {
+      pageTotal: 0,
+      pageStart: 0,
+      pageEnd: 0,
+      rowStart: 0,
+      rowEnd: 0,
+    },
     async mounted() {
       copyRef(ref, elem)
       update(C.UPDATE_FULL)
     },
     async updated() {
-      if (!vars.currentPage) { vars.currentPage = 1 }
-      if (!vars.rowCount) { vars.rowCount = 10 }
-      if (!vars.rowTotal) { vars.rowTotal = 0 }
-      if (!vars.pageCount) { vars.pageCount = Math.ceil(1.0 * vars.rowTotal / vars.rowCount) }
-      if (vars.currentPage > vars.pageCount) { vars.currentPage = vars.pageCount }
-      vars.rowStart = (vars.currentPage - 1) * vars.rowCount
+      if (!model.currentPage) { model.currentPage = 1 }
+      if (!model.rowCount) { model.rowCount = 10 }
+      if (!model.pageCount) { model.pageCount = 10 }
+      if (!model.rowTotal) { model.rowTotal = 0 }
+      if (!vars.pageTotal) { vars.pageTotal = Math.ceil(1.0 * model.rowTotal / model.rowCount) }
+      if (model.currentPage > vars.pageTotal) { model.currentPage = vars.pageTotal }
+      log.debug('ROW-TOTAL:', model.rowTotal)
+      model.rowStart = (model.currentPage - 1) * model.rowCount
+      const paging = new Paging(model.rowCount, model.pageCount, model.rowTotal)
+      const [pageStart, pageEnd, pageTotal] = paging.pageNumbers(model.currentPage)
+      putAll(vars, { pageStart, pageEnd, pageTotal })
+      log.debug('PAGES:', model.currentPage, paging.pageNumbers(model.currentPage))
+      log.debug('ROWS:', model.currentPage, paging.rowNumbers(model.currentPage))
       update(C.UPDATE_SELF)
     }
   })
   const { vars, update } = self()
+  const model = props.model || {}
   const onChange = (e: any, n: number) => {
     log.debug('ON-CHANGE:', e, n)
     if (!n) { n = 1 }
-    if (!vars.pageCount) { vars.pageCount = 0 }
-    if (n > vars.pageCount) { n = vars.pageCount || 1 }
+    if (!vars.pageTotal) { vars.pageTotal = 0 }
+    if (n > vars.pageTotal) { n = vars.pageTotal || 1 }
     if (n < 1) { n = 1 }
-    vars.rowStart = (n - 1) * (vars.rowCount || 10)
-    vars.currentPage = n
+    model.rowStart = (n - 1) * (model.rowCount || 10)
+    model.currentPage = n
     if (props?.onChange && props.onChange instanceof Function) {
       (props as any).onChange()
     }
   }
   return (
   <>
+  { vars.pageStart > 0 && (
   <div>
-    <_Pagination
-    >
-    { Array.from({ length: Number(vars.pageCount) }, (_, inx) => {
-      const page = (Math.ceil(1.0 * Number(vars.rowStart) / Number(vars.rowCount)) || 1) + inx 
+    <_Pagination>
+    { Array.from({ length: Number(vars.pageEnd - vars.pageStart + 1) }, (_, inx) => {
+      const page = vars.pageStart + inx 
       return (
       <_Pagination.Item
         key={ page }
-        active={ Number(page) == Number(vars.currentPage) }
+        active={ Number(page) == Number(model.currentPage) }
         onClick={ (e) => onChange(e, page) }
         >
         { page }
@@ -74,6 +88,7 @@ export default defineComponent((props: PaginationProps, ref: PaginationProps['re
       ) }) }
     </_Pagination>
   </div>
+  ) }
   </>
   )
 })

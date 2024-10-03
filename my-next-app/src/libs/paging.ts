@@ -11,44 +11,44 @@ import log from './log'
 const ROWS_DEF = 10
 const PAGES_DEF = 5
 class Paging {
-  rows = ROWS_DEF
-  pages = PAGES_DEF
-  tot = 0
-  constructor(rows?: string | number, pages?: string | number, tot?: string | number) {
-    rows = Number(rows)
-    pages = Number(pages)
-    tot = Number(tot)
-    if (isNaN(rows)) { rows = ROWS_DEF }
-    if (isNaN(pages)) { pages = PAGES_DEF }
-    if (isNaN(tot)) { tot = 0 }
-    this.rows = rows
-    this.pages = pages
-    this.tot = tot
+  rowCount = ROWS_DEF
+  pageCount = PAGES_DEF
+  rowTotal = 0
+  constructor(rowCount?: string | number, pageCount?: string | number, rowTotal?: string | number) {
+    rowCount = Number(rowCount)
+    pageCount = Number(pageCount)
+    rowTotal = Number(rowTotal)
+    if (isNaN(rowCount)) { rowCount = ROWS_DEF }
+    if (isNaN(pageCount)) { pageCount = PAGES_DEF }
+    if (isNaN(rowTotal)) { rowTotal = 0 }
+    this.rowCount = rowCount
+    this.pageCount = pageCount
+    this.rowTotal = rowTotal
   }
 
-  rnums(pn: string | number) {
+  rowNumbers(pn: string | number) {
     pn = Number(pn)
     if (isNaN(pn)) { pn = 1 }
     if (pn < 1) { pn = 1 }
-    let rns = (pn - 1) * this.rows + 1
-    let rne = rns + this.rows
-    if (rne > this.tot) { rne = this.tot }
+    let rns = (pn - 1) * this.rowCount + 1
+    let rne = rns + this.rowCount
+    if (rne > this.rowTotal) { rne = this.rowTotal }
     return [rns, rne]
   }
 
-  pnums(pn: string | number) {
+  pageNumbers(pn: string | number) {
     pn = Number(pn)
     if (isNaN(pn)) { pn = 1 }
     if (pn < 1) { pn = 1 }
     let mod = 0
-    const pnt = Math.ceil(this.tot / this.rows)
+    const pnt = Math.ceil(this.rowTotal / this.rowCount)
     // if (pn > this.pages) { mod = (pn - 1) %  this.pages }
-    mod = (pn - 1) %  this.pages
+    mod = (pn - 1) %  this.pageCount
     let pns = pn - mod
-    let pne = pns + this.pages - 1
+    let pne = pns + this.pageCount - 1
     if (pne > pnt) { pne = pnt }
-    return [pns, pne]
+    return [pns, pne, pnt]
   }
 }
 
-export { Paging }
+export default Paging
