@@ -32,8 +32,7 @@ const keepalive = true
 const init = async (method: string, apicd: string, data?: any, opt?: any) => {
   if (!opt?.noprogress) { await dialog.progress(true) }
   const headers = putAll({}, opt?.headers || {})
-  // const timeout = opt?.timeout || (getConfig()?.api[0] || {})?.timeout || 10000
-  const timeout = 100
+  const timeout = opt?.timeout || (getConfig()?.api[0] || {})?.timeout || 10000
   /** timeout 구현을 위해 AbortController 생성 (구형 브라우저 지원용) */
   const abortctl = new AbortController()
   const signal = abortctl.signal
