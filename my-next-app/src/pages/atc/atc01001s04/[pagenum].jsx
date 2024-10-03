@@ -11,6 +11,7 @@ import userContext from '@/libs/user-context'
 import * as C from '@/libs/constants'
 import { Container, Block, Button, Pagination, Link } from '@/components'
 import moment from 'moment'
+import values from '@/libs/values'
 
 const { definePage, useSetup, log, clone, getParameter, goPage } = app
 
