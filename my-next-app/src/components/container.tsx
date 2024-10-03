@@ -9,6 +9,8 @@
 import { ComponentPropsWithRef } from 'react'
 import app from '@/libs/app-context'
 type ContainerProps = ComponentPropsWithRef<'div'> & { }
+const { copyExclude, strm } = app
 export default app.defineComponent((props: ContainerProps, ref: ContainerProps['ref']) => {
-  return ( <div className='container' ref={ ref } { ...props }> { props.children } </div> )
+  const pprops = copyExclude(props, ['className'])
+  return ( <div className={ strm(`${props.className} container`) } ref={ ref } { ...pprops }> { props.children } </div> )
 })
