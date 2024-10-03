@@ -7,6 +7,7 @@
  **/
 import { Dropdown , DropdownProps } from 'react-bootstrap'
 
+import $ from 'jquery'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
 import { isEvent, cancelEvent, KEYCODES } from '@/libs/evdev'
@@ -23,11 +24,10 @@ type InputProps = DropdownProps & Record<string, any> & {
   options?: OptionType[]
 }
 
-const { log, useRef, copyExclude, clear, copyRef, useSetup, defineComponent, modelValue } = app
+const { log, useRef, copyExclude, clear, copyRef, useSetup, defineComponent, modelValue, putAll } = app
 
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model', 'options', 'onChange'])
-  const elem: any = useRef()
   const self = useSetup({
     name: 'select',
     props,
@@ -37,9 +37,13 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       text: '',
       options: [] as OptionType[],
       menuvisb: false,
+      elem: useRef<any>()
     },
     async mounted() {
-      copyRef(ref, elem)
+      copyRef(ref, vars.elem)
+      {
+        putAll(window, { SELF: self() })
+      }
     }
   })
   const { vars, update } = self()
@@ -74,30 +78,36 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   }
 
   const onKeyDown = async (e: KeyboardEvent) => {
-    // log.debug('E:', e)
+    // log.debug('E:', e.keyCode, KEYCODES.ENTER, vars.menuvisb)
     const { setValue } = modelValue(self())
     if (!vars.menuvisb) {
-      vars.menuvisb = true
+      // vars.menuvisb = true
+      // $(vars.elem.current).trigger('click')
+      // if (isEvent(e)) { cancelEvent(e) }
+      // update(C.UPDATE_SELF)
     } else {
       /** FIXME: evdev 완성후 수정할것 */
-      switch (e.keyCode) {
+      switch (Number(e.keyCode)) {
       case KEYCODES.UP: {
         if (vars.index > 0) { vars.index -= 1 }
-        // log.debug('UP', vars.index)
+        if (isEvent(e)) { cancelEvent(e) }
+        update(C.UPDATE_SELF)
       } break
       case KEYCODES.DOWN: {
         if (vars.index < vars.options.length - 1) { vars.index += 1 }
-        // log.debug('DOWN', vars.index)
-      } break
-      case KEYCODES.ENTER: {
-        vars.menuvisb = false
-      } break
-      }
+        if (isEvent(e)) { cancelEvent(e) }
+        update(C.UPDATE_SELF)
+      } break 
+      // case KEYCODES.ENTER: {
+      //   vars.menuvisb = false
+      //   $(vars.elem.current).trigger('click')
+      //   if (isEvent(e)) { cancelEvent(e) }
+      //   update(C.UPDATE_SELF)
+      // } break
+      default: }
       vars.options[vars.index].selected = true
       setValue(vars.options[vars.index].value)
     }
-    update(C.UPDATE_SELF)
-    if (isEvent(e)) { cancelEvent(e) }
   }
 
   const onToggle = async (v: boolean) => {
@@ -107,7 +117,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
 
   return (
   <Dropdown
-    ref={ elem }
+    ref={ vars?.elem }
     onSelect={ (v, e) => onChange(e, v) }
     onKeyDown={ onKeyDown as any }
     onToggle={ onToggle }
