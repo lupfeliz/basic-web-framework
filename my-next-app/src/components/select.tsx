@@ -40,9 +40,6 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     },
     async mounted() {
       copyRef(ref, vars.elem)
-      {
-        putAll(window, { SELF: self() })
-      }
     }
   })
   const { vars, update } = self()

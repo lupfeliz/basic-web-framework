@@ -13,6 +13,7 @@ import userContext from './user-context'
 import crypto from './crypto'
 import dialog from './dialog-context'
 import proc from './proc'
+import { Function0 } from 'lodash'
 
 type OptType = {
   method?: String
@@ -31,7 +32,8 @@ const keepalive = true
 const init = async (method: string, apicd: string, data?: any, opt?: any) => {
   if (!opt?.noprogress) { await dialog.progress(true) }
   const headers = putAll({}, opt?.headers || {})
-  const timeout = opt?.timeout || (getConfig()?.api[0] || {})?.timeout || 10000
+  // const timeout = opt?.timeout || (getConfig()?.api[0] || {})?.timeout || 10000
+  const timeout = 100
   /** timeout 구현을 위해 AbortController 생성 (구형 브라우저 지원용) */
   const abortctl = new AbortController()
   const signal = abortctl.signal
@@ -59,21 +61,22 @@ const init = async (method: string, apicd: string, data?: any, opt?: any) => {
     }
   }
   /** timeout 시간동안 request 가 처리되지 않으면 abort signal 발생 */
-  const hndtimeout = setTimeout(abortctl.abort, timeout)
+  const hndtimeout = setTimeout(() => abortctl.abort(), timeout)
   /** 정상처리되어 abort signal 이 발생하지 않도록 clear 한다. */
   const abortclr = () => clearTimeout(hndtimeout)
   return { method, url, body, headers, signal, abortclr }
 }
 
 /** 통신결과 처리 */
-const mkres = async (r: Promise<Response>, opt?: OptType) => {
+const mkres = async (run: Function0<Promise<Response>>, opt?: OptType) => {
   let ret = { }
   let t: any = ''
-  const resp = await r
-  const hdrs = resp?.headers || { get: (v: any) => {} }
-  /** 정상처리 되었으므로 abort signal 취소 */
-  opt?.abortclr && opt.abortclr()
+  const state = { error: false, message: '' }
   try {
+    const resp = await run()
+    const hdrs = resp?.headers || { get: (v: any) => {} }
+    /** 정상처리 되었으므로 abort signal 취소 */
+    opt?.abortclr && opt.abortclr()
     /** 통신결과 헤더에서 로그인 JWT 토큰이 발견된 경우 토큰저장소에 저장 */
     if ((t = hdrs.get(C.AUTHORIZATION.toLowerCase()))) {
       const auth: string[] = String(t).split(' ')
@@ -118,7 +121,6 @@ const mkres = async (r: Promise<Response>, opt?: OptType) => {
       }
     }
     /** 상태값에 따른 오류처리 */
-    const state = { error: false, message: '' }
     let msgcode = async () => (await (resp?.json && resp.json()))?.message
     switch (resp.status) {
     case C.SC_BAD_GATEWAY:
@@ -159,7 +161,10 @@ const mkres = async (r: Promise<Response>, opt?: OptType) => {
     } else {
       ret = opt?.reject && opt.reject(state) || {}
     }
-  } catch(e) { }
+  } catch(e) {
+    putAll(state, { error: true, message: `처리 중 오류가 발생했어요`, msgcode: -1 })
+    ret = opt?.reject && opt.reject(state) || {}
+  }
   if (!opt?.noprogress) { await dialog.progress(false) }
   return ret
 }
@@ -174,8 +179,8 @@ const api = {
       if (opt?.noping) { return resolve(true) }
       if (curtime < api.nextping) { return resolve(true) }
       const { method, headers, signal, url, abortclr } = await init(C.GET, apicd, {}, { noprogress: true })
-      const r = fetch(url, { method, headers, signal, keepalive })
-      const res: any = await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject, abortclr }))
+      const run = () => fetch(url, { method, headers, signal, keepalive })
+      const res: any = await mkres(run, putAll(opt || {}, { apicd, method, resolve, reject, abortclr }))
       /** 다음 ping 은 10초 이후 */
       api.nextping = curtime + (1000 * 10)
       return res
@@ -184,41 +189,49 @@ const api = {
   /** POST 메소드 처리 */
   async post(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
-      await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 })
-      await api.ping(opt)
-      const { method, url, body, headers, signal, abortclr } = await init(C.POST, apicd, data, opt)
-      const r = fetch(url, { method, body, headers, signal, keepalive })
-      return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject, abortclr }))
+      try {
+        await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 })
+        await api.ping(opt)
+        const { method, url, body, headers, signal, abortclr } = await init(C.POST, apicd, data, opt)
+        const run = () => fetch(url, { method, body, headers, signal, keepalive })
+        return await mkres(run, putAll(opt || {}, { apicd, method, resolve, reject, abortclr }))
+      } catch (e) { reject(e) }
     })
   },
   /** GET 메소드 처리 */
   async get(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
-      if (apicd !== 'cmn01001') { await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 }) }
-      await api.ping(opt)
-      const { method, url, headers, signal, abortclr } = await init(C.GET, apicd, data, opt)
-      const r = fetch(url, { method, headers, signal, keepalive })
-      return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject, abortclr }))
+      try {
+        if (apicd !== 'cmn01001') { await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 }) }
+        await api.ping(opt)
+        const { method, url, headers, signal, abortclr } = await init(C.GET, apicd, data, opt)
+        const run = () => fetch(url, { method, headers, signal, keepalive })
+        return await mkres(run, putAll(opt || {}, { apicd, method, resolve, reject, abortclr }))
+      } catch (e) { reject(e) }
     })
   },
   /** PUT 메소드 처리 */
   async put(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
-      await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 })
-      await api.ping(opt)
-      const { method, url, body, headers, signal, abortclr } = await init(C.PUT, apicd, data, opt)
-      const r = fetch(url, { method, body, headers, signal, keepalive })
-      return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject, abortclr }))
+      try {
+        await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 })
+        await api.ping(opt)
+        const { method, url, body, headers, signal, abortclr } = await init(C.PUT, apicd, data, opt)
+        const run = () => fetch(url, { method, body, headers, signal, keepalive })
+        return await mkres(run, putAll(opt || {}, { apicd, method, resolve, reject, abortclr }))
+      } catch (e) { reject(e) }
     })
   },
   /** DELETE 메소드 처리 */
   async delete(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
-      await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 })
-      await api.ping(opt)
-      const { method, headers, signal, url, abortclr } = await init(C.DELETE, apicd, data, opt)
-      const r = fetch(url, { method, headers, signal, keepalive })
-      return await mkres(r, putAll(opt || {}, { apicd, method, resolve, reject, abortclr }))
+      try {
+        await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 })
+        await api.ping(opt)
+        const { method, headers, signal, url, abortclr } = await init(C.DELETE, apicd, data, opt)
+        const run = () => fetch(url, { method, headers, signal, keepalive })
+        return await mkres(run, putAll(opt || {}, { apicd, method, resolve, reject, abortclr }))
+      } catch (e) { reject(e) }
     })
   },
   /** URL 을 형태에 맞게 조립해 준다 */

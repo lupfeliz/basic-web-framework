@@ -11,7 +11,7 @@ import _Pagination, { PaginationProps as _PaginationProps } from 'react-bootstra
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
 
-const { defineComponent, copyExclude, useSetup, copyRef, useRef } = app
+const { defineComponent, copyExclude, useSetup, copyRef, useRef, log } = app
 
 type PaginationProps = _PaginationProps & Record<string, any> & {
   onChange?: Function
@@ -45,6 +45,7 @@ export default defineComponent((props: PaginationProps, ref: PaginationProps['re
   })
   const { vars, update } = self()
   const onChange = (e: any, n: number) => {
+    log.debug('ON-CHANGE:', e, n)
     if (!n) { n = 1 }
     if (!vars.pageCount) { vars.pageCount = 0 }
     if (n > vars.pageCount) { n = vars.pageCount || 1 }
@@ -55,33 +56,23 @@ export default defineComponent((props: PaginationProps, ref: PaginationProps['re
       (props as any).onChange()
     }
   }
-  // return (
-  //   <>
-  //   { (vars.pageCount || 0) > 0 && (
-  //     <_Stack
-  //       spacing={2}
-  //       >
-  //       <_Pagination
-  //         ref={ elem }
-  //         count={ vars.pageCount }
-  //         page={ Number(vars?.currentPage || 1) }
-  //         siblingCount={ props.siblingCount || 3 }
-  //         boundaryCount={ props.boundaryCount || 2 }
-  //         onChange={ onChange }
-  //         showFirstButton
-  //         showLastButton
-  //         size='small'
-  //         { ...pprops }
-  //         />
-  //     </_Stack>
-  //   ) }
-  //   </>
-  // )
   return (
   <>
   <div>
     <_Pagination
-      />
+    >
+    { Array.from({ length: Number(vars.pageCount) }, (_, inx) => {
+      const page = (Math.ceil(1.0 * Number(vars.rowStart) / Number(vars.rowCount)) || 1) + inx 
+      return (
+      <_Pagination.Item
+        key={ page }
+        active={ Number(page) == Number(vars.currentPage) }
+        onClick={ (e) => onChange(e, page) }
+        >
+        { page }
+      </_Pagination.Item>
+      ) }) }
+    </_Pagination>
   </div>
   </>
   )
