@@ -9,7 +9,7 @@ import { Dropdown , DropdownProps } from 'react-bootstrap'
 
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
-import { isEvent, cancelEvent, KEYCODES } from '@/libs/evdev'
+import { isEvent, cancelEvent, KEYCODE_TABLE } from '@/libs/evdev'
 
 /** 선택목록 타입 */
 type OptionType = {
@@ -77,12 +77,12 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     if (vars.menuvisb) {
       /** FIXME: evdev 완성후 수정할것 */
       switch (Number(e.keyCode)) {
-      case KEYCODES.UP: {
+      case KEYCODE_TABLE.PC.ArrowUp: {
         if (vars.index > 0) { vars.index -= 1 }
         if (isEvent(e)) { cancelEvent(e) }
         update(C.UPDATE_SELF)
       } break
-      case KEYCODES.DOWN: {
+      case KEYCODE_TABLE.PC.ArrowDown: {
         if (vars.index < vars.options.length - 1) { vars.index += 1 }
         if (isEvent(e)) { cancelEvent(e) }
         update(C.UPDATE_SELF)

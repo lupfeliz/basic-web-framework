@@ -12,7 +12,7 @@ import format from '@/libs/format'
 import proc from '@/libs/proc'
 import values from '@/libs/values'
 import * as C from '@/libs/constants'
-import { KEYCODES, isEvent, cancelEvent } from '@/libs/evdev'
+import { KEYCODE_TABLE, isEvent, cancelEvent } from '@/libs/evdev'
 import { Function1 } from 'lodash'
 
 const InputPropsSchema = {
@@ -143,34 +143,35 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       if (vars?.itype === 'number') {
         let v = 0
         switch (kcode) {
-        case KEYCODES.ESC:
-        case KEYCODES.ENTER:
-        case KEYCODES.DEL:
-        case KEYCODES.INSERT:
-        case KEYCODES.TAB:
-        case KEYCODES.BS:
-        case KEYCODES.LEFT:
-        case KEYCODES.RIGHT:
-        case KEYCODES.HOME:
-        case KEYCODES.END:
-        case KEYCODES.PGUP:
-        case KEYCODES.PGDN:
-        case KEYCODES.SUPER: { /** NO-OP */ } break
+        case KEYCODE_TABLE.PC.Esc:
+        case KEYCODE_TABLE.PC.Enter:
+        case KEYCODE_TABLE.PC.Delete:
+        case KEYCODE_TABLE.PC.Insert:
+        case KEYCODE_TABLE.PC.Tab:
+        case KEYCODE_TABLE.PC.Backslash:
+        case KEYCODE_TABLE.PC.ArrowLeft:
+        case KEYCODE_TABLE.PC.ArrowRight:
+        case KEYCODE_TABLE.PC.Home:
+        case KEYCODE_TABLE.PC.End:
+        case KEYCODE_TABLE.PC.PageUp:
+        case KEYCODE_TABLE.PC.PageDown:
+        case KEYCODE_TABLE.PC.MetaLeft: 
+        case KEYCODE_TABLE.PC.MetaRight: { /** NO-OP */ } break
         case C.UNDEFINED: { /** NO-OP */ } break
-        case KEYCODES.UP: {
+        case KEYCODE_TABLE.PC.ArrowUp: {
           v = Number(inputVal() || 0) - 1
           setValue(inputVal(v))
           cancelEvent(e)
         } break
-        case KEYCODES.DOWN: {
+        case KEYCODE_TABLE.PC.ArrowDown: {
           v = Number(inputVal() || 0) + 1
           setValue(inputVal(v))
           cancelEvent(e)
         } break
         default: {
           if (
-            (kcode >= KEYCODES.KP0 && kcode <= KEYCODES.KP9) ||
-            (kcode >= KEYCODES.NK0 && kcode <= KEYCODES.NK9) ||
+            (kcode >= KEYCODE_TABLE.PC.Digit0 && kcode <= KEYCODE_TABLE.PC.Digit9) ||
+            (kcode >= KEYCODE_TABLE.PC.Numpad0 && kcode <= KEYCODE_TABLE.PC.Numpad9) ||
             ( cdnm === 'Key1' || cdnm === 'Key2' || cdnm === 'Key3' ||
               cdnm === 'Key4' || cdnm === 'Key5' || cdnm === 'Key6' ||
               cdnm === 'Key7' || cdnm === 'Key8' || cdnm === 'Key9' ||
@@ -182,7 +183,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
             /** NO-OP */
           } else if ((
             /** Ctrl+C, Ctrl+V, Ctrl-A, Ctrl+R 허용 */
-            ([KEYCODES['A'], KEYCODES['C'], KEYCODES['V'], KEYCODES['R']].indexOf(kcode) !== -1) &&
+            ([KEYCODE_TABLE.PC.KeyA, KEYCODE_TABLE.PC.KeyC, KEYCODE_TABLE.PC.KeyV, KEYCODE_TABLE.PC.KeyR].indexOf(kcode) !== -1) &&
             e.ctrlKey)) {
             /** NO-OP */
           } else {
@@ -215,7 +216,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
             setValue(inputVal(v))
           }
         }
-        if (e?.keyCode === KEYCODES.ENTER && props?.onEnter instanceof Function) { props.onEnter(e) }
+        if (e?.keyCode === KEYCODE_TABLE.PC.Enter && props?.onEnter instanceof Function) { props.onEnter(e) }
         update(C.UPDATE_FULL)
         vars.avail = true
       }, 50)
