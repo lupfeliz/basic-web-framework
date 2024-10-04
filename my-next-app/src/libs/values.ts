@@ -114,6 +114,9 @@ const values = {
     }
     return target
   },
+  put(target: any, key: string, value: any) {
+    if (target && key) { target[key] = value }
+  },
   /** target 에서 exclude 나열된 것들을 제외한 모든 요소를 복제한 객체 생성 */
   copyExclude<T>(target: T, excludes: any[] = []) {
     let ret: any = { }
