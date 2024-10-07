@@ -96,6 +96,9 @@ export default defineNuxtConfig({
       basePath: ''
     }
   },
+  app: {
+    baseURL: `${yml.app.basePath || ''}`,
+  },
   nitro: {
     output: { publicDir: distdir }
   },
