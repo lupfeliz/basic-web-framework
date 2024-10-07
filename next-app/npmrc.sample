@@ -1,0 +1,5 @@
+## 환경에 맞게 registry 주소 변경후 파일명을 .npmrc 로 복사해서 쓰세요
+shamefully-hoist=true
+strict-peer-dependencies=false
+registry=http://localhost:8081/repository/npm-public/
+timeout=60000

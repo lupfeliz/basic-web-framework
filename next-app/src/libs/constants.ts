@@ -62,7 +62,7 @@ export const APPSTATE_LIBS = 2
 export const APPSTATE_ENV = 3
 export const APPSTATE_USER = 4
 export const APPSTATE_READY = 5
-export const APPSTATE_ERROR = 6
+export const APPSTATE_ERROR = 999
 
 export const UNDEFINED = undefined as any
 
@@ -133,6 +133,7 @@ export const SC_BAD_GATEWAY = 502
 export const SC_SERVICE_UNAVAILABLE = 503
 export const SC_GATEWAY_TIMEOUT = 504
 export const SC_RESOURCE_LIMIT_IS_REACHED = 508
+export const SC_UNKNOWN = -1
 
 export const RESCD_OK = '0000'
 /** 이 부분은 웹팩 플러그인(replace-loader)에 의해 자동으로 채워진다 */

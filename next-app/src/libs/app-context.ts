@@ -321,27 +321,28 @@ const app = {
         appvars.astate = C.APPSTATE_USER
 
         /** FIXME: 임시코드 */
-        {
-          putAll(window, {
-            $,
-            APPPROPS: props,
-            DIALOG: dialog,
-            APPVARS: appvars,
-          })
-          const errhandler = (e: any) => {
-            log.debug('E:', e)
-            // e.preventDefault()
-            // e.stopPropagation()
-            // return false
-          }
-          window.addEventListener('error', errhandler)
-          window.addEventListener('unhandledrejection', errhandler)
-          $('#__next')[0].addEventListener('error', errhandler)
-          $('#__next')[0].addEventListener('unhandledrejection', errhandler)
-        }
+        // {
+        //   putAll(window, {
+        //     $,
+        //     APPPROPS: props,
+        //     DIALOG: dialog,
+        //     APPVARS: appvars,
+        //   })
+        //   const errhandler = (e: any) => {
+        //     log.debug('E:', e)
+        //     // e.preventDefault()
+        //     // e.stopPropagation()
+        //     // return false
+        //   }
+        //   window.addEventListener('error', errhandler)
+        //   window.addEventListener('unhandledrejection', errhandler)
+        //   $('#__next')[0].addEventListener('error', errhandler)
+        //   $('#__next')[0].addEventListener('unhandledrejection', errhandler)
+        // }
       } catch (e) {
         appvars.astate = C.APPSTATE_ERROR
         log.debug('E:', e)
+        return
       }
       appvars.astate = C.APPSTATE_READY
     }

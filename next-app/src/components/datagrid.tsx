@@ -12,7 +12,7 @@ import * as C from '@/libs/constants'
 import $ from 'jquery'
 
 import { CSSProperties, MutableRefObject } from 'react'
-import { ColDef, ColSpanParams, GridApi, GridReadyEvent, RowSpanParams, CellClassParams, RowDataUpdatedEvent, SortChangedEvent, GridPreDestroyedEvent, CellMouseOverEvent } from 'ag-grid-community'
+import { ColDef, ColSpanParams, GridApi, GridReadyEvent, RowSpanParams, CellClassParams, RowDataUpdatedEvent, SortChangedEvent, GridPreDestroyedEvent, CellMouseOverEvent, CellMouseOutEvent } from 'ag-grid-community'
 
 type DataGridProps = AgGridReactProps & Record<string, any> & Partial<typeof DataGridPropsSchema> & { }
 
@@ -179,6 +179,18 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
   }
   const onCellMouseOver = async (e: CellMouseOverEvent) => {
     log.trace('MOUSE-OVER:', e)
+    // log.debug('CHECK:', vars.rowData[Number(e.rowIndex || 0)][`${e.colDef.field}`])
+    // const spaninf = vars.ctx.rowSpan[`${e.colDef.field}`]
+    // const rinx = Number(e.rowIndex)
+    // for (let inx = 0; inx < (spaninf?.length || 0); inx++) {
+    //   if (spaninf[inx]) {
+    //     log.debug('CHECK:', rinx >= spaninf[inx].oinx, rinx < (spaninf[inx].oinx + spaninf[inx].size))
+    //   }
+    // }
+    /** TODO: ROWSPAN, COLSPAN 하이라이팅  */
+  }
+  const onCellMouseOut = async (e: CellMouseOutEvent) => {
+    /** TODO: 하이라이팅 제거 */
   }
   return (
   <>
@@ -198,6 +210,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
         onRowDataUpdated={ onRowDataUpdated }
         onSortChanged={ onSortChanged }
         onCellMouseOver={ onCellMouseOver }
+        onCellMouseOut={ onCellMouseOut }
         { ...(pprops as any) }
         />
     </div>
