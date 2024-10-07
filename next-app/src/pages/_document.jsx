@@ -21,7 +21,7 @@ export default definePage(() => {
           body { transition: opacity 0.4s 0.2s ease; display: block !important; }
           .hide-onload { opacity: 0; }
         </style>
-        <link rel="stylesheet" href="/assets/fonts/bootstrap-icons.min.css">
+        <link rel="stylesheet" href="${app.basepath('/assets/fonts/bootstrap-icons.min.css')}">
         `} />
     </Head>
     {/* hide-onload 클래스가 사라지면 트랜지션이 시작된다. */}

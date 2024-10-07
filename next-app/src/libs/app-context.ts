@@ -458,8 +458,8 @@ const app = {
   },
   profile: () => String(appvars.config.runtime.profile),
   basepath(uri: string) {
-    if (uri.startsWith('/')) { uri = `${String(appvars.config.runtime?.basePath || '').replace(/[\/]+/g, '/')}${uri}` }
-    return uri
+    if (uri && uri.startsWith('/')) { uri = `${String(appvars.config.runtime?.basePath || '').replace(/[\/]+/g, '/')}${uri}` }
+    return uri || '/'
   },
   astate: () => appvars.astate,
   ready: (astate: number = C.APPSTATE_READY) => appvars.astate >= astate ? true : false,
