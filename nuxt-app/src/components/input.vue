@@ -2,7 +2,7 @@
 import * as C from '@/libs/constants'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
 import log from '@/libs/log'
-import { useField, FieldContext } from 'vee-validate'
+import { useField, type FieldContext } from 'vee-validate'
 
 const self = inst(getCurrentInstance())
 const sys = useBaseSystem()

@@ -14,7 +14,7 @@ import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import ReplaceLoader from './env/replace-loader'
 
-const dir = dirname(fileURLToPath(import.meta.url))
+const dir = dirname(__filename)
 const log = { debug: console.log }
 
 env.config()
@@ -43,17 +43,18 @@ if (!process.env?.PRINTED) {
   })
 }
 /** API 프록시 설정 */
-const apiproxy = [] as any[]
+// const apiproxy = [] as any[]
+let apiproxy = {} as any
 ((yml?.api || []) as any[]).map(api => {
   const rewrites: any = {}
   const base = api?.base || '/api'
   rewrites[`^${base}`] = api?.alter || '/api'
-  apiproxy.push({
+  apiproxy = {
     target: api?.server || 'http://localhost:8080',
     changeOrigin: true,
     pathRewrite: rewrites,
     pathFilter: [base]
-  })
+  }
 })
 
 const ReplaceLoaderPlugin = () => {
@@ -72,44 +73,55 @@ const ReplaceLoaderPlugin = () => {
 }
 
 export default defineNuxtConfig({
+  compatibilityDate: '2024-10-17',
   devtools: { enabled: true },
   components: false,
-  modules: ['@pinia/nuxt', 'nuxt-proxy'],
+  modules: ['@pinia/nuxt', 'nuxt-proxy-request'],
   experimental: { viewTransition: true },
+
+  proxy: {
+    options: apiproxy
+  },
+
   vite: {
-    plugins: [ ReplaceLoaderPlugin() ],
+    plugins: [ReplaceLoaderPlugin()],
     build: {
-      rollupOptions: { }
+      rollupOptions: {}
     },
     server: {
-      hmr: {
-        path: '/hmr',
-        clientPort: Number(String(process.env['VITE_HMR_CLIENT_PORT'] || '24678'))
-      },
+      // hmr: {
+      //   path: '/hmr',
+      //   clientPort: Number(String(process.env['VITE_HMR_CLIENT_PORT'] || '24678'))
+      // },
     },
   },
+
   srcDir: 'src',
+
   runtimeConfig: {
-    proxy: { options: apiproxy },
     public: {
       profile: PROFILE,
       basePath: ''
     }
   },
+
   app: {
     baseURL: `${yml.app.basePath || ''}`,
   },
+
   nitro: {
     output: { publicDir: distdir }
   },
+
   css: [
     'bootstrap/dist/css/bootstrap.css',
     '@/pages/globals.scss',
   ],
+
   pinia: {
-    autoImports: [
-      'defineStore',
-      ['defineStore', 'definePiniaStore'],
-    ],
-  },
+    // autoImports: [
+    //   'defineStore',
+    //   ['defineStore', 'definePiniaStore'],
+    // ],
+  }
 })

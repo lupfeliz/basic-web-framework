@@ -8,5 +8,6 @@ if (!app.isServer()) { app.onload({ config: useRuntimeConfig() }) }
   <Component is="script" v-html="`console.log('OK')`"/>
   <DefaultLayout>
     <NuxtPage />
+    <!-- <RouterView /> -->
   </DefaultLayout>
 </template>

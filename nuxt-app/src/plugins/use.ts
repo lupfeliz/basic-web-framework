@@ -2,7 +2,7 @@ import 'core-js'
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
 import app from '@/libs/app-context'
-import { useBaseSystem, mixin, ComponentType  } from '@/store/commons/basesystem'
+import { useBaseSystem, mixin, type ComponentType  } from '@/store/commons/basesystem'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 

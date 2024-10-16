@@ -5,7 +5,7 @@ import * as C from '@/libs/constants'
 import log from '@/libs/log'
 import api from '@/libs/api'
 import app from '@/libs/app-context'
-import { useBaseSystem, inst, ComponentType } from '@/store/commons/basesystem'
+import { useBaseSystem, inst, type ComponentType } from '@/store/commons/basesystem'
 import { useUserInfo, type UserInfoType } from '@/store/commons/userinfo'
 import dialog from '@/libs/dialog-context'
 

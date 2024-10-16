@@ -1,6 +1,7 @@
 {
   "name": "nuxt-app",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "nuxt build",
     "start": "nuxt start",
@@ -23,13 +24,14 @@
     "ie 11"
   ],
   "dependencies": {
-    "@pinia/nuxt": "^0.5.4",
+    "@pinia/nuxt": "^0.5.5",
     "@tiptap/pm": "^2.7.2",
     "@tiptap/starter-kit": "^2.7.2",
     "@tiptap/vue-3": "^2.7.2",
     "@vee-validate/rules": "^4.13.2",
-    "ag-grid-community": "^32.2.0",
+    "ag-grid-community": "^32.2.2",
     "bootstrap": "^5.3.3",
+    "bootstrap-vue-next": "^0.25.3",
     "jquery": "^3.7.1",
     "jsencrypt": "^3.3.2",
     "lodash": "^4.17.21",
@@ -37,26 +39,28 @@
     "pinia": "^2.2.2",
     "pinia-plugin-persistedstate": "^4.0.2",
     "vee-validate": "^4.13.2",
-    "vue": "^3.5.6"
+    "vue": "^3.5.12"
   },
   "devDependencies": {
-    "@nuxt/devtools": "1.5.1",
-    "@types/bootstrap": "^5.2.6",
+    "@nuxt/devtools": "^1.6.0",
+    "@types/bootstrap": "^5.2.10",
     "@types/crypto-js": "^4.1.1",
     "@types/jquery": "^3.5.16",
     "@types/js-yaml": "^4.0.9",
     "@types/lodash": "^4.14.197",
     "@types/moment": "^2.13.0",
-    "@types/node": "^18.17.1",
+    "@vitejs/plugin-legacy": "^5.4.2",
     "abortcontroller-polyfill": "^1.7.5",
     "autoprefixer": "^10.4.14",
     "core-js": "^3.38.1",
     "crypto-js": "^4.1.1",
     "js-yaml": "^4.1.0",
-    "nuxt": "^3.6.5",
-    "nuxt-proxy": "^0.4.1",
+    "nuxt": "^3.13.2",
+    "nuxt-proxy-request": "^1.10.0",
     "postcss": "^8.4.27",
+    "resize-observer-polyfill": "^1.5.1",
     "sass": "^1.64.2",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "unplugin-auto-import": "^0.18.3"
   }
 }

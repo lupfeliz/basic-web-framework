@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
+import { type ComponentInternalInstance, type ComponentPublicInstance } from 'vue'
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
 import { navigateTo } from 'nuxt/app'
@@ -115,4 +115,4 @@ const inst: (e: any) => ComponentMixedType = (e: any) => {
   return ret as any as ComponentMixedType
 }
 
-export { mixin, inst, ComponentType, AnyType }
+export { mixin, inst, type ComponentType, type AnyType }

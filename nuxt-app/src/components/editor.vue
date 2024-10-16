@@ -2,7 +2,7 @@
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
 import { inst } from '@/store/commons/basesystem'
-import { useField, FieldContext } from 'vee-validate';
+import { useField, type FieldContext } from 'vee-validate';
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 

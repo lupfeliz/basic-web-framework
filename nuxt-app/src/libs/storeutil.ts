@@ -2,7 +2,7 @@ import * as C from '@/libs/constants'
 import log from '@/libs/log'
 import values from '@/libs/values'
 
-import { PiniaPluginContext } from 'pinia'
+import { type PiniaPluginContext } from 'pinia'
 
 const storeutil = {
   checkExpire(ctx: PiniaPluginContext<any, any>) {
