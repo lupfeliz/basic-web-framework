@@ -48,7 +48,6 @@ configurations {
 repositories {
   mavenCentral()
   maven(url = "https://repo.spring.io/milestone")
-  maven(url = uri("https://nexus.ntiple.com/repository/maven-public/")).isAllowInsecureProtocol = true
 }
 
 dependencies {
@@ -95,7 +94,7 @@ dependencies {
   /** 테스트관련 */
   testCompileOnly("org.projectlombok:lombok")
   testAnnotationProcessor("org.projectlombok:lombok")
-  testImplementation("com.ntiple:ntiple-utils:0.0.2-9")
+  testImplementation("com.ntiple:ntiple-utils:0.0.2-10")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
