@@ -12,23 +12,29 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 app.setEntrypoint()
 
 const plugin = defineNuxtPlugin(nuxtApp => {
+  /** [nuxt] Your project has pages but the <NuxtPage /> component 오류 억제 */
+  nuxtApp._isNuxtPageUsed = true
   const vueApp = nuxtApp.vueApp
-
   /** VUE 경고 핸들링. hydration 경고 등을 제어하도록 한다. */
-  // vueApp.config.warnHandler = (msg: string, instance: any) => {
-  //   // if (/^Hydration node mismatch[:]/.test(msg)) {
-  //   //   log.debug(msg)
+  // vueApp.config.warnHandler = (msg: string, instance: ComponentPublicInstance | null, trace: string) => {
+  //   // if (msg.startsWith('Failed to resolve component: Mjx')) {
+  //   //   return
+  //   // }
+  //   // if (msg.includes('mjx-container')) {
+  //   //   return
+  //   // }
+  //   // // if (/^Hydration node mismatch[:]/.test(msg)) {
+  //   // //   log.debug(msg)
+  //   // //   return ''
+  //   // // }
+  //   // if (/^Hydration class mismatch on/.test(msg)) {
+  //   //   log.trace(msg)
   //   //   return ''
   //   // }
-  //   if (/^Hydration class mismatch on/.test(msg)) {
-  //     log.trace(msg)
-  //     return ''
-  //   }
+  //   log.warn('WARN: ', msg, trace)
   // }
-
-  // vueApp.config.errorHandler = (e: any) => {
-  //   log.debug('E:', e)
-  //   // log.debug('ERROR:', e)
+  // vueApp.config.errorHandler = (err: unknown, instance: ComponentPublicInstance | null, info: string) => {
+  //   log.warn('ERROR: ', err, info)
   // }
 
   vueApp.use(createPinia)
