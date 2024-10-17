@@ -12,10 +12,11 @@ import cryptojs from 'crypto-js'
 import { copyFileSync, readFileSync, existsSync, rmSync, mkdirSync } from 'fs'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
+import legacy from '@vitejs/plugin-legacy'
 import ReplaceLoader from './env/replace-loader'
 
-const dir = dirname(__filename)
 const log = { debug: console.log }
+const dir = dirname(__filename)
 
 env.config()
 const distdir = path.join(dir, 'dist')
@@ -27,6 +28,11 @@ const prod = process.env.NODE_ENV === 'production'
 /** 프로파일별 환경변수를 읽어온다 */
 const PROFILE = process.env.PROFILE || 'local'
 const yml: any = yaml.load(readFileSync(`${process.cwd()}/env/env-${PROFILE}.yml`, 'utf8'))
+
+const baseURL = `${yml.app.basePath || ''}`
+process.env.BASE_DIR = dir
+process.env.BASE_URL = baseURL
+
 if (!process.env?.PRINTED) {
   console.log('================================================================================')
   console.log(`샘플앱 / 프로파일 : ${PROFILE} / 구동모드 : ${cmd}[${prod}] / API프록시 : ${((yml?.api || [])[0] || {})?.server}`)
@@ -84,7 +90,13 @@ export default defineNuxtConfig({
   },
 
   vite: {
-    plugins: [ReplaceLoaderPlugin()],
+    plugins: [
+      legacy({
+        targets: ['defaults', 'not IE 11', 'chrome > 59', 'firefox > 60'],
+        externalSystemJS: false,
+      }),
+      ReplaceLoaderPlugin()
+    ],
     build: {
       rollupOptions: {}
     },
@@ -106,7 +118,10 @@ export default defineNuxtConfig({
   },
 
   app: {
-    baseURL: `${yml.app.basePath || ''}`,
+    head: {
+      // script: [ { src: `${baseURL}/system.min.js` } ]
+    },
+    baseURL
   },
 
   nitro: {

@@ -1,4 +1,7 @@
 import 'core-js'
+import ResizeObserver from 'resize-observer-polyfill'
+if (typeof window !== 'undefined') { window.ResizeObserver = ResizeObserver }
+
 import * as C from '@/libs/constants'
 import log from '@/libs/log'
 import app from '@/libs/app-context'
