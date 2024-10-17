@@ -13,6 +13,24 @@ app.setEntrypoint()
 
 const plugin = defineNuxtPlugin(nuxtApp => {
   const vueApp = nuxtApp.vueApp
+
+  /** VUE 경고 핸들링. hydration 경고 등을 제어하도록 한다. */
+  // vueApp.config.warnHandler = (msg: string, instance: any) => {
+  //   // if (/^Hydration node mismatch[:]/.test(msg)) {
+  //   //   log.debug(msg)
+  //   //   return ''
+  //   // }
+  //   if (/^Hydration class mismatch on/.test(msg)) {
+  //     log.trace(msg)
+  //     return ''
+  //   }
+  // }
+
+  // vueApp.config.errorHandler = (e: any) => {
+  //   log.debug('E:', e)
+  //   // log.debug('ERROR:', e)
+  // }
+
   vueApp.use(createPinia)
   { (nuxtApp as any).$pinia.use(piniaPluginPersistedstate) }
   vueApp.mixin({

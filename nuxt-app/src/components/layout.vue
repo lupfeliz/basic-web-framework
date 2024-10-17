@@ -6,6 +6,7 @@ import * as C from '@/libs/constants'
 import { useBaseSystem, inst } from '@/store/commons/basesystem'
 import log from '@/libs/log'
 import $ from 'jquery'
+import app from '@/libs/app-context'
 
 const self = inst(getCurrentInstance())
 
@@ -86,6 +87,9 @@ onBeforeMount(async () => {
   }
 })
 
+if (!app.isServer()) {
+}
+
 onUnmounted(async () => {
   window.removeEventListener(C.POPSTATE, () => { })
 })
@@ -95,15 +99,23 @@ onUnmounted(async () => {
     <Header />
     <RouterView v-slot="{ Component, route }">
       <Transition name="slide-fade" mode="out-in">
-        <main
-          class="container"
-          :key="route.fullPath"
-          >
+        <main class="container" :key="route.fullPath">
           <Component :is="Component" />
         </main>
       </Transition>
     </RouterView>
+    <!-- <NuxtPage v-slot="{ Component, route }">
+      <Transition name="slide-fade" mode="out-in">
+        <main class="container" :key="route.fullPath">
+          <Component :is="Component" />
+        </main>
+      </Transition>
+    </NuxtPage> -->
     <Footer />
     <DialogContainer />
   </template>
+  <!-- FIXME: 임시코드 (suppress warning 용) -->
+  <!-- <template v-else>
+    <NuxtPage />
+  </template> -->
 </template>

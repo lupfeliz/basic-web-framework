@@ -59,7 +59,8 @@ let apiproxy = {} as any
     target: api?.server || 'http://localhost:8080',
     changeOrigin: true,
     pathRewrite: rewrites,
-    pathFilter: [base]
+    pathFilter: [base],
+    enableLogger: false,
   }
 })
 
@@ -84,6 +85,8 @@ export default defineNuxtConfig({
   components: false,
   modules: ['@pinia/nuxt', 'nuxt-proxy-request'],
   experimental: { viewTransition: true },
+  build: {
+  },
 
   proxy: {
     options: apiproxy
@@ -132,6 +135,22 @@ export default defineNuxtConfig({
     'bootstrap/dist/css/bootstrap.css',
     '@/pages/globals.scss',
   ],
+
+  hooks: {
+    'vite:extendConfig': (config: any, { isClient, isServer }: any) => {
+      const server = config.server as any
+      const build = config.build as any
+      if (isClient) {
+        (config.resolve?.alias as any).vue = 'vue/dist/vue.esm-bundler'
+      }
+      if (config.mode === 'development') {
+        if (isClient) { build.sourcemap = true; }
+        if (isServer) { build.sourcemap = 'inline'; }
+        build.minify = false
+        build.assetsInlineLimit = 0
+      }
+    }
+  },
 
   pinia: {
     // autoImports: [
