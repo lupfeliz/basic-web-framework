@@ -37,7 +37,7 @@ const apivars = {
 
 /** 초기화, 기본적으로 사용되는 통신헤더 등을 만들어 준다 */
 const init = async (method: string, apicd: string, data?: any, opt?: any) => {
-  if (!opt?.noprogress) { await dialog.progress(true) }
+  if (!opt?.noprogress) { dialog.progress(true) }
   const headers = putAll({}, opt?.headers || {})
   const timeout = opt?.timeout || (getConfig()?.api[0] || {})?.timeout || 10000
   /** timeout 구현을 위해 AbortController 생성 (구형 브라우저 지원용) */
@@ -182,7 +182,7 @@ const mkres = async (run: Function0<Promise<Response>>, opt?: OptType) => {
       ret = opt?.reject && opt.reject(state) || {} 
     }
   }
-  if (!opt?.noprogress) { await dialog.progress(false) }
+  if (!opt?.noprogress) { dialog.progress(false) }
   return ret
 }
 
