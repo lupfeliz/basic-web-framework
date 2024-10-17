@@ -4,8 +4,8 @@ import app from '@/libs/app-context'
 if (!app.isServer()) { app.onload({ config: useRuntimeConfig() }) }
 </script>
 <template>
-  <!-- <DefaultLayout>
-    <NuxtPage :page-key="route => route.fullPath" />
-  </DefaultLayout> -->
-  <DefaultLayout />
+  <DefaultLayout>
+    <!-- <NuxtPage :page-key="route => route.fullPath" /> -->
+  </DefaultLayout>
+  <!-- <DefaultLayout /> -->
 </template>

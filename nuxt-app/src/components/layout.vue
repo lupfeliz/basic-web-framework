@@ -9,6 +9,8 @@ import $ from 'jquery'
 import app from '@/libs/app-context'
 
 const self = inst(getCurrentInstance())
+const slot = useSlots()
+const route = useRoute()
 
 const sys = ref()
 
@@ -104,6 +106,11 @@ onUnmounted(async () => {
         </main>
       </Transition>
     </RouterView>
+      <!-- <Transition name="slide-fade" mode="out-in">
+        <main class="container" :key="route.fullPath">
+          <NuxtPage />
+        </main>
+      </Transition> -->
     <!-- <NuxtPage v-slot="{ Component, route }">
       <Transition name="slide-fade" mode="out-in">
         <main class="container" :key="route.fullPath">

@@ -47,17 +47,23 @@ onMounted(async () => {
     orderType: ''
   }
   if (history?.state?.histdata) { data = JSON.parse(history.state.histdata) }
+  await app.until(() => app.astate() === C.APPSTATE_READY, { interval: 100, maxcheck: 100 })
   search(data)
 })
 
 const search = async (req: any, save?: boolean) => {
-  log.debug('SEARCH-API..', app.astate())
-  const data = await api.post('atc01001', req)
-  log.debug('SEARCH-RESULT..', data)
-  if (save) { self.saveHist(req) }
-  paging.value = new Paging(data.rows, data.pages, data.cnt)
-  data.totp = Math.ceil(Number(data.cnt) / Number(data.rows))
-  boardData.value = data
+  try {
+    log.debug('SEARCH-API..', app.astate())
+    const data = await api.post('atc01001', req)
+    log.debug('SEARCH-RESULT..', data)
+    if (save) { self.saveHist(req) }
+    paging.value = new Paging(data.rows, data.pages, data.cnt)
+    data.totp = Math.ceil(Number(data.cnt) / Number(data.rows))
+    boardData.value = data
+    self.$forceUpdate()
+  } catch (e) {
+    log.debug('E:', e)
+  }
 }
 
 const viewArticle = async (item: any) => {

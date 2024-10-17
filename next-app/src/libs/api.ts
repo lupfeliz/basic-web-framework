@@ -13,7 +13,7 @@ import userContext from './user-context'
 import crypto from './crypto'
 import dialog from './dialog-context'
 import proc from './proc'
-import { Function0 } from 'lodash'
+import { type Function0 } from 'lodash'
 
 type ConfigType = {
 
@@ -26,7 +26,6 @@ type OptType = {
   reject?: Function
   /** timeout abort 취소용메소드 */
   abortclr: Function
-  [name: string]: any
 } & Record<string, any>
 
 const { putAll, getConfig, log } = app
