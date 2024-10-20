@@ -14,6 +14,7 @@ import values from '@/libs/values'
 import * as C from '@/libs/constants'
 import { KEYCODE_TABLE, isEvent, cancelEvent } from '@/libs/evdev'
 import { Function1 } from 'lodash'
+import { registForm } from '@/components/form'
 
 const InputPropsSchema = {
   model: {} as any,
@@ -49,6 +50,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     },
     async mounted() {
       copyRef(ref, vars?.elem)
+      log.debug('INPUT MOUNTED')
+      registForm(() => self().props, () => vars, () => vars?.elem)
       /** 최초상태 화면반영 */
       inputVal(modelValue(self())?.value || '')
     },
@@ -89,6 +92,20 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   }
 
   const inputVal = (v: any = C.UNDEFINED) => v === C.UNDEFINED ? $(vars?.elem?.current).val() : $(vars?.elem?.current).val(v) && v
+
+  const toNumber = (v: any) => {
+    if (!v) { return v }
+    let s = 1
+    v = String(v)
+    if (v[0] == '-') {
+      s = -1
+      v = v.substring(1)
+    } else if (v[0] == '+') {
+      v = v.substring(1)
+    }
+    v = v.replace(/[^0-9]+/g, '')
+    return Number(v) * s
+  }
 
   /** 입력컴포넌트 변경이벤트 처리 */
   const onChange = async (e: ChangeEvent) => {
@@ -136,7 +153,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     if (props?.onKeyDown instanceof Function) { props.onKeyDown(e) }
     const cdnm = e.code
     const kcode = Number(e?.keyCode || 0)
-    log.debug('E:', e.code, e.keyCode)
+    // log.debug('E:', e.code, e.keyCode)
     /** 이벤트가 존재하면 */
     if (isEvent(e)) {
       /** 허용키 : ctrl+c ctrl+v 방향키 bs delete tab enter space */
@@ -146,6 +163,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         case KEYCODE_TABLE.PC.Esc:
         case KEYCODE_TABLE.PC.Enter:
         case KEYCODE_TABLE.PC.Delete:
+        case KEYCODE_TABLE.PC.Backspace:
         case KEYCODE_TABLE.PC.Insert:
         case KEYCODE_TABLE.PC.Tab:
         case KEYCODE_TABLE.PC.Backslash:
@@ -159,13 +177,13 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         case KEYCODE_TABLE.PC.MetaRight: { /** NO-OP */ } break
         case C.UNDEFINED: { /** NO-OP */ } break
         case KEYCODE_TABLE.PC.ArrowUp: {
-          v = Number(inputVal() || 0) - 1
-          setValue(inputVal(v))
+          v = Number(toNumber(inputVal()) || 0) - 1
+          setValue(inputVal(format.numeric(v)))
           cancelEvent(e)
         } break
         case KEYCODE_TABLE.PC.ArrowDown: {
-          v = Number(inputVal() || 0) + 1
-          setValue(inputVal(v))
+          v = Number(toNumber(inputVal()) || 0) + 1
+          setValue(inputVal(format.numeric(v)))
           cancelEvent(e)
         } break
         default: {
@@ -198,7 +216,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           let st = Number(el.selectionStart || 1)
           let ed = Number(el.selectionEnd || 1)
           let ch = String(v).substring(st - 1, ed)
-          log.debug('CHAR:', `'${ch}'`, st, ed, v.length, kcode, v)
+          // log.debug('CHAR:', `'${ch}'`, st, ed, v.length, kcode, v)
           if (vars?.itype === 'number') {
             /** FIXME: formatter 테스트 */
             v = format.numeric(el.value)

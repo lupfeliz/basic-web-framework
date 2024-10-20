@@ -1,5 +1,5 @@
 /**
- * @File        : usr01001s03.jsx
+ * @File        : smp01001s04.jsx
  * @Author      : 정재백
  * @Since       : 2024-04-16 
  * @Description : 샘플4
