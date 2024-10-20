@@ -9,6 +9,7 @@
 import app from '@/libs/app-context'
 import { Checkbox, Block, Form, Button, Input, Select, Container, Textarea } from '@/components'
 import { useForm } from '@/components/form'
+import format from '@/libs/format'
 
 const { log, definePage, useSetup, goPage, getParameter, asType, useRef } = app
 
@@ -48,7 +49,11 @@ export default definePage(() => {
               model={ vars.data }
               name='input1'
               vrules='auto'
+              formatter={ format.numeric }
               />
+          </Block>
+          <Block className='form-block'>
+            { format.numToHangul(vars.data.input1) }
           </Block>
           <Block className='form-block'>
             <Button

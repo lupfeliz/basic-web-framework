@@ -210,6 +210,52 @@ const format = {
     if (dpoint) { ret = `${ret}.${dpoint}`}
     return ret
   },
+  numberOnly(str: string) {
+    let ret = str
+    if (!str) { str = '' }
+    ret = String(str).replace(/[^0-9]+/g, '')
+    return ret
+  },
+  numToHangul(str: string): string {
+    let minus = /^[-]/.test(str)
+    str = format.numberOnly(str)
+    if (!str) { str = '' }
+    let ret = ''
+    str = str.replace(/^[0]+/g, '')
+    if (!str) { str = '0' }
+    let len = str.length
+    let digit = ''
+    let word = ''
+    let han = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구']
+    let pos1 = ['', '십', '백', '천']
+    let pos2 = ['', '만', '억', '조', '경']
+    const divide = (str: string) => {
+      let ret = ''
+      let len = str.length
+      for (let inx = 0; inx < len; inx++) {
+        word = ''
+        digit = str.substring(len - inx - 1, len - inx)
+        if (digit != '0') {
+          if (digit == '1' && inx % 4 != 0) {
+            word = (pos1[inx % 4])
+          } else {
+            word = han[Number(digit)] + (pos1[inx % 4])
+          }
+        }
+        ret = word + ret
+      }
+      return ret
+    }
+    for (let inx = 0; inx < len; inx += 4) {
+      let frag = str.substring(len - inx - 4, len - inx)
+      word = divide(frag)
+      if (inx % 4 == 0) {
+        if (word.length > 0) { word = word + pos2[Math.floor(inx / 4)] + ' ' }
+      }
+      ret = '' + word + ret
+    }
+    return ret
+  },
   picklink(v: any) {
     /** 문장 중 링크가 발견되면 a태그 덧씌움 */
     let ret = String(v)

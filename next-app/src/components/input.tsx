@@ -28,6 +28,7 @@ const InputPropsSchema = {
   minLength: 0 as number,
   maxValue: 0 as number,
   minValue: 0 as number,
+  formatter: ((v: any) => v) as Function1<any, any>,
   type: '' as string,
   pattern: '' as string
 }
@@ -53,12 +54,12 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       log.debug('INPUT MOUNTED')
       registForm(() => self().props, () => vars, () => vars?.elem)
       /** 최초상태 화면반영 */
-      inputVal(modelValue(self())?.value || '')
+      inputVal(modelValue(self()).value || '')
     },
     async updated(mode: any) {
       if (mode && vars) {
         /** 화면 강제 업데이트 발생시 화면반영 */
-        inputVal(modelValue(self())?.value || '')
+        inputVal(modelValue(self()).value || '')
       }
     }
   })
@@ -148,8 +149,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   }
   const onKeyDownProc = (e: KeyboardEvent) => {
     vars.avail = false
-    const props = self().props
-    const { setValue } = modelValue(self())
+    const { props, setValue } = modelValue(self())
     if (props?.onKeyDown instanceof Function) { props.onKeyDown(e) }
     const cdnm = e.code
     const kcode = Number(e?.keyCode || 0)
@@ -178,12 +178,20 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         case C.UNDEFINED: { /** NO-OP */ } break
         case KEYCODE_TABLE.PC.ArrowUp: {
           v = Number(toNumber(inputVal()) || 0) - 1
-          setValue(inputVal(format.numeric(v)))
+          if (props?.formatter) {
+            setValue(inputVal(props.formatter(v)))
+          } else {
+            setValue(inputVal(v))
+          }
           cancelEvent(e)
         } break
         case KEYCODE_TABLE.PC.ArrowDown: {
           v = Number(toNumber(inputVal()) || 0) + 1
-          setValue(inputVal(format.numeric(v)))
+          if (props?.formatter) {
+            setValue(inputVal(props.formatter(v)))
+          } else {
+            setValue(inputVal(v))
+          }
           cancelEvent(e)
         } break
         default: {
@@ -219,15 +227,20 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           // log.debug('CHAR:', `'${ch}'`, st, ed, v.length, kcode, v)
           if (vars?.itype === 'number') {
             /** FIXME: formatter 테스트 */
-            v = format.numeric(el.value)
+            // v = format.numeric(el.value)
+            if (props?.formatter) {
+              v = props.formatter(el.value)
+            } else {
+              v = el.value
+            }
             const l1 = String(el.value).length
             const l2 = v.length
             el.value = v
             await proc.sleep(1)
             /** TODO 기존에 선택상태였는지 체크, 삭제의 경우, 붙여넣기의 경우 */
             if (l2 > l1) {
-              st ++;
-              ed ++;
+              st ++
+              ed ++
             }
             el.selectionStart = st
             el.selectionEnd = ed
