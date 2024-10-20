@@ -90,11 +90,14 @@ export default defineComponent(() => {
   return (
     <>
     <footer
-      ref={vars.elem}
+      className='navbar navbar-expand-sm fixed-bottom'
+      // ref={vars.elem}
       // className={`${vars?.forceHide ? 'hidden' : ''}`}
-      style={{ display: vars.forceHide ? 'none' : 'block' }}
+      // style={{ display: vars.forceHide ? 'none' : 'block' }}
       >
-      <Container>
+      <Container
+        className='text-center justify-center'
+        >
         FOOTER
       </Container>
     </footer>
