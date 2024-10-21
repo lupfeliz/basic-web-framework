@@ -95,10 +95,13 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
         {
           cdef.cellClass = (p: CellClassParams) => {
             let o: any
-            const ccls = p.colDef.cellClass
+            // log.debug('CELL-CLASS:', p.colDef.field, p.rowIndex)
+            // const spaninf = vars.ctx.rowSpan[`${p.colDef.field}`][p.rowIndex]
+            // if (spaninf) { log.debug('CELL-SPAN:', spaninf) }
+            // const ccls = p.colDef.cellClass
             const rinx = Number(p.node.rowIndex || 0)
             let ret: string[] = []
-            ret.push(`dgi-${rinx}-${cinx}`)
+            ret.push(`dgi-${p.colDef.field}-${rinx}`)
             {
               if ((vars.ctx.cellStyle[cfld] || [])[rinx]) {
                 ret.push(vars.ctx.cellStyle[cfld][rinx])
@@ -141,8 +144,9 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
               if (vccst[oinx].indexOf('rspan-slave') === -1) { vccst[oinx].push('rspan-slave') }
               if ((o = vccst[oinx].indexOf('rspan-prime')) !== -1) { vccst[oinx].splice(o, 1) }
             }
+            putAll(getSpaninf(rinx), { size: 1, oinx: oinx, topinx: spaninf? spaninf.oinx : oinx, topctx: spaninf })
           } else {
-            putAll(spaninf = getSpaninf(rinx), { size: 1, oinx: oinx, topinx: oinx, toprow: crow, topctx: spaninf })
+            putAll(spaninf = getSpaninf(rinx), { size: 1, oinx: oinx, topinx: oinx, topctx: spaninf })
           }
           sval = crow[cfld]
         }
@@ -178,19 +182,46 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
     if (props?.onSortChanged) { props.onSortChanged(e) }
   }
   const onCellMouseOver = async (e: CellMouseOverEvent) => {
-    log.trace('MOUSE-OVER:', e)
+    const { props } = self()
+    // log.debug('MOUSE-OVER:', e)
     // log.debug('CHECK:', vars.rowData[Number(e.rowIndex || 0)][`${e.colDef.field}`])
     // const spaninf = vars.ctx.rowSpan[`${e.colDef.field}`]
-    // const rinx = Number(e.rowIndex)
+    const rinx = Number(e.rowIndex)
+    LOOP1: for (const col of props?.columnDefs || []) {
+      const spaninf = vars.ctx.rowSpan[`${col.field}`]
+      if (spaninf && spaninf[rinx]?.topctx) {
+        const topctx = spaninf[rinx]?.topctx
+        const el = $(vars.elem.current).find(`.dgi-${col.field}-${topctx.oinx}`)
+        if (el.length > 0) {
+          el.addClass('ag-cell-hover')
+          // log.debug('SPAN-INF:', spaninf[rinx], el)
+          // spaninf[rinx].topctx.hover = true
+        }
+      }
+      // LOOP2: for (const itm of spaninf) {
+      //   if (!itm) { continue LOOP2 }
+      //   if (rinx >= itm.oinx && rinx < (itm.oinx + itm.size)) {
+      //     log.debug('ROWSPAN:', col.field, rinx, itm.oinx, itm.topinx)
+      //   }
+      // }
+    }
     // for (let inx = 0; inx < (spaninf?.length || 0); inx++) {
     //   if (spaninf[inx]) {
-    //     log.debug('CHECK:', rinx >= spaninf[inx].oinx, rinx < (spaninf[inx].oinx + spaninf[inx].size))
+    //     log.debug('CHECK:', rinx, rinx >= spaninf[inx].oinx, rinx < (spaninf[inx].oinx + spaninf[inx].size), spaninf)
     //   }
     // }
-    /** TODO: ROWSPAN, COLSPAN 하이라이팅  */
   }
   const onCellMouseOut = async (e: CellMouseOutEvent) => {
-    /** TODO: 하이라이팅 제거 */
+    const { props } = self()
+    const rinx = Number(e.rowIndex)
+    LOOP1: for (const col of props?.columnDefs || []) {
+      const spaninf = vars.ctx.rowSpan[`${col.field}`]
+      if (spaninf && spaninf[rinx]?.topctx) {
+        const topctx = spaninf[rinx]?.topctx
+        const el = $(vars.elem.current).find(`.dgi-${col.field}-${topctx.oinx}`)
+        if (el.length > 0) { el.removeClass('ag-cell-hover') }
+      }
+    }
   }
   return (
   <>
