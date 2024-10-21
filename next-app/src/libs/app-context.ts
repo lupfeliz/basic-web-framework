@@ -139,7 +139,7 @@ const app = {
       let ret = {
         uid,
         update: (mode: any) => setState(app.state(mode, uid)),
-        ready: () => !!(appvars.astate && ctx[uid].phase),
+        ready: () => !!(appvars.astate && ctx[uid]?.phase),
         vars: ctx[uid]?.vars || {} as V,
         props: (props || ctx[uid]?.props || {}) as P,
       }

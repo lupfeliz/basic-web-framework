@@ -28,13 +28,13 @@ export default defineComponent(() => {
       fncResize()
       document.addEventListener('touchstart', fncHide)
       document.addEventListener('touchend', fncCancelHide)
-      vars.elem?.current && vars.elem.current.addEventListener('touchstart', fncHide)
+      vars.elem?.current?.addEventListener && vars.elem.current.addEventListener('touchstart', fncHide)
     },
     async unmount() {
       evtlst.map(v => window.removeEventListener(v, fncResize))
       document.removeEventListener('touchstart', fncHide)
       document.removeEventListener('touchend', fncCancelHide)
-      vars.elem?.current && vars.elem.current.removeEventListener('touchstart', fncHide)
+      vars.elem?.current?.removeEventListener && vars.elem.current.removeEventListener('touchstart', fncHide)
     }
   })
   const { vars, update } = self()
@@ -53,39 +53,39 @@ export default defineComponent(() => {
     }
   }, 50)
   const fncHide = (e: any) => {
-    if (e?.target === vars.elem?.current || vars.elem?.current?.contains(e?.target)) {
-      log.debug('FNC-HIDE:', e)
-    } else {
-      vars.hndTouch = setTimeout(() => {
-        vars.isScrolling = true 
-        vars.elem?.current?.classList?.add('sticky', 'hide')
-      }, 100)
-    }
+    // if (e?.target === vars.elem?.current || vars.elem?.current?.contains(e?.target)) {
+    //   log.debug('FNC-HIDE:', e)
+    // } else {
+    //   vars.hndTouch = setTimeout(() => {
+    //     vars.isScrolling = true 
+    //     vars.elem?.current?.classList?.add('sticky', 'hide')
+    //   }, 100)
+    // }
   }
   const fncCancelHide = () => {
-    if (vars.hndTouch) { clearTimeout(vars.hndTouch) }
-    vars.elem?.current?.classList?.remove('hide')
-    vars.isScrolling = false
+    // if (vars.hndTouch) { clearTimeout(vars.hndTouch) }
+    // vars.elem?.current?.classList?.remove('hide')
+    // vars.isScrolling = false
   }
   const fncResize = () => {
-    let o = C.UNDEFINED
-    vars.elem?.current?.classList?.add('sticky', 'hide')
-    fncResizePost()
-    if (!vars.forceHide && (o = document.getSelection()?.anchorNode)) {
-      const inp: HTMLInputElement = o?.nodeName === 'INPUT' ? o : $(o).find('> input')[0] as any
-      if (inp) {
-        vars.forceHide = true
-        update(C.UPDATE_SELF)
-        const fncBlur = () => {
-          log.debug('INPUT-BLUR:', inp)
-          vars.forceHide = false
-          inp.removeEventListener('blur', fncBlur)
-          update(C.UPDATE_SELF)
-        }
-        inp.addEventListener('blur', fncBlur)
-        log.debug('INPUT:', inp)
-      }
-    }
+    // let o = C.UNDEFINED
+    // vars.elem?.current?.classList?.add('sticky', 'hide')
+    // fncResizePost()
+    // if (!vars.forceHide && (o = document.getSelection()?.anchorNode)) {
+    //   const inp: HTMLInputElement = o?.nodeName === 'INPUT' ? o : $(o).find('> input')[0] as any
+    //   if (inp) {
+    //     vars.forceHide = true
+    //     update(C.UPDATE_SELF)
+    //     const fncBlur = () => {
+    //       log.debug('INPUT-BLUR:', inp)
+    //       vars.forceHide = false
+    //       inp.removeEventListener('blur', fncBlur)
+    //       update(C.UPDATE_SELF)
+    //     }
+    //     inp.addEventListener('blur', fncBlur)
+    //     log.debug('INPUT:', inp)
+    //   }
+    // }
   }
   return (
     <>
