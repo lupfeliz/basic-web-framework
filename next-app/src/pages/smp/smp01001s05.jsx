@@ -8,7 +8,7 @@
 
 import app from '@/libs/app-context'
 import { Checkbox, Block, Form, Button, Input, Select, Container, Textarea } from '@/components'
-import { useForm } from '@/components/form'
+import { useForm, validateForm } from '@/components/form'
 import format from '@/libs/format'
 
 const { log, definePage, useSetup, goPage, getParameter, asType, useRef } = app
@@ -30,6 +30,7 @@ export default definePage(() => {
   const { update, vars, ready } = self()
   const onClick = async (num) => {
     log.debug('FORM:', vars.form)
+    const res = await validateForm(vars.form)
   }
   return (
   <Container>
@@ -48,8 +49,12 @@ export default definePage(() => {
               form={ vars.form }
               model={ vars.data }
               name='input1'
-              vrules='auto'
+              label='금액'
+              required={ true }
               formatter={ format.numeric }
+              maxLength={ 10 }
+              minLength={ 2 }
+              vrules='auto'
               />
           </Block>
           <Block className='form-block'>

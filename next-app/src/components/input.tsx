@@ -30,7 +30,7 @@ const InputPropsSchema = {
   minValue: 0 as number,
   formatter: ((v: any) => v) as Function1<any, any>,
   type: '' as string,
-  pattern: '' as string
+  pattern: '' as string,
 }
 
 type InputProps = ComponentPropsWithRef<'input'> & Record<string, any> & Partial<typeof InputPropsSchema>
@@ -48,11 +48,17 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       material: false,
       elem: useRef<any>(),
       wrap: useRef<any>(),
+      valid: {
+        error: false,
+        isvalidated: false,
+        isvalid: C.UNDEFINED,
+        message: C.UNDEFINED,
+      }
     },
     async mounted() {
       copyRef(ref, vars?.elem)
       log.debug('INPUT MOUNTED')
-      registForm(() => self().props, () => vars, () => vars?.elem)
+      registForm(self, () => vars?.elem)
       /** 최초상태 화면반영 */
       inputVal(modelValue(self()).value || '')
     },

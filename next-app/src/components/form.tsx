@@ -20,12 +20,11 @@ type MessageProps = ComponentPropsWithRef<'div'> & {
   open?: any
 }
 
-const { defineComponent, useRef, copyExclude, clone, putAll, log, useSetup, isServer } = app
+const { defineComponent, useRef, copyExclude, clone, putAll, log, useSetup, isServer, modelValue } = app
 
 const formElement = {
   name: '',
-  props: {} as () => {},
-  ctx: {} as () => {},
+  self: (() => {}) as any,
   ref: {} as () => {},
   rules: {} as any,
   seq: 0,
@@ -39,20 +38,21 @@ const formRef = {
   }
 }
 const useForm = () => (useRef(clone(formRef.current) as any))
-const registForm = async (props: any, ctx: any, ref: any) => {
-  const cprops = props()
+const registForm = async (self: any, ref: any) => {
+  const { props: cprops,  } = modelValue(self()) as any
+  // const cprops = props()
   const cref = ref()
   if (cprops?.form?.current?.form) {
     const form = cprops.form.current.form as typeof formRef.current.form
-    const pmodel = cprops?.model
-    const pname = cprops?.name ? cprops.name.split(/[.]/)[0] : undefined
-    const pinx = cprops?.name ? cprops.name.split(/[.]/)[1] : 0
-    const pvalue = pmodel && pname ? pmodel[pname] : C.UNDEFINED
+    // const pmodel = cprops?.model
+    // const pname = cprops?.name ? cprops.name.split(/[.]/)[0] : undefined
+    // const pinx = cprops?.name ? cprops.name.split(/[.]/)[1] : 0
+    // const pvalue = pmodel && pname ? pmodel[pname] : C.UNDEFINED
     // log.debug('FORM:', form, pname, pvalue, cprops)
-    log.trace(`FORM-COMPONENT: ${pname}${!isNaN(pinx) ? '.' + pinx : ''}`, cref?.current)
+    // log.trace(`FORM-COMPONENT: ${pname}${!isNaN(pinx) ? '.' + pinx : ''}`, cref?.current)
     form.elements.push({
-      name: cprops?.name, props: props,
-      ctx: ctx, ref: ref, seq: 0, el: C.UNDEFINED, rules: C.UNDEFINED
+      name: cprops?.name, self,
+      ref: ref, seq: 0, el: C.UNDEFINED, rules: C.UNDEFINED
     })
   }
 }
@@ -67,8 +67,9 @@ const validateForm = async (vform: any, opt: any = {}) => {
     for (let inx in form.elements) {
       const item = form.elements[inx]
       const cname: any = item.name
-      const cprops: any = item.props()
-      const cctx: any = item.ctx()
+      const { props : cprops, vars } = modelValue(item.self()) as any
+      // const cprops: any = item.props()
+      // const cctx: any = item.ctx()
       const cref: any = item.ref()
       const elem = cref?.current ? cref.current : C.UNDEFINED
       item.rules = parseRules(cprops)
@@ -79,7 +80,7 @@ const validateForm = async (vform: any, opt: any = {}) => {
         qlst = `${qlst}[${DATA_VALID_INX}='${inx}']`
         elist[inx] = item
       }
-      cctx.error = false
+      vars.valid.error = false
     }
     const list = $(document.body).find(qlst)
     for (let inx = 0; inx < list.length; inx++) {
@@ -107,8 +108,9 @@ const validateForm = async (vform: any, opt: any = {}) => {
 const validate = async (item: any, opt: any = {}) => new Promise((resolve) => {
   let ret = true
   let result
-  const cctx: any = item.ctx()
-  const cprops: any = item.props()
+  let { props: cprops, value: cvalue, vars } = modelValue(item.self()) as any
+  // const cctx: any = item.ctx()
+  // const cprops: any = item.props()
   try {
     const rlist = String(item.rules).split(/\|/g)
     const label = cprops.label ? cprops.label : cprops.name
@@ -116,24 +118,26 @@ const validate = async (item: any, opt: any = {}) => new Promise((resolve) => {
       const rdata = rule.split(/\:/g)
       const rparm = rdata.length > 1 ? String(rdata[1]).split(/\,/g) : []
       /** NULL, UNDEFINED 값 통일 */
-      cctx.value = values.nval(cctx.value, C.UNDEFINED)
+      // cctx.value = values.nval(cctx.value, C.UNDEFINED)
+      cvalue = values.nval(cvalue, C.UNDEFINED)
       // log.debug('RULE:', rule, rdata, cctx.value, cprops)
       if (!rdata || rdata.length < 1) { continue }
       const vitm  = validations()[rdata[0]]
-      log.trace('VITM:', rule, rdata[0], vitm ? true: false, cctx.value, rparm)
+      // log.debug('VITM:', rule, rdata[0], vitm ? true: false, cctx.value, rparm)
+      log.trace('VITM:', rule, rdata[0], vitm ? true: false, cvalue, rparm)
       if (!vitm) { continue }
       if (rule !== C.REQUIRED &&
         !/^u:/.test(rule) &&
-        (cctx.value === '' || cctx.value === undefined)) {
+        (cvalue === '' || cvalue === undefined)) {
         result = true
       } else {
-        result = vitm({ value: cctx.value, name: label }, rparm, cctx)
+        result = vitm({ value: cvalue, name: label }, rparm, vars.valid)
       }
       log.trace('RESULT:', result, typeof result)
       if (typeof result === C.STRING) {
         if (!opt?.noerror) {
-          cctx.error = true
-          cctx.message = result
+          vars.valid.error = true
+          vars.valid.message = result
         }
         if (opt) { opt.message = result }
         result = false
@@ -147,8 +151,8 @@ const validate = async (item: any, opt: any = {}) => new Promise((resolve) => {
   } catch (e) {
     log.debug('E:', e)
   }
-  cctx.validated = true
-  cctx.valid = ret
+  vars.valid.isvalidated = true
+  vars.valid.isvalid = ret
   resolve(ret)
   return ret;
 })
@@ -436,6 +440,7 @@ const parseRules = (props: any, attrs?: any) => {
         list.splice(pinx, 0, `${rule}`)
         pinx++
       }
+      if (props.required && list.indexOf('required') == -1) { list.push('required') }
     }
     {
       /** min-max length */
