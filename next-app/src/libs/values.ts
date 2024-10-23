@@ -644,6 +644,7 @@ const values = {
   },
   /** react의 ref 객체끼리 복제 할 때 사용 (useRef), 기본적으로는 putAll 과 동일 */
   copyRef(target: any, source: any, opt?: any) {
+    /** 사용단에서 useRef 를 사용했는지 확인 필요 */
     if (target && source && target.hasOwnProperty('current')) {
       values.putAll(target, source)
       if (opt) { values.putAll(target, opt) }

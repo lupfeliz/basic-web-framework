@@ -13,7 +13,7 @@ import * as C from '@/libs/constants'
 import format from '@/libs/format'
 import { Block, Button, Checkbox, Input, Select, Editor, Lottie, Container, Image, DataGrid } from '@/components'
 
-const { log, definePage, goPage, useSetup, clear, putAll } = app
+const { log, definePage, goPage, useSetup, clear, putAll, useRef } = app
 
 export default definePage((props) => {
   const self = useSetup({
@@ -43,7 +43,8 @@ export default definePage((props) => {
     idgen: ['', '', '', ''],
 
     columnDefs: [],
-    rowData: []
+    rowData: [],
+    anim: useRef(),
     },
     mounted, unmount, updated
   })
@@ -51,7 +52,7 @@ export default definePage((props) => {
   /** 페이지 시작 이벤트처리 */
   async function mounted() {
     // putAll(window, { DIALOG: dialog })
-    log.debug('MOUNTED! SMP01001S01', props)
+    log.debug('MOUNTED! SMP01001S01')
     const fdata = vars.formdata
     /** 3초가 지나면 데이터 강제 업데이트를 수행한다 */
     const fnctime = async () => {
@@ -292,8 +293,10 @@ export default definePage((props) => {
         <hr />
         <Block className='my-1 flex justify-center'>
           <Lottie 
+            ref={ vars.anim }
             className='max-w-2/3'
             src='/assets/lottie/hello.json'
+            onClick={ () => vars.anim.play(3) }
             />
         </Block>
       </article>
