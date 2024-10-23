@@ -19,6 +19,12 @@ type MessageProps = ComponentPropsWithRef<'div'> & {
   anchor?: any
   open?: any
 }
+type ValidationType = {
+  error?: boolean
+  isValidated?: boolean
+  isValid?: boolean
+  message?: string
+}
 
 const { defineComponent, useRef, copyExclude, clone, putAll, log, useSetup, isServer, modelValue } = app
 
@@ -97,6 +103,9 @@ const validateForm = async (vform: any, opt: any = {}) => {
       let res = await validate(item, opt)
       if (res === false) {
         log.debug('INVALID:', item, opt)
+        const { props } = item.self()
+        putAll(opt, { element: item.el })
+        if (props?.onError) { props.onError(opt) }
         ret = false
         break
       }
@@ -151,8 +160,8 @@ const validate = async (item: any, opt: any = {}) => new Promise((resolve) => {
   } catch (e) {
     log.debug('E:', e)
   }
-  vars.valid.isvalidated = true
-  vars.valid.isvalid = ret
+  vars.valid.isValidated = true
+  vars.valid.isValid = ret
   resolve(ret)
   return ret;
 })
@@ -507,7 +516,7 @@ const Message = defineComponent((props: MessageProps, ref: MessageProps['ref']) 
     </>
   )
 })
-export { useForm, registForm, validateForm }
+export { useForm, registForm, validateForm, type ValidationType }
 export default defineComponent((props: FormProps, ref: FormProps['ref'] & any) => {
   const pprops = copyExclude(props, [])
   const self = useSetup({

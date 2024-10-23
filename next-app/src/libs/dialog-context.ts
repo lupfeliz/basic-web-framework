@@ -114,7 +114,9 @@ const slice = createSlice({
         let pid = modal.resolveId
         if(o = dialogvars.list[pid]) {
           /** 버튼인덱스 값에 있는 결과값을 리턴한다. */
-          o(modal.buttons[payload?.value]?.value)
+          const res = modal.buttons[payload?.value]?.value
+          /** FIXME: 트랜지션 시간을 동적으로 체크하도록 */
+          proc.sleep(200).then(() => { o(res) })
         }
         /** 큐에 쌓여있는 대화창을 처리한다. */
         if (modal.queue.length > 0) {

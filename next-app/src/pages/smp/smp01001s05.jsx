@@ -10,6 +10,7 @@ import app from '@/libs/app-context'
 import { Checkbox, Block, Form, Button, Input, Select, Container, Textarea } from '@/components'
 import { useForm, validateForm } from '@/components/form'
 import format from '@/libs/format'
+import dialog from '@/libs/dialog-context'
 
 const { log, definePage, useSetup, goPage, getParameter, asType, useRef } = app
 
@@ -31,6 +32,11 @@ export default definePage(() => {
   const onClick = async (num) => {
     log.debug('FORM:', vars.form)
     const res = await validateForm(vars.form)
+  }
+  const onError = async (e) => {
+    log.debug('ERROR:', e)
+    await dialog.alert(e.message)
+    e.element.focus()
   }
   return (
   <Container>
@@ -55,6 +61,7 @@ export default definePage(() => {
               maxLength={ 20 }
               minLength={ 2 }
               vrules='auto'
+              onError={ onError }
               />
           </Block>
           <Block className='form-block'>

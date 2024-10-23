@@ -14,7 +14,7 @@ import values from '@/libs/values'
 import * as C from '@/libs/constants'
 import { KEYCODE_TABLE, isEvent, cancelEvent } from '@/libs/evdev'
 import { Function1 } from 'lodash'
-import { registForm } from '@/components/form'
+import { registForm, type ValidationType } from '@/components/form'
 
 const InputPropsSchema = {
   model: {} as any,
@@ -50,10 +50,10 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       wrap: useRef<any>(),
       valid: {
         error: false,
-        isvalidated: false,
-        isvalid: C.UNDEFINED,
+        isValidated: false,
+        isValid: C.UNDEFINED,
         message: C.UNDEFINED,
-      }
+      } as ValidationType
     },
     async mounted() {
       copyRef(ref, vars?.elem)
