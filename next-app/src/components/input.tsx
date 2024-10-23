@@ -88,7 +88,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       update(C.UPDATE_SELF)
     }, 1)
   }
-  if (props?.type === 'number') {
+  if (props?.type === 'number' || props?.type == 'numeric') {
     pprops.type = 'text'
     pprops.pattern = '[0-9]*'
     pprops.inputMode = 'numeric'
@@ -142,7 +142,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   }
   const onBlur = async (e: FocusEvent) => {
     const { setValue } = modelValue(self())
-    if (vars?.itype === 'number') {
+    if (vars?.itype === 'number' || vars?.itype === 'numeric') {
       let v = inputVal()
       const minv = Number(props?.minValue)
       const maxv = Number(props?.maxValue)
@@ -155,7 +155,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   }
   const onKeyDownProc = (e: KeyboardEvent) => {
     vars.avail = false
-    const { props, setValue } = modelValue(self())
+    const { props, setValue, value: vprev } = modelValue(self())
     if (props?.onKeyDown instanceof Function) { props.onKeyDown(e) }
     const cdnm = e.code
     const kcode = Number(e?.keyCode || 0)
@@ -163,7 +163,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     /** 이벤트가 존재하면 */
     if (isEvent(e)) {
       /** 허용키 : ctrl+c ctrl+v 방향키 bs delete tab enter space */
-      if (vars?.itype === 'number') {
+      if (vars?.itype === 'number' || vars?.itype === 'numeric') {
         let v = 0
         switch (kcode) {
         case KEYCODE_TABLE.PC.Esc:
@@ -226,31 +226,69 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       const el = $(vars?.elem.current)[0]
       setTimeout(async () => {
         {
-          let v = el.value
-          let st = Number(el.selectionStart || 1)
-          let ed = Number(el.selectionEnd || 1)
-          let ch = String(v).substring(st - 1, ed)
-          // log.debug('CHAR:', `'${ch}'`, st, ed, v.length, kcode, v)
-          if (vars?.itype === 'number') {
-            /** FIXME: formatter 테스트 */
-            // v = format.numeric(el.value)
-            if (props?.formatter) {
-              v = props.formatter(el.value)
-            } else {
-              v = el.value
+          if ([KEYCODE_TABLE.PC.Backspace, KEYCODE_TABLE.PC.Delete].indexOf(kcode) !== -1) {
+            /** 삭제키인(backspace, delete) 경우 별도처리 */
+            let v1, v2, l1, l2
+            let st = Number(el.selectionStart || 0)
+            let ed = Number(el.selectionEnd || 0)
+            v1 = props?.formatter ? props.formatter(vprev) : vprev
+            v2 = props?.formatter ? props.formatter(el.value) : el.value
+            if (el.value === '') {
+              setValue('')
+              return vars.avail = true
             }
-            const l1 = String(el.value).length
-            const l2 = v.length
-            el.value = v
-            await proc.sleep(1)
-            /** TODO 기존에 선택상태였는지 체크, 삭제의 경우, 붙여넣기의 경우 */
-            if (l2 > l1) {
-              st ++
-              ed ++
+            LOOP: while(true) {
+              l1 = v1.length
+              l2 = v2.length
+              // log.debug('LENGTH:', l1, l2, v1, v2, st, ed, el.value)
+              if (l2 === l1) {
+                // if (st > 1 && kcode === KEYCODE_TABLE.PC.Backspace)
+                if (kcode === KEYCODE_TABLE.PC.Backspace) {
+                  v2 = `${v2.substring(0, st - 1)}${v2.substring(st)}`
+                  v2 = props?.formatter ? props.formatter(v2) : v2
+                  l2 --
+                  st --
+                  ed --
+                // } else if (ed < l2 && kcode === KEYCODE_TABLE.PC.Delete) {
+                } else if (kcode === KEYCODE_TABLE.PC.Delete) {
+                  v2 = `${v2.substring(0, st)}${v2.substring(st + 2)}`
+                  v2 = props?.formatter ? props.formatter(v2) : v2
+                  l2 --
+                }
+              }
+              if (st < 0) { st = 0 }
+              if (ed < 0) { ed = 0 }
+              // log.debug('CHECK:', l1, l2, st, ed, v2)
+              el.value = v2
+              await proc.sleep(1)
+              el.selectionStart = st
+              el.selectionEnd = ed
+              setValue(inputVal(v2))
+              break LOOP
             }
-            el.selectionStart = st
-            el.selectionEnd = ed
-            setValue(inputVal(v))
+          }  else {
+            /** 일반키인경우 처리 */
+            let v = el.value
+            let st = Number(el.selectionStart || 0)
+            let ed = Number(el.selectionEnd || 0)
+            let ch = String(v).substring(st - 1, ed)
+            // log.debug('CHAR:', `'${ch}'`, st, ed, v.length, kcode, v)
+            if (vars?.itype === 'number' || vars?.itype === 'numeric') {
+              v = props?.formatter ? props.formatter(el.value) : v
+              if (props?.maxLength && v.length > props.maxLength) { v = props?.formatter ? props.formatter(vprev) : vprev }
+              const l1 = String(el.value).length
+              const l2 = v.length
+              el.value = v
+              await proc.sleep(1)
+              /** TODO 기존에 선택상태였는지 체크, 삭제의 경우, 붙여넣기의 경우 */
+              if (l2 > l1) {
+                st ++
+                ed ++
+              }
+              el.selectionStart = st
+              el.selectionEnd = ed
+              setValue(inputVal(v))
+            }
           }
         }
         if (e?.keyCode === KEYCODE_TABLE.PC.Enter && props?.onEnter instanceof Function) { props.onEnter(e) }
@@ -262,13 +300,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   return (
   <>
   <div
-    // className={ strm(`form-floating form-floating-outlined`) }
     ref={ vars?.wrap }
-    /** FIXME: 하드코딩 SSR 에서부터 border 유지여부 */
-    // style={ app.ready(C.APPSTATE_LIBS) ? {} : {
-    //   border: `var(--bs-form-field-border-width) var(--bs-border-style) var(--bs-form-field-border-color)`,
-    //   borderRadius: `var(--bs-form-field-border-radius)`
-    // } }
     >
     <input
       ref={ vars?.elem }
@@ -286,7 +318,6 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       onKeyDown={ onKeyDown }
       placeholder={ pprops.placeholder }
       />
-    {/* <label htmlFor={ app.ready() ? uid : C.UNDEFINED }> { pprops.placeholder } </label> */}
   </div>
   </>
   )

@@ -364,7 +364,7 @@ const validations = () => {
         let name = josa(v.name, '의')
         return String(`#(name) 길이는 최대 #(max) 글자 입니다.`)
           .replace(/\#\(name\)/g, name)
-          .replace(/\#\(min\)/g, String(vmin))
+          .replace(/\#\(max\)/g, String(vmax))
       }
       return true
     },

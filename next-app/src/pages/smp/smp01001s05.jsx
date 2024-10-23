@@ -45,20 +45,20 @@ export default definePage(() => {
         <article>
           <Block className='form-block'>
             <Input
-              type='number'
+              type='numeric'
               form={ vars.form }
               model={ vars.data }
               name='input1'
               label='금액'
               required={ true }
               formatter={ format.numeric }
-              maxLength={ 10 }
+              maxLength={ 20 }
               minLength={ 2 }
               vrules='auto'
               />
           </Block>
           <Block className='form-block'>
-            { format.numToHangul(vars.data.input1) }
+            { format.numToHangul(vars.data.input1) } [ { String(vars.data.input1).length } ]
           </Block>
           <Block className='form-block'>
             <Button
