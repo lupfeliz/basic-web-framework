@@ -9,6 +9,47 @@ html#my-first-app {
   body {
 
     /******************************************************************************/
+    /** 슬라이더 */
+    /******************************************************************************/
+    .slider {
+      > .slider-track {
+        height: 0.4rem;
+        width: 100%;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        border-radius: 0.4rem;
+        > .slider-thumb {
+          height: 0.8rem;
+          width: 0.8rem;
+          background-color: #999;
+          border-radius: 0.8rem;
+          > div {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            top: -1.2rem;
+            &::after {
+              position: absolute;
+              font-size: 0.5rem;
+              top: 0.56rem;
+              content: '▼';
+              color: #ccc;
+            }
+            > span {
+              position: relative;
+              top: -0.8rem;
+              background: #fff;
+              border: 1px solid #ccc;
+              border-radius: 0.5rem;
+              padding: 0 0.5rem 0 0.5rem;
+              display: block;
+            }
+          }
+        }
+      }
+    }
+
+    /******************************************************************************/
     /** 편집기 */
     /******************************************************************************/
     .tiptap > p:first-child {

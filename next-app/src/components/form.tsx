@@ -25,8 +25,9 @@ type ValidationType = {
   message?: string
 }
 
+const COMPONENT = 'form'
 const { getLogger, defineComponent, useRef, copyExclude, clone, putAll, useSetup, isServer, modelValue } = app
-const log = getLogger('form')
+const log = getLogger(COMPONENT)
 // log.setLevel('trace')
 
 const formElement = {
@@ -129,9 +130,10 @@ const validate = async (item: any, opt: any = {}) => new Promise((resolve) => {
         if (rparm.length == 0) { rparm.push('1') }
         if (props?.value !== C.UNDEFINED) { rparm.push(props.value) }
       }
-      let vitm  = validations()[rdata[0]]
-      /** 사용자함수 사용 */
+      let vitm  = C.UNDEFINED
+      /** 사용자함수 를 우선한다 (원래함수 덮어쓰기 용도) */
       if (!vitm && props?.validctx) { vitm = props.validctx[rdata[0]] }
+      if (!vitm) { vitm = validations()[rdata[0]] }
       log.trace('VITM:', rule, rdata[0], vitm ? true: false, value, rparm)
       if (!vitm) { continue }
       if (rule !== C.REQUIRED && (value === '' || value === undefined)) {
@@ -566,6 +568,7 @@ export { useForm, registForm, validateForm, type ValidationType }
 export default defineComponent((props: FormProps, ref: FormProps['ref'] & any) => {
   const pprops = copyExclude(props, [])
   const self = useSetup({
+    name: COMPONENT,
     async mounted() {
       if (ref && ref.hasOwnProperty('current')) {
         log.trace('REF:', ref.current)
@@ -577,6 +580,6 @@ export default defineComponent((props: FormProps, ref: FormProps['ref'] & any) =
   })
   return (<form> {pprops.children} </form>)
 }, {
-  displayName: 'form',
+  displayName: COMPONENT,
   Message
 })

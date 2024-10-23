@@ -24,6 +24,8 @@ export default definePage(() => {
         input1: '',
         checklist: ['', '', '', ''],
         select: '',
+        slider1: '',
+        slider2: '',
       },
       options1: [
         { name: '선택해주세요', value: '' },
@@ -71,7 +73,10 @@ export default definePage(() => {
         <article>
           <Block className='form-block'>
             <Slider
-              ranges={[10, 200, 1000, 5000, 100000]}
+              ranges={ [10, 20, 50, 80, 100] }
+              form={ vars.form }
+              model={ vars.data}
+              names={ ['slider1', 'slider2'] }
               snap
               />
           </Block>
