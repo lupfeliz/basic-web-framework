@@ -5,7 +5,7 @@
  * @Description : 범위선택용 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-import { ChangeEvent, ComponentPropsWithRef, createElement, MouseEvent } from 'react'
+import { ChangeEvent, ComponentPropsWithRef, createElement, Fragment, MouseEvent } from 'react'
 import lodash, { type Function1 } from 'lodash'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
@@ -38,7 +38,7 @@ const SlidePropsSchema = {
 type SliderProps = ComponentPropsWithRef<'input'> & Record<string, any> & Partial<typeof SlidePropsSchema>
 
 const COMPONENT = 'slider'
-const { getLogger, defineComponent, copyExclude, useSetup, useRef, copyRef, modelValue, merge, putAll, strm, clear, pushAll, ready } = app
+const { getLogger, defineComponent, copyExclude, useSetup, useRef, copyRef, modelValue, merge, putAll, strm, clear, pushAll, ready, sleep } = app
 const log = getLogger(COMPONENT)
 
 export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => {
@@ -74,6 +74,8 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
         })
         registForm(gen(inx), getThumbs(inx))
       }
+      /** 슬라이더 초기화 이후 움직이지 않는 현상 버그픽스용 */
+      for (const inx in vars.values) { vars.values[inx] = vars.values[inx] }
       update(C.UPDATE_SELF)
     },
     async updated(mode: any) {
@@ -105,7 +107,6 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
       }
     }
   }
-  const inputVal = (v: any = C.UNDEFINED) => v === C.UNDEFINED ? $(vars?.elem?.current).val() : $(vars?.elem?.current).val(v) && v
   const onChange = async (e: any) => {
     pushAll(clear(vars.values), e)
     if (props?.names && props?.model) {
@@ -139,11 +140,12 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
         </div>
       ) }
       renderThumb={ ({ props }) => (
-        <> { vars.thumbs[props.key] && (
+        <Fragment key={ props.key }>
+        { vars.thumbs[props.key] && (
         <div
           { ...props }
-          tabIndex={ - 1 }
           key={ props.key }
+          tabIndex={ - 1 }
           className={ strm(`slider-thumb`) }
           >
           <div ref={ vars.thumbs[props.key] }>
@@ -151,7 +153,7 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
           </div>
         </div>
         ) }
-        </>
+        </Fragment>
       ) }
       />
   </div>

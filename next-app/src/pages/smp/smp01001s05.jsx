@@ -81,7 +81,7 @@ export default definePage(() => {
         <article>
           <Block className='form-block'>
             <Slider
-              ranges={ [10, 20, 50, 80, 100] }
+              ranges={ [0, 10, 20, 50, 80, 100] }
               form={ vars.form }
               model={ vars.data }
               label='슬라이더'

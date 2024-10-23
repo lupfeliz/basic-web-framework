@@ -234,6 +234,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
       style={ props.gridStyle || {} }
       >
       <AgGridReact
+        suppressDragLeaveHidesColumns={ true }
         suppressPropertyNamesCheck={ true }
         suppressRowTransform={ true }
         columnDefs={ vars?.columnDefs || [] }
