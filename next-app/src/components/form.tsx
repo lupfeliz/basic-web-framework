@@ -321,7 +321,7 @@ const validations = () => {
       let t: any
       if (!format.pattern(C.EMAIL, v.value)) {
         let name = josa(v.value, '은', '"')
-        return String(`#(name) 정상적인 이메일 형식이 아니예요`)
+        return String(`#(name) 올바른 이메일 형식이 아니예요`)
           .replace(/\#\(name\)/g, name)
       }
       return true

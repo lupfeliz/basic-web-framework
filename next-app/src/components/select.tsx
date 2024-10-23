@@ -9,6 +9,7 @@ import { Dropdown , DropdownProps } from 'react-bootstrap'
 
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
+import { registForm, type ValidationType } from '@/components/form'
 import { isEvent, cancelEvent, KEYCODE_TABLE } from '@/libs/evdev'
 
 /** 선택목록 타입 */
@@ -23,7 +24,10 @@ type InputProps = DropdownProps & Record<string, any> & {
   options?: OptionType[]
 }
 
-const { log, useRef, copyExclude, clear, copyRef, useSetup, defineComponent, modelValue, putAll } = app
+const { getLogger, useRef, copyExclude, clear, copyRef, useSetup, defineComponent, modelValue, putAll } = app
+
+const log = getLogger('select')
+log.setLevel('trace')
 
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model', 'options', 'onChange'])
@@ -36,10 +40,18 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       text: '',
       options: [] as OptionType[],
       menuvisb: false,
-      elem: useRef<any>()
+      elem: useRef<any>(),
+      valid: {
+        type: 'select',
+        error: false,
+        isValidated: false,
+        isValid: C.UNDEFINED,
+        message: C.UNDEFINED,
+      } as ValidationType
     },
     async mounted() {
       copyRef(ref, vars.elem)
+      registForm(self, () => vars?.elem)
     }
   })
   const { vars, update } = self()
@@ -97,12 +109,12 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
 
   return (
   <Dropdown
-    ref={ vars?.elem }
     onSelect={ (v, e) => onChange(e, v) }
     onKeyDown={ onKeyDown as any }
     onToggle={ onToggle }
     >
     <Dropdown.Toggle
+      ref={ vars?.elem }
       variant='light'
       style={{
         border: '1px solid #ccc'

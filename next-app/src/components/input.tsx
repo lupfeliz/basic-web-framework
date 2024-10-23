@@ -8,7 +8,6 @@
 import { ChangeEvent, ComponentPropsWithRef, KeyboardEvent, FocusEvent } from 'react'
 import $ from 'jquery'
 import app from '@/libs/app-context'
-import format from '@/libs/format'
 import proc from '@/libs/proc'
 import values from '@/libs/values'
 import * as C from '@/libs/constants'
@@ -38,12 +37,15 @@ const InputPropsSchema = {
 
 type InputProps = ComponentPropsWithRef<'input'> & Record<string, any> & Partial<typeof InputPropsSchema>
 
+const COMPONENT = 'input'
 const { merge } = values
-const { log, copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue, isServer, until, strm } = app
+const { getLogger, copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue, isServer, until, strm } = app
+const log = getLogger(COMPONENT)
+
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
   const pprops = copyExclude(props, merge(Object.keys(InputPropsSchema), []))
   const self = useSetup({
-    name: 'input',
+    name: COMPONENT,
     props,
     vars: {
       itype: props.type,
@@ -146,6 +148,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   const onBlur = async (e: FocusEvent) => {
     const { setValue } = modelValue(self())
     if (vars?.itype === 'number' || vars?.itype === 'numeric') {
+      /** blur시 업데이트가 필요한 경우 */
       // let v = Number(toNumber(inputVal()))
       // const minv = Number(props?.minValue)
       // const maxv = Number(props?.maxValue)
@@ -165,6 +168,9 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     // log.debug('E:', e.code, e.keyCode)
     /** 이벤트가 존재하면 */
     if (isEvent(e)) {
+      const el = $(vars?.elem.current)[0]
+      let st = Number(el.selectionStart || 0)
+      let ed = Number(el.selectionEnd || 0)
       /** 허용키 : ctrl+c ctrl+v 방향키 bs delete tab enter space */
       if (vars?.itype === 'number' || vars?.itype === 'numeric') {
         let v = 0
@@ -186,21 +192,35 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         case KEYCODE_TABLE.PC.MetaRight: { /** NO-OP */ } break
         case C.UNDEFINED: { /** NO-OP */ } break
         case KEYCODE_TABLE.PC.ArrowUp: {
+          log.trace('CHECK:', String(inputVal()).substring((st - 1) || 0, st))
+          const minv = Number(props?.minValue || C.UNDEFINED)
+          const maxv = Number(props?.maxValue || C.UNDEFINED)
           v = Number(toNumber(inputVal()) || 0) - 1
+          if (minv !== C.UNDEFINED && v < minv) { v = minv }
+          if (maxv !== C.UNDEFINED && v > maxv) { v = maxv }
           if (props?.formatter) {
             setValue(inputVal(props.formatter(v)))
           } else {
             setValue(inputVal(v))
           }
+          el.selectionStart = st
+          el.selectionEnd = ed
           cancelEvent(e)
         } break
         case KEYCODE_TABLE.PC.ArrowDown: {
+          log.trace('CHECK:', String(inputVal()).substring((st - 1) || 0, st))
+          const minv = Number(props?.minValue || C.UNDEFINED)
+          const maxv = Number(props?.maxValue || C.UNDEFINED)
           v = Number(toNumber(inputVal()) || 0) + 1
+          if (minv !== C.UNDEFINED && v < minv) { v = minv }
+          if (maxv !== C.UNDEFINED && v > maxv) { v = maxv }
           if (props?.formatter) {
             setValue(inputVal(props.formatter(v)))
           } else {
             setValue(inputVal(v))
           }
+          el.selectionStart = st
+          el.selectionEnd = ed
           cancelEvent(e)
         } break
         default: {
@@ -226,7 +246,6 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           }
         } }
       }
-      const el = $(vars?.elem.current)[0]
       setTimeout(async () => {
         {
           if ([KEYCODE_TABLE.PC.Backspace, KEYCODE_TABLE.PC.Delete].indexOf(kcode) !== -1) {

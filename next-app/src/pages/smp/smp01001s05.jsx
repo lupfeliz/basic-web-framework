@@ -12,16 +12,26 @@ import { useForm, validateForm } from '@/components/form'
 import format from '@/libs/format'
 import dialog from '@/libs/dialog-context'
 
-const { log, definePage, useSetup, goPage, getParameter, asType, useRef } = app
+const PAGE = 'smp01001s05'
+const { getLogger, definePage, useSetup, goPage, getParameter, asType, useRef } = app
+const log = getLogger(PAGE)
 
 export default definePage(() => {
   const self = useSetup({
-    name: 'SMP01001S05',
+    name: PAGE,
     vars: {
       data: {
         input1: '',
-        checklist: ['', '', '', '']
+        checklist: ['', '', '', ''],
+        select: '',
       },
+      options1: [
+        { name: '선택해주세요', value: '' },
+        'hotmail.com',
+        'naver.com',
+        'kakao.com',
+        'gmail.com',
+      ],
       form: useForm(),
       validctx: {
         check2: (v, p) => {
@@ -33,6 +43,7 @@ export default definePage(() => {
       }
     },
     async mounted() {
+      getLogger('input').setLevel('trace')
     },
     async updated(mode) {
     }
@@ -59,13 +70,25 @@ export default definePage(() => {
         >
         <article>
           <Block className='form-block'>
+            <Select
+              form={ vars.form }
+              options={ vars?.options1 }
+              model={ vars.data }
+              name={ `select` }
+              required
+              label='이메일'
+              onError={ onError }
+              vrules='auto'
+              />
+          </Block>
+          <Block className='form-block'>
             <Input
               type='numeric'
               form={ vars.form }
               model={ vars.data }
               name='input1'
               label='금액'
-              required={ true }
+              required
               maxLength={ 20 }
               minLength={ 2 }
               minValue={ 1000 }
@@ -84,7 +107,7 @@ export default definePage(() => {
               <Checkbox
                 key={ inx }
                 form={ vars.form }
-                model={ vars?.data }
+                model={ vars.data }
                 name={ `checklist.${inx}` }
                 label='체크리스트'
                 onError={ onError }
