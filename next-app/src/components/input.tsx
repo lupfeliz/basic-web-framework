@@ -275,7 +275,11 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
             // log.debug('CHAR:', `'${ch}'`, st, ed, v.length, kcode, v)
             if (vars?.itype === 'number' || vars?.itype === 'numeric') {
               v = props?.formatter ? props.formatter(el.value) : v
-              if (props?.maxLength && v.length > props.maxLength) { v = props?.formatter ? props.formatter(vprev) : vprev }
+              if (props?.maxLength && v.length > props.maxLength) {
+                v = props?.formatter ? props.formatter(vprev) : vprev
+                st--
+                ed--
+              }
               const l1 = String(el.value).length
               const l2 = v.length
               el.value = v
