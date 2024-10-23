@@ -14,6 +14,7 @@ import Head from 'next/head'
 import { AnimatePresence } from 'framer-motion'
 import LayoutDefault from '@/components/layout'
 import DialogContainer from '@/components/dialog-container'
+import * as C from '@/libs/constants'
 
 // import 'bootstrap/dist/css/bootstrap.min.css'
 import '@materialstyle/materialstyle/scss/materialstyle.scss'
@@ -22,11 +23,14 @@ import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 
 /** 전역 스타일시트 */
-import '@/pages/global.scss'
+import '@/pages/globals.scss'
+import '@/pages/components.scss'
 import '@/pages/util.scss'
 
-const { useSetup, definePage, onload, log, isServer } = app
-log.setLevel(getConfig()?.publicRuntimeConfig?.logLevel || 'debug')
+const PAGENAME = '_app'
+const { useSetup, definePage, onload, isServer, getLogger } = app
+getLogger(C.ROOT).setLevel(getConfig()?.publicRuntimeConfig?.logLevel || 'debug')
+const log = getLogger(PAGENAME)
 
 export default definePage((props) => {
   const { Component, pageProps, router } = props

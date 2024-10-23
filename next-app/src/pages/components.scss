@@ -1,0 +1,64 @@
+/**
+ * @File        : components.scss
+ * @Author      : 정재백
+ * @Since       : 2024-10-24
+ * @Description : 컴포넌트용 스타일시트
+ * @Site        : https://devlog.ntiple.com
+ **/
+html#my-first-app {
+  body {
+
+    /******************************************************************************/
+    /** 편집기 */
+    /******************************************************************************/
+    .tiptap > p:first-child {
+      margin-top: 0;
+    }
+
+    /******************************************************************************/
+    /** 데이터그리드 */
+    /******************************************************************************/
+    .ag-theme-quartz {
+      --ag-background-color: #fff;
+      --ag-row-hover-color: #aef;
+      --ag-row-border-color: #ccc;
+      --ag-wrapper-border-radius: 0.5rem;
+      --ag-borders: 1px solid;
+      --ag-border-color: #ccc;
+      --ag-header-background-color: #eee;
+    }
+
+    .ag-root-wrapper {
+      .rspan-prime {
+        display: flex;
+        // align-items: center;
+        background-color: var(--ag-background-color);
+        border-bottom: 1px solid var(--ag-row-border-color);
+      }
+      .rspan-slave {
+        color: rgba(255, 255, 255, 0);
+        // border: 1px solid var(--ag-background-color);
+        // border-top: 1px solid #fff;
+        // position: relative;
+        // top: -1px;
+      }
+
+      .ag-body {
+        overflow: auto;
+      }
+
+      .ag-row-hover {
+        .rspan-prime {
+          background-color: var(--ag-row-hover-color);
+        }
+      }
+      .ag-cell-hover {
+        background-color: var(--ag-row-hover-color);
+      }
+
+      .ag-row {
+        border-bottom: var(--ag-row-border-width) var(--ag-row-border-style) var(--ag-row-border-color);
+      }
+    }
+  }
+}

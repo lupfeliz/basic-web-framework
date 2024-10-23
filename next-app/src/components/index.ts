@@ -23,5 +23,6 @@ export { default as Pagination } from './pagination'
 export { default as Select } from './select'
 export { default as Spinner } from './spinner'
 export { default as Textarea } from './textarea'
+export { default as Slider } from './slider'
 
 export { Fragment } from 'react'

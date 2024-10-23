@@ -22,7 +22,7 @@ import { MDCRipple } from '@material/ripple'
 import * as C from '@/libs/constants'
 import values from '@/libs/values'
 import dialog from '@/libs/dialog-context'
-import log, { getLogger } from '@/libs/log'
+import { getLogger } from '@/libs/log'
 import proc from '@/libs/proc'
 import $t from '@/libs/i18n'
 
@@ -51,9 +51,13 @@ type SetupType<V, P> = {
 type ContextType<T> = {
   [name: string]: T
 }
+
+const LIBNAME = 'app-context'
+
 const { AES: cjaes, enc: cjenc } = CryptoJS
 const { until } = proc
 const { randomStr, putAll } = values
+const log = getLogger(LIBNAME)
 
 /** 이 부분은 웹팩 플러그인(replace-loader)에 의해 자동으로 채워진다 */
 const encrypted = () => '{$$ENCRYPTED$$}'
@@ -113,8 +117,8 @@ const applyRipple = debounce(() => {
 }, 300)
 const app = {
   /** values, log, getLogger mixin */
-  ...values, log, getLogger, useRef,
-  until, $t,
+  ...values, getLogger, useRef, until, $t,
+  log: getLogger(C.ROOT),
   /** 앱 내 유일키 생성 */
   genId() { return `${new Date().getTime()}${String((appvars.uidseq = (appvars.uidseq + 1) % 1000) + 1000).substring(1, 4)}` },
   /**
@@ -303,6 +307,7 @@ const app = {
         const conf = decryptAES(encrypted(), C.CRYPTO_KEY)
         const clitime = new Date().getTime()
         putAll(appvars.config, conf)
+        getLogger(LIBNAME).setLevel(conf.log.level)
         log.setLevel(conf.log.level)
         log.debug('CONF:', conf)
         const cres = await api.get(`cmn01001`, {}, { noprogress: true })
@@ -484,6 +489,8 @@ const app = {
   strm: (v?: any) => String(v || '').replace(/[ ]+/g, ' ').trim(),
   MaterialStyle: (fnc: Function1<any, any>) => fnc(appvars.MaterialStyle),
   router: () => appvars.router,
+  fncDefineHideOnload: () => FNC_DEFINE_HIDE_ONLOAD(),
+  fncWaitCssLoading: () => FNC_WAIT_CSS_LOADING(),
 }
 
 const compoSubscribe = <V, P>(prm: LauncherProps<V, P>, uid: string, setState: Function) => {
@@ -505,6 +512,48 @@ const compoSubscribe = <V, P>(prm: LauncherProps<V, P>, uid: string, setState: F
     }, 1)
   }
 }
+
+var FNC_DEFINE_HIDE_ONLOAD = () => `
+  <style type="text/css">
+    body { transition: opacity 0.4s 0.2s ease; display: block !important; }
+    .hide-onload { opacity: 0; }
+  </style>
+`
+
+var FNC_WAIT_CSS_LOADING = () => `
+<script>
+{
+  var body = document.body;
+  function fnunload() {
+    window.removeEventListener('beforeunload', fnunload);
+    body.classList.add('hide-onload');
+  }
+  /** CSS가 적재될때 까지 대기 (깨짐방지) */
+  function fnload() {
+    var o = false;
+    for (var inx = document.styleSheets.length; inx >= 0; inx--) {
+      if ((o = document.styleSheets[inx]) && (
+        String(o.href).endsWith('/pages/_app.css') || (
+          (o = o.rules) && (o = o[0]) && (String(o.selectorText).startsWith('html#my-first-app'))
+        ))
+      ) {
+        o = true; break;
+      } else {
+        o = false;
+      }
+    }
+    if (o === true) {
+      window.addEventListener('beforeunload', fnunload)
+      document.removeEventListener('DOMContentLoaded', fnload)
+      body.classList.remove('hide-onload')
+    } else {
+      setTimeout(fnload, 50);
+    }
+  }
+  fnload()
+}
+</script>
+`
 
 export default app
 export { type ContextType }

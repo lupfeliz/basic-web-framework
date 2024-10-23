@@ -7,18 +7,18 @@
  **/
 
 import app from '@/libs/app-context'
-import { Checkbox, Block, Form, Button, Input, Select, Container, Textarea } from '@/components'
+import { Checkbox, Block, Form, Button, Input, Select, Container, Slider, Textarea } from '@/components'
 import { useForm, validateForm } from '@/components/form'
 import format from '@/libs/format'
 import dialog from '@/libs/dialog-context'
 
-const PAGE = 'smp01001s05'
+const PAGENAME = 'smp01001s05'
 const { getLogger, definePage, useSetup, goPage, getParameter, asType, useRef } = app
-const log = getLogger(PAGE)
+const log = getLogger(PAGENAME)
 
 export default definePage(() => {
   const self = useSetup({
-    name: PAGE,
+    name: PAGENAME,
     vars: {
       data: {
         input1: '',
@@ -69,6 +69,12 @@ export default definePage(() => {
         ref={ vars.form }
         >
         <article>
+          <Block className='form-block'>
+            <Slider
+              ranges={[10, 200, 1000, 5000, 100000]}
+              snap
+              />
+          </Block>
           <Block className='form-block'>
             <Select
               form={ vars.form }

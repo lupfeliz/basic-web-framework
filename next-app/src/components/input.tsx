@@ -15,15 +15,17 @@ import { KEYCODE_TABLE, isEvent, cancelEvent } from '@/libs/evdev'
 import { Function1 } from 'lodash'
 import { registForm, type ValidationType } from '@/components/form'
 
+const efnc1 = (() => '') as Function1<any, any>
+
 const InputPropsSchema = {
   model: {} as any,
-  onEnter: (() => '') as Function1<any, any>,
-  onChange: (() => '') as Function1<any, any>,
-  onKeyDown: (() => '') as Function1<any, any>,
-  onKeyUp: (() => '') as Function1<any, any>,
-  onFocus: (() => '') as Function1<any, any>,
-  onBlur: (() => '') as Function1<any, any>,
-  onError: (({ message: string, element: any }) => '') as Function1<any, any>,
+  onEnter: efnc1,
+  onChange: efnc1,
+  onKeyDown: efnc1,
+  onKeyUp: efnc1,
+  onFocus: efnc1,
+  onBlur: efnc1,
+  onError: efnc1 as Function1<{ message: string, element: any}, any>,
   maxLength: 0 as number,
   minLength: 0 as number,
   maxValue: 0 as number,
@@ -192,7 +194,11 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         case KEYCODE_TABLE.PC.MetaRight: { /** NO-OP */ } break
         case C.UNDEFINED: { /** NO-OP */ } break
         case KEYCODE_TABLE.PC.ArrowUp: {
-          log.trace('CHECK:', String(inputVal()).substring((st - 1) || 0, st))
+          let d = String(inputVal()).substring((st - 1) || 0, st)
+          if (/[0-9]/.test(d)) {
+            d = String(Number(d) - 1)
+            log.trace('CHECK:', d)
+          }
           const minv = Number(props?.minValue || C.UNDEFINED)
           const maxv = Number(props?.maxValue || C.UNDEFINED)
           v = Number(toNumber(inputVal()) || 0) - 1
@@ -208,7 +214,11 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           cancelEvent(e)
         } break
         case KEYCODE_TABLE.PC.ArrowDown: {
-          log.trace('CHECK:', String(inputVal()).substring((st - 1) || 0, st))
+          let d = String(inputVal()).substring((st - 1) || 0, st)
+          if (/[0-9]/.test(d)) {
+            d = String(Number(d) + 1)
+            log.trace('CHECK:', d)
+          }
           const minv = Number(props?.minValue || C.UNDEFINED)
           const maxv = Number(props?.maxValue || C.UNDEFINED)
           v = Number(toNumber(inputVal()) || 0) + 1
