@@ -349,13 +349,13 @@ const validations = () => {
         let name = josa(v.name, '의')
         return String(`#(name) 길이는 최소 #(min) 글자 입니다.`)
           .replace(/\#\(name\)/g, name)
-          .replace(/\#\(min\)/g, String(vmin))
+          .replace(/\#\(min\)/g, String(format.numeric(vmin)))
       }
       if (vmax > 0 && clen > vmax) {
         let name = josa(v.name, '의')
         return String(`#(name) 길이는 최대 #(max) 글자 입니다.`)
           .replace(/\#\(name\)/g, name)
-          .replace(/\#\(min\)/g, String(vmin))
+          .replace(/\#\(min\)/g, String(format.numeric(vmin)))
       }
       return true
     },
@@ -367,35 +367,37 @@ const validations = () => {
         let name = josa(v.name, '의')
         return String(`#(name) 길이는 최소 #(min) 글자 입니다.`)
           .replace(/\#\(name\)/g, name)
-          .replace(/\#\(min\)/g, String(vmin))
+          .replace(/\#\(min\)/g, String(format.numeric(vmin)))
       }
       if (vmax > 0 && v.value && String(v.value).length > vmax) {
         let name = josa(v.name, '의')
         return String(`#(name) 길이는 최대 #(max) 글자 입니다.`)
           .replace(/\#\(name\)/g, name)
-          .replace(/\#\(max\)/g, String(vmax))
+          .replace(/\#\(max\)/g, String(format.numeric(vmax)))
       }
       return true
     },
     'minv': (v: any, p: any, c: any) => {
       let t: any
       const vmin = values.num(values.item(p, 0), 0)
-      if (Number(v.value || 0) < vmin) {
+      /** FIXME: 부호체크(+-) 가능하도록 수정할것 */
+      if (Number(format.numberOnly(v.value || 0)) < vmin) {
         let name = josa(v.name, '은')
         return String(`#(name) #(min) 이상의 값을 입력해 주세요`)
           .replace(/\#\(name\)/g, name)
-          .replace(/\#\(min\)/g, String(vmin))
+          .replace(/\#\(min\)/g, String(format.numeric(vmin)))
       }
       return true
     },
     'maxv': (v: any, p: any, c: any) => {
       let t: any
       const vmax = values.num(values.item(p, 0), 0)
-      if (Number(v.value || 0) > vmax) {
+      /** FIXME: 부호체크(+-) 가능하도록 수정할것 */
+      if (Number(format.numberOnly(v.value || 0)) > vmax) {
         let name = josa(v.name, '은')
         return String(`#(name) #(max) 이하의 값을 입력해 주세요`)
           .replace(/\#\(name\)/g, name)
-          .replace(/\#\(max\)/g, String(vmax))
+          .replace(/\#\(max\)/g, String(format.numeric(vmax)))
       }
       return true
     },
@@ -430,6 +432,10 @@ const parseRules = (props: any, attrs?: any) => {
     }
   }
   if (auto) {
+    if (props.required && list.indexOf('required') == -1) {
+      list.splice(pinx, 0, `required`)
+      pinx++
+    }
     {
       /** type */
       log.trace('DATA-TYPE:', props.type)
@@ -449,7 +455,6 @@ const parseRules = (props: any, attrs?: any) => {
         list.splice(pinx, 0, `${rule}`)
         pinx++
       }
-      if (props.required && list.indexOf('required') == -1) { list.push('required') }
     }
     {
       /** min-max length */
@@ -459,6 +464,21 @@ const parseRules = (props: any, attrs?: any) => {
       if (props.maxLength !== undefined) { max = Number(props.maxLength) }
       if (min != 0 || max != 0) {
         list.splice(pinx, 0, `len:${min},${max}`)
+        pinx++
+      }
+    }
+    {
+      /** min-max value */
+      let minv = 0
+      let maxv = 0
+      if (props.minValue !== undefined) { minv = Number(props.minValue) }
+      if (props.maxValue !== undefined) { maxv = Number(props.maxValue) }
+      if (minv != 0) {
+        list.splice(pinx, 0, `minv:${minv}`)
+        pinx++
+      }
+      if (maxv != 0) {
+        list.splice(pinx, 0, `maxv:${maxv}`)
         pinx++
       }
     }

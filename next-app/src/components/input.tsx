@@ -24,6 +24,7 @@ const InputPropsSchema = {
   onKeyUp: (() => '') as Function1<any, any>,
   onFocus: (() => '') as Function1<any, any>,
   onBlur: (() => '') as Function1<any, any>,
+  onError: (({ message: string, element: any }) => '') as Function1<any, any>,
   maxLength: 0 as number,
   minLength: 0 as number,
   maxValue: 0 as number,
@@ -143,13 +144,13 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   const onBlur = async (e: FocusEvent) => {
     const { setValue } = modelValue(self())
     if (vars?.itype === 'number' || vars?.itype === 'numeric') {
-      let v = inputVal()
-      const minv = Number(props?.minValue)
-      const maxv = Number(props?.maxValue)
-      if (props?.minValue !== C.UNDEFINED && v < minv) { v = minv }
-      if (props?.maxValue !== C.UNDEFINED && v > maxv) { v = maxv }
-      setValue(inputVal(v))
-      update(C.UPDATE_FULL)
+      // let v = Number(toNumber(inputVal()))
+      // const minv = Number(props?.minValue)
+      // const maxv = Number(props?.maxValue)
+      // if (props?.minValue !== C.UNDEFINED && v < minv) { v = minv }
+      // if (props?.maxValue !== C.UNDEFINED && v > maxv) { v = maxv }
+      // setValue(inputVal(props?.formatter ? props.formatter(v) : v))
+      // update(C.UPDATE_FULL)
     }
     if (props?.onBlur) { props.onBlur(e) }
   }

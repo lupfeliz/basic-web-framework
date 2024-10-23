@@ -36,7 +36,7 @@ export default definePage(() => {
   const onError = async (e) => {
     log.debug('ERROR:', e)
     await dialog.alert(e.message)
-    e.element.focus()
+    e?.element?.focus && e.element.focus()
   }
   return (
   <Container>
@@ -57,11 +57,13 @@ export default definePage(() => {
               name='input1'
               label='금액'
               required={ true }
-              formatter={ format.numeric }
               maxLength={ 20 }
               minLength={ 2 }
-              vrules='auto'
+              minValue={ 1000 }
+              maxValue={ 999999999999 }
               onError={ onError }
+              formatter={ format.numeric }
+              vrules='auto'
               />
           </Block>
           <Block className='form-block'>
