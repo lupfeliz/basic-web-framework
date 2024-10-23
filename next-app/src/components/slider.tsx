@@ -38,7 +38,7 @@ const SlidePropsSchema = {
 type SliderProps = ComponentPropsWithRef<'input'> & Record<string, any> & Partial<typeof SlidePropsSchema>
 
 const COMPONENT = 'slider'
-const { getLogger, defineComponent, copyExclude, useSetup, useRef, copyRef, modelValue, merge, putAll, strm, clear, pushAll } = app
+const { getLogger, defineComponent, copyExclude, useSetup, useRef, copyRef, modelValue, merge, putAll, strm, clear, pushAll, ready } = app
 const log = getLogger(COMPONENT)
 
 export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => {
@@ -118,6 +118,7 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
   }
   return (
   <>
+  { ready() && (
   <div
     ref={ vars.elem }
     className={ strm(`slider`) }
@@ -138,6 +139,7 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
         </div>
       ) }
       renderThumb={ ({ props }) => (
+        <> { vars.thumbs[props.key] && (
         <div
           { ...props }
           tabIndex={ - 1 }
@@ -148,9 +150,12 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
             <span>{ vars.values[props.key] }</span>
           </div>
         </div>
+        ) }
+        </>
       ) }
       />
   </div>
+  ) }
   </>
   )
 })

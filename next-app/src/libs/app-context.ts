@@ -90,7 +90,7 @@ const appvars = {
 
 /** 전역 STORE 저장소 (serializable 객체) */
 const appContextSlice = createSlice({
-  name: 'appContext',
+  name: LIBNAME,
   initialState: {
     state: 0,
     mode: 0,
@@ -356,8 +356,8 @@ const app = {
   modelValue<V, P>(self: SetupType<V, P>) {
     const props = self?.props || {} as any
     const model = props?.model
-    const name = props?.name ? props.name.split(/[.]/)[0] : undefined
-    const inx = props?.name ? props.name.split(/[.]/)[1] : -1
+    const name = props?.name?.split ? String(props.name).split(/[.]/)[0] : undefined
+    const inx = props?.name?.split ? String(props.name).split(/[.]/)[1] : -1
     let value = (model && name) ? model[name] : undefined
     if (value && typeof value == C.OBJECT) { value = value[inx] }
     const setValue = (v: any, callback?: Function) => {

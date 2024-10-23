@@ -22,12 +22,14 @@ const CheckboxPropsSchema = {
 /** mui 기본 체크박스(라디오버튼) 속성 타입 상속  */
 type CheckboxProps = _CheckboxProps & Record<string, any> & Partial<typeof CheckboxPropsSchema>
 
-const { useRef, copyExclude, copyRef, useSetup, defineComponent, modelValue, log } = app
+const COMPONENT = 'checkbox'
+const { useRef, copyExclude, copyRef, useSetup, defineComponent, modelValue, getLogger } = app
+const log = getLogger(COMPONENT)
 
 export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model'])
   const self = useSetup({
-    name: 'checkbox',
+    name: COMPONENT,
     props,
     vars: {
       checked: false,

@@ -11,7 +11,9 @@ import Paging from '@/libs/paging'
 import app from '@/libs/app-context'
 import values from '@/libs/values'
 
-const { defineComponent, copyExclude, useSetup, copyRef, useRef, log, modelValue, putAll } = app
+const COMPONENT = 'pagination'
+const { defineComponent, copyExclude, useSetup, copyRef, useRef, getLogger, modelValue, putAll } = app
+const log = getLogger(COMPONENT)
 
 type PaginationProps = _PaginationProps & Record<string, any> & {
   onChange?: Function
@@ -27,7 +29,7 @@ export default defineComponent((props: PaginationProps, ref: PaginationProps['re
   const pprops = copyExclude(props, ['onChange', 'model'])
   const elem = useRef({} as HTMLDivElement)
   const self = useSetup({
-    name: 'pagination',
+    name: COMPONENT,
     vars: {
       pageTotal: 0,
       pageStart: 0,

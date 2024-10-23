@@ -80,7 +80,7 @@ export default definePage(() => {
         >
         <article>
           <Block className='form-block'>
-            {/* <Slider
+            <Slider
               ranges={ [10, 20, 50, 80, 100] }
               form={ vars.form }
               model={ vars.data }
@@ -90,7 +90,7 @@ export default definePage(() => {
               onError={ onError }
               vrules='chkslide'
               validctx={ vars.validctx }
-              /> */}
+              />
           </Block>
           <Block className='form-block'>
             <Select
