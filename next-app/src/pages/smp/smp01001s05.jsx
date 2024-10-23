@@ -19,9 +19,18 @@ export default definePage(() => {
     name: 'SMP01001S05',
     vars: {
       data: {
-        input1: ''
+        input1: '',
+        checklist: ['', '', '', '']
       },
-      form: useForm()
+      form: useForm(),
+      validctx: {
+        check2: (v, p) => {
+          /** 숫자 2 는 사용할수 없도록 하는 규칙. */
+          log.debug('VALIDATION-CHECK2:', v, p, String(v).indexOf('2'))
+          if (String(v.value).indexOf('2') != -1) { return `숫자 '2' 는 사용할 수 없어요.` }
+          return true
+        }
+      }
     },
     async mounted() {
     },
@@ -63,11 +72,26 @@ export default definePage(() => {
               maxValue={ 999999999999 }
               onError={ onError }
               formatter={ format.numeric }
-              vrules='auto'
+              vrules='auto|check2'
+              validctx={ vars.validctx }
               />
           </Block>
           <Block className='form-block'>
             { format.numToHangul(vars.data.input1) } [ { String(vars.data.input1).length } ]
+          </Block>
+          <Block className='form-block'>
+            { vars?.data?.checklist && vars?.data?.checklist.map((itm, inx) => (
+              <Checkbox
+                key={ inx }
+                form={ vars.form }
+                model={ vars?.data }
+                name={ `checklist.${inx}` }
+                label='체크리스트'
+                onError={ onError }
+                value='Y'
+                vrules='auto|atleast:2'
+                />
+            )) }
           </Block>
           <Block className='form-block'>
             <Button

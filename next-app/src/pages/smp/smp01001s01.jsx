@@ -10,6 +10,7 @@
  **/
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
+import format from '@/libs/format'
 import { Block, Button, Checkbox, Input, Select, Editor, Lottie, Container, Image, DataGrid } from '@/components'
 
 const { log, definePage, goPage, useSetup, clear, putAll } = app
@@ -177,14 +178,15 @@ export default definePage((props) => {
             model={ vars?.formdata }
             name='input01'
             size='small'
-            type='number'
+            type='numeric'
             maxLength={ 20 }
             minLength={ 2 }
             // minValue={ 10 }
             // maxValue={ 100 }
+            formatter={ format.numeric }
             />
           <span className='mx-1 my-1'>
-          [VALUE: { vars?.formdata?.input01 }]
+          [VALUE: { format.numToHangul(vars?.formdata?.input01) }]
           </span>
         </Block>
         <Block className='my-1'>

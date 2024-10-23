@@ -6,7 +6,6 @@
  * @Site        : https://devlog.ntiple.com
  **/
 import { ComponentPropsWithRef } from 'react'
-// import Popper from '@/components/popper'
 import hangul from '@/libs/hangul'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
@@ -26,7 +25,9 @@ type ValidationType = {
   message?: string
 }
 
-const { defineComponent, useRef, copyExclude, clone, putAll, log, useSetup, isServer, modelValue } = app
+const { getLogger, defineComponent, useRef, copyExclude, clone, putAll, useSetup, isServer, modelValue } = app
+const log = getLogger('form')
+// log.setLevel('trace')
 
 const formElement = {
   name: '',
@@ -45,20 +46,13 @@ const formRef = {
 }
 const useForm = () => (useRef(clone(formRef.current) as any))
 const registForm = async (self: any, ref: any) => {
-  const { props: cprops,  } = modelValue(self()) as any
-  // const cprops = props()
+  const { props } = modelValue(self()) as any
   const cref = ref()
-  if (cprops?.form?.current?.form) {
-    const form = cprops.form.current.form as typeof formRef.current.form
-    // const pmodel = cprops?.model
-    // const pname = cprops?.name ? cprops.name.split(/[.]/)[0] : undefined
-    // const pinx = cprops?.name ? cprops.name.split(/[.]/)[1] : 0
-    // const pvalue = pmodel && pname ? pmodel[pname] : C.UNDEFINED
-    // log.debug('FORM:', form, pname, pvalue, cprops)
-    // log.trace(`FORM-COMPONENT: ${pname}${!isNaN(pinx) ? '.' + pinx : ''}`, cref?.current)
+  if (props?.form?.current?.form) {
+    const form = props.form.current.form as typeof formRef.current.form
     form.elements.push({
-      name: cprops?.name, self,
-      ref: ref, seq: 0, el: C.UNDEFINED, rules: C.UNDEFINED
+      name: props?.name, self,
+      ref, seq: 0, el: C.UNDEFINED, rules: C.UNDEFINED
     })
   }
 }
@@ -72,15 +66,12 @@ const validateForm = async (vform: any, opt: any = {}) => {
     let qlst = ''
     for (let inx in form.elements) {
       const item = form.elements[inx]
-      const cname: any = item.name
-      const { props : cprops, vars } = modelValue(item.self()) as any
-      // const cprops: any = item.props()
-      // const cctx: any = item.ctx()
+      const { props, vars } = modelValue(item.self()) as any
       const cref: any = item.ref()
       const elem = cref?.current ? cref.current : C.UNDEFINED
-      item.rules = parseRules(cprops)
+      item.rules = parseRules(props)
       if (elem) {
-        // log.debug('ELEM:', elem)
+        log.trace('ELEM:', elem)
         elem.setAttribute(DATA_VALID_INX, inx)
         if (qlst) { qlst = `${qlst},` }
         qlst = `${qlst}[${DATA_VALID_INX}='${inx}']`
@@ -98,7 +89,7 @@ const validateForm = async (vform: any, opt: any = {}) => {
       item.el = elem
     }
     elist.sort((a: any, b: any) => Number(a.seq) - Number(b.seq))
-    // log.debug('VALIDATION-COUNT:', elist.length)
+    log.trace('VALIDATION-COUNT:', elist.length)
     for (const item of elist) {
       let res = await validate(item, opt)
       if (res === false) {
@@ -117,30 +108,36 @@ const validateForm = async (vform: any, opt: any = {}) => {
 const validate = async (item: any, opt: any = {}) => new Promise((resolve) => {
   let ret = true
   let result
-  let { props: cprops, value: cvalue, vars } = modelValue(item.self()) as any
-  // const cctx: any = item.ctx()
-  // const cprops: any = item.props()
+  const self = modelValue(item.self()) as any
+  const { props, vars } = self
+  let { value } = self
   try {
     const rlist = String(item.rules).split(/\|/g)
-    const label = cprops.label ? cprops.label : cprops.name
+    let label = props.label ? props.label : props.name
+    let name = props.name
     for (const rule of rlist) {
       const rdata = rule.split(/\:/g)
       const rparm = rdata.length > 1 ? String(rdata[1]).split(/\,/g) : []
       /** NULL, UNDEFINED 값 통일 */
-      // cctx.value = values.nval(cctx.value, C.UNDEFINED)
-      cvalue = values.nval(cvalue, C.UNDEFINED)
-      // log.debug('RULE:', rule, rdata, cctx.value, cprops)
+      value = values.nval(value, C.UNDEFINED)
+      log.trace('RULE:', rule, rdata, value, props)
       if (!rdata || rdata.length < 1) { continue }
-      const vitm  = validations()[rdata[0]]
-      // log.debug('VITM:', rule, rdata[0], vitm ? true: false, cctx.value, rparm)
-      log.trace('VITM:', rule, rdata[0], vitm ? true: false, cvalue, rparm)
+      if (rdata[0] == C.ATLEAST && /\.[0-9]+$/g.test(name)) {
+        name = name.replace(/\.[0-9]+$/g, '')
+        label = label.replace(/\.[0-9]+$/g, '')
+        value = (props?.model || {})[name]
+        if (rparm.length == 0) { rparm.push('1') }
+        if (props?.value !== C.UNDEFINED) { rparm.push(props.value) }
+      }
+      let vitm  = validations()[rdata[0]]
+      /** 사용자함수 사용 */
+      if (!vitm && props?.validctx) { vitm = props.validctx[rdata[0]] }
+      log.trace('VITM:', rule, rdata[0], vitm ? true: false, value, rparm)
       if (!vitm) { continue }
-      if (rule !== C.REQUIRED &&
-        !/^u:/.test(rule) &&
-        (cvalue === '' || cvalue === undefined)) {
+      if (rule !== C.REQUIRED && (value === '' || value === undefined)) {
         result = true
       } else {
-        result = vitm({ value: cvalue, name: label }, rparm, vars.valid)
+        result = vitm({ value: value, name: label }, rparm, vars.valid)
       }
       log.trace('RESULT:', result, typeof result)
       if (typeof result === C.STRING) {
@@ -156,7 +153,7 @@ const validate = async (item: any, opt: any = {}) => new Promise((resolve) => {
         break
       }
     }
-    // log.trace('FINAL-RESULT:', pprops?.name, ret)
+    // log.trace('FINAL-RESULT:', props?.name, ret)
   } catch (e) {
     log.debug('E:', e)
   }
@@ -192,11 +189,11 @@ const validations = () => {
       const value = v.value
       log.trace('V-REQUIRED:', value, p, !(value !== undefined && value !== '' && value !== false))
       if (!(value !== undefined && value !== null && value !== '' && value !== false)) {
-        if (c && c.hasOwnProperty('checked')) {
+        if (c && c.type == 'checkbox') {
           let name = josa(v.name, '에')
           return String(`#(name) 반드시 체크해 주세요`)
             .replace(/\#\(name\)/g, name)
-        } else if (c && c.hasOwnProperty('index')) {
+        } else if (c && c.type == 'select') {
           let name = josa(v.name, '은')
           return String(`#(name) 반드시 선택해 주세요`)
             .replace(/\#\(name\)/g, name)
@@ -294,7 +291,7 @@ const validations = () => {
       if (valid) {
         const d = String(v.value).split('-')
         const f = format.formatDate(format.date(d[0], d[1], d[2]), C.DATE_FORMAT_YMD)
-        // log.debug('CHECK-DATE:', v.value, valid, d, f);
+        log.trace('CHECK-DATE:', v.value, valid, d, f);
         if (v.value != f) { valid = false }
       }
       if (!valid) {
@@ -401,11 +398,40 @@ const validations = () => {
       }
       return true
     },
-    'u': (v: any, p: any, c: any) => {
-      // log.trace('CHECK-USER-FUNCTION:FORM:', cform.value?.userRules, p)
-      // if (cform.value?.userRules && p && p[0] && cform.value.userRules[p[0]]) {
-      //   return cform.value.userRules[p[0]](v, p, c)
-      // }
+    'atleast': (v: any, p: any, c: any) => {
+      log.trace('ATLEAST:', v, p, c)
+      const count = p[0]
+      let found = 0
+      let vv = p ? p[1] :  C.UNDEFINED
+      if (v.value && v.value instanceof Array) {
+        LOOP: for (const itm of v.value) {
+          if ((vv && itm == vv) || (!vv && itm)) {
+            found++
+            if (found >= count) { break LOOP }
+          }
+          continue LOOP
+        }
+      }
+      if (found < count) {
+        if (c && c.type == 'checkbox') {
+          let name = josa(v.name, '에')
+          return String(`#(name) 반드시 #(count)개 이상 체크해 주세요`)
+            .replace(/\#\(name\)/g, name)
+            .replace(/\#\(count\)/g, count)
+        } else if (c && c.type == 'select') {
+          let name = josa(v.name, '은')
+          return String(`#(name) 반드시 #(count)개 이상 선택해 주세요`)
+            .replace(/\#\(name\)/g, name)
+            .replace(/\#\(count\)/g, count)
+        } else {
+          let name = josa(v.name, '은')
+          return String(`#(name) 반드시 #(count)개 이상 입력해 주세요`)
+            .replace(/\#\(name\)/g, name)
+            .replace(/\#\(count\)/g, count)
+        }
+      } else {
+        return true
+      }
     }
   } as any
 }
@@ -497,7 +523,7 @@ const Message = defineComponent((props: MessageProps, ref: MessageProps['ref']) 
     },
     async updated() {
       if (props?.anchor) { vars.anchor = props.anchor?.current }
-      // log.debug('CHECK-ERROR:', props.open(), vars.anchor)
+      log.trace('CHECK-ERROR:', props.open(), vars.anchor)
       vars.visible = props.open()
       if (vars.visible) {
         const $el = $(vars.anchor)
@@ -542,7 +568,7 @@ export default defineComponent((props: FormProps, ref: FormProps['ref'] & any) =
   const self = useSetup({
     async mounted() {
       if (ref && ref.hasOwnProperty('current')) {
-        // log.debug('REF:', ref.current)
+        log.trace('REF:', ref.current)
         const form = ref.current?.form
         ref.current = { }
         ref.current.form = form

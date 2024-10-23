@@ -30,6 +30,8 @@ const InputPropsSchema = {
   maxValue: 0 as number,
   minValue: 0 as number,
   formatter: ((v: any) => v) as Function1<any, any>,
+  vrules: '' as string,
+  validctx: {} as any,
   type: '' as string,
   pattern: '' as string,
 }
@@ -58,7 +60,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     },
     async mounted() {
       copyRef(ref, vars?.elem)
-      log.debug('INPUT MOUNTED')
+      // log.debug('INPUT MOUNTED')
       registForm(self, () => vars?.elem)
       /** 최초상태 화면반영 */
       inputVal(modelValue(self()).value || '')
