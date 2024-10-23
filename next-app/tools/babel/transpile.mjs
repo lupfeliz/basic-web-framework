@@ -73,6 +73,7 @@ const convert = (path) => {
   `${dir}/node_modules/reselect`,
   `${dir}/node_modules/redux-thunk`,
   `${dir}/node_modules/react-redux`,
+  // `${dir}/node_modules/react-range`,
 ].map(v => findFiles(v))
 
 // WORKLIST.push(`${dir}/dist/_next/static/chunks/941-41f6770e9314edcd.js`)

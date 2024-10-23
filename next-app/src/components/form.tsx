@@ -64,8 +64,9 @@ const validateForm = async (vform: any, opt: any = {}) => {
   let ret = true
   if (form) {
     let qlst = ''
-    for (let inx in form.elements) {
+    LOOP: for (let inx in form.elements) {
       const item = form.elements[inx]
+      if (!item?.self) { continue LOOP }
       const { props, vars } = modelValue(item.self()) as any
       const ref: any = item.ref()
       const elem = ref?.current ? ref.current : C.UNDEFINED

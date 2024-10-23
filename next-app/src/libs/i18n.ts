@@ -5,6 +5,7 @@
  * @Description : 다국어 유틸
  * @Site        : https://devlog.ntiple.com
  **/
+import 'intl-pluralrules'
 import { createInstance } from 'i18next'
 import resourcesToBackend from 'i18next-resources-to-backend'
 import { initReactI18next } from 'react-i18next/initReactI18next'

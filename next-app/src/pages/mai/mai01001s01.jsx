@@ -78,6 +78,13 @@ export default definePage(() => {
         </Block>
         <Block>
           <Button
+            href='/smp/smp01001s05'
+            >
+            샘플5
+          </Button>
+        </Block>
+        <Block>
+          <Button
             href='https://devwas.ntiple.com/study202403/swagger/swagger-ui/index.html'
             >
             오픈API
