@@ -30,12 +30,14 @@ const DataGridPropsSchema = {
   onSortChanged: async (e: SortChangedEvent) => ({} as any),
 }
 
-const { useSetup, putAll, defineComponent, log, copyExclude, copyRef, useRef, until, getFrom } = app
+const COMPONENT = 'datagrid'
+const { useSetup, putAll, defineComponent, getLogger, copyExclude, copyRef, useRef, until, getFrom } = app
+const log = getLogger(COMPONENT)
 
 export default defineComponent((props: DataGridProps, ref: DataGridProps['ref']) => {
   const pprops = copyExclude(props, values.merge(Object.keys(DataGridPropsSchema), [ ]))
   const self = useSetup({
-    name: 'datagrid',
+    name: COMPONENT,
     props,
     vars: {
       rowData: [ ] as any[],

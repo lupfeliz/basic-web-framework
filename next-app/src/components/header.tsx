@@ -10,10 +10,12 @@ import * as C from '@/libs/constants'
 import { Container, Block, Button, Link } from '@/components'
 import Aside from './aside'
 import { nextTick } from 'process'
-const { log, defineComponent, useSetup, goPage, strm } = app
+const COMPONENT = 'header'
+const { getLogger, defineComponent, useSetup, goPage, strm } = app
+const log = getLogger(COMPONENT)
 export default defineComponent(() => {
   const self = useSetup({
-    name: 'header',
+    name: COMPONENT,
     vars: {
       clsAside: ''
     },
