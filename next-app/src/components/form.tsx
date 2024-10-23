@@ -48,7 +48,6 @@ const formRef = {
 const useForm = () => (useRef(clone(formRef.current) as any))
 const registForm = async (self: any, ref: any) => {
   const { props } = modelValue(self()) as any
-  const cref = ref()
   if (props?.form?.current?.form) {
     const form = props.form.current.form as typeof formRef.current.form
     form.elements.push({
@@ -68,8 +67,8 @@ const validateForm = async (vform: any, opt: any = {}) => {
     for (let inx in form.elements) {
       const item = form.elements[inx]
       const { props, vars } = modelValue(item.self()) as any
-      const cref: any = item.ref()
-      const elem = cref?.current ? cref.current : C.UNDEFINED
+      const ref: any = item.ref()
+      const elem = ref?.current ? ref.current : C.UNDEFINED
       item.rules = parseRules(props)
       if (elem) {
         log.trace('ELEM:', elem)
@@ -130,13 +129,13 @@ const validate = async (item: any, opt: any = {}) => new Promise((resolve) => {
         if (rparm.length == 0) { rparm.push('1') }
         if (props?.value !== C.UNDEFINED) { rparm.push(props.value) }
       }
-      let vitm  = C.UNDEFINED
+      let vitm = C.UNDEFINED, ufnc = C.UNDEFINED
       /** 사용자함수 를 우선한다 (원래함수 덮어쓰기 용도) */
-      if (!vitm && props?.validctx) { vitm = props.validctx[rdata[0]] }
+      if (!vitm && props?.validctx) { ufnc = vitm = props.validctx[rdata[0]] }
       if (!vitm) { vitm = validations()[rdata[0]] }
       log.trace('VITM:', rule, rdata[0], vitm ? true: false, value, rparm)
       if (!vitm) { continue }
-      if (rule !== C.REQUIRED && (value === '' || value === undefined)) {
+      if (rule !== C.REQUIRED && !ufnc && (value === '' || value === undefined)) {
         result = true
       } else {
         result = vitm({ value: value, name: label }, rparm, vars.valid)

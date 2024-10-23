@@ -12,6 +12,7 @@ import * as C from '@/libs/constants'
 import { registForm, type ValidationType } from '@/components/form'
 import { cancelEvent } from '@/libs/evdev'
 import { Range } from "react-range";
+import $ from 'jquery'
 
 const { throttle } = lodash
 
@@ -37,7 +38,7 @@ const SlidePropsSchema = {
 type SliderProps = ComponentPropsWithRef<'input'> & Record<string, any> & Partial<typeof SlidePropsSchema>
 
 const COMPONENT = 'slider'
-const { getLogger, defineComponent, copyExclude, useSetup, useRef, copyRef, modelValue, merge, putAll, strm } = app
+const { getLogger, defineComponent, copyExclude, useSetup, useRef, copyRef, modelValue, merge, putAll, strm, clear, pushAll } = app
 const log = getLogger(COMPONENT)
 
 export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => {
@@ -50,6 +51,7 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
       minv: C.UNDEFINED as number,
       maxv: C.UNDEFINED as number,
       elem: useRef<any>(),
+      thumbs: [] as any,
       valid: {
         error: false,
         isValidated: false,
@@ -59,8 +61,19 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
     },
     async mounted() {
       copyRef(ref, vars?.elem)
-      // log.debug('INPUT MOUNTED')
-      // registForm(self, () => vars?.elem)
+      for (const inx in props.names) {
+        const gen = (inx: any) => () => {
+          const ret = putAll({}, self())
+          const props = putAll({}, ret.props)
+          props.name = props.names[inx]
+          ret.props = props
+          return ret
+        }
+        const getThumbs = (inx: any) => () => ({
+          current: vars?.thumbs[inx]?.current?.parentNode
+        })
+        registForm(gen(inx), getThumbs(inx))
+      }
       update(C.UPDATE_SELF)
     },
     async updated(mode: any) {
@@ -81,16 +94,20 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
     }
 
     if (props?.names && props?.model) {
-      vars.values = []
+      clear(vars.values)
       for (const inx in props.names) {
+        vars.thumbs[inx] = useRef()
         const itm = props.names[inx]
-        vars.values.push(props.model[itm] || vars.minv)
+        let v = props.model[itm]
+        if (!v || v < vars.minv) { v = vars.minv }
+        if (v && v > vars.maxv) { v = vars.maxv }
+        vars.values.push(props.model[itm] = v)
       }
     }
   }
   const inputVal = (v: any = C.UNDEFINED) => v === C.UNDEFINED ? $(vars?.elem?.current).val() : $(vars?.elem?.current).val(v) && v
   const onChange = async (e: any) => {
-    vars.values = e
+    pushAll(clear(vars.values), e)
     if (props?.names && props?.model) {
       for (const inx in props.names) {
         const itm = props.names[inx]
@@ -102,6 +119,7 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
   return (
   <>
   <div
+    ref={ vars.elem }
     className={ strm(`slider`) }
     >
     <Range
@@ -122,10 +140,11 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
       renderThumb={ ({ props }) => (
         <div
           { ...props }
+          tabIndex={ - 1 }
           key={ props.key }
           className={ strm(`slider-thumb`) }
           >
-          <div>
+          <div ref={ vars.thumbs[props.key] }>
             <span>{ vars.values[props.key] }</span>
           </div>
         </div>

@@ -41,11 +41,19 @@ export default definePage(() => {
           log.debug('VALIDATION-CHECK2:', v, p, String(v).indexOf('2'))
           if (String(v.value).indexOf('2') != -1) { return `숫자 '2' 는 사용할 수 없어요.` }
           return true
+        },
+        chkslide: (v, p) => {
+          log.debug('VLIDATION-SLIDE:', v, p)
+          if (Number(v.value) <= 10) {
+            return String(`10 이상 입력해 주세요`)
+          }
+          return true
         }
       }
     },
     async mounted() {
-      getLogger('input').setLevel('trace')
+      // getLogger('input').setLevel('trace')
+      // getLogger('form').setLevel('trace')
     },
     async updated(mode) {
     }
@@ -75,9 +83,13 @@ export default definePage(() => {
             <Slider
               ranges={ [10, 20, 50, 80, 100] }
               form={ vars.form }
-              model={ vars.data}
+              model={ vars.data }
+              label='슬라이더'
               names={ ['slider1', 'slider2'] }
               snap
+              onError={ onError }
+              vrules='chkslide'
+              validctx={ vars.validctx }
               />
           </Block>
           <Block className='form-block'>
