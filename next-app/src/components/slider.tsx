@@ -213,11 +213,11 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
         </div>
       ) }
       renderThumb={ ({ props, index }) => (
-        <Fragment key={ index }>
+        <Fragment key={ props.key }>
         { vars.thumbs[index] && (
         <div
           { ...props }
-          key={ index }
+          key={ props.key }
           tabIndex={ props.tabIndex }
           className={ strm(`slider-thumb`) }
           data-thumb-inx={ index }
@@ -231,11 +231,11 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
         </Fragment>
       ) }
       renderMark={ ({ props, index }) => (
-        <Fragment key={ index }>
+        <Fragment key={ props.key }>
           { (index % 10 == 0) && (
           <div
             { ...props }
-            key={ index }
+            key={ props.key }
             className={ strm(`slider-mark`) }
             >
             { index }
