@@ -31,6 +31,7 @@ const InputPropsSchema = {
   maxValue: 0 as number,
   minValue: 0 as number,
   formatter: ((v: any) => v) as Function1<any, any>,
+  rtformatter: ((v: any) => v) as Function1<any, any>,
   vrules: '' as string,
   validctx: {} as any,
   type: '' as string,
@@ -135,15 +136,15 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   /** 입력컴포넌트 키입력 이벤트 처리 */
   const onKeyDown = async (e: KeyboardEvent) => {
     if (vars.avail) {
-      onKeyDownProc(e)
-      if (props?.onKeyDown) { props.onKeyDown(e) }
+      await onKeyDownProc(e)
+      if (props?.onKeyDown) { await props.onKeyDown(e) }
     } else {
       cancelEvent(e)
     }
   }
   const onKeyUp = async (e: KeyboardEvent) => {
     if (vars.avail) {
-      if (props?.onKeyUp) { props.onKeyUp(e) }
+      if (props?.onKeyUp) { await props.onKeyUp(e) }
     } else {
       cancelEvent(e)
     }
@@ -153,19 +154,12 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   }
   const onBlur = async (e: FocusEvent) => {
     const { setValue } = modelValue(self())
-    if (vars?.itype === 'number' || vars?.itype === 'numeric') {
-      /** blur시 업데이트가 필요한 경우 */
-      // let v = Number(toNumber(inputVal()))
-      // const minv = Number(props?.minValue)
-      // const maxv = Number(props?.maxValue)
-      // if (props?.minValue !== C.UNDEFINED && v < minv) { v = minv }
-      // if (props?.maxValue !== C.UNDEFINED && v > maxv) { v = maxv }
-      // setValue(inputVal(props?.formatter ? props.formatter(v) : v))
-      // update(C.UPDATE_FULL)
-    }
+    const v = inputVal()
+    setValue(inputVal(props?.formatter ? props.formatter(v) : v))
+    update(C.UPDATE_FULL)
     if (props?.onBlur) { props.onBlur(e) }
   }
-  const onKeyDownProc = (e: KeyboardEvent) => {
+  const onKeyDownProc = async (e: KeyboardEvent) => {
     vars.avail = false
     const { props, setValue, value: vprev } = modelValue(self())
     if (props?.onKeyDown instanceof Function) { props.onKeyDown(e) }
@@ -174,6 +168,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     // log.debug('E:', e.code, e.keyCode)
     /** 이벤트가 존재하면 */
     if (isEvent(e)) {
+      /** 1. 선처리, 직접적인 하드웨어 키보드 (scan-code) 입력에 대한 이벤트처리 */
       const el = $(vars?.elem.current)[0]
       let st = Number(el.selectionStart || 0)
       let ed = Number(el.selectionEnd || 0)
@@ -208,8 +203,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           v = Number(toNumber(inputVal()) || 0) - 1
           if (minv !== C.UNDEFINED && v < minv) { v = minv }
           if (maxv !== C.UNDEFINED && v > maxv) { v = maxv }
-          if (props?.formatter) {
-            setValue(inputVal(props.formatter(v)))
+          if (props?.rtformatter) {
+            setValue(inputVal(props.rtformatter(v)))
           } else {
             setValue(inputVal(v))
           }
@@ -228,8 +223,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           v = Number(toNumber(inputVal()) || 0) + 1
           if (minv !== C.UNDEFINED && v < minv) { v = minv }
           if (maxv !== C.UNDEFINED && v > maxv) { v = maxv }
-          if (props?.formatter) {
-            setValue(inputVal(props.formatter(v)))
+          if (props?.rtformatter) {
+            setValue(inputVal(props.rtformatter(v)))
           } else {
             setValue(inputVal(v))
           }
@@ -260,80 +255,77 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           }
         } }
       }
+      /** 2. 후처리, 키입력이 이루어진 후 DOM 에 반영된 결과물을 2차 가공하는 과정 */
       setTimeout(async () => {
-        {
-          if ([KEYCODE_TABLE.PC.Backspace, KEYCODE_TABLE.PC.Delete].indexOf(kcode) !== -1) {
-            /** 삭제키인(backspace, delete) 경우 별도처리 */
-            let v1, v2, l1, l2
-            let st = Number(el.selectionStart || 0)
-            let ed = Number(el.selectionEnd || 0)
-            v1 = props?.formatter ? props.formatter(vprev) : vprev
-            v2 = props?.formatter ? props.formatter(el.value) : el.value
-            if (el.value === '') {
-              setValue('')
-              return vars.avail = true
-            }
-            LOOP: while(true) {
-              l1 = v1.length
-              l2 = v2.length
-              // log.debug('LENGTH:', l1, l2, v1, v2, st, ed, el.value)
-              if (l2 === l1) {
-                // if (st > 1 && kcode === KEYCODE_TABLE.PC.Backspace)
-                if (kcode === KEYCODE_TABLE.PC.Backspace) {
-                  v2 = `${v2.substring(0, st - 1)}${v2.substring(st)}`
-                  v2 = props?.formatter ? props.formatter(v2) : v2
-                  l2 --
-                  st --
-                  ed --
-                // } else if (ed < l2 && kcode === KEYCODE_TABLE.PC.Delete) {
-                } else if (kcode === KEYCODE_TABLE.PC.Delete) {
-                  v2 = `${v2.substring(0, st)}${v2.substring(st + 2)}`
-                  v2 = props?.formatter ? props.formatter(v2) : v2
-                  l2 --
-                }
+        if ([KEYCODE_TABLE.PC.Backspace, KEYCODE_TABLE.PC.Delete].indexOf(kcode) !== -1) {
+          /** 삭제키인(backspace, delete) 경우 별도처리 */
+          let v1, v2, l1, l2
+          let st = Number(el.selectionStart || 0)
+          let ed = Number(el.selectionEnd || 0)
+          v1 = props?.rtformatter ? props.rtformatter(vprev) : vprev
+          v2 = props?.rtformatter ? props.rtformatter(el.value) : el.value
+          if (el.value === '') {
+            setValue('')
+            return vars.avail = true
+          }
+          LOOP: while(true) {
+            l1 = v1.length
+            l2 = v2.length
+            // log.debug('LENGTH:', l1, l2, v1, v2, st, ed, el.value)
+            if (l2 === l1) {
+              // if (st > 1 && kcode === KEYCODE_TABLE.PC.Backspace)
+              if (kcode === KEYCODE_TABLE.PC.Backspace) {
+                v2 = `${v2.substring(0, st - 1)}${v2.substring(st)}`
+                v2 = props?.rtformatter ? props.rtformatter(v2) : v2
+                l2 --
+                st --
+                ed --
+              // } else if (ed < l2 && kcode === KEYCODE_TABLE.PC.Delete) {
+              } else if (kcode === KEYCODE_TABLE.PC.Delete) {
+                v2 = `${v2.substring(0, st)}${v2.substring(st + 2)}`
+                v2 = props?.rtformatter ? props.rtformatter(v2) : v2
+                l2 --
               }
-              if (st < 0) { st = 0 }
-              if (ed < 0) { ed = 0 }
-              // log.debug('CHECK:', l1, l2, st, ed, v2)
-              el.value = v2
-              await proc.sleep(1)
-              el.selectionStart = st
-              el.selectionEnd = ed
-              setValue(inputVal(v2))
-              break LOOP
             }
-          }  else {
-            /** 일반키인경우 처리 */
-            let v = el.value
-            let st = Number(el.selectionStart || 0)
-            let ed = Number(el.selectionEnd || 0)
-            let ch = String(v).substring(st - 1, ed)
-            // log.debug('CHAR:', `'${ch}'`, st, ed, v.length, kcode, v)
-            if (vars?.itype === 'number' || vars?.itype === 'numeric') {
-              v = props?.formatter ? props.formatter(el.value) : v
-              if (props?.maxLength && v.length > props.maxLength) {
-                v = props?.formatter ? props.formatter(vprev) : vprev
-                st--
-                ed--
-              }
-              const l1 = String(el.value).length
-              const l2 = v.length
-              el.value = v
-              await proc.sleep(1)
-              /** TODO 기존에 선택상태였는지 체크, 삭제의 경우, 붙여넣기의 경우 */
-              if (l2 > l1) {
-                st ++
-                ed ++
-              }
-              // el.selectionStart = 0
-              // el.selectionEnd = v.length
-              // el.blur()
-              // await sleep(5)
-              // el.focus()
-              setValue(inputVal(v))
-              el.selectionStart = st
-              el.selectionEnd = ed
+            if (st < 0) { st = 0 }
+            if (ed < 0) { ed = 0 }
+            // log.debug('CHECK:', l1, l2, st, ed, v2)
+            el.value = v2
+            await proc.sleep(1)
+            el.selectionStart = st
+            el.selectionEnd = ed
+            setValue(inputVal(v2))
+            break LOOP
+          }
+        }  else {
+          /** 일반키인경우 처리 */
+          let v = el.value
+          let st = Number(el.selectionStart || 0)
+          let ed = Number(el.selectionEnd || 0)
+          let ch = String(v).substring(st - 1, ed)
+          // log.debug('CHAR:', `'${ch}'`, st, ed, v.length, kcode, v)
+          if (vars?.itype === 'number' || vars?.itype === 'numeric') {
+            v = props?.rtformatter ? props.rtformatter(el.value) : v
+            if (props?.maxLength && v.length > props.maxLength) {
+              v = props?.rtformatter ? props.rtformatter(vprev) : vprev
+              v = vprev
+              st--
+              ed--
             }
+            const l1 = String(el.value).length
+            const l2 = v.length
+            el.value = v
+            await proc.sleep(2)
+            /** TODO 기존에 선택상태였는지 체크, 삭제의 경우, 붙여넣기의 경우 */
+            if (l2 > l1) {
+              st ++
+              ed ++
+            }
+            setValue(inputVal(`${v}\r`))
+            el.selectionStart = st
+            el.selectionEnd = ed
+            await proc.sleep(5)
+            setValue(inputVal(`${v}`))
           }
         }
         if (e?.keyCode === KEYCODE_TABLE.PC.Enter && props?.onEnter instanceof Function) { props.onEnter(e) }

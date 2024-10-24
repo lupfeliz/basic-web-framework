@@ -118,6 +118,7 @@ export default definePage(() => {
               minValue={ 1000 }
               maxValue={ 999999999999 }
               onError={ onError }
+              rtformatter={ format.numeric }
               formatter={ format.numeric }
               vrules='auto|check2'
               validctx={ vars.validctx }
