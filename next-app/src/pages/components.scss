@@ -48,6 +48,12 @@ html#my-first-app {
             }
           }
         }
+        > .slider-mark {
+          position: relative;
+          top: 1.2rem;
+          font-size: 0.7rem;
+          opacity: 0.5;
+        }
       }
     }
 

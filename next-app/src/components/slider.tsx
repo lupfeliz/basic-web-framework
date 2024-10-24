@@ -11,16 +11,17 @@ import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
 import { registForm, type ValidationType } from '@/components/form'
 import { cancelEvent } from '@/libs/evdev'
-import { Range } from "react-range";
+import { Range, getTrackBackground } from "react-range";
 import $ from 'jquery'
 
-const { throttle } = lodash
+const { throttle, debounce } = lodash
 
 const efnc1 = (() => '') as Function1<any, any>
 
 const SlidePropsSchema = {
   model: {} as any,
   names: [] as string[],
+  label: '',
   onEnter: efnc1,
   onChange: efnc1,
   onKeyDown: efnc1,
@@ -38,7 +39,7 @@ const SlidePropsSchema = {
 type SliderProps = ComponentPropsWithRef<'input'> & Record<string, any> & Partial<typeof SlidePropsSchema>
 
 const COMPONENT = 'slider'
-const { getLogger, defineComponent, copyExclude, useSetup, useRef, copyRef, modelValue, merge, putAll, strm, clear, pushAll, ready, sleep } = app
+const { getLogger, defineComponent, copyExclude, useSetup, useRef, copyRef, modelValue, merge, putAll, strm, clear, pushAll, ready, sleep, swap } = app
 const log = getLogger(COMPONENT)
 
 export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => {
@@ -79,6 +80,7 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
       update(C.UPDATE_SELF)
     },
     async updated(mode: any) {
+      log.trace('SLIDER-UPDATED', mode)
       if (mode && vars) {
       }
     }
@@ -107,7 +109,25 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
       }
     }
   }
-  const onChange = async (e: any) => {
+
+  const sortValues = debounce(() => {
+    // for (let inx = 0; inx < vars.values.length - 1; inx++) {
+    //   const v1 = vars.values[inx]
+    //   const v2 = vars.values[inx + 1]
+    //   if (v1 > v2) {
+    //     swap(vars.values, inx, inx + 1)
+    //     swap(vars.thumbs, inx, inx + 1)
+    //   }
+    // }
+    // log.debug('SORT!!!', vars.values, vars.thumbs)
+    // vars.values = app.clone(vars.values.sort())
+    // log.debug('SORTED:', vars.values)
+    // // update(C.UPDATE_FULL)
+    // update(C.UPDATE_SELF)
+  }, 300)
+
+  const onChange = throttle(async (e: any) => {
+    log.debug('SLIDER-CHANGE:', e)
     pushAll(clear(vars.values), e)
     if (props?.names && props?.model) {
       for (const inx in props.names) {
@@ -116,43 +136,87 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
       }
     }
     update(C.UPDATE_SELF)
+    if (props?.onChange) { props.onChange(e) }
+  }, 100)
+
+  const onMouseUp = (e: any) => {
+    log.trace('ONMOUSEUP')
+    sortValues()
+    if (props?.onMouseUp) { props.onMouseUp(e) }
+  }
+  const onKeyUp = (e: any) => {
+    log.trace('ONKEYUP')
+    sortValues()
+    if (props?.onKeyUp) { props.onKeyUp(e) }
+  }
+  const onDragEnd = (e: any) => {
+    log.trace('ONDRAGEND')
+    sortValues()
+    if (props?.onDragEnd) { props.onDragEnd(e) }
   }
   return (
   <>
   { ready() && (
   <div
+    { ...pprops }
     ref={ vars.elem }
     className={ strm(`slider`) }
+    onMouseUp={ onMouseUp }
+    onKeyUp={ onKeyUp }
+    onDragEnd={ onDragEnd }
     >
     <Range
-      label='Select your value'
+      label={ props.label }
       // step={0.1}
       min={ vars.minv }
       max={ vars.maxv }
       values={ vars.values }
+      // allowOverlap={ true }
+      // draggableTrack={ true }
       onChange={ onChange as any }
       renderTrack={ ({ props, children }) => (
         <div
           {...props}
           className={ strm(`slider-track`) }
+          // style={{
+          //   background: getTrackBackground({
+          //     values: vars.values,
+          //     colors: ["#548BF4", "#ccc"],
+          //     min: vars.minv,
+          //     max: vars.maxv,
+          //   }),
+          // }}
           >
-          {children}
+          { children }
         </div>
       ) }
-      renderThumb={ ({ props }) => (
-        <Fragment key={ props.key }>
-        { vars.thumbs[props.key] && (
+      renderThumb={ ({ props, index }) => (
+        <Fragment key={ index }>
+        { vars.thumbs[index] && (
         <div
           { ...props }
-          key={ props.key }
-          tabIndex={ - 1 }
+          key={ index }
+          tabIndex={ props.tabIndex }
           className={ strm(`slider-thumb`) }
           >
-          <div ref={ vars.thumbs[props.key] }>
-            <span>{ vars.values[props.key] }</span>
+          <div ref={ vars.thumbs[index] }>
+            <span>{ vars.values[index] }</span>
           </div>
         </div>
         ) }
+        </Fragment>
+      ) }
+      renderMark={ ({ props, index }) => (
+        <Fragment key={ index }>
+          { (index % 10 == 0) && (
+          <div
+            { ...props }
+            key={ index }
+            className={ strm(`slider-mark`) }
+            >
+            { index }
+          </div>
+          ) }
         </Fragment>
       ) }
       />

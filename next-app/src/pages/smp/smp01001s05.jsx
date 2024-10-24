@@ -90,6 +90,7 @@ export default definePage(() => {
               onError={ onError }
               vrules='chkslide'
               validctx={ vars.validctx }
+              style={{ marginBottom: '3rem' }}
               />
           </Block>
           <Block className='form-block'>

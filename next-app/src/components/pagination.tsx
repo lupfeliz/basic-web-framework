@@ -55,7 +55,7 @@ export default defineComponent((props: PaginationProps, ref: PaginationProps['re
       putAll(vars, { pageStart, pageEnd, pageTotal })
       log.debug('PAGES:', model.currentPage, paging.pageNumbers(model.currentPage))
       log.debug('ROWS:', model.currentPage, paging.rowNumbers(model.currentPage))
-      update(C.UPDATE_SELF)
+      update()
     }
   })
   const { vars, update } = self()

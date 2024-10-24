@@ -14,13 +14,16 @@ type ModalProps = _ModalProps & Record<string, any> & {
   onClosed?: Function
 }
 
-const { defineComponent, copyExclude, useSetup } = app
+const COMPONENT = 'modal'
+const { defineComponent, copyExclude, useSetup, getLogger } = app
+const log = getLogger(COMPONENT)
 export default defineComponent((props: ModalProps, ref: ModalProps['ref']) => {
   const pprops = copyExclude(props, ['onClosed']) as ModalProps
 
   const self = useSetup({
-    async updated() {
-      update(C.UPDATE_SELF)
+    name: COMPONENT,
+    async updated(mode) {
+      if (mode) { update() }
     }
   })
 

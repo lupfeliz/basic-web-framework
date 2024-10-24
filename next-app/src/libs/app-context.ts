@@ -142,7 +142,10 @@ const app = {
     const self = (vars?: any, props?: any) => {
       let ret = {
         uid,
-        update: (mode: any) => setState(app.state(mode, uid)),
+        update: (mode: any) => {
+          setState(app.state(mode, uid))
+          if (mode === C.UPDATE_SELF && prm?.updated) { prm.updated(C.UPDATE_IF_NOT, uid) }
+        },
         ready: () => !!(appvars.astate && ctx[uid]?.phase),
         vars: ctx[uid]?.vars || {} as V,
         props: (props || ctx[uid]?.props || {}) as P,

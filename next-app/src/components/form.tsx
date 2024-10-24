@@ -531,7 +531,7 @@ const Message = defineComponent((props: MessageProps, ref: MessageProps['ref']) 
         const $el = $(vars.anchor)
         vars.style = { minWidth: `${$el.width()}px` }
       }
-      update(C.UPDATE_SELF)
+      update()
     }
   })
   const { vars, update } = self()

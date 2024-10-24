@@ -48,10 +48,13 @@ const authConfirm = async (v: number) => {
   }
 }
 
-const { defineComponent, useSetup, useRef, log } = app
+const COMPONENT = 'dialog-container'
+const { defineComponent, useSetup, useRef, getLogger } = app
+const log = getLogger(COMPONENT)
 
 export default defineComponent((props: any, ref?: any) => {
   const self = useSetup({
+    name: COMPONENT,
     vars: {
       modal: {
         element: C.UNDEFINED as RefObject<HTMLElement>

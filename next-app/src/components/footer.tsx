@@ -11,12 +11,14 @@ import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
 import { Container } from '@/components'
 
-const { defineComponent, useSetup, useRef, log } = app
+const COMPONENT = 'footer'
 const { debounce } = lodash
+const { defineComponent, useSetup, useRef, getLogger } = app
 const evtlst = ['scroll', 'resize']
+const log = getLogger(COMPONENT)
 export default defineComponent(() => {
   const self = useSetup({
-    name: 'footer',
+    name: COMPONENT,
     vars: {
       hndTouch: C.UNDEFINED,
       elem: useRef({} as HTMLDivElement),

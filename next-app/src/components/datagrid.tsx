@@ -67,7 +67,7 @@ export default defineComponent((props: DataGridProps, ref: DataGridProps['ref'])
       if (mode === C.UPDATE_ENTIRE) {
         // log.debug('UPDATE-GRID:', self().props?.rowData)
         await refreshData(self().props)
-        update(C.UPDATE_IF_NOT)
+        update()
       }
     }
   })

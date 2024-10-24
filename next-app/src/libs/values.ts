@@ -390,6 +390,11 @@ const values = {
     })
     return arr
   },
+  swap(arr: any[], inx1: number, inx2: number) {
+    let v = arr[inx1]
+    arr[inx1] = arr[inx2]
+    arr[inx2] = v
+  },
   hierarchy<T extends Array<any>>(list: T, idKey: string, parentKey: string, subListKey: string, sortKey?: string, extmap?: any) {
     const ret: T = [ ] as any as T
     const map: any = extmap || { }

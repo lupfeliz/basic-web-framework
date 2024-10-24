@@ -24,15 +24,17 @@ type InputProps = DropdownProps & Record<string, any> & {
   options?: OptionType[]
 }
 
+const COMPONENT = 'select'
+
 const { getLogger, useRef, copyExclude, clear, copyRef, useSetup, defineComponent, modelValue, putAll } = app
 
-const log = getLogger('select')
+const log = getLogger(COMPONENT)
 log.setLevel('trace')
 
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model', 'options', 'onChange'])
   const self = useSetup({
-    name: 'select',
+    name: COMPONENT,
     props,
     vars: {
       index: 0,

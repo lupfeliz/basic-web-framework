@@ -25,11 +25,14 @@ type ButtonProps = Record<string, any> & Partial<typeof ButtonPropsSchema>
 
 const { throttle } = lodash
 const { merge } = values
-const { defineComponent, useSetup, copyExclude, goPage, strm, useRef, copyRef } = app
+const COMPONENT = 'button'
+const { defineComponent, useSetup, copyExclude, goPage, strm, useRef, copyRef, getLogger } = app
+const log = getLogger(COMPONENT)
 
 export default defineComponent((props: ButtonProps, ref: ButtonProps['ref']) => {
   const pprops = copyExclude(props, merge(Object.keys(ButtonPropsSchema), []))
   const self = useSetup({
+    name: COMPONENT,
     vars: { elem: useRef<any>() },
     async mounted() { copyRef(ref, vars.elem) }
   })
