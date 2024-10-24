@@ -36,6 +36,13 @@ html#my-first-app {
               content: '▼';
               color: var(--bs-surface-bg-hover);
             }
+            > a.hidddenbtn {
+              position: relative;
+              width: 1px;
+              opacity: 0;
+              padding: 0;
+              margin: 0;
+            }
             > span {
               position: relative;
               top: -0.8rem;

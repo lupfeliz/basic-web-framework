@@ -59,7 +59,12 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
         isValidated: false,
         isValid: C.UNDEFINED,
         message: C.UNDEFINED,
-      } as ValidationType
+      } as ValidationType,
+      event: {
+        start: efnc1,
+        end: efnc1,
+        move: efnc1
+      }
     },
     async mounted() {
       copyRef(ref, vars?.elem)
@@ -87,6 +92,14 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
     }
   })
   const { uid, vars, update, ready } = self()
+  const updateModelValue = () => {
+    if (props?.names && props?.model) {
+      for (const inx in props.names) {
+        const itm = props.names[inx]
+        props.model[itm] = vars.values[inx]
+      }
+    }
+  }
   {
     if (props?.ranges) {
       let minv = C.UNDEFINED as number
@@ -114,12 +127,7 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
   const onChange = throttle(async (e: any) => {
     log.trace('SLIDER-CHANGE:', e)
     pushAll(clear(vars.values), e)
-    if (props?.names && props?.model) {
-      for (const inx in props.names) {
-        const itm = props.names[inx]
-        props.model[itm] = vars.values[inx]
-      }
-    }
+    updateModelValue()
     update(C.UPDATE_SELF)
     if (props?.onChange) { props.onChange(e) }
   }, 100)
@@ -132,6 +140,65 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
   }
   const onDragEnd = (e: any) => {
     if (props?.onDragEnd) { props.onDragEnd(e) }
+  }
+  const onFocus = (e: any) => {
+    log.debug('E:', e.target)
+    const $el = $(e.target)
+    const finx = Number(format.numberOnly($el.attr('data-thumb-inx') || '0'))
+    vars.event.start = (e: any) => {
+      // document.addEventListener('mousemove', vars.event.move)
+      // document.addEventListener('touchmove', vars.event.move)
+      // document.addEventListener('drag', vars.event.move)
+      // cancelEvent(e)
+    }
+    vars.event.end = (e: any) => {
+      log.debug('MOUSE-EVENT-FINISHED!!')
+      // document.removeEventListener('mousedown', vars.event.start)
+      // document.removeEventListener('mouseup', vars.event.end)
+      // document.removeEventListener('mousemove', vars.event.move)
+      // document.removeEventListener('touchstart', vars.event.start)
+      // document.removeEventListener('touchend', vars.event.end)
+      // document.removeEventListener('touchmove', vars.event.move)
+      // document.removeEventListener('dragstart', vars.event.start)
+      // document.removeEventListener('dragend', vars.event.end)
+      // document.removeEventListener('drag', vars.event.move)
+      // vars.event.start = efnc1
+      // vars.event.move = efnc1
+      // vars.event.end = efnc1
+      // cancelEvent(e)
+    }
+    vars.event.move = (e: any) => {
+      // log.debug('E:', (e?.touches || [])[0]?.radiusX)
+      // const movement = Number(e.movementX + e.movementY) >> 1
+      // // log.debug('E1:', movement, vars.values)
+      // vars.values[finx] += movement
+      // updateModelValue()
+      // update(C.UPDATE_SELF)
+      // cancelEvent(e)
+    }
+    // document.addEventListener('mousedown', vars.event.start)
+    // document.addEventListener('mouseup', vars.event.end)
+    // document.addEventListener('touchstart', vars.event.start)
+    // document.addEventListener('touchend', vars.event.end)
+    // document.addEventListener('dragstart', vars.event.start)
+    // document.addEventListener('dragend', vars.event.end)
+  }
+
+  const onBlur = (e: any) => {
+    // window.removeEventListener('mousedown', vars.event.start)
+    // window.removeEventListener('mouseup', vars.event.end)
+    // window.removeEventListener('mousemove', vars.event.move)
+    // vars.event.start = efnc1
+    // vars.event.move = efnc1
+    // vars.event.end = efnc1
+  }
+
+  const addValues = (e: any, inx: number, val: number) => {
+    cancelEvent(e)
+    vars.values[inx] += val
+    updateModelValue()
+    update(C.UPDATE_SELF)
+    setTimeout(() => e.target.focus(), 100)
   }
   return (
   <>
@@ -176,37 +243,60 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
           </div>
         </div>
       ) }
+      /** FIXME: (a11y) 차라리 키보드 수동입력으로 전환하는 기능이 있어야 할 듯 */
       renderThumb={ ({ props, index }) => (
         <Fragment key={ props.key }>
-        { vars.thumbs[index] && (
-        <div
-          { ...props }
-          key={ props.key }
+        <a
+          className='hiddenbtn'
+          aria-label={ `${index == 0 ? '하한' : '상한' }값 감소 현재 ${vars.values[index]}` }
           tabIndex={ props.tabIndex }
-          className={ strm(`slider-thumb`) }
-          data-thumb-inx={ index }
-          // aria-label={ index == 0 ? '최소값' : '최대값'  }
+          onClick={ (e) => addValues(e, index, -1) }
+          role='button'
           >
-          <div ref={ vars.thumbs[index] }>
-            <span>{ vars.values[index] }</span>
-          </div>
-        </div>
-        ) }
-        </Fragment>
-      ) }
-      renderMark={ ({ props, index }) => (
-        <Fragment key={ props.key }>
-          { (index % Math.round((vars.maxv - vars.minv) / 10) == 0) && (
+        </a>
+        { vars.thumbs[index] && (
           <div
             { ...props }
             key={ props.key }
-            className={ strm(`slider-mark`) }
+            className={ strm(`slider-thumb`) }
+            data-thumb-inx={ index }
+            tabIndex={ 999999999 }
+            // onFocus={ onFocus }
+            // onBlur={ onBlur }
+            // aria-hidden={ true }
+            aria-label={ `${index == 0 ? '하한' : '상한' }값 ${vars.values[index]}` }
             >
-            { format.numeric(index) }
+            <div ref={ vars.thumbs[index] }>
+              <span>
+                { vars.values[index] }
+              </span>
+            </div>
           </div>
-          ) }
+        ) }
+        <a
+          className='hiddenbtn'
+          aria-label={ `${index == 0 ? '하한' : '상한' }값 증가 현재 ${vars.values[index]}` }
+          tabIndex={ props.tabIndex }
+          onClick={ (e) => addValues(e, index, 1) }
+          role='button'
+          >
+        </a>
         </Fragment>
       ) }
+      // renderMark={ ({ props, index }) => (
+      //   <Fragment key={ props.key }>
+      //     { (index % Math.round((vars.maxv - vars.minv) / 10) == 0) && (
+      //     <div
+      //       { ...props }
+      //       key={ props.key }
+      //       className={ strm(`slider-mark`) }
+      //       role='text'
+      //       >
+      //       { format.numeric(index) }
+      //     </div>
+      //     ) }
+      //   </Fragment>
+      // ) }
       />
   </div>
   ) }

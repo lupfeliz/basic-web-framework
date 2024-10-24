@@ -37,11 +37,15 @@ const InputPropsSchema = {
   pattern: '' as string,
 }
 
+/**
+ * TODO: inputmode 속성 추가할것
+ */
+
 type InputProps = ComponentPropsWithRef<'input'> & Record<string, any> & Partial<typeof InputPropsSchema>
 
 const COMPONENT = 'input'
 const { merge } = values
-const { getLogger, copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue, isServer, until, strm } = app
+const { getLogger, copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue, isServer, until, strm, sleep } = app
 const log = getLogger(COMPONENT)
 
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
@@ -321,9 +325,14 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
                 st ++
                 ed ++
               }
+              // el.selectionStart = 0
+              // el.selectionEnd = v.length
+              // el.blur()
+              // await sleep(5)
+              // el.focus()
+              setValue(inputVal(v))
               el.selectionStart = st
               el.selectionEnd = ed
-              setValue(inputVal(v))
             }
           }
         }
