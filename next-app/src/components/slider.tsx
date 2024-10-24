@@ -9,6 +9,7 @@ import { ChangeEvent, ComponentPropsWithRef, createElement, Fragment, MouseEvent
 import lodash, { type Function1 } from 'lodash'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
+import format from '@/libs/format'
 import { registForm, type ValidationType } from '@/components/form'
 import { cancelEvent } from '@/libs/evdev'
 import { Range, getTrackBackground, Direction } from "react-range";
@@ -78,21 +79,6 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
       /** 슬라이더 초기화 이후 움직이지 않는 현상 버그픽스용 */
       for (const inx in vars.values) { vars.values[inx] = vars.values[inx] }
       update(C.UPDATE_SELF)
-      // await sleep(100)
-      // try {
-      //   const $slider = $(vars.elem.current).find('.slider-track')
-      //   const $thumbs = $slider.find('.slider-thumb')
-      //   if ($thumbs.length > 1) {
-      //     // $thumbs[0].setAttribute('z-index', '1')
-      //     // $thumbs[1].setAttribute('z-index', '0')
-      //     // const item = $thumbs[0]
-      //     // $(item).remove()
-      //     // $slider.append(item)
-      //   }
-      //   log.debug('SLIDER-THUMBS:', $thumbs)
-      // } catch (e) {
-      //   log.debug('E:', e)
-      // }
     },
     async updated(mode: any) {
       log.trace('SLIDER-UPDATED', mode)
@@ -125,24 +111,8 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
     }
   }
 
-  const sortValues = debounce(() => {
-    // for (let inx = 0; inx < vars.values.length - 1; inx++) {
-    //   const v1 = vars.values[inx]
-    //   const v2 = vars.values[inx + 1]
-    //   if (v1 > v2) {
-    //     swap(vars.values, inx, inx + 1)
-    //     swap(vars.thumbs, inx, inx + 1)
-    //   }
-    // }
-    // log.debug('SORT!!!', vars.values, vars.thumbs)
-    // vars.values = app.clone(vars.values.sort())
-    // log.debug('SORTED:', vars.values)
-    // // update(C.UPDATE_FULL)
-    // update(C.UPDATE_SELF)
-  }, 300)
-
   const onChange = throttle(async (e: any) => {
-    log.debug('SLIDER-CHANGE:', e)
+    log.trace('SLIDER-CHANGE:', e)
     pushAll(clear(vars.values), e)
     if (props?.names && props?.model) {
       for (const inx in props.names) {
@@ -155,18 +125,12 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
   }, 100)
 
   const onMouseUp = (e: any) => {
-    log.trace('ONMOUSEUP')
-    sortValues()
     if (props?.onMouseUp) { props.onMouseUp(e) }
   }
   const onKeyUp = (e: any) => {
-    log.trace('ONKEYUP')
-    sortValues()
     if (props?.onKeyUp) { props.onKeyUp(e) }
   }
   const onDragEnd = (e: any) => {
-    log.trace('ONDRAGEND')
-    sortValues()
     if (props?.onDragEnd) { props.onDragEnd(e) }
   }
   return (
@@ -203,7 +167,7 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
             style={ {
               background: getTrackBackground({
                 values: vars.values,
-                colors: ['#ccc', '#548bf4', '#ccc'],
+                colors: ['var(--bs-border-color)', 'var(--bs-primary)', 'var(--bs-border-color)'],
                 min: vars.minv,
                 max: vars.maxv,
               }),
@@ -232,13 +196,13 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
       ) }
       renderMark={ ({ props, index }) => (
         <Fragment key={ props.key }>
-          { (index % 10 == 0) && (
+          { (index % Math.round((vars.maxv - vars.minv) / 10) == 0) && (
           <div
             { ...props }
             key={ props.key }
             className={ strm(`slider-mark`) }
             >
-            { index }
+            { format.numeric(index) }
           </div>
           ) }
         </Fragment>
