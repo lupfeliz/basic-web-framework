@@ -11,7 +11,7 @@ import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
 import { registForm, type ValidationType } from '@/components/form'
 import { cancelEvent } from '@/libs/evdev'
-import { Range, getTrackBackground } from "react-range";
+import { Range, getTrackBackground, Direction } from "react-range";
 import $ from 'jquery'
 
 const { throttle, debounce } = lodash
@@ -78,6 +78,21 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
       /** 슬라이더 초기화 이후 움직이지 않는 현상 버그픽스용 */
       for (const inx in vars.values) { vars.values[inx] = vars.values[inx] }
       update(C.UPDATE_SELF)
+      // await sleep(100)
+      // try {
+      //   const $slider = $(vars.elem.current).find('.slider-track')
+      //   const $thumbs = $slider.find('.slider-thumb')
+      //   if ($thumbs.length > 1) {
+      //     // $thumbs[0].setAttribute('z-index', '1')
+      //     // $thumbs[1].setAttribute('z-index', '0')
+      //     // const item = $thumbs[0]
+      //     // $(item).remove()
+      //     // $slider.append(item)
+      //   }
+      //   log.debug('SLIDER-THUMBS:', $thumbs)
+      // } catch (e) {
+      //   log.debug('E:', e)
+      // }
     },
     async updated(mode: any) {
       log.trace('SLIDER-UPDATED', mode)
@@ -171,23 +186,30 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
       min={ vars.minv }
       max={ vars.maxv }
       values={ vars.values }
-      // allowOverlap={ true }
+      direction={ Direction.Right }
+      allowOverlap={ true }
       // draggableTrack={ true }
       onChange={ onChange as any }
       renderTrack={ ({ props, children }) => (
         <div
           {...props}
+          onMouseDown={ props.onMouseDown }
+          onTouchStart={ props.onTouchStart }
           className={ strm(`slider-track`) }
-          // style={{
-          //   background: getTrackBackground({
-          //     values: vars.values,
-          //     colors: ["#548BF4", "#ccc"],
-          //     min: vars.minv,
-          //     max: vars.maxv,
-          //   }),
-          // }}
           >
           { children }
+          <div
+            className={ strm(`slider-inter-thumb`) }
+            style={ {
+              background: getTrackBackground({
+                values: vars.values,
+                colors: ['#ccc', '#548bf4', '#ccc'],
+                min: vars.minv,
+                max: vars.maxv,
+              }),
+            } }
+            >
+          </div>
         </div>
       ) }
       renderThumb={ ({ props, index }) => (
@@ -198,6 +220,8 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
           key={ index }
           tabIndex={ props.tabIndex }
           className={ strm(`slider-thumb`) }
+          data-thumb-inx={ index }
+          // aria-label={ index == 0 ? '최소값' : '최대값'  }
           >
           <div ref={ vars.thumbs[index] }>
             <span>{ vars.values[index] }</span>
