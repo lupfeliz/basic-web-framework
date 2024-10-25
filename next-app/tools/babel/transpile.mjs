@@ -29,6 +29,8 @@ const findFiles = (dir, depth = 0) => {
       if ([ ].indexOf(file) !== -1) { continue }
       findFiles(fpath, depth + 1)
       /** js, cjs, mjs 파일만 작업목록에 입력 */
+    } else if (/(\.d\.ts)$/.test(file)) {
+      continue
     } else if (/(\.js|\.cjs|\.mjs)$/.test(file)) {
       WORKLIST.push(fpath)
     }
@@ -48,21 +50,26 @@ const convert = (path) => {
     }
     if (doTrans) {
       console.log('TRANSPILE:', path)
-      const out = babel.transformSync(src, {
+      const plugins = [
+        '@babel/plugin-transform-nullish-coalescing-operator',
+        '@babel/plugin-proposal-optional-catch-binding',
+        '@babel/plugin-transform-optional-chaining',
+        '@babel/plugin-transform-logical-assignment-operators',
+        // '@babel/plugin-transform-classes',
+      ]
+      let out = undefined
+      
+      if (/\.ts/.test(path)) {
+        out = babel.transformSync(src, { presets: ['@babel/preset-typescript'], plugins })
+      } else {
         // presets: [['@babel/preset-env', { targets: { browsers: ['chrome 60'] } }]],
-        plugins: [
-          '@babel/plugin-transform-nullish-coalescing-operator',
-          '@babel/plugin-proposal-optional-catch-binding',
-          '@babel/plugin-transform-optional-chaining',
-          '@babel/plugin-transform-logical-assignment-operators',
-          '@babel/plugin-transform-classes',
-        ]
-      })
+        out = babel.transformSync(src, { plugins })
+      }
       writeFileSync(path, out.code)
       writeFileSync(hashpath, md5(out.code))
     }
   } catch (e) {
-    console.log('CANNOT CONVERT: ', path)
+    console.log('CANNOT CONVERT: ', path, /\.ts/.test(path))
   }
 }
 
