@@ -521,7 +521,7 @@ var FNC_DEFINE_HIDE_ONLOAD = () => `
     body { transition: opacity 0.4s 0.2s ease; display: block !important; }
     .hide-onload { opacity: 0; }
   </style>
-`
+`.replace(/[ \r\n\t]+/gm, ' ').trim()
 
 var FNC_WAIT_CSS_LOADING = () => `
 <script>
@@ -531,11 +531,11 @@ var FNC_WAIT_CSS_LOADING = () => `
     window.removeEventListener('beforeunload', fnunload);
     body.classList.add('hide-onload');
   }
-  /** CSS가 적재될때 까지 대기 (깨짐방지) */
+  ${''/** CSS가 적재될때 까지 대기 (깨짐방지) */}
   function fnload() {
     var o = false;
-    for (var inx = document.styleSheets.length; inx >= 0; inx--) {
-      if ((o = document.styleSheets[inx]) && (
+    for (var i = document.styleSheets.length; i >= 0; i--) {
+      if ((o = document.styleSheets[i]) && (
         String(o.href).endsWith('/pages/_app.css') || (
           (o = o.rules) && (o = o[0]) && (String(o.selectorText).startsWith('html#my-first-app'))
         ))
@@ -546,17 +546,17 @@ var FNC_WAIT_CSS_LOADING = () => `
       }
     }
     if (o === true) {
-      window.addEventListener('beforeunload', fnunload)
-      document.removeEventListener('DOMContentLoaded', fnload)
-      body.classList.remove('hide-onload')
+      window.addEventListener('beforeunload', fnunload);
+      document.removeEventListener('DOMContentLoaded', fnload);
+      body.classList.remove('hide-onload');
     } else {
       setTimeout(fnload, 50);
     }
   }
-  fnload()
+  fnload();
 }
 </script>
-`
+`.replace(/[ \r\n\t]+/gm, ' ').trim()
 
 export default app
 export { type ContextType }

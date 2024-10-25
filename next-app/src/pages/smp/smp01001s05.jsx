@@ -2,7 +2,7 @@
  * @File        : smp01001s05.jsx
  * @Author      : 정재백
  * @Since       : 2024-04-16 
- * @Description : 샘플4
+ * @Description : 샘플5 폼-validation 테스트 페이지
  * @Site        : https://devlog.ntiple.com
  **/
 

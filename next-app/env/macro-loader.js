@@ -9,20 +9,35 @@
  **/
 const PTN_IMPORT = /\/\*[ \t]*#MACRO-DEFINE#[ \t]*.*\*\//
 const REPLACES = `
+${''/** 라이브러리 임포트 */}
+import * as C from '@/libs/constants';
 import app from '@/libs/app-context';
-const { getLogger, definePage, useSetup, goPage, getParameter, asType, useRef } = app;
+import api from '@/libs/api';
+import dialog from '@/libs/dialog-context';
+import userContext from '@/libs/user-context';
+import { Block, Button, Checkbox, Container, Content, DataGrid, Editor, Form, Fragment, Image, Input, Link, Lottie, Modal, Page, Pagination, React, Select, Slider, Spinner, Textarea } from '@/components';
+${''/** 필요한 메소드들 추출 */}
+const { $t, asAny, asType, basepath, clear, clone, defineComponent, definePage, getFrom, getGlobalTmp, getLogger, getOpenerTmp, getParameter, getUri, goPage, isServer, log, matcher, merge, modelValue, profile, pushAll, putAll, px2rem, randomStr, rem2px, setGlobalTmp, setOpenerTmp, sleep, strm, toJSON, toString, until, useRef, useSetup } = app;
+${''/** 페이지명 */}
+const $PAGENAME$ = '#{PAGENAME}';
+${''/** 지역로그 */}
+const log = getLogger($PAGENAME$);
 `.replace(/[ \r\n\t]+/gm, ' ').trim()
 module.exports = function(source) {
-  // console.log('SRCPATH:', this.resourcePath)
+  const pagepath = String(this.resourcePath).replace(/.*\/([^\/]+\/[^\/]+).jsx$/g, '$1')
+  if (['pages/_app', 'pages/_document', 'pages/index'].indexOf(pagepath) !== -1) { return source }
+  const namedata = pagepath.split(/\//g).reverse()
+  let pagename = namedata[0]
+  if (pagename == 'index' || /\[[^\[^\]]+\]/.test(pagename)) {
+    pagename = namedata[1]
+  }
+  // console.log('SRCPATH:', pagename, this.resourcePath)
   let result = String(source || '')
-  let mat
   /** 치환데이터 저장소를 초기화 한다 */
   /** 소스코드에서 // #MACRO-IMPORTS# 가 발견되면 1회 치환한다 */
   if (PTN_IMPORT.test(result)) {
     // console.log('SRCPATH:', this.resourcePath)
-    result = result.replace(PTN_IMPORT, REPLACES)
+    result = result.replace(PTN_IMPORT, REPLACES.replace('#{PAGENAME}', pagename))
   }
   return result
 }
-/** 치환데이터 저장소 */
-const BUILD_STORE = { $INITIALIZED: false }
