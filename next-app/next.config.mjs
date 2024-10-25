@@ -77,11 +77,15 @@ return {
           plugin.options.chunkFilename = plugin.options.chunkFilename.replace('[contenthash]', '[name]')
         }
       }
+      cfg.module.rules.push({
+        test: [ /\/libs\/(constants|app-context)\.[jt]s$/ ],
+        loader: `${process.cwd()}/env/replace-loader.js`,
+      })
+      cfg.module.rules.push({
+        test: [ /\/pages\/.*\.jsx$/ ],
+        loader: `${process.cwd()}/env/macro-loader.js`,
+      })
     }
-    cfg?.module?.rules?.push && cfg.module.rules.push({
-      test: [ /\/libs\/(constants|app-context)\.[jt]s$/ ],
-      loader: `${process.cwd()}/env/replace-loader.js`,
-    })
     return cfg
   },
 }}
