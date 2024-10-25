@@ -74,20 +74,25 @@ export default defineComponent(() => {
             <h5> 개발자 전용 메뉴 </h5>
             <hr />
             <section>
-            <Block>
-              <ul className={ 'devmenu-list' }>
-                <li> 환경설정 (WIP) </li>
-                <li> 로그제어 (WIP) </li>
-                <li> API제어 (WIP) </li>
-                <li>
-                  <a
-                    onClick={ () => dowork({ job: 'hide-menu' }) }
-                    >
-                    플로팅메뉴 숨김
-                  </a>
-                </li>
-              </ul>
-            </Block>
+              <article>
+                <p> 현재 프로파일 : "{ app.profile() }" </p>
+              </article>
+            </section>
+            <section>
+              <article>
+                <ul className={ 'devmenu-list' }>
+                  <li> 환경설정 (WIP) </li>
+                  <li> 로그제어 (WIP) </li>
+                  <li> API제어 (WIP) </li>
+                  <li>
+                    <a
+                      onClick={ () => dowork({ job: 'hide-menu' }) }
+                      >
+                      플로팅메뉴 숨김
+                    </a>
+                  </li>
+                </ul>
+              </article>
             </section>
           </Modal.Body>
           <Modal.Footer>

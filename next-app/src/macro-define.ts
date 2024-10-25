@@ -27,7 +27,6 @@ declare global {
   const Modal: typeof import('@/components/index')['Modal']
   const Page: typeof import('@/components/index')['Page']
   const Pagination: typeof import('@/components/index')['Pagination']
-  const React: typeof import('react')['default']
   const Select: typeof import('@/components/index')['Select']
   const Slider: typeof import('@/components/index')['Slider']
   const Spinner: typeof import('@/components/index')['Spinner']
