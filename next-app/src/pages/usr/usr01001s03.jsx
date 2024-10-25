@@ -5,17 +5,9 @@
  * @Description : 마이페이지
  * @Site        : https://devlog.ntiple.com
  **/
-import app from '@/libs/app-context'
-import api from '@/libs/api'
-import userContext from '@/libs/user-context'
-import dialog from '@/libs/dialog-context'
-import values from '@/libs/values'
-import crypto from '@/libs/crypto'
-import * as C from '@/libs/constants'
-import { Block, Form, Button, Input, Select, Container } from '@/components'
 
-const { definePage, useSetup, log, goPage, clone } = app
-const { matcher } = values
+/* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
+
 const userInfo = userContext.getUserInfo()
 
 export default definePage(() => {
@@ -82,7 +74,7 @@ export default definePage(() => {
       try {
         /** 필요한 파라메터만 복사한다. */
         Object.keys(model).map((k) => ['id', 'userId', 'passwd', 'email'].indexOf(k) == -1 && delete model[k])
-        if (model.passwd) { model.passwd = crypto.aes.encrypt(model.passwd) }
+        if (model.passwd) { model.passwd = encrypt(model.passwd) }
         let res = await api.put(`usr01002`, model)
         log.debug('RES:', res)
         if (res.rescd === C.RESCD_OK) {
@@ -98,7 +90,7 @@ export default definePage(() => {
     }
   }
   return (
-  <Container>
+  <Page>
     <section className='title'>
       <h2>회원정보 수정</h2>
     </section>
@@ -201,6 +193,6 @@ export default definePage(() => {
         </article>
       </Form>
     </section>
-  </Container>
+  </Page>
   )
 })

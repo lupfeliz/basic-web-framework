@@ -19,7 +19,6 @@ const CheckboxPropsSchema = {
   validctx: {} as any,
 }
 
-/** mui 기본 체크박스(라디오버튼) 속성 타입 상속  */
 type CheckboxProps = _CheckboxProps & Record<string, any> & Partial<typeof CheckboxPropsSchema>
 
 const COMPONENT = 'checkbox'

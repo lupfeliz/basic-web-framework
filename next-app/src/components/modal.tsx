@@ -5,7 +5,6 @@
  * @Description : 대화창 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-'use client'
 import _Modal, { ModalProps as _ModalProps } from 'react-bootstrap/Modal'
 
 import * as C from '@/libs/constants'

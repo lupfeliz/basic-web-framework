@@ -16,7 +16,7 @@ import LayoutDefault from '@/components/layout'
 import DialogContainer from '@/components/dialog-container'
 import * as C from '@/libs/constants'
 
-// import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
 import '@materialstyle/materialstyle/scss/materialstyle.scss'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import 'ag-grid-community/styles/ag-grid.css'

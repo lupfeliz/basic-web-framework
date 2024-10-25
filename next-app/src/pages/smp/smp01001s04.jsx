@@ -196,7 +196,7 @@ export default definePage(() => {
     }
   }
   return (
-  <Container>
+  <Page>
     <section className='title'>
       <h2></h2>
     </section>
@@ -285,6 +285,6 @@ export default definePage(() => {
         </article>
       </Form>
     </section>
-  </Container>
+  </Page>
   )
 })

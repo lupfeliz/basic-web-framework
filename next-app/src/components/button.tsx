@@ -5,7 +5,6 @@
  * @Description : 버튼 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-// import _Button, { ButtonProps as _ButtonProps } from '@mui/material/Button'
 import { Button as _Button, ButtonProps as _ButtonProps } from 'react-bootstrap'
 import * as C from '@/libs/constants'
 import lodash from 'lodash'
@@ -21,7 +20,7 @@ const ButtonPropsSchema = {
   color: ''
 }
 
-type ButtonProps = Record<string, any> & Partial<typeof ButtonPropsSchema>
+type ButtonProps = _ButtonProps & Record<string, any> & Partial<typeof ButtonPropsSchema>
 
 const { throttle } = lodash
 const { merge } = values
@@ -40,7 +39,7 @@ export default defineComponent((props: ButtonProps, ref: ButtonProps['ref']) => 
   const getClasses = (props: ButtonProps) => {
     let ret = ''
     if (props.size) {
-      switch (props.size) {
+      switch (String(props.size)) {
       case 'small': case 'sm': { ret = `${ret} btn-sm` } break
       case 'large': case 'lg': { ret = `${ret} btn-lg` } break
       default: ret = `${ret} btn-md`

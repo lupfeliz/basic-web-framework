@@ -16,10 +16,13 @@ type AsideProps = {
   openAside?: Function
 }
 
-const { log, defineComponent, useSetup, goPage, strm } = app
+const COMPONENT = 'aside'
+const { getLogger, defineComponent, useSetup, goPage, strm } = app
+const log = getLogger(COMPONENT)
+
 export default defineComponent((props: AsideProps) => {
   const self = useSetup({
-    name: 'aside',
+    name: COMPONENT,
     vars: {
       clsAside: ''
     },

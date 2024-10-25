@@ -105,7 +105,7 @@ export default definePage((props) => {
     log.debug('UPDATED! SMP01001S01')
   }
   return (
-  <Container>
+  <Page>
     <section className='title'>
       <h2>컴포넌트샘플</h2>
     </section>
@@ -308,6 +308,6 @@ export default definePage((props) => {
         </Block>
       </article>
     </section>
-  </Container>
+  </Page>
   )
 })

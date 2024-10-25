@@ -5,19 +5,18 @@
  * @Description : 메인 페이지
  * @Site        : https://devlog.ntiple.com
  **/
-import app from '@/libs/app-context'
-import userContext from '@/libs/user-context'
-import { Button, Block, Container } from '@/components'
 
-const { definePage, useSetup, $t } = app
+/* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
 
 export default definePage(() => {
 
-  const { ready } = useSetup()()
+  const { ready } = useSetup({
+    name: $PAGENAME$
+  })()
   const userInfo = userContext.getUserInfo()
 
   return (
-  <Container>
+  <Page>
     <section className='title'>
       <h2>메인페이지</h2>
     </section>
@@ -85,6 +84,13 @@ export default definePage(() => {
         </Block>
         <Block>
           <Button
+            href='/smp/smp01001s06'
+            >
+            샘플6
+          </Button>
+        </Block>
+        <Block>
+          <Button
             href='https://devwas.ntiple.com/study202403/swagger/swagger-ui/index.html'
             >
             오픈API
@@ -92,6 +98,6 @@ export default definePage(() => {
         </Block>
       </article>
     </section>
-  </Container>
+  </Page>
   )
 })

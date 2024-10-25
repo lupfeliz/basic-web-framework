@@ -61,7 +61,7 @@ export default definePage(() => {
     e?.element?.focus && e.element.focus()
   }
   return (
-  <Container>
+  <Page>
     <section className='title'>
       <h2></h2>
     </section>
@@ -143,6 +143,6 @@ export default definePage(() => {
         </article>
       </Form>
     </section>
-  </Container>
+  </Page>
   )
 })

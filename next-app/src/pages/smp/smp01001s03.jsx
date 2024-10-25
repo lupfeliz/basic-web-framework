@@ -146,6 +146,7 @@ persistStore(STORE1)
 
 export default definePage((props) => {
   const self = useSetup({
+    name: $PAGENAME$,
     vars: {
     },
     async mounted() {
@@ -180,7 +181,7 @@ export default definePage((props) => {
     default: }
   }
   return (
-  <Container>
+  <Page>
     <section className='title'>
       <h2>STORE샘플</h2>
     </section>
@@ -217,6 +218,6 @@ export default definePage((props) => {
         </Button>
       </Block>
     </section>
-  </Container>
+  </Page>
   )
 })

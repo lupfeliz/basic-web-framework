@@ -21,7 +21,6 @@ import { MDCRipple } from '@material/ripple'
 
 import * as C from '@/libs/constants'
 import values from '@/libs/values'
-import dialog from '@/libs/dialog-context'
 import { getLogger } from '@/libs/log'
 import proc from '@/libs/proc'
 import $t from '@/libs/i18n'
@@ -402,6 +401,7 @@ const app = {
     ret = key ? prm[key] : prm
     return ret
   },
+  getUrl: () => location.href,
   getUri() {
     let ret = '/'
     if (appvars.astate) {
@@ -489,6 +489,7 @@ const app = {
     if (!el) { el = document.documentElement }
     return v * parseFloat(getComputedStyle(el).fontSize)
   },
+  getText: <T extends HTMLElement>(element: T) => element ? $(element).text() : '',
   strm: (v?: any) => String(v || '').replace(/[ ]+/g, ' ').trim(),
   MaterialStyle: (fnc: Function1<any, any>) => fnc(appvars.MaterialStyle),
   router: () => appvars.router,

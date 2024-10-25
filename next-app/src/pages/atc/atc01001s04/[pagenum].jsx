@@ -5,32 +5,21 @@
  * @Description : 게시물 목록 페이지
  * @Site        : https://devlog.ntiple.com
  **/
-import app from '@/libs/app-context'
-import api from '@/libs/api'
-import userContext from '@/libs/user-context'
-import * as C from '@/libs/constants'
-import { Container, Block, Button, Pagination, Link } from '@/components'
-import moment from 'moment'
-import values from '@/libs/values'
 
-const { definePage, useSetup, log, clone, getParameter, goPage } = app
+/* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
+
+import cschema from '@/schema/commons'
+import aschema from '@/schema/article'
 
 export default definePage(() => {
   const self = useSetup({
+    name: $PAGENAME$,
     vars: {
       data: {
-        list: [],
+        list: clone([aschema]),
       },
       /** pagination 을위한 데이터 */
-      pdata: {
-        currentPage: 1,
-        rowCount: 10,
-        rowStart: 0,
-        rowTotal: 0,
-        keyword: '',
-        searchType: '',
-        orderType: ''
-      },
+      pdata: clone(cschema.search),
       state: 0,
     },
     async mounted() {
@@ -43,7 +32,7 @@ export default definePage(() => {
 
   const print = {
     num: (inx) => (vars.pdata?.rowTotal || 0) - (vars.pdata?.rowStart || 0) - inx,
-    cdate: (date) => date && moment(date).format('YYYY-MM-DD'),
+    cdate: (date) => date && format.formatDate(date, 'YYYY-MM-DD'),
     /** 상태에 따라 다른 메시지가 출력된다 */
     state(state) {
       switch (state) {
@@ -85,7 +74,7 @@ export default definePage(() => {
     goPage(`/atc/atc01001s04/${vars.pdata.currentPage}`)
   }
   return (
-  <Container>
+  <Page>
     <section className='title'>
       <h2>게시물 목록</h2>
       { ready() && userInfo.userId && (
@@ -148,6 +137,6 @@ export default definePage(() => {
         </Block>
       </article>
     </section>
-  </Container>
+  </Page>
   )
 })

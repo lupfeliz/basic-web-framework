@@ -6,6 +6,7 @@
 // biome-ignore lint: disable
 
 import type * as form from '@/components/form'
+import crypto from '@/libs/crypto'
 
 export {}
 declare global {
@@ -41,8 +42,8 @@ declare global {
   /** 라이브러리 임포트 */
   const app: typeof import('@/libs/app-context')['default']
   const api: typeof import('@/libs/api')['default']
-  const format: typeof import('@/libs/format')
-  const values: typeof import('@/libs/values')
+  const format: typeof import('@/libs/format')['default']
+  const values: typeof import('@/libs/values')['default']
   const dialog: typeof import('@/libs/dialog-context')['default']
   const userContext: typeof import('@/libs/user-context')['default']
 
@@ -60,7 +61,9 @@ declare global {
   const getLogger: typeof app.getLogger
   const getOpenerTmp: typeof app.getOpenerTmp
   const getParameter: typeof app.getParameter
+  const getText: typeof app.getText
   const getUri: typeof app.getUri
+  const getUrl: typeof app.getUrl
   const goPage: typeof app.goPage
   const isServer: typeof app.isServer
   const log: typeof app.log
@@ -82,6 +85,10 @@ declare global {
   const until: typeof app.until
   const useRef: typeof app.useRef
   const useSetup: typeof app.useSetup
+
+  /** 암복호화 관련 */
+  const encrypt: typeof crypto.aes.encrypt
+  const decrypt: typeof crypto.aes.decrypt
 
   /** 폼관련 */
   const useForm: typeof form.useForm

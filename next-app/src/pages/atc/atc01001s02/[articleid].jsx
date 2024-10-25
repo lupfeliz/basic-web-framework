@@ -5,51 +5,35 @@
  * @Description : 게시물 조회 페이지
  * @Site        : https://devlog.ntiple.com
  **/
-import app from '@/libs/app-context'
-import api from '@/libs/api'
-import dialog from '@/libs/dialog-context'
-import * as C from '@/libs/constants'
-import userContext from '@/libs/user-context'
-import { Container, Block, Input, Button, Link, Content, Form, Editor } from '@/components'
-import moment from 'moment'
-import $ from 'jquery'
 
-const { definePage, useSetup, log, putAll, clone, getParameter, goPage } = app
+/* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
+
+import aschema from '@/schema/article'
 
 export default definePage(() => {
   const self = useSetup({
+    name: $PAGENAME$,
     vars: {
-      formdata: {
-        id: '',
-        title: '',
-        contents: '',
-        userId: '',
-        userNm: '',
-        ctime: '',
-        utime: '',
-        boardId: '',
-        num: ''
-      },
+      formdata: clone(aschema),
     },
     async mounted() {
       /** getParameter 로 path-variable (articleid)을 읽어온다 */
       loadData(getParameter('articleid'))
     }
   })
-  const userInfo = userContext.getUserInfo()
-  const { vars, update, ready } = self()
+  const { vars, update } = self()
 
   const loadData = async (articleId) => {
     const res = await api.get(`atc01001/${articleId}`)
-    vars.formdata = clone(res)
     log.debug('RES:', res)
+    vars.formdata = clone(res)
     setTimeout(() => update(C.UPDATE_ENTIRE), 200)
   }
 
   const submit = async () => {
     let msg = ''
     let model = clone(vars.formdata)
-    const contents = String($(model.contents).text()).trim()
+    const contents = getText(model.contents).trim()
     if (!msg && !model.title) { msg = '제목을 입력해 주세요' }
     if (!msg && model.title.length < 2) { msg = '제목을 2글자 이상 입력해 주세요' }
     if (!msg && !contents) { msg = '내용을 입력해 주세요' }
@@ -78,11 +62,8 @@ export default definePage(() => {
     }
   }
 
-  const print = {
-    cdate: (date) => date && moment(date).format('YYYY-MM-DD'),
-  }
   return (
-  <Container>
+  <Page>
     <section className='title'>
       <h2>글수정</h2>
     </section>
@@ -138,6 +119,6 @@ export default definePage(() => {
         </article>
       </Form>
     </section>
-  </Container>
+  </Page>
   )
 })

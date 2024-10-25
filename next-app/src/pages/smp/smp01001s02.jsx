@@ -75,7 +75,7 @@ export default definePage((props) => {
     }
   }
   return (
-  <Container>
+  <Page>
     <section className='title'>
       <h2>통신샘플</h2>
     </section>
@@ -128,6 +128,6 @@ export default definePage((props) => {
         </Block>
       </Block>
     </section>
-  </Container>
+  </Page>
   )
 })

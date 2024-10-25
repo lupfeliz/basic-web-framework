@@ -5,31 +5,24 @@
  * @Description : 로그인 페이지
  * @Site        : https://devlog.ntiple.com
  **/
-import app from '@/libs/app-context'
-import api from '@/libs/api'
-import dialog from '@/libs/dialog-context'
-import crypto from '@/libs/crypto'
-import * as C from '@/libs/constants'
-import { Form, Block, Button, Container, Input } from '@/components'
 
-const { definePage, useSetup, clone, log, goPage } = app
+/* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
+
+import uschema from '@/schema/user'
 
 export default definePage(() => {
-
   const self = useSetup({
+    name: $PAGENAME$,
     vars: {
-      formdata: {
-        userId: '',
-        passwd: '',
-      }
+      formdata: clone(uschema)
     }
   })
 
   const { vars } = self()
 
   const submit = async () => {
-    const formdata = clone (vars.formdata)
-    formdata.passwd = crypto.aes.encrypt(JSON.stringify({ p: formdata.passwd, t: new Date().getTime() }))
+    const formdata = clone(vars.formdata)
+    formdata.passwd = encrypt(JSON.stringify({ p: formdata.passwd, t: new Date().getTime() }))
     try {
       const res = await api.post(`lgn01001`, formdata)
       log.debug('RES:', res)
@@ -49,7 +42,7 @@ export default definePage(() => {
   }
 
   return (
-  <Container>
+  <Page>
     <section className='title'>
       <h2>로그인</h2>
     </section>
@@ -109,6 +102,6 @@ export default definePage(() => {
         </article>
       </Form>
     </section>
-  </Container>
+  </Page>
   )
 })

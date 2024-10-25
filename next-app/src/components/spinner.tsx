@@ -5,7 +5,6 @@
  * @Description : Spinner 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-'use client'
 import _Spinner, { SpinnerProps as _SpinnerProps } from 'react-bootstrap/Spinner';
 import values from '@/libs/values'
 import app from '@/libs/app-context'
@@ -24,4 +23,4 @@ export default defineComponent((props: SpinnerProps, ref: SpinnerProps['ref'] & 
       {...pprops}
     />
   )
-}, { displayName: 'spinner' })
+})

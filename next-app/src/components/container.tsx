@@ -5,7 +5,6 @@
  * @Description : 컨테이너 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-// import _Container, { ContainerProps as _ContainerProps } from '@mui/material/Container'
 import { ComponentPropsWithRef } from 'react'
 import app from '@/libs/app-context'
 type ContainerProps = ComponentPropsWithRef<'div'> & { }

@@ -18,7 +18,7 @@ type OptionType = {
   value?: any
   selected?: boolean
 }
-/** mui 선택기 타입 상속 */
+
 type InputProps = DropdownProps & Record<string, any> & {
   model?: any
   options?: OptionType[]

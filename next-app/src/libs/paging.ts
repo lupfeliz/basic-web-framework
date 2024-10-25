@@ -6,8 +6,6 @@
  * @Site        : https://devlog.ntiple.com
  **/
 
-import log from './log'
-
 const ROWS_DEF = 10
 const PAGES_DEF = 5
 class Paging {

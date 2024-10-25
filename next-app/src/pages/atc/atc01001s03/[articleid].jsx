@@ -5,26 +5,17 @@
  * @Description : 게시물 수정 페이지
  * @Site        : https://devlog.ntiple.com
  **/
-import app from '@/libs/app-context'
-import api from '@/libs/api'
-import * as C from '@/libs/constants'
-import userContext from '@/libs/user-context'
-import { Container, Block, Button, Link, Content } from '@/components'
-import moment from 'moment'
 
-const { definePage, useSetup, log, putAll, clone, getParameter, goPage } = app
+/* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
+
+import aschema from '@/schema/article'
+const { formatDate } = format
 
 export default definePage(() => {
   const self = useSetup({
+    name: $PAGENAME$,
     vars: {
-      data: {
-        id: '',
-        title: '',
-        contents: '',
-        userId: '',
-        userNm: '',
-        ctime: ''
-      },
+      data: clone(aschema),
     },
     async mounted() {
       loadData(getParameter('articleid'))
@@ -41,10 +32,10 @@ export default definePage(() => {
   }
 
   const print = {
-    cdate: (date) => date && moment(date).format('YYYY-MM-DD'),
+    cdate: (date) => date && formatDate(date, 'YYYY-MM-DD'),
   }
   return (
-  <Container>
+  <Page>
     <section className='title'>
       <h2>{ vars.data?.title || '' }</h2>
       { ready() && (userInfo?.userId || '') == vars.data?.userId && (
@@ -69,6 +60,6 @@ export default definePage(() => {
         </Block>
       </article>
     </section>
-  </Container>
+  </Page>
   )
 })

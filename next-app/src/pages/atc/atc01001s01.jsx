@@ -5,26 +5,16 @@
  * @Description : 게시물 작성 페이지
  * @Site        : https://devlog.ntiple.com
  **/
-import app from '@/libs/app-context'
-import api from '@/libs/api'
-import dialog from '@/libs/dialog-context'
-import * as C from '@/libs/constants'
-import { Block, Button, Container, Form, Editor } from '@/components'
-import Input from '@/components/input'
-import $ from 'jquery'
 
-const { definePage, useSetup, log, clone, goPage } = app
+/* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
+
+import aschema from '@/schema/article'
 
 export default definePage(() => {
   const self = useSetup({
-    vars: {
-      formdata: {
-        title: '',
-        contents: '',
-      }
-    },
-    async mounted() {
-    }
+    name: $PAGENAME$,
+    vars: clone(aschema),
+    async mounted() { }
   })
 
   const { vars, update } = self()
@@ -32,7 +22,7 @@ export default definePage(() => {
   const submit = async () => {
     let msg = ''
     let model = clone(vars.formdata)
-    const contents = String($(model.contents).text()).trim()
+    const contents = getText(model.contents).trim()
     if (!msg && !model.title) { msg = '제목을 입력해 주세요' }
     if (!msg && model.title.length < 2) { msg = '제목을 2글자 이상 입력해 주세요' }
     if (!msg && !contents) { msg = '내용을 입력해 주세요' }
@@ -62,7 +52,7 @@ export default definePage(() => {
   }
 
   return (
-  <Container>
+  <Page>
     <section className='title'>
       <h2>새글 작성</h2>
     </section>
@@ -118,6 +108,6 @@ export default definePage(() => {
         </article>
       </Form>
     </section>
-  </Container>
+  </Page>
   )
 })

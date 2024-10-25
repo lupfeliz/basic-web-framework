@@ -19,11 +19,11 @@ export default definePage(() => {
   })
   const { vars } = self()
   return (
-    <Container>
+    <Page>
       <Button
         >
         OK
       </Button>
-    </Container>
+    </Page>
   )
 })

@@ -5,14 +5,12 @@
  * @Description : 가입완료
  * @Site        : https://devlog.ntiple.com
  **/
-import app from '@/libs/app-context'
-import { Block, Form, Button, Container, Lottie } from '@/components'
 
-const { definePage, goPage } = app
+/* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
 
 export default definePage(() => {
   return (
-  <Container>
+  <Page>
     <section className='title'>
       <h2>회원가입 완료</h2>
     </section>
@@ -39,6 +37,6 @@ export default definePage(() => {
         </article>
       </Form>
     </section>
-  </Container>
+  </Page>
   )
 })

@@ -15,16 +15,19 @@ import app from '@/libs/app-context';
 import api from '@/libs/api';
 import format from '@/libs/format';
 import values from '@/libs/values';
+import __$CRYPTO$ from '@/libs/crypto';
 import dialog from '@/libs/dialog-context';
 import userContext from '@/libs/user-context';
 import { Block, Button, Checkbox, Container, Content, DataGrid, Editor, Form, Fragment, Image, Input, Link, Lottie, Modal, Page, Pagination, React, Select, Slider, Spinner, Textarea } from '@/components';
 import { useForm, validateForm } from '@/components/form';
 ${''/** 필요한 메소드들 추출 */}
-const { $t, asAny, asType, basepath, clear, clone, defineComponent, definePage, getFrom, getGlobalTmp, getLogger, getOpenerTmp, getParameter, getUri, goPage, isServer, matcher, merge, modelValue, profile, pushAll, putAll, px2rem, randomStr, rem2px, setGlobalTmp, setOpenerTmp, sleep, strm, toJSON, toString, until, useRef, useSetup } = app;
+const { $t, asAny, asType, basepath, clear, clone, defineComponent, definePage, getFrom, getGlobalTmp, getLogger, getOpenerTmp, getParameter, getText, getUri, getUrl, goPage, isServer, matcher, merge, modelValue, profile, pushAll, putAll, px2rem, randomStr, rem2px, setGlobalTmp, setOpenerTmp, sleep, strm, toJSON, toString, until, useRef, useSetup } = app;
 ${''/** 페이지명 */}
 const $PAGENAME$ = '#{PAGENAME}';
 ${''/** 지역로그 */}
 const log = getLogger($PAGENAME$);
+const encrypt = __$CRYPTO$.aes.encrypt;
+const decrypt = __$CRYPTO$.aes.decrypt;
 `.replace(/[ \r\n\t]+/gm, ' ').trim()
 module.exports = function(source) {
   const pagepath = String(this.resourcePath).replace(/.*\/([^\/]+\/[^\/]+).jsx$/g, '$1')

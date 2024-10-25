@@ -31,8 +31,10 @@ type EditorProps = ComponentPropsWithRef<'div'> & EditorContentProps & {
   name?: string
 }
 
-const { useRef, copyExclude, copyRef, useSetup, defineComponent, modelValue } = app
+const COMPONENT = 'editor'
+const { useRef, copyExclude, copyRef, useSetup, defineComponent, modelValue, getLogger } = app
 const { debounce } = lodash
+const log = getLogger(COMPONENT)
 
 export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model', 'editor'])
@@ -45,7 +47,7 @@ export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & an
   })
 
   const self = useSetup({
-    name: 'editor',
+    name: COMPONENT,
     props,
     vars: { editor },
     async mounted() {
