@@ -15,7 +15,7 @@ import { AnimatePresence } from 'framer-motion'
 import LayoutDefault from '@/components/layout'
 import DialogContainer from '@/components/dialog-container'
 import * as C from '@/libs/constants'
-import DevModule from '@/app/dev/module'
+import DevModule from '@/app/devtools/module'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '@materialstyle/materialstyle/scss/materialstyle.scss'
