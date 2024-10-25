@@ -6,19 +6,11 @@
  * @Site        : https://devlog.ntiple.com
  **/
 
-import app from '@/libs/app-context'
-import { Checkbox, Block, Form, Button, Input, Select, Container, Slider, Textarea } from '@/components'
-import { useForm, validateForm } from '@/components/form'
-import format from '@/libs/format'
-import dialog from '@/libs/dialog-context'
-
-const PAGENAME = 'smp01001s05'
-const { getLogger, definePage, useSetup, goPage, getParameter, asType, useRef } = app
-const log = getLogger(PAGENAME)
+/* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
 
 export default definePage(() => {
   const self = useSetup({
-    name: PAGENAME,
+    name: $PAGENAME$,
     vars: {
       data: {
         input1: '',

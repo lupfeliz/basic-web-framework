@@ -13,11 +13,14 @@ ${''/** 라이브러리 임포트 */}
 import * as C from '@/libs/constants';
 import app from '@/libs/app-context';
 import api from '@/libs/api';
+import format from '@/libs/format';
+import values from '@/libs/values';
 import dialog from '@/libs/dialog-context';
 import userContext from '@/libs/user-context';
 import { Block, Button, Checkbox, Container, Content, DataGrid, Editor, Form, Fragment, Image, Input, Link, Lottie, Modal, Page, Pagination, React, Select, Slider, Spinner, Textarea } from '@/components';
+import { useForm, validateForm } from '@/components/form';
 ${''/** 필요한 메소드들 추출 */}
-const { $t, asAny, asType, basepath, clear, clone, defineComponent, definePage, getFrom, getGlobalTmp, getLogger, getOpenerTmp, getParameter, getUri, goPage, isServer, log, matcher, merge, modelValue, profile, pushAll, putAll, px2rem, randomStr, rem2px, setGlobalTmp, setOpenerTmp, sleep, strm, toJSON, toString, until, useRef, useSetup } = app;
+const { $t, asAny, asType, basepath, clear, clone, defineComponent, definePage, getFrom, getGlobalTmp, getLogger, getOpenerTmp, getParameter, getUri, goPage, isServer, matcher, merge, modelValue, profile, pushAll, putAll, px2rem, randomStr, rem2px, setGlobalTmp, setOpenerTmp, sleep, strm, toJSON, toString, until, useRef, useSetup } = app;
 ${''/** 페이지명 */}
 const $PAGENAME$ = '#{PAGENAME}';
 ${''/** 지역로그 */}

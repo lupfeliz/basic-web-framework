@@ -5,17 +5,14 @@
  * @Description : 통신 샘플
  * @Site        : https://devlog.ntiple.com
  **/
-import app from '@/libs/app-context'
-import api from '@/libs/api'
-import * as C from '@/libs/constants'
-import crypto from '@/libs/crypto'
-import { Button, Block, Container } from '@/components'
-import userContext from '@/libs/user-context'
 
-const { log, definePage, useSetup, goPage, getParameter } = app
+/* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
+
+import crypto from '@/libs/crypto'
 
 export default definePage((props) => {
   const self = useSetup({
+    name: $PAGENAME$,
     vars: {
       aeskey: '',
       userInfo: { },

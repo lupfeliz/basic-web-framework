@@ -2,24 +2,18 @@
  * @File        : smp01001s03.jsx
  * @Author      : 정재백
  * @Since       : 2024-04-16 
- * @Description : 통신 샘플
+ * @Description : 간이 스토어 테스트 샘플 (redux-like)
  * @Site        : https://devlog.ntiple.com
  **/
-import app from '@/libs/app-context'
-import api from '@/libs/api'
-// import { createSlice, configureStore, combineReducers } from '@reduxjs/toolkit'
+
+/* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
+
 import { createSlice, configureStore, combineReducers } from '@/libs/simple-store'
-// import { persistStore, persistReducer } from 'redux-persist'
-// import { getPersistConfig } from 'redux-deep-persist'
 import { persistStore, persistReducer } from '@/libs/simple-store'
 import { getPersistConfig } from '@/libs/simple-store'
 import { createSessionStorage } from '@/libs/simple-store'
-import * as C from '@/libs/constants'
-import { Button, Block, Container } from '@/components'
 
-const { log, definePage, useSetup, goPage, getParameter, putAll, asType } = app
-
-if (app.isServer()) { log.setLevel('error') }
+if (isServer()) { log.setLevel('error') }
 
 const slice1 = createSlice({
   name: 'slice1',

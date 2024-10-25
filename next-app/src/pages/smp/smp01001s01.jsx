@@ -8,16 +8,12 @@
  *                컴포넌트를 업데이트 시킬 수 있다.
  * @Site        : https://devlog.ntiple.com
  **/
-import app from '@/libs/app-context'
-import * as C from '@/libs/constants'
-import format from '@/libs/format'
-import { Block, Button, Checkbox, Input, Select, Editor, Lottie, Container, Image, DataGrid } from '@/components'
 
-const { log, definePage, goPage, useSetup, clear, putAll, useRef } = app
+/* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
 
 export default definePage((props) => {
   const self = useSetup({
-    name: 'smp01001s01',
+    name: $PAGENAME$,
     vars: {
     /** 3초 타이머 */
     timer: 3,
