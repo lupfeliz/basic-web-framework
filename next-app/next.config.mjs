@@ -54,6 +54,17 @@ return {
   serverRuntimeConfig: yml,
   /** 브라우저에 전달할 설정정보 */
   publicRuntimeConfig: { profile: PROFILE, basePath: yml.app.basePath || '' },
+  /** NEXT-15 에서 sass 빌드가 많이 시끄러우므로 모든 경고 옵션을 꺼둔다. */
+  sassOptions: {
+    silenceDeprecations: [
+      'abs-percent', 'bogus-combinators', 'call-string', 'color-4-api',
+      'color-functions', 'color-module-compat', 'css-function-mixin', 'duplicate-var-flags',
+      'elseif', 'feature-exists', 'fs-importer-cwd', 'function-units',
+      'global-builtin', 'import', 'legacy-js-api', 'mixed-decls',
+      'moz-document', 'new-global', 'null-alpha', 'relative-canonical',
+      'slash-div', 'strict-unary',
+    ]
+  },
   /** 웹팩 빌드중 소스코드를 가로채 변경한다 (replace-loader) */
   webpack: (cfg, opt) => {
     cfg.cache = /dev/.test(cmd) ? false : true
@@ -91,3 +102,4 @@ return {
 }}
 
 export default nextConfig()
+
