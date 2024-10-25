@@ -142,64 +142,28 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
     if (props?.onDragEnd) { props.onDragEnd(e) }
   }
   const onFocus = (e: any) => {
-    log.debug('E:', e.target)
-    const $el = $(e.target)
-    const finx = Number(format.numberOnly($el.attr('data-thumb-inx') || '0'))
-    vars.event.start = (e: any) => {
-      // document.addEventListener('mousemove', vars.event.move)
-      // document.addEventListener('touchmove', vars.event.move)
-      // document.addEventListener('drag', vars.event.move)
-      // cancelEvent(e)
-    }
-    vars.event.end = (e: any) => {
-      log.debug('MOUSE-EVENT-FINISHED!!')
-      // document.removeEventListener('mousedown', vars.event.start)
-      // document.removeEventListener('mouseup', vars.event.end)
-      // document.removeEventListener('mousemove', vars.event.move)
-      // document.removeEventListener('touchstart', vars.event.start)
-      // document.removeEventListener('touchend', vars.event.end)
-      // document.removeEventListener('touchmove', vars.event.move)
-      // document.removeEventListener('dragstart', vars.event.start)
-      // document.removeEventListener('dragend', vars.event.end)
-      // document.removeEventListener('drag', vars.event.move)
-      // vars.event.start = efnc1
-      // vars.event.move = efnc1
-      // vars.event.end = efnc1
-      // cancelEvent(e)
-    }
-    vars.event.move = (e: any) => {
-      // log.debug('E:', (e?.touches || [])[0]?.radiusX)
-      // const movement = Number(e.movementX + e.movementY) >> 1
-      // // log.debug('E1:', movement, vars.values)
-      // vars.values[finx] += movement
-      // updateModelValue()
-      // update(C.UPDATE_SELF)
-      // cancelEvent(e)
-    }
-    // document.addEventListener('mousedown', vars.event.start)
-    // document.addEventListener('mouseup', vars.event.end)
-    // document.addEventListener('touchstart', vars.event.start)
-    // document.addEventListener('touchend', vars.event.end)
-    // document.addEventListener('dragstart', vars.event.start)
-    // document.addEventListener('dragend', vars.event.end)
+    if (props?.onFocus) { props.onFocus(e) }
   }
 
   const onBlur = (e: any) => {
-    // window.removeEventListener('mousedown', vars.event.start)
-    // window.removeEventListener('mouseup', vars.event.end)
-    // window.removeEventListener('mousemove', vars.event.move)
-    // vars.event.start = efnc1
-    // vars.event.move = efnc1
-    // vars.event.end = efnc1
+    if (props?.onBlur) { props.onBlur(e) }
   }
 
-  const addValues = (e: any, inx: number, val: number) => {
-    cancelEvent(e)
-    vars.values[inx] += val
-    updateModelValue()
-    update(C.UPDATE_SELF)
-    setTimeout(() => e.target.focus(), 100)
-  }
+  /** 위치계산용 */
+  const tpos = (inx: number) => {
+    let ret = 0
+    let left = app.min(vars.values) * Number($(vars?.elem?.current).width() || 0) / (vars.maxv - vars.minv)
+    switch (inx) {
+    case 0: {
+      ret = left
+    } break
+    case 1: {
+      ret = app.max(vars.values) * Number($(vars?.elem?.current).width() || 0) / (vars.maxv - vars.minv) - left
+    } break
+    }
+    return ret
+  } 
+
   return (
   <>
   { ready() && (
@@ -219,7 +183,6 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
       values={ vars.values }
       direction={ Direction.Right }
       allowOverlap={ true }
-      // draggableTrack={ true }
       onChange={ onChange as any }
       renderTrack={ ({ props, children }) => (
         <div
@@ -232,12 +195,8 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
           <div
             className={ strm(`slider-inter-thumb`) }
             style={ {
-              background: getTrackBackground({
-                values: vars.values,
-                colors: ['var(--bs-border-color)', 'var(--bs-primary)', 'var(--bs-border-color)'],
-                min: vars.minv,
-                max: vars.maxv,
-              }),
+              left: `${tpos(0)}px`,
+              width: `${tpos(1)}px`,
             } }
             >
           </div>
@@ -246,14 +205,6 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
       /** FIXME: (a11y) 차라리 키보드 수동입력으로 전환하는 기능이 있어야 할 듯 */
       renderThumb={ ({ props, index }) => (
         <Fragment key={ props.key }>
-        {/* <a
-          className='hiddenbtn'
-          aria-label={ `${index == 0 ? '하한' : '상한' }값 감소 현재 ${vars.values[index]}` }
-          tabIndex={ props.tabIndex }
-          onClick={ (e) => addValues(e, index, -1) }
-          role='button'
-          >
-        </a> */}
         { vars.thumbs[index] && (
           <div
             { ...props }
@@ -261,8 +212,8 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
             className={ strm(`slider-thumb`) }
             data-thumb-inx={ index }
             tabIndex={ props.tabIndex }
-            // onFocus={ onFocus }
-            // onBlur={ onBlur }
+            onFocus={ onFocus }
+            onBlur={ onBlur }
             aria-label={ `${index == 0 ? '하한' : '상한' }값 ${vars.values[index]}` }
             >
             <div ref={ vars.thumbs[index] }>
@@ -272,14 +223,6 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
             </div>
           </div>
         ) }
-        {/* <a
-          className='hiddenbtn'
-          aria-label={ `${index == 0 ? '하한' : '상한' }값 증가 현재 ${vars.values[index]}` }
-          tabIndex={ props.tabIndex }
-          onClick={ (e) => addValues(e, index, 1) }
-          role='button'
-          >
-        </a> */}
         </Fragment>
       ) }
       renderMark={ ({ props, index }) => (
