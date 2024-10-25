@@ -66,6 +66,8 @@ export default defineComponent((props: ButtonProps, ref: ButtonProps['ref']) => 
       { ...pprops }
       className={ strm(`btn ${getClasses(props)}`) }
       onClick={ onClick }
+      role='button'
+      tabIndex={ props.tabIndex !== undefined ? props.tabIndex : 0 }
       >
       { props.children }
       <span className='ripple-surface'></span>

@@ -121,6 +121,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       style={{
         border: '1px solid #ccc'
       }}
+      role='combobox'
+      tabIndex={ props.tabIndex !== undefined ? props.tabIndex : 0 }
       >
       { vars.text || props.children }
     </Dropdown.Toggle>

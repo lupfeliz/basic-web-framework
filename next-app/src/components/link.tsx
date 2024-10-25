@@ -16,11 +16,14 @@ type LinkProps = ComponentPropsWithRef<'a'> & {
   param?: any
 }
 const { throttle } = lodash
-const { defineComponent, copyExclude, goPage} = app
+const { defineComponent, copyExclude, goPage, putAll } = app
 
 /** 기본적으로는 일반 a 태그와 같지만 SPA 방식으로 화면을 전환한다 */
 export default defineComponent((props: LinkProps, ref: LinkProps['ref']) => {
-  const pprops = copyExclude(props, ['param'])
+  const pprops = putAll(copyExclude(props, ['param']), {
+    'role': 'button',
+    'tabIndex': props.tabIndex !== undefined ? props.tabIndex : 0
+  })
   const onClick = throttle(async (e: MouseEvent) => {
     if (props.href !== C.UNDEFINED) {
       /** 입력된 이벤트 전달을 취소하고 */

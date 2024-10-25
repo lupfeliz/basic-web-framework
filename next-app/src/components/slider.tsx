@@ -246,24 +246,23 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
       /** FIXME: (a11y) 차라리 키보드 수동입력으로 전환하는 기능이 있어야 할 듯 */
       renderThumb={ ({ props, index }) => (
         <Fragment key={ props.key }>
-        <a
+        {/* <a
           className='hiddenbtn'
           aria-label={ `${index == 0 ? '하한' : '상한' }값 감소 현재 ${vars.values[index]}` }
           tabIndex={ props.tabIndex }
           onClick={ (e) => addValues(e, index, -1) }
           role='button'
           >
-        </a>
+        </a> */}
         { vars.thumbs[index] && (
           <div
             { ...props }
             key={ props.key }
             className={ strm(`slider-thumb`) }
             data-thumb-inx={ index }
-            tabIndex={ 999999999 }
+            tabIndex={ props.tabIndex }
             // onFocus={ onFocus }
             // onBlur={ onBlur }
-            // aria-hidden={ true }
             aria-label={ `${index == 0 ? '하한' : '상한' }값 ${vars.values[index]}` }
             >
             <div ref={ vars.thumbs[index] }>
@@ -273,30 +272,30 @@ export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => 
             </div>
           </div>
         ) }
-        <a
+        {/* <a
           className='hiddenbtn'
           aria-label={ `${index == 0 ? '하한' : '상한' }값 증가 현재 ${vars.values[index]}` }
           tabIndex={ props.tabIndex }
           onClick={ (e) => addValues(e, index, 1) }
           role='button'
           >
-        </a>
+        </a> */}
         </Fragment>
       ) }
-      // renderMark={ ({ props, index }) => (
-      //   <Fragment key={ props.key }>
-      //     { (index % Math.round((vars.maxv - vars.minv) / 10) == 0) && (
-      //     <div
-      //       { ...props }
-      //       key={ props.key }
-      //       className={ strm(`slider-mark`) }
-      //       role='text'
-      //       >
-      //       { format.numeric(index) }
-      //     </div>
-      //     ) }
-      //   </Fragment>
-      // ) }
+      renderMark={ ({ props, index }) => (
+        <Fragment key={ props.key }>
+          { (index % Math.round((vars.maxv - vars.minv) / 10) == 0) && (
+          <div
+            { ...props }
+            key={ props.key }
+            className={ strm(`slider-mark`) }
+            aria-hidden
+            >
+            { format.numeric(index) }
+          </div>
+          ) }
+        </Fragment>
+      ) }
       />
   </div>
   ) }

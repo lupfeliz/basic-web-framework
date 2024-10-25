@@ -190,7 +190,10 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         case KEYCODE_TABLE.PC.PageUp:
         case KEYCODE_TABLE.PC.PageDown:
         case KEYCODE_TABLE.PC.MetaLeft: 
-        case KEYCODE_TABLE.PC.MetaRight: { /** NO-OP */ } break
+        case KEYCODE_TABLE.PC.MetaRight: {
+          vars.avail = true
+          return
+        } break
         case C.UNDEFINED: { /** NO-OP */ } break
         case KEYCODE_TABLE.PC.ArrowUp: {
           let d = String(inputVal()).substring((st - 1) || 0, st)
@@ -211,6 +214,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           el.selectionStart = st
           el.selectionEnd = ed
           cancelEvent(e)
+          vars.avail = true
+          return
         } break
         case KEYCODE_TABLE.PC.ArrowDown: {
           let d = String(inputVal()).substring((st - 1) || 0, st)
@@ -231,6 +236,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           el.selectionStart = st
           el.selectionEnd = ed
           cancelEvent(e)
+          vars.avail = true
+          return
         } break
         default: {
           if (
@@ -354,6 +361,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       onFocus={ onFocus }
       onKeyDown={ onKeyDown }
       placeholder={ pprops.placeholder }
+      tabIndex={ props.tabIndex !== undefined ? props.tabIndex : 0 }
       />
   </div>
   </>

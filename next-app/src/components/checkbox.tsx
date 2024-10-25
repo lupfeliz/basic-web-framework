@@ -77,6 +77,8 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
       { ...pprops }
       checked={ vars.checked || false }
       onChange={ onChange as any }
+      tabIndex={ props.tabIndex !== undefined ? props.tabIndex : 0 }
+      role='checkbox'
       />
     ),
     'radio', (
@@ -88,6 +90,8 @@ export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] 
       { ...pprops }
       checked={ vars.checked || false }
       onChange={ onChange as any }
+      tabIndex={ props.tabIndex !== undefined ? props.tabIndex : 0 }
+      role='radio'
       />
     )
   )}
