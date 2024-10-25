@@ -79,8 +79,30 @@ html#my-first-app {
     /******************************************************************************/
     /** 편집기 */
     /******************************************************************************/
-    .tiptap > p:first-child {
-      margin-top: 0;
+    .editor-component {
+      /** 메뉴바 */
+      > .control-group {
+        background: var(--bs-surface-bg-hover);
+        border-radius: 0.3rem;
+        > .button-group {
+          button {
+            padding: 0.2rem;
+            margin: 0.05rem;
+            border: 0;
+            background: none;
+          }
+        }
+      }
+      /** 에디터 최상단 여백제거 */
+      > div {
+        > .tiptap {
+          min-height: 5rem;
+          padding: 0.1rem;
+          > p:first-child {
+            margin-top: 0;
+          }
+        }
+      }
     }
 
     /******************************************************************************/
