@@ -6,7 +6,10 @@
  * @Site        : https://devlog.ntiple.com
  **/
 
-import log from './log'
+import { getLogger } from './log'
+
+const LIBNAME = 'hangul'
+const log = getLogger(LIBNAME)
 
 /**
  * 유니코드 조합공식

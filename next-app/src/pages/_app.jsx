@@ -15,6 +15,7 @@ import { AnimatePresence } from 'framer-motion'
 import LayoutDefault from '@/components/layout'
 import DialogContainer from '@/components/dialog-container'
 import * as C from '@/libs/constants'
+import Devmenu from '@/devmodules/devmenu'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '@materialstyle/materialstyle/scss/materialstyle.scss'
@@ -31,6 +32,10 @@ const PAGENAME = '_app'
 const { useSetup, definePage, onload, isServer, getLogger } = app
 getLogger(C.ROOT).setLevel(getConfig()?.publicRuntimeConfig?.logLevel || 'debug')
 const log = getLogger(PAGENAME)
+
+if (!isServer() && [C.MY, C.DEV, C.LOCAL].indexOf(app.profile()) !== -1) {
+  import('@/pages/devmodules.scss')
+}
 
 export default definePage((props) => {
   const { Component, pageProps, router } = props
@@ -62,6 +67,9 @@ export default definePage((props) => {
       { applyLayout(<Component key={ !isServer() ? history.state.as : router.asPath } { ...pageProps } />, router) }
     </AnimatePresence>
     <DialogContainer />
+    { ([C.DEV, C.MY, C.LOCAL].indexOf(app.profile()) !== -1) && (
+      <Devmenu />
+    ) }
     </>
   )
 })

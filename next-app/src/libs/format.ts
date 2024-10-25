@@ -6,10 +6,13 @@
  * @Site        : https://devlog.ntiple.com
  **/
 
-import log from './log'
+import { getLogger } from './log'
 import * as C from './constants'
 import values from './values'
 import moment from 'moment'
+
+const LIBNAME = 'format'
+const log = getLogger(LIBNAME)
 
 const format = {
   dateStrFormat(v: any, of?: string, nf?: string) {
@@ -64,7 +67,7 @@ const format = {
       if ((t = Number(i)) >= 0) { ret.setMinutes(t) }
       if ((t = Number(s)) >= 0) { ret.setSeconds(t) }
     }
-    // log.debug(`FORMAT-DATE:${y || ''}-${m || ''}-${d || ''} / ${h || ''}:${i || ''}:${s || ''}`, ret)
+    // log.trace(`FORMAT-DATE:${y || ''}-${m || ''}-${d || ''} / ${h || ''}:${i || ''}:${s || ''}`, ret)
     return ret
   },
   parsePhone(v: any) {

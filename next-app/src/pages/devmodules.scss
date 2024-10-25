@@ -1,0 +1,49 @@
+/**
+ * @File        : devmodules.scss
+ * @Author      : 정재백
+ * @Since       : 2024-10-26 
+ * @Description : 개발모드 메뉴 스타일
+ * @Site        : https://devlog.ntiple.com
+ **/
+
+html {
+  body {
+    #__DEVMODULE_MENU__ {
+      --menu-size-w: 2rem;
+      --menu-size-h: 2rem;
+      position: fixed;
+      top: calc(100vh - var(--menu-size-h) - 1rem);
+      // left: calc(50% - var(--menu-size-w) / 2);
+      left: calc(100vw - var(--menu-size-w) - 1rem);
+      width: var(--menu-size-w);
+      height: var(--menu-size-h);
+      z-index: 99999;
+      cursor: pointer;
+      transition: all 0.2s;
+      opacity: 0.8;
+      filter:blur(2px);
+      // backdrop-filter: blur(10px);
+      // -webkit-backdrop-filter: blur(10px);
+      &:hover {
+        filter: none;
+        opacity: 1;
+      }
+      > a {
+        border: 1px solid #ccc;
+        background-color: #ccc;
+        border-radius: 1rem;
+      }
+    }
+    #__DEVMODULE_MENU_MODAL__ {
+      ul.devmenu-list {
+        padding-left: 0;
+        li {
+          list-style: none;
+          cursor: pointer;
+          padding-top: 0.2rem;
+          padding-bottom: 0.2rem;
+        }
+      }
+    }
+  }
+}

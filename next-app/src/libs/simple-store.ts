@@ -6,7 +6,10 @@
  * @Site        : https://devlog.ntiple.com
  **/
 import lodash from 'lodash'
+import { getLogger } from './log'
 const { debounce } = lodash
+const LIBNAME = 'simple-store'
+const log = getLogger(LIBNAME)
 
 /*******************************************************************************
  * 타입정의
@@ -112,10 +115,10 @@ const createSlice: <T, N extends string>(p: SliceProps<T, N>) => SliceType<T, N>
     let ret = mystate
     const actionType = String(action.type || '')
     if (!state || actionType === TYPE_INIT) {
-      // console.log('INIT:', action.type)
+      log.trace('INIT:', action.type)
       for (const k in prm.initialState) { ret[k] = prm.initialState[k] }
     } else if (actionType === TYPE_PERSIST) {
-      // console.log('PERSIST:', action)
+      log.trace('PERSIST:', action)
     } else if (actionType === TYPE_REHYDRATE) {
       /** FIXME: 우선은 TYPE_REHYDRATE 에 대한 코드를 강제 입력한다 (범용성 무시) */
       if (!action.payload) {
@@ -124,9 +127,9 @@ const createSlice: <T, N extends string>(p: SliceProps<T, N>) => SliceType<T, N>
       } else {
         Object.keys(action.payload).map(k => mystate[k] = action.payload[k])
       }
-      // console.log('REHYDRATE:', mystate, state, action)
+      log.trace('REHYDRATE:', mystate, state, action)
     } else {
-      // console.log('REDUCE!!:', state, action)
+      log.trace('REDUCE!!:', state, action)
       const names = actionType.split(/\//)
       if (reducers && reducers[names[1]]) {
         reducers[names[1]](mystate, action)
@@ -148,10 +151,10 @@ const combineReducers: <T extends Record<string, any>, R extends CombineResultTy
       for (const k1 in map) {
         const prm: any = map[k1]
         ret[k1] = prm(state, action)
-        // console.log('COMBINE-PRM:', k1, prm, ret[k1])
+        log.trace('COMBINE-PRM:', k1, prm, ret[k1])
       }
     } else {
-      // console.log('REDUCE:', state, state == rootState, action)
+      log.trace('REDUCE:', state, state == rootState, action)
       const names = String(action.type).split(/\//)
       const reducers: any = storeCtx.reducers[names[0]]
       const mystate: any = storeCtx.states[names[0]]
@@ -190,10 +193,10 @@ const configureStore: <T>(p: StoreProps<T>) => StoreType<T> = <T>(prm: StoreProp
     subscribe: (fnc: Function) => {
       const sid = genId()
       subscribers[sid] = fnc
-      // log.debug('ADD-SUBSCRIBE:', Object.keys(subscribers).length)
+      log.trace('ADD-SUBSCRIBE:', Object.keys(subscribers).length)
       return () => {
         delete subscribers[sid]
-        // log.debug('REMOVE-SUBSCRIBE:', Object.keys(subscribers).length)
+        log.trace('REMOVE-SUBSCRIBE:', Object.keys(subscribers).length)
       }
     },
     getState: () => new Proxy(state as any, {
@@ -206,22 +209,22 @@ const configureStore: <T>(p: StoreProps<T>) => StoreType<T> = <T>(prm: StoreProp
 }
 
 const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
-  // console.log('CONFIG:', config)
+  log.trace('CONFIG:', config)
   const write = debounce((v: any) => {
     let str = JSON.stringify(v || {})
-    // console.log('WRITE:', str)
+    log.trace('WRITE:', str)
     config.storage.setItem(`persist:${config.key}`, str)
   }, 100)
   storeCtx.storage[config.key] = config.storage
   const ret = (state: any, action: any) => {
     let ret: T = undefined as any
     if (action.type === TYPE_PERSIST) {
-      // console.log('REDUCE-TYPE:', state, action, config.key)
+      log.trace('REDUCE-TYPE:', state, action, config.key)
       /** FIXME: 임시코드 */
       action.register(config.key)
       ret = reducer(state, action)
     } else if (action.type === TYPE_REHYDRATE) {
-      // console.log('REDUCE-TYPE:', state, action, config.key)
+      log.trace('REDUCE-TYPE:', state, action, config.key)
       /** FIXME: 임시코드 */
       ret = config.stateReconciler(action.payload, reducer(undefined as any, {}), state)
       ret = reducer(ret, action)
@@ -229,7 +232,7 @@ const persistReducer = <T>(config: any, reducer: ReducerType<T>) => {
       ret = reducer(state, action)
       write(ret)
     }
-    // console.log('P_REDUCE:', state, action, ret, config)
+    log.trace('P_REDUCE:', state, action, ret, config)
     return ret
   }
   return ret 
@@ -252,9 +255,9 @@ const persistStore = async <T>(store: StoreType<T>) => {
     let ret = undefined as any
     if (typeof window) {
       const ss = storeCtx.storage[key]
-      // console.log('READ-STORAGE', key)
+      log.trace('READ-STORAGE', key)
       const data = await ss.getItem(`persist:${key}`)
-      // console.log('DATA:', `persist:${key}`, data)
+      log.trace('DATA:', `persist:${key}`, data)
       if (data) {
         ret = JSON.parse(data)
       }
@@ -263,16 +266,16 @@ const persistStore = async <T>(store: StoreType<T>) => {
   }
   res = store.dispatch(persi)
   const data = await getData(hyinf.key)
-  // console.log('KEY:', hyinf.key, 'PAYLOAD:', data)
+  log.trace('KEY:', hyinf.key, 'PAYLOAD:', data)
   res = store.dispatch({
     type: TYPE_REHYDRATE,
     payload: data,
     err: hyinf.err,
     key: hyinf.key
   })
-  // console.log('DISPATCH-FINISHED')
+  log.trace('DISPATCH-FINISHED')
   persi.rehydrate(hyinf.key, data, hyinf.err)
-  // console.log('REHYDRATE-FINISHED')
+  log.trace('REHYDRATE-FINISHED')
 }
 
 /**  */

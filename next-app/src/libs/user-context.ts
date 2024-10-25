@@ -17,7 +17,9 @@ import app from '@/libs/app-context'
 import api from '@/libs/api'
 import dialog from '@/libs/dialog-context'
 
-const { log, clone } = app
+const LIBNAME = 'user-context'
+const { getLogger, clone } = app
+const log = getLogger(LIBNAME)
 
 /** 사용자 정보 */
 const schema = {

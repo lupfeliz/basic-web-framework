@@ -6,8 +6,11 @@
  * @Site        : https://devlog.ntiple.com
  **/
 
-import log from './log'
+import { getLogger } from './log'
 import values from './values'
+
+const LIBNAME = 'proc'
+const log = getLogger(LIBNAME)
 
 const ctxProc = {
   debounceMap: { } as any,

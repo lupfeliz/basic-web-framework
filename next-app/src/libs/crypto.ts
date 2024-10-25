@@ -8,7 +8,10 @@
  **/
 import cryptojs from 'crypto-js'
 import * as C from './constants'
-import log from './log'
+import { getLogger } from './log'
+
+const LIBNAME = 'crypto'
+const log = getLogger(LIBNAME)
 
 type WordArray = cryptojs.lib.WordArray
 /** 암호화 기본키 저장소 */
@@ -102,17 +105,17 @@ const crypto = {
       }
       const kobj = cryptor.getKey()
       if (kobj.d) {
-        // log.debug('PRV-DEC', msg)
+        // log.trace('PRV-DEC', msg)
         return cryptor.decrypt(msg)
       } else {
-        // log.debug('PUB-DEC', msg)
+        // log.trace('PUB-DEC', msg)
         let ret = C.UNDEFINED
         const c = context.rsa.parseBigInt(context.rsa.b64tohex(msg), 16)
         const e = tobig(kobj.e)
         ret = c.modPow(e, kobj.n)
-        // log.debug('N:', tohex(kobj?.n))
-        // log.debug('E:', tohex(kobj?.e))
-        // log.debug('DECRYPT:', tohex(ret))
+        // log.trace('N:', tohex(kobj?.n))
+        // log.trace('E:', tohex(kobj?.e))
+        // log.trace('DECRYPT:', tohex(ret))
         ret = pkcsunpad(ret, (kobj.n.bitLength() + 7) >> 3)
         return ret
       }
@@ -127,16 +130,16 @@ const crypto = {
       if (!kobj.d) {
         return cryptor.encrypt(msg)
       } else {
-        // log.debug('PRV-ENC', msg)
+        // log.trace('PRV-ENC', msg)
         let ret = C.UNDEFINED
 
         let maxLength = (kobj.n.bitLength() + 7) >> 3
         let c = pkcspad(msg, maxLength);
         ret = c.modPow(tobig(kobj.d), kobj.n)
-        // log.debug('PADDING:', tohex(c))
-        // log.debug('N:', tohex(kobj?.n))
-        // log.debug('D:', tohex(kobj?.d))
-        // log.debug('ENCRYPT:', tohex(ret))
+        // log.trace('PADDING:', tohex(c))
+        // log.trace('N:', tohex(kobj?.n))
+        // log.trace('D:', tohex(kobj?.d))
+        // log.trace('ENCRYPT:', tohex(ret))
         ret = ret.toString(16)
         let length = ret.length
         /** fix zero before result */

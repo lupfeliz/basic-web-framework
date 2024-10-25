@@ -17,10 +17,11 @@ const ButtonPropsSchema = {
   href: C.UNDEFINED,
   param: C.UNDEFINED,
   size: '' as 'small' | 'large' | 'sm' | 'md' | 'lg',
-  color: ''
+  variant: '' as 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'
 }
 
-type ButtonProps = _ButtonProps & Record<string, any> & Partial<typeof ButtonPropsSchema>
+type ButtonProps = Record<string, any> & Partial<typeof ButtonPropsSchema> & {
+}
 
 const { throttle } = lodash
 const { merge } = values
@@ -45,8 +46,8 @@ export default defineComponent((props: ButtonProps, ref: ButtonProps['ref']) => 
       default: ret = `${ret} btn-md`
       }
     }
-    if (props.color) {
-      ret = `${ret} btn-${props.color}`
+    if (props.variant) {
+      ret = `${ret} btn-${props.variant}`
     }
     return ret
   }

@@ -46,7 +46,7 @@ export default defineComponent((props: ModalProps, ref: ModalProps['ref']) => {
     </>
   )
 }, {
-  displayName: 'modal',
+  displayName: COMPONENT,
   Body: _Modal.Body,
   Header: _Modal.Header,
   Title: _Modal.Title,

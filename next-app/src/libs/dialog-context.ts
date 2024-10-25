@@ -9,7 +9,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { configureStore } from '@reduxjs/toolkit'
 
 import * as C from '@/libs/constants'
-import log from '@/libs/log'
+import { getLogger } from '@/libs/log'
 import values from '@/libs/values'
 import app from '@/libs/app-context'
 import proc from '@/libs/proc'
@@ -18,6 +18,9 @@ import lodash from 'lodash'
 const { debounce } = lodash
 const { clone } = values
 const { until } = proc
+
+const LIBNAME = 'dialog-context'
+const log = getLogger(LIBNAME)
 
 type OptionType = {
   width?: number,

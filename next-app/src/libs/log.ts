@@ -61,6 +61,7 @@ class Log {
   }
   getLevel() { return this.level }
   getNamespace() { return this.namespace }
+  getNamespaces() { return Object.keys(logctx) }
   /** 로그 레벨링, log.setLevel('info') 실행 후 log.debug('log') 호출시 콘솔에 출력되지 않음  */
   setLevel(level: Levels, appender?: AppenderType) {
     let inst = this.inst

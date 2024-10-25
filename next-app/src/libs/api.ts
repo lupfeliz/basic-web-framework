@@ -28,7 +28,9 @@ type OptType = {
   abortclr: Function
 } & Record<string, any>
 
-const { putAll, getConfig, log } = app
+const LIBNAME = 'api'
+const { putAll, getConfig, getLogger } = app
+const log = getLogger(LIBNAME)
 const keepalive = true
 
 const apivars = {
