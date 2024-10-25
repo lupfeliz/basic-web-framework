@@ -92,6 +92,7 @@ const validateForm = async (vform: any, opt: any = {}) => {
     elist.sort((a: any, b: any) => Number(a.seq) - Number(b.seq))
     log.trace('VALIDATION-COUNT:', elist.length)
     for (const item of elist) {
+      if (!item?.self) { continue }
       let res = await validate(item, opt)
       if (res === false) {
         log.debug('INVALID:', item, opt)
