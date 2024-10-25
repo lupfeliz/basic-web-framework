@@ -5,7 +5,7 @@
  * @Description : 개발메뉴 컴포넌트. 개발시에만 보여진다.
  * @Site        : https://devlog.ntiple.com
  **/
-
+'use client'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
 import dialog from '@/libs/dialog-context'
@@ -14,7 +14,7 @@ import { Modal, Content, Block, Button } from '@/components'
 import $ from 'jquery'
 
 const COMPONENT = 'devmenu'
-const { defineComponent, getLogger, useSetup, useRef } = app
+const { isServer, defineComponent, getLogger, useSetup, useRef } = app
 const log = getLogger(COMPONENT)
 
 export default defineComponent(() => {
@@ -103,6 +103,4 @@ export default defineComponent(() => {
       ) }
     </>
   )
-})
-
-
+}, { nossr: true })
