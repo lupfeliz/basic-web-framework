@@ -49,11 +49,13 @@ const convert = (path) => {
     if (doTrans) {
       console.log('TRANSPILE:', path)
       const out = babel.transformSync(src, {
+        // presets: [['@babel/preset-env', { targets: { browsers: ['chrome 60'] } }]],
         plugins: [
           '@babel/plugin-transform-nullish-coalescing-operator',
           '@babel/plugin-proposal-optional-catch-binding',
           '@babel/plugin-transform-optional-chaining',
           '@babel/plugin-transform-logical-assignment-operators',
+          '@babel/plugin-transform-classes',
         ]
       })
       writeFileSync(path, out.code)
