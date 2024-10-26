@@ -248,10 +248,11 @@ export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & an
         />
     ) }
     <EditorContent
+      { ...pprops }
+      className='editor-content'
       ref={ vars.elem as any }
       /* @ts-ignore */
       editor={ vars.editor }
-      { ...pprops }
       />
   </div>
   </>
