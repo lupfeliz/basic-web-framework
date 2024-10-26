@@ -8,6 +8,8 @@
 
 /* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
 
+import { useEffect, useState } from 'react'
+
 export default definePage(() => {
   const self = useSetup({
     name: $PAGENAME$,
@@ -17,13 +19,36 @@ export default definePage(() => {
       log.debug(`${$PAGENAME$} mounted`)
     },
   })
+  const [state, setState] = useState(0)
+  useEffect(() => {
+    let ret = undefined
+    switch (state) {
+    case 0: {
+      setState(state + 1)
+    } break
+    case 1: {
+      for (var itm of document.styleSheets) { for (var v of itm.rules) { console.log('E:', v.selectorText); } }
+    } break
+    }
+    return ret
+  }, [state])
+
   const { vars } = self()
+  const test2 = () => {
+    let r = ''
+    for (var itm of document.styleSheets) { for (var v of itm.rules) { r = `${r} / ${v.selectorText || ''}` } }
+    return r
+  }
   return (
     <Page>
       <Button
         >
         OK
       </Button>
+      [{ state }]
+      { state > 0 && (
+        <> { test2() } </>
+      ) }
     </Page>
   )
 })

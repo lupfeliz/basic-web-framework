@@ -11,9 +11,12 @@ import app from '@/libs/app-context'
 
 const { definePage, basepath, fncWaitCssLoading, fncDefineHideOnload } = app
 
+const projid = 'my-first-app'
+const mincnt = 1000
+
 export default definePage(() => {
   return (
-  <Html id='my-first-app' className='my-first-app-new' lang='ko'>
+  <Html id={ projid } lang='ko'>
     <Head>
       {/* 페이지 hard-loading 시 적용할 기본 transition */}
       <Content html={`
@@ -24,7 +27,7 @@ export default definePage(() => {
     {/* hide-onload 클래스가 사라지면 트랜지션이 시작된다. */}
     <body className='hide-onload'>
       <Main />
-      <Content html={ fncWaitCssLoading() } />
+      <Content html={ fncWaitCssLoading(projid, mincnt) } />
       <NextScript />
     </body>
   </Html>

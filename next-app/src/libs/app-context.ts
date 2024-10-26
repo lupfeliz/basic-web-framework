@@ -494,7 +494,7 @@ const app = {
   MaterialStyle: (fnc: Function1<any, any>) => fnc(appvars.MaterialStyle),
   router: () => appvars.router,
   fncDefineHideOnload: () => FNC_DEFINE_HIDE_ONLOAD(),
-  fncWaitCssLoading: () => FNC_WAIT_CSS_LOADING(),
+  fncWaitCssLoading: (v: string, c: number) => FNC_WAIT_CSS_LOADING(v, c),
 }
 
 const compoSubscribe = <V, P>(prm: LauncherProps<V, P>, uid: string, setState: Function) => {
@@ -524,7 +524,7 @@ var FNC_DEFINE_HIDE_ONLOAD = () => `
   </style>
 `.replace(/[ \r\n\t]+/gm, ' ').trim()
 
-var FNC_WAIT_CSS_LOADING = () => `
+var FNC_WAIT_CSS_LOADING = (htmlid: string, duration: number = 1000) => `
 <script>
 {
   var body = document.body;
@@ -533,25 +533,27 @@ var FNC_WAIT_CSS_LOADING = () => `
     body.classList.add('hide-onload');
   }
   ${''/** CSS가 적재될때 까지 대기 (깨짐방지) */}
-  function fnload() {
+  var c = 0;
+  function findcss () {
+    var s = false;
     var o = false;
     for (var i = document.styleSheets.length; i >= 0; i--) {
-      if ((o = document.styleSheets[i]) && (
-        String(o.href).endsWith('/pages/_app.css') || (
-          (o = o.rules) && (o = o[0]) && (String(o.selectorText).startsWith('html#my-first-app'))
-        ))
-      ) {
-        o = true; break;
-      } else {
-        o = false;
+      if (!(s = document.styleSheets[i])) { continue; }
+      if (!(s = s.rules)) { continue; }
+      for (var j = 0; j < s.length; j++) {
+        if (!(o = s[j])) { continue; }
+        if (String(o.selectorText).startsWith('html#${htmlid}')) { return true; }
       }
     }
-    if (o === true) {
+    return false;
+  }
+  function fnload() {
+    if (findcss() || ((c = c + 1) > ${duration})) {
       window.addEventListener('beforeunload', fnunload);
       document.removeEventListener('DOMContentLoaded', fnload);
       body.classList.remove('hide-onload');
     } else {
-      setTimeout(fnload, 50);
+      setTimeout(fnload, 10);
     }
   }
   fnload();
