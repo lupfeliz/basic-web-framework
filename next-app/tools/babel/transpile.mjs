@@ -28,10 +28,10 @@ const findFiles = (dir, depth = 0) => {
     if (isdir && depth < MAX_DEPTH) {
       if ([ ].indexOf(file) !== -1) { continue }
       findFiles(fpath, depth + 1)
-      /** js, cjs, mjs 파일만 작업목록에 입력 */
+      /** js, cjs, mjs ts 파일들을 작업목록에 입력 */
     } else if (/(\.d\.ts)$/.test(file)) {
       continue
-    } else if (/(\.js|\.cjs|\.mjs)$/.test(file)) {
+    } else if (/(\.js|\.cjs|\.mjs|\.ts)$/.test(file)) {
       WORKLIST.push(fpath)
     }
   }
@@ -51,20 +51,14 @@ const convert = (path) => {
     if (doTrans) {
       console.log('TRANSPILE:', path)
       const plugins = [
+        '@babel/plugin-syntax-typescript',
         '@babel/plugin-transform-nullish-coalescing-operator',
-        '@babel/plugin-proposal-optional-catch-binding',
+        '@babel/plugin-transform-optional-catch-binding',
         '@babel/plugin-transform-optional-chaining',
         '@babel/plugin-transform-logical-assignment-operators',
-        // '@babel/plugin-transform-classes',
+        '@babel/plugin-transform-class-properties',
       ]
-      let out = undefined
-      
-      if (/\.ts/.test(path)) {
-        out = babel.transformSync(src, { presets: ['@babel/preset-typescript'], plugins })
-      } else {
-        // presets: [['@babel/preset-env', { targets: { browsers: ['chrome 60'] } }]],
-        out = babel.transformSync(src, { plugins })
-      }
+      let out = babel.transformSync(src, { plugins })
       writeFileSync(path, out.code)
       writeFileSync(hashpath, md5(out.code))
     }
@@ -86,6 +80,7 @@ const convert = (path) => {
 ].map(v => findFiles(v))
 
 // WORKLIST.push(`${dir}/dist/_next/static/chunks/941-41f6770e9314edcd.js`)
+// WORKLIST.push(`${dir}/tools/babel/test.js`)
 WORKLIST.map(v => convert(v))
 
 /**

@@ -5,9 +5,7 @@
  * @Description : 단순대화창 제어용 스토어 라이브러리
  * @Site        : https://devlog.ntiple.com
  **/
-import { createSlice } from '@reduxjs/toolkit'
-import { configureStore } from '@reduxjs/toolkit'
-
+import { createSlice, configureStore } from '@reduxjs/toolkit'
 import * as C from '@/libs/constants'
 import { getLogger } from '@/libs/log'
 import values from '@/libs/values'
