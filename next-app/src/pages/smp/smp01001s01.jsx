@@ -56,7 +56,7 @@ export default definePage((props) => {
         fdata.input02 = 'BBBB'
         fdata.checkbox2 = 'C'
         fdata.select1 = 'kakao.com'
-        fdata.content = `<p><span style="color:#f00">CONTENT</span></p>`
+        fdata.content = `<p>CONTENT-CHANGED${ new Date().getTime() }</p>`
         vars.idgen.map((v, i, l) => l[i] = app.genId())
         /** 전체 데이터 갱신으로 화면 데이터가 자동으로 바뀐다 */
         update(C.UPDATE_ENTIRE)
@@ -114,11 +114,13 @@ export default definePage((props) => {
       { ready() && (
       <article>
         <Block className='my-1'>
-        <p> GLOBAL-STATE-VALUE: { app.state() } </p>
-        <p> UPDATE_IF_NOT: { app.tstate(C.UPDATE_IF_NOT) } </p>
-        <p> UPDATE_SELF: { app.tstate(C.UPDATE_SELF) } </p>
-        <p> UPDATE_FULL: { app.tstate(C.UPDATE_FULL) } </p>
-        <p> UPDATE_ENTIRE: { app.tstate(C.UPDATE_ENTIRE) } </p>
+        <span> GLOBAL-STATE-VALUE: { app.state() } </span>
+        <br/>
+        <span> / UPDATE_IF_NOT: { app.tstate(C.UPDATE_IF_NOT) } </span>
+        <span> / UPDATE_SELF: { app.tstate(C.UPDATE_SELF) } </span>
+        <br/>
+        <span> / UPDATE_FULL: { app.tstate(C.UPDATE_FULL) } </span>
+        <span> / UPDATE_ENTIRE: { app.tstate(C.UPDATE_ENTIRE) } </span>
         </Block>
       </article>
       ) }
@@ -134,7 +136,7 @@ export default definePage((props) => {
           </Button>
           <Button
             className='mx-1'
-            variant='contained'
+            variant='primary'
             onClick={ () => {
               clear(vars?.formdata)
               update(C.UPDATE_SELF)
@@ -144,22 +146,19 @@ export default definePage((props) => {
           </Button>
           <Button
             className='mx-1'
-            variant='contained'
-            color='warning'
+            variant='warning'
             >
             경고버튼
           </Button>
           <Button
             className='mx-1'
-            variant='outlined'
-            color='info'
+            variant='outline-info'
             >
             기본버튼
           </Button>
           <Button
             className='mx-1'
-            variant='outlined'
-            color='info'
+            variant='outline-info'
             href={'/smp/smp01001s02'}
             param={ { key: 'a', val: 'b' } }
             >
@@ -260,6 +259,13 @@ export default definePage((props) => {
         </Block>
       </article>
       <article>
+        <h3>전체 폼데이터</h3>
+        <hr />
+        <Block className='my-1 w-full overflow-x-auto'>
+          FORMDATA: [{ JSON.stringify(vars?.formdata) }]
+        </Block>
+      </article>
+      <article>
         <h3> DATA-GRID </h3>
         <hr />
         <Block className='my-1'>
@@ -268,13 +274,6 @@ export default definePage((props) => {
             columnDefs={ vars.columnDefs || [] }
             rowData={ vars.rowData || [] }
             />
-        </Block>
-      </article>
-      <article>
-        <h3>전체 폼데이터</h3>
-        <hr />
-        <Block className='my-1 w-full overflow-x-auto'>
-          FORMDATA: [{ JSON.stringify(vars?.formdata) }]
         </Block>
       </article>
       <article>

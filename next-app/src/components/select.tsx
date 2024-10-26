@@ -6,11 +6,18 @@
  * @Site        : https://devlog.ntiple.com
  **/
 import { Dropdown , DropdownProps } from 'react-bootstrap'
-
+import type { ButtonVariant } from '@/components/button'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
 import { registForm, type ValidationType } from '@/components/form'
 import { isEvent, cancelEvent, KEYCODE_TABLE } from '@/libs/evdev'
+
+const SelectSchema = {
+  model: {} as any,
+  options: [] as OptionType[],
+  variant: '' as ButtonVariant,
+  onChange: C.EMPTY_FUNC1,
+}
 
 /** 선택목록 타입 */
 type OptionType = {
@@ -19,20 +26,15 @@ type OptionType = {
   selected?: boolean
 }
 
-type InputProps = DropdownProps & Record<string, any> & {
-  model?: any
-  options?: OptionType[]
+type SelectProps = DropdownProps & Partial<typeof SelectSchema> & Record<string, any> & {
 }
 
 const COMPONENT = 'select'
-
-const { getLogger, useRef, copyExclude, clear, copyRef, useSetup, defineComponent, modelValue, putAll } = app
-
+const { clear, copyExclude, copyRef, defineComponent, getLogger, modelValue, useRef, useSetup } = app
 const log = getLogger(COMPONENT)
-log.setLevel('trace')
 
-export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
-  const pprops = copyExclude(props, ['model', 'options', 'onChange'])
+export default defineComponent((props: SelectProps, ref: SelectProps['ref'] & any) => {
+  const pprops = copyExclude(props, Object.keys(SelectSchema))
   const self = useSetup({
     name: COMPONENT,
     props,
@@ -117,10 +119,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     >
     <Dropdown.Toggle
       ref={ vars?.elem }
-      variant='light'
-      style={{
-        border: '1px solid #ccc'
-      }}
+      variant={ props.variant || 'light' }
       role='combobox'
       tabIndex={ props.tabIndex !== undefined ? props.tabIndex : 0 }
       >

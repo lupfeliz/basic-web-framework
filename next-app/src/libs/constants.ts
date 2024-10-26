@@ -1,3 +1,5 @@
+import { Function1, Function2, Function3, Function4 } from "lodash"
+
 /**
  * @File        : constants.ts
  * @Author      : 정재백
@@ -139,3 +141,8 @@ export const SC_UNKNOWN = -1
 export const RESCD_OK = '0000'
 /** 이 부분은 웹팩 플러그인(replace-loader)에 의해 자동으로 채워진다 */
 export const CRYPTO_KEY = '{$$CRYPTO_KEY$$}'
+
+export const EMPTY_FUNC1: Function1<any, any> = ((a) => '')
+export const EMPTY_FUNC2: Function2<any, any, any> = ((a, b) => '')
+export const EMPTY_FUNC3: Function3<any, any, any, any> = ((a, b, c) => '')
+export const EMPTY_FUNC4: Function4<any, any, any, any, any> = ((a, b, c, d) => '')

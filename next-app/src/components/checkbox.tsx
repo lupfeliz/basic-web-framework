@@ -5,7 +5,7 @@
  * @Description : 체크박스 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-import { FormCheck as _Checkbox, FormCheckProps as _CheckboxProps } from 'react-bootstrap'
+import { FormCheck as _Checkbox, type FormCheckProps as _CheckboxProps } from 'react-bootstrap'
 import app from '@/libs/app-context'
 import values from '@/libs/values'
 import * as C from '@/libs/constants'
@@ -22,7 +22,7 @@ const CheckboxPropsSchema = {
 type CheckboxProps = _CheckboxProps & Record<string, any> & Partial<typeof CheckboxPropsSchema>
 
 const COMPONENT = 'checkbox'
-const { useRef, copyExclude, copyRef, useSetup, defineComponent, modelValue, getLogger } = app
+const { copyExclude, copyRef, defineComponent, getLogger, modelValue, useRef, useSetup } = app
 const log = getLogger(COMPONENT)
 
 export default defineComponent((props: CheckboxProps, ref: CheckboxProps['ref'] & any) => {

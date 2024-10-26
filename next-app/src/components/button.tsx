@@ -5,28 +5,32 @@
  * @Description : 버튼 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-import { Button as _Button, ButtonProps as _ButtonProps } from 'react-bootstrap'
+import { Button as _Button, type ButtonProps as _ButtonProps } from 'react-bootstrap'
+// import { ButtonVariant, Variant, AlignDirection } from 'react-bootstrap/types'
+
 import * as C from '@/libs/constants'
 import lodash from 'lodash'
-import values from '@/libs/values'
 import app from '@/libs/app-context'
 import { cancelEvent } from '@/libs/evdev'
 
+/** react-bootstrap/types 에서 코드이식 */
+export type Variant = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'dark' | 'light' | (string & {})
+export type ButtonVariant = Variant | 'link' | 'outline-primary' | 'outline-secondary' | 'outline-success' | 'outline-danger' | 'outline-warning' | 'outline-info' | 'outline-dark' | 'outline-light'
+
 const ButtonPropsSchema = {
-  onClick: (() => '') as (Function | undefined),
+  onClick: C.EMPTY_FUNC1,
   href: C.UNDEFINED,
   param: C.UNDEFINED,
   size: '' as 'small' | 'large' | 'sm' | 'md' | 'lg',
-  variant: '' as 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'
+  variant: '' as ButtonVariant
 }
 
-type ButtonProps = Record<string, any> & Partial<typeof ButtonPropsSchema> & {
+type ButtonProps = Partial<typeof ButtonPropsSchema> & Record<string, any> & {
 }
 
-const { throttle } = lodash
-const { merge } = values
 const COMPONENT = 'button'
-const { defineComponent, useSetup, copyExclude, goPage, strm, useRef, copyRef, getLogger } = app
+const { throttle } = lodash
+const { copyExclude, copyRef, defineComponent, getLogger, goPage, merge, strm, useRef, useSetup } = app
 const log = getLogger(COMPONENT)
 
 export default defineComponent((props: ButtonProps, ref: ButtonProps['ref']) => {
@@ -36,9 +40,10 @@ export default defineComponent((props: ButtonProps, ref: ButtonProps['ref']) => 
     vars: { elem: useRef<any>() },
     async mounted() { copyRef(ref, vars.elem) }
   })
-  const { vars, update } = self()
+  const { vars } = self()
   const getClasses = (props: ButtonProps) => {
     let ret = ''
+    if (props.className) { ret = `${ret} ${props.className}` }
     if (props.size) {
       switch (String(props.size)) {
       case 'small': case 'sm': { ret = `${ret} btn-sm` } break
@@ -46,9 +51,7 @@ export default defineComponent((props: ButtonProps, ref: ButtonProps['ref']) => 
       default: ret = `${ret} btn-md`
       }
     }
-    if (props.variant) {
-      ret = `${ret} btn-${props.variant}`
-    }
+    if (props.variant) { ret = `${ret} btn-${props.variant}` }
     return ret
   }
   const onClick = throttle(async (e: any) => {

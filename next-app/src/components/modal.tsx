@@ -28,15 +28,9 @@ export default defineComponent((props: ModalProps, ref: ModalProps['ref']) => {
 
   const { update } = self()
 
-  /** Material-UI 의 경우 별도 종료이벤트가 없으므로 transition 종료시점을 사용한다. */
-  // const onTransitionExited = async () => {
-  //   if (props.onTransitionExited) { props.onTransitionExited() }
-  //   if (props.onClosed) { props.onClosed() }
-  // }
   return (
     <>
     <_Modal
-      // onTransitionExited={ onTransitionExited }
       onExited={ props?.onExited }
       ref={ ref }
       { ...pprops }

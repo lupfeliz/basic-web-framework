@@ -11,6 +11,14 @@ html#my-first-app {
     /******************************************************************************/
     /** 슬라이더 */
     /******************************************************************************/
+    .dropdown {
+      > button.dropdown-toggle {
+        border: 1px solid #ccc;
+      }
+    }
+    /******************************************************************************/
+    /** 슬라이더 */
+    /******************************************************************************/
     .slider {
       > .slider-track {
         height: 0.4rem;
@@ -82,7 +90,7 @@ html#my-first-app {
     .editor-component {
       /** 메뉴바 */
       > .control-group {
-        background: var(--bs-surface-bg-hover);
+        background: var(--bs-surface-bg);
         border-radius: 0.3rem;
         > .button-group {
           button {
@@ -90,6 +98,9 @@ html#my-first-app {
             margin: 0.05rem;
             border: 0;
             background: none;
+            &.is-active {
+              background: var(--bs-surface-bg-hover);
+            }
           }
         }
       }
@@ -97,6 +108,8 @@ html#my-first-app {
       > div {
         > .tiptap {
           min-height: 5rem;
+          max-height: 20rem;
+          overflow-y: auto;
           padding: 0.1rem;
           > p:first-child {
             margin-top: 0;

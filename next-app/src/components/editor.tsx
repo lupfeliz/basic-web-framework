@@ -7,13 +7,10 @@
  **/
 import { ComponentPropsWithRef } from 'react'
 import { useEditor, EditorContent, type EditorContentProps, type Editor } from '@tiptap/react'
-import { Mark, mergeAttributes } from '@tiptap/core'
 import { Color } from '@tiptap/extension-color'
 import ListItem from '@tiptap/extension-list-item'
 import TextStyle from '@tiptap/extension-text-style'
-import { EditorProvider, useCurrentEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import lodash from 'lodash'
 import app from '@/libs/app-context'
 import proc from '@/libs/proc'
 import * as C from '@/libs/constants'
@@ -26,7 +23,6 @@ type EditorProps = ComponentPropsWithRef<'div'> & EditorContentProps & {
 
 const COMPONENT = 'editor'
 const { useRef, copyExclude, copyRef, useSetup, defineComponent, modelValue, getLogger, strm } = app
-const { debounce } = lodash
 const { debouncePromise } = proc
 const log = getLogger(COMPONENT)
 
@@ -42,6 +38,7 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
           onClick={ () => editor.chain().focus().toggleBold().run() }
           disabled={ !editor.can().chain().focus().toggleBold().run() }
           className={ editor.isActive('bold') ? 'is-active' : '' }
+          title='bold'
           >
           <i className='bi bi-type-bold' />
         </button>
@@ -49,6 +46,7 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
           onClick={ () => editor.chain().focus().toggleItalic().run() }
           disabled={ !editor.can().chain().focus().toggleItalic().run() }
           className={ editor.isActive('italic') ? 'is-active' : '' }
+          title='italic'
           >
           <i className='bi bi-type-italic' />
         </button>
@@ -56,6 +54,7 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
           onClick={ () => editor.chain().focus().toggleStrike().run() }
           disabled={ !editor.can().chain().focus().toggleStrike().run() }
           className={ editor.isActive('strike') ? 'is-active' : '' }
+          title='strike-through'
           >
           <i className='bi bi-type-strikethrough' />
         </button>
@@ -63,10 +62,11 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
           onClick={ () => editor.chain().focus().toggleCode().run() }
           disabled={ !editor.can().chain().focus().toggleCode().run() }
           className={ editor.isActive('code') ? 'is-active' : '' }
+          title='code'
           >
           <i className='bi bi-code-slash' />
         </button>
-        <button onClick={ () => editor.chain().focus().unsetAllMarks().run() }>
+        <button onClick={ () => editor.chain().focus().unsetAllMarks().run() } title='clear'>
           <i className='bi bi-trash3' />
         </button>
         {/* <button onClick={ () => editor.chain().focus().clearNodes().run() }>
@@ -75,90 +75,104 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
         <button
           onClick={ () => editor.chain().focus().setParagraph().run() }
           className={ editor.isActive('paragraph') ? 'is-active' : '' }
+          title='paragraph'
           >
           <i className='bi bi-paragraph' />
         </button>
         <button
           onClick={ () => editor.chain().focus().toggleHeading({ level: 1 }).run() }
           className={ editor.isActive('heading', { level: 1 }) ? 'is-active' : '' }
+          title='heading-1'
           >
           <i className='bi bi-type-h1' />
         </button>
         <button
           onClick={ () => editor.chain().focus().toggleHeading({ level: 2 }).run() }
           className={ editor.isActive('heading', { level: 2 }) ? 'is-active' : '' }
+          title='heading-2'
           >
           <i className='bi bi-type-h2' />
         </button>
         <button
           onClick={ () => editor.chain().focus().toggleHeading({ level: 3 }).run() }
           className={ editor.isActive('heading', { level: 3 }) ? 'is-active' : '' }
+          title='heading-3'
           >
           <i className='bi bi-type-h3' />
         </button>
         <button
           onClick={ () => editor.chain().focus().toggleHeading({ level: 4 }).run() }
           className={ editor.isActive('heading', { level: 4 }) ? 'is-active' : '' }
+          title='heading-4'
           >
           <i className='bi bi-type-h4' />
         </button>
         <button
           onClick={ () => editor.chain().focus().toggleHeading({ level: 5 }).run() }
           className={ editor.isActive('heading', { level: 5 }) ? 'is-active' : '' }
+          title='heading-5'
           >
           <i className='bi bi-type-h5' />
         </button>
         <button
           onClick={ () => editor.chain().focus().toggleHeading({ level: 6 }).run() }
           className={ editor.isActive('heading', { level: 6 }) ? 'is-active' : '' }
+          title='heading-6'
           >
           <i className='bi bi-type-h6' />
         </button>
         <button
           onClick={ () => editor.chain().focus().toggleBulletList().run() }
           className={ editor.isActive('bulletList') ? 'is-active' : '' }
+          title='bullet-list'
           >
           <i className='bi bi-list-ul' />
         </button>
         <button
           onClick={ () => editor.chain().focus().toggleOrderedList().run() }
           className={ editor.isActive('orderedList') ? 'is-active' : '' }
+          title='ordered-list'
           >
           <i className='bi bi-list-ol' />
         </button>
         <button
           onClick={ () => editor.chain().focus().toggleCodeBlock().run() }
           className={ editor.isActive('codeBlock') ? 'is-active' : '' }
+          title='code-block'
           >
           <i className='bi bi-code-square' />
         </button>
         <button
           onClick={ () => editor.chain().focus().toggleBlockquote().run() }
           className={ editor.isActive('blockquote') ? 'is-active' : '' }
+          title='quote'
           >
           <i className='bi bi-quote' />
         </button>
-        <button onClick={ () => editor.chain().focus().setHorizontalRule().run() }>
+        <button onClick={ () => editor.chain().focus().setHorizontalRule().run() } title='horizontal-bar'>
           <i className='bi bi-dash-lg' />
         </button>
-        <button onClick={ () => editor.chain().focus().setHardBreak().run() }>
+        <button onClick={ () => editor.chain().focus().setHardBreak().run() } title='line-break'>
           <i className='bi bi-arrow-return-left' />
         </button>
         <button
           onClick={ () => editor.chain().focus().undo().run() }
           disabled={ !editor.can().chain().focus().undo().run() }
+          title='undo'
           >
           <i className='bi bi-arrow-clockwise' />
         </button>
         <button
           onClick={ () => editor.chain().focus().redo().run() }
           disabled={ !editor.can().chain().focus().redo().run() }
+          title='redo'
           >
           <i className='bi bi-arrow-counterclockwise' />
         </button>
         <button
           onClick={ () => editor.chain().focus().setColor('#958DF1').run() }
           className={ editor.isActive('textStyle', { color: '#958DF1' }) ? 'is-active' : '' }
+          title='color'
           >
           <i className='bi bi-eyedropper' />
         </button>

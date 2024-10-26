@@ -5,19 +5,18 @@
  * @Description : 범위선택용 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-import { ChangeEvent, ComponentPropsWithRef, createElement, Fragment, MouseEvent } from 'react'
+import { ComponentPropsWithRef, Fragment } from 'react'
 import lodash, { type Function1 } from 'lodash'
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
 import format from '@/libs/format'
 import { registForm, type ValidationType } from '@/components/form'
-import { cancelEvent } from '@/libs/evdev'
 import { Range, getTrackBackground, Direction } from "react-range";
 import $ from 'jquery'
 
-const { throttle, debounce } = lodash
+const { throttle } = lodash
 
-const efnc1 = (() => '') as Function1<any, any>
+const efnc1 = C.EMPTY_FUNC1
 
 const SlidePropsSchema = {
   model: {} as any,
