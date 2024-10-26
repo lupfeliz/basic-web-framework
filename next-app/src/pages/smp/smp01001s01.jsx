@@ -48,7 +48,7 @@ export default definePage((props) => {
   /** 페이지 시작 이벤트처리 */
   async function mounted() {
     // putAll(window, { DIALOG: dialog })
-    log.debug('MOUNTED! SMP01001S01')
+    log.debug('MOUNTED! ', $PAGENAME$)
     const fdata = vars.formdata
     /** 3초가 지나면 데이터 강제 업데이트를 수행한다 */
     const fnctime = async () => {
@@ -98,11 +98,11 @@ export default definePage((props) => {
   }
   /** 페이지 종료 이벤트 처리 */
   async function unmount() {
-    log.debug('UNMOUNT! SMP01001S01')
+    log.debug('UNMOUNT! ', $PAGENAME$)
   }
   /** 페이지 업데이트 이벤트 처리 */
   async function updated() {
-    log.debug('UPDATED! SMP01001S01')
+    log.debug('UPDATED! ', $PAGENAME$)
   }
   return (
   <Page>

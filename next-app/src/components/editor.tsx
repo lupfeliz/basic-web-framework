@@ -15,7 +15,20 @@ import { EditorProvider, useCurrentEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import lodash from 'lodash'
 import app from '@/libs/app-context'
+import proc from '@/libs/proc'
 import * as C from '@/libs/constants'
+
+/** 편집기 속성타입 상속 */
+type EditorProps = ComponentPropsWithRef<'div'> & EditorContentProps & {
+  model?: any
+  name?: string
+}
+
+const COMPONENT = 'editor'
+const { useRef, copyExclude, copyRef, useSetup, defineComponent, modelValue, getLogger, strm } = app
+const { debounce } = lodash
+const { debouncePromise } = proc
+const log = getLogger(COMPONENT)
 
 const MenuBar = ({ editor }: { editor: Editor }) => {
   // const { editor } = useCurrentEditor()
@@ -154,17 +167,6 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
   )
 }
 
-/** 편집기 속성타입 상속 */
-type EditorProps = ComponentPropsWithRef<'div'> & EditorContentProps & {
-  model?: any
-  name?: string
-}
-
-const COMPONENT = 'editor'
-const { useRef, copyExclude, copyRef, useSetup, defineComponent, modelValue, getLogger, strm } = app
-const { debounce } = lodash
-const log = getLogger(COMPONENT)
-
 export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & any) => {
   const pprops = copyExclude(props, ['model', 'editor'])
 
@@ -178,15 +180,17 @@ export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & an
     async mounted() {
       copyRef(ref, vars.elem)
     },
-    updated: debounce(async (mode: number) => {
+    updated: async (mode: number) => {
       /** 외부에서 강제 업데이트 신호를 받아도 100ms 정도 debounce 를 걸어준다 */
       if (mode === C.UPDATE_ENTIRE && vars) {
-        const { value } = modelValue(self())
-        self()?.vars?.editor?.commands.setContent(value)
+        debouncePromise(`${uid}#editor-updated`, () => {
+          const { value } = modelValue(self())
+          self()?.vars?.editor?.commands.setContent(value)
+        }, 300)
       }
-    }, 100)
+    }
   })
-  const { vars, update } = self()
+  const { uid, vars, update } = self()
 
   vars.editor = useEditor({
     immediatelyRender: false,
@@ -211,13 +215,15 @@ export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & an
   }) as Editor
 
   /** 편집기 편집 이벤트는 자주 발생하기 때문에 debounce 로 이벤트 발생빈도를 낮춘다 */
-  const onChange = debounce(async (v) => {
+  const onChange = async (v: any) => {
     const { setValue } = modelValue(self())
     setValue(v, () => update(C.UPDATE_FULL))
     if (props?.onChange) { props.onChange(v) }
-  }, 100)
+  }
   vars.editor && vars.editor.on('transaction', ({ editor }) => {
-    onChange(editor.getHTML())
+    debouncePromise(`${uid}#editor-onchange`, () => {
+      onChange(editor.getHTML())
+    }, 300)
   })
   return (
   <>
