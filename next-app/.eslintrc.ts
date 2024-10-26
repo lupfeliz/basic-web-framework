@@ -6,6 +6,7 @@ module.exports = {
   },
   extends: [
     'next/core-web-vitals',
+    'next/typescript',
     // '@nuxtjs/eslint-config-typescript',
     // 'plugin:nuxt/recommended'
   ],

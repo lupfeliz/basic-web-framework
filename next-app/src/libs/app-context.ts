@@ -409,7 +409,7 @@ const app = {
     }
     return ret
   },
-  window: () => (app.isServer() ? {} : window) as any,
+  window: () => (app.isServer() ? {} : window) as typeof window & Record<string, any>,
   setGlobalTmp(value: any) {
     const tid = randomStr(10, C.ALPHANUM)
     if (!app.isServer()) {
