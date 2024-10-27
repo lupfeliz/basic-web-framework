@@ -20,6 +20,10 @@ export default defineComponent(() => {
       clsAside: '',
       lang: C.KO
     },
+    async mounted() {
+      vars.lang = app.$t.persist() || C.KO
+      update()
+    }
   })
   const { vars, update, ready } = self()
   /** aside 메뉴 오픈 */

@@ -13,6 +13,7 @@ import * as C from '@/libs/constants'
 import values from '@/libs/values'
 import { getLogger } from '@/libs/log'
 import misc from '@/libs/misc'
+import lodash from 'lodash'
 
 const LIBNAME = 'i18n'
 const log = getLogger(LIBNAME)
@@ -72,7 +73,45 @@ const initI18next = async (ns: string[] | string, lng: string) => {
   return inst
 }
 
+function getPersistedLang() {
+  let lng = C.UNDEFINED
+  let o: any
+  if (typeof localStorage !== 'undefined') {
+    if ((o = localStorage.getItem(C.RUNTIME)) && (o = JSON.parse(o))) {
+      if (o?.lang) { lng = o.lang }
+    }
+  }
+  return lng
+}
+
+var setPersistedLang = lodash.debounce((lng: string) => {
+  let o: any
+  if (typeof localStorage !== 'undefined') {
+    if (!(o = localStorage.getItem(C.RUNTIME))) {
+      localStorage.setItem(C.RUNTIME, '{}')
+    }
+    if ((o = localStorage.getItem(C.RUNTIME)) && (o = JSON.parse(o))) {
+      o.lang = lng
+      localStorage.setItem(C.RUNTIME, JSON.stringify(o))
+    }
+  }
+}, 100)
+
+function persist(lng?: string) {
+  if (lng === undefined) {
+    lng = getPersistedLang()
+  } else {
+    setPersistedLang(lng)
+  }
+  return lng
+}
+
 async function getTranslation(ns: string[] | string, lng?: string, opt: any = {}) {
+  if (!lng) {
+    lng = getPersistedLang()
+  } else {
+    setPersistedLang(lng)
+  }
   if (!lng) { lng = lngdef }
   if (!ns) { ns = nsdef }
   log.trace('GET-TRANSLATION:', ns, lng, opt)
@@ -95,8 +134,10 @@ const initI18N = async (ns: string[] | string, lng?: string) => { await getTrans
 const changeLang = async (lng: string) => { await getTranslation(nscur, lng) }
 $t.init = initI18N
 $t.lang = changeLang
+$t.persist = persist
 
 export default $t as typeof $t & {
   init: typeof initI18N
   lang: typeof changeLang
+  persist: typeof persist
 }
