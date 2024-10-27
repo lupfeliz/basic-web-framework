@@ -9,7 +9,7 @@ const messages = {
   CMN0001: 'Ok',
   CMN0002: 'Cancel',
   CMN0003: `An error occurred during processing`,
-  CMN0004: `Please log in`,
+  CMN0004: `Please sign in`,
   CMN0005: `You do not have access permission.`,
   CMN0006: `This request cannot be processed.`,
   CMN0007: `An error occurred during processing`,

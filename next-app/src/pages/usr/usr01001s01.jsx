@@ -22,7 +22,7 @@ export default definePage(() => {
       }),
       iddupchk: false,
       emailSelector: 'select',
-      emailHosts: [ ],
+      emailHosts: [ C.SELECT_ITEM_EMPTY() ],
       form: useForm(),
       validctx: {
         dupchk: (v) => {
@@ -43,13 +43,10 @@ export default definePage(() => {
     async mounted() {
       try {
         log.debug(`${$PAGENAME$} - MOUNTED!`)
-        pushAll(
-          vars.emailHosts, 
-          mergeAll(
-            [ C.SELECT_ITEM_EMPTY($t) ],
-            commonCodes.get('cmn01', '001'),
-            [ C.SELECT_ITEM_MANUAL($t) ],
-          )
+        vars.emailHosts = mergeAll(
+          [ C.SELECT_ITEM_EMPTY($t) ],
+          await commonCodes.get('cmn01', '001'),
+          [ C.SELECT_ITEM_MANUAL($t) ],
         )
       } catch (e) {
         log.debug('E:', e)

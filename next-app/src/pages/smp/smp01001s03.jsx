@@ -13,8 +13,6 @@ import { persistStore, persistReducer } from '@/libs/simple-store'
 import { getPersistConfig } from '@/libs/simple-store'
 import { createSessionStorage } from '@/libs/simple-store'
 
-if (isServer()) { log.setLevel('error') }
-
 const slice1 = createSlice({
   name: 'slice1',
   initialState: {

@@ -29,7 +29,7 @@ const vars = {
 
 const commonCodes = {
   /** TODO: 실제로는 api 를 통해 백엔드 통신 및 캐싱하여 사용 */
-  get(ns: string, code?: string, inx?: number) {
+  async get(ns: string, code?: string, inx?: number) {
     let ret: any = undefined
     let o: any
     if (!ns) { return ret }
@@ -38,7 +38,7 @@ const commonCodes = {
       ret = ret[code]
       if (inx !== undefined) { ret = ret[inx] }
     }
-    log.debug('RET:', ns, code, inx, ret)
+    log.trace('RET:', ns, code, inx, ret)
     return ret
   }
 }

@@ -28,13 +28,7 @@ export default definePage((props) => {
       content: '',
     },
     /** 선택기 목록 설정 */
-    options1: [
-      { name: '선택해주세요', value: '' },
-      'hotmail.com',
-      'naver.com',
-      'kakao.com',
-      'gmail.com',
-    ],
+    options1: [ C.SELECT_ITEM_EMPTY() ],
     /** 난수테스트용 */
     idgen: ['', '', '', ''],
 
@@ -50,6 +44,10 @@ export default definePage((props) => {
     // putAll(window, { DIALOG: dialog })
     log.debug('MOUNTED! ', $PAGENAME$)
     const fdata = vars.formdata
+    vars.options1 = mergeAll(
+      [C.SELECT_ITEM_EMPTY($t)],
+      await commonCodes.get('cmn01', '001'),
+    )
     /** 3초가 지나면 데이터 강제 업데이트를 수행한다 */
     const fnctime = async () => {
       if (vars.timer == 1) {

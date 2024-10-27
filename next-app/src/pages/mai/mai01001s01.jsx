@@ -8,8 +8,6 @@
 
 /* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
 
-getLogger('i18n').setLevel('trace')
-
 export default definePage(() => {
 
   const { ready, update } = useSetup({

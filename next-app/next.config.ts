@@ -11,6 +11,7 @@ import cryptojs from 'crypto-js'
 import { copyFileSync, readFileSync, existsSync, rmSync } from 'fs'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
+import log from './src/libs/log'
 const dir = dirname(fileURLToPath(import.meta.url))
 const nextConfig: () => NextConfig = () => {
 /** 커맨드 : npm run dev 했을경우 : dev */
@@ -21,9 +22,9 @@ const prod = process.env.NODE_ENV === 'production'
 const PROFILE = process.env.PROFILE || 'local'
 const yml = yaml.load(readFileSync(`${process.cwd()}/env/env-${PROFILE}.yml`, 'utf8'))
 if (!process.env?.PRINTED) {
-  console.log('================================================================================')
-  console.log(`샘플앱 / 프로파일 : ${PROFILE} / 구동모드 : ${cmd}[${prod}] / API프록시 : ${((yml?.api || [])[0] || {})?.server}`)
-  console.log('================================================================================')
+  log.debug('================================================================================')
+  log.debug(`샘플앱 / 프로파일 : ${PROFILE} / 구동모드 : ${cmd}[${prod}] / API프록시 : ${((yml?.api || [])[0] || {})?.server}`)
+  log.debug('================================================================================')
   process.env.PRINTED = 'true'
   if (existsSync(`${dir}/babel.config.js`)) { rmSync(`${dir}/babel.config.js`) }
   if (/(bbuild|bgenerate)/.test(cmd)) { copyFileSync(`${dir}/tools/babel/babel.config.js`, `${dir}/babel.config.js`) }
@@ -53,7 +54,7 @@ return {
   /** 빌드타임에 사용되는 설정정보 */
   serverRuntimeConfig: yml,
   /** 브라우저에 전달할 설정정보 */
-  publicRuntimeConfig: { profile: PROFILE, basePath: yml.app.basePath || '' },
+  publicRuntimeConfig: { profile: PROFILE, basePath: yml?.app?.basePath || '', logLevel: yml?.log?.level || 'debug' },
   /** NEXT-15 에서 sass 빌드가 많이 시끄러우므로 모든 경고 옵션을 꺼둔다. */
   sassOptions: {
     silenceDeprecations: [

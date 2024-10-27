@@ -13,5 +13,8 @@ const process = async (req: NextRequest) => {
 }
 export const POST = async (req: NextRequest) => await process(req)
 export const GET = async (req: NextRequest) => new Response('')
+/** 빌드오류 방지용 */
+export const dynamic = 'force-static'
+export const revalidate = 0
 /* @ts-ignore */
 /* eslint-disable no-alert, no-console */
