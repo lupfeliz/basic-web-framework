@@ -5,16 +5,16 @@
  * @Description : nextjs 구동설정
  * @Site        : https://devlog.ntiple.com
  **/
+import { NextConfig } from 'next'
 import yaml from 'js-yaml'
 import cryptojs from 'crypto-js'
 import { copyFileSync, readFileSync, existsSync, rmSync } from 'fs'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 const dir = dirname(fileURLToPath(import.meta.url))
-
-const nextConfig = () => {
+const nextConfig: () => NextConfig = () => {
 /** 커맨드 : npm run dev 했을경우 : dev */
-const cmd = process.env.npm_lifecycle_event
+const cmd = String(process.env.npm_lifecycle_event)
 /** 개발모드로 실행중인지 여부 */
 const prod = process.env.NODE_ENV === 'production'
 /** 프로파일별 환경변수를 읽어온다 */
@@ -24,22 +24,22 @@ if (!process.env?.PRINTED) {
   console.log('================================================================================')
   console.log(`샘플앱 / 프로파일 : ${PROFILE} / 구동모드 : ${cmd}[${prod}] / API프록시 : ${((yml?.api || [])[0] || {})?.server}`)
   console.log('================================================================================')
-  process.env.PRINTED = true
+  process.env.PRINTED = 'true'
   if (existsSync(`${dir}/babel.config.js`)) { rmSync(`${dir}/babel.config.js`) }
   if (/(bbuild|bgenerate)/.test(cmd)) { copyFileSync(`${dir}/tools/babel/babel.config.js`, `${dir}/babel.config.js`) }
   /** 설정정보 등을 암호화 하여 클라이언트로 보내기 위한 AES 키, replace-loader 에 의해 constants 에 입력된다 */
-  const cryptokey = btoa(Array(32).fill('0').map((v, i, l) => l[i] = Math.round(Math.random() * 255)))
+  const cryptokey = btoa(Array(32).fill('0').map((v, i, l) => l[i] = Math.round(Math.random() * 255)) as any)
   process.env.BUILD_STORE = JSON.stringify({
     CRYPTO_KEY: cryptokey,
     ENCRYPTED: cryptojs.AES.encrypt(JSON.stringify(yml), cryptokey).toString()
   })
 }
 /** API 프록시 설정 */
-const apiproxy = [ ];
-(yml?.api || []).map(api => apiproxy.push({
+const apiproxy = [ ] as any[];
+((yml?.api || []) as any[]).map((api: any) => apiproxy.push({
   source: `${api?.base || '/api'}/:path*`,
   destination: `${api?.server || 'http://localhost:8080'}${api?.alter || '/api'}/:path*`
-}))
+} as any))
 return {
   /** /api 경로로 요청이 들어올 경우 API 자바서버로 프록시 */
   async rewrites() { return apiproxy },
@@ -65,7 +65,7 @@ return {
       'slash-div', 'strict-unary',
     ]
   },
-  devIndicators: { appIsrStatus: true },
+  devIndicators: { appIsrStatus: false },
   compress: true,
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
@@ -104,6 +104,4 @@ return {
     return cfg
   },
 }}
-
 export default nextConfig()
-

@@ -167,5 +167,15 @@ html#my-first-app {
         border-bottom: var(--ag-row-border-width) var(--ag-row-border-style) var(--ag-row-border-color);
       }
     }
+
+    /******************************************************************************/
+    /** 기타 */
+    /******************************************************************************/
+    .form-check.inline-block {
+      > input[type='checkbox'],
+      > input[type='radio'] {
+        transition: all 0.2s;
+      }
+    }
   }
 }
