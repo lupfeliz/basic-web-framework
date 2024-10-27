@@ -83,6 +83,7 @@ declare global {
   const px2rem: typeof app.px2rem
   const randomStr: typeof app.randomStr
   const rem2px: typeof app.rem2px
+  const replacePage: typeof app.replacePage
   const setGlobalTmp: typeof app.setGlobalTmp
   const setOpenerTmp: typeof app.setOpenerTmp
   const sleep: typeof app.sleep
@@ -93,6 +94,7 @@ declare global {
   const useGlobalRef: typeof app.useGlobalRef
   const useRef: typeof app.useRef
   const useSetup: typeof app.useSetup
+
 
   /** 암복호화 관련 */
   const encrypt: typeof crypto.aes.encrypt

@@ -26,6 +26,17 @@ export default definePage(() => {
   })
 
   const { vars } = self()
+
+  const onClick = async () => {
+    replacePage('/smp/smp01001s01')
+    // const callback = () => {
+    //   window.removeEventListener('popstate', callback)
+    //   app.goPage('/smp/smp01001s01')
+    // }
+    // window.addEventListener('popstate', callback)
+    // history.go(-1)
+  }
+
   return (
     <Page>
       <section className='my-3'>
@@ -35,6 +46,7 @@ export default definePage(() => {
       <section className='my-3'>
         <article>
           <Button
+            onClick={ onClick }
             >
             OK
           </Button>

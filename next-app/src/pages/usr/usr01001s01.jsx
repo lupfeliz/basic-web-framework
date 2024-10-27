@@ -93,8 +93,7 @@ export default definePage(() => {
         let res = await api.put(`usr01001`, model)
         log.debug('RES:', res)
         if (res.rescd === C.RESCD_OK) {
-          await goPage(-1)
-          await goPage(`/usr/usr01001s02`)
+          replacePage(`/usr/usr01001s02`)
         }
       }
     } catch (e) {

@@ -230,6 +230,14 @@ const app = {
       }
     })
   },
+  replacePage(uri: string, param?: any) {
+    const callback = () => {
+      window.removeEventListener('popstate', callback)
+      app.goPage(uri, param)
+    }
+    window.addEventListener('popstate', callback)
+    history.go(-1)
+  },
   sleep(time: number) { return new Promise(r => setTimeout(r, time)) },
   createElement: React.createElement,
   /** react 페이지 선언 */
