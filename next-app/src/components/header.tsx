@@ -7,17 +7,18 @@
  **/
 import app from '@/libs/app-context'
 import * as C from '@/libs/constants'
-import { Container, Block, Button, Link } from '@/components'
+import { Container, Block, Button, Link, Select } from '@/components'
 import Aside from './aside'
 import { nextTick } from 'process'
 const COMPONENT = 'header'
-const { getLogger, defineComponent, useSetup, goPage, strm } = app
+const { getLogger, defineComponent, useSetup, goPage, changeLang } = app
 const log = getLogger(COMPONENT)
 export default defineComponent(() => {
   const self = useSetup({
     name: COMPONENT,
     vars: {
-      clsAside: ''
+      clsAside: '',
+      lang: C.KO
     },
   })
   const { vars, update, ready } = self()
@@ -55,11 +56,26 @@ export default defineComponent(() => {
         </Button>
       </Block>
       <Block>
+        <span></span>
         <Link
           href={ '/' }
           >
           HEADER
         </Link>
+        <Block>
+          <span>
+            <Select
+              size='sm'
+              model={ vars }
+              name='lang'
+              onChange={ () => changeLang(vars.lang) }
+              options={[
+                { name: '한국어', value: 'ko' },
+                { name: 'English', value: 'en' },
+              ]}
+              />
+          </span>
+        </Block>
       </Block>
       <Block>
         <Button

@@ -31,7 +31,14 @@ html#my-first-app {
           width: 64px;
         }
         > div:nth-child(2) {
-          width: calc(100% - 4rem)
+          width: calc(100% - 4rem);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          > *:nth-child(1),
+          > *:nth-child(3) {
+            width: 5rem;
+          }
         }
         > div:nth-child(3) {
           width: 64px;

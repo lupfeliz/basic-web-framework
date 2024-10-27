@@ -6,15 +6,23 @@
  * @Site        : https://devlog.ntiple.com
  **/
 import 'intl-pluralrules'
-import { createInstance } from 'i18next'
+import { createInstance, type i18n } from 'i18next'
 import resourcesToBackend from 'i18next-resources-to-backend'
 import { initReactI18next } from 'react-i18next/initReactI18next'
 import * as C from '@/libs/constants'
 import values from '@/libs/values'
+import { getLogger } from '@/libs/log'
+import misc from '@/libs/misc'
+
+const LIBNAME = 'i18n'
+const log = getLogger(LIBNAME)
+const { asAny } = misc
 
 let lngdef = C.KO
-let languages = [lngdef, C.EN]
 let nsdef = 'common'
+let languages = [lngdef, C.EN]
+let nscur: string[] | string = nsdef
+let lngcur = lngdef
 
 function getOptions (lng = lngdef, ns: any = nsdef) {
   return {
@@ -28,45 +36,67 @@ function getOptions (lng = lngdef, ns: any = nsdef) {
 }
 
 const initI18next = async (ns: string[] | string, lng: string) => {
-  const inst = createInstance()
-  let messages: any = { }
-  await inst
-    .use(initReactI18next)
-    .use(resourcesToBackend((lng: string, _: string) => {
-      const ret = new Promise<any>(async (resolve) => {
-        /** 네임스페이스는 initI18next 에서 받은 인자로 인식한다. */
-        if (ns instanceof Array) {
-          for (let itm of ns) {
+  if (!inst) {
+    inst = createInstance()
+    let messages: any = { }
+    await inst
+      .use(initReactI18next)
+      .use(resourcesToBackend((lng: string, _: string) => {
+        log.trace('RESOURCE:', lng, ns)
+        const ret = new Promise<any>(async (resolve) => {
+          /** 네임스페이스는 initI18next 에서 받은 인자로 인식한다. */
+          if (ns instanceof Array) {
+            for (let itm of ns) {
+              try {
+                log.trace('GET-RESOURCE:', lng, itm)
+                messages = values.putAll(messages, (await import(`@/locales/${lng}/${itm}`)).default)
+              } catch (e) {
+                log.trace('E:', asAny(e).message)
+              }
+            }
+          } else {
             try {
-              messages = values.putAll(messages, (await import(`@/locales/${lng}/${itm}`)).default)
-            } catch (ignore) { }
+              log.trace('GET-RESOURCE:', lng, ns)
+              messages = (await import(`@/locales/${lng}/${ns}`)).default
+            } catch (e) {
+              log.trace('E:', asAny(e).message)
+            }
           }
-        } else {
-          try {
-            messages = (await import(`@/locales/${lng}/${ns}`)).default
-          } catch (ignore) { }
-        }
-        return resolve(messages)
-      })
-      return ret
-    }))
-    /** 메시지를 한번에 가져오기 위해 최초 네임스페이스만 인식한다. */
-    .init(getOptions(lng, ns instanceof Array ? ns[0] : ns))
+          return resolve(messages)
+        })
+        return ret
+      }))
+      /** 메시지를 한번에 가져오기 위해 최초 네임스페이스만 인식한다. */
+      .init(getOptions(lng, ns instanceof Array ? ns[0] : ns))
+  }
   return inst
 }
 
 async function getTranslation(ns: string[] | string, lng?: string, opt: any = {}) {
   if (!lng) { lng = lngdef }
-  const inst = await initI18next(ns, lng)
+  if (!ns) { ns = nsdef }
+  log.trace('GET-TRANSLATION:', ns, lng, opt)
+  nscur = ns
+  lngcur = lng
+  if (!inst) { inst = await initI18next(ns, lng) }
+  await inst.changeLanguage(lngcur)
   fnc = inst.getFixedT(lng, Array.isArray(ns) ? ns[0] : ns, opt.keyPrefix)
   return { t: fnc, i18n: inst }
 }
 
+var inst = C.UNDEFINED as i18n
 var fnc: any = (_: any) => ''
 var $t: any = (v: string) => {
+  log.trace('I18N-GET:', nscur, lngcur, v, fnc(v))
   return fnc(v) || C.UNDEFINED
 }
 
-$t.init = async (ns: string[] | string, lng?: string) => { await getTranslation(ns, lng) }
+const initI18N = async (ns: string[] | string, lng?: string) => { await getTranslation(ns, lng) }
+const changeLang = async (lng: string) => { await getTranslation(nscur, lng) }
+$t.init = initI18N
+$t.lang = changeLang
 
-export default $t
+export default $t as typeof $t & {
+  init: typeof initI18N
+  lang: typeof changeLang
+}

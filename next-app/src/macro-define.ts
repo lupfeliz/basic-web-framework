@@ -17,6 +17,7 @@ declare global {
   const Container: typeof import('@/components/index')['Container']
   const Content: typeof import('@/components/index')['Content']
   const DataGrid: typeof import('@/components/index')['DataGrid']
+  const EditorClassic: typeof import('@/components/index')['EditorClassic']
   const Editor: typeof import('@/components/index')['Editor']
   const Form: typeof import('@/components/index')['Form']
   const Fragment: typeof import('@/components/index')['Fragment']
@@ -27,6 +28,7 @@ declare global {
   const Modal: typeof import('@/components/index')['Modal']
   const Page: typeof import('@/components/index')['Page']
   const Pagination: typeof import('@/components/index')['Pagination']
+  const Portal: typeof import('@/components/index')['Portal']
   const Select: typeof import('@/components/index')['Select']
   const Slider: typeof import('@/components/index')['Slider']
   const Spinner: typeof import('@/components/index')['Spinner']
@@ -51,6 +53,7 @@ declare global {
   const asAny: typeof app.asAny
   const asType: typeof app.asType
   const basepath: typeof app.basepath
+  const changeLang: typeof app.changeLang
   const clear: typeof app.clear
   const clone: typeof app.clone
   const defineComponent: typeof app.defineComponent
@@ -64,6 +67,7 @@ declare global {
   const getUri: typeof app.getUri
   const getUrl: typeof app.getUrl
   const goPage: typeof app.goPage
+  const isClient: typeof app.isClient
   const isServer: typeof app.isServer
   const log: typeof app.log
   const matcher: typeof app.matcher
@@ -82,6 +86,7 @@ declare global {
   const toJSON: typeof app.toJSON
   const toString: typeof app.toString
   const until: typeof app.until
+  const useGlobalRef: typeof app.useGlobalRef
   const useRef: typeof app.useRef
   const useSetup: typeof app.useSetup
 

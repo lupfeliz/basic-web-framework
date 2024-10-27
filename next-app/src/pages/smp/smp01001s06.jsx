@@ -8,12 +8,13 @@
 
 /* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
 
-import EditorClassic from '@/components/editor-classic'
+import $ from 'jquery'
 
 export default definePage(() => {
   const self = useSetup({
     name: $PAGENAME$,
     vars: {
+      portal: useRef()
     },
     async mounted() {
       log.debug(`${$PAGENAME$} mounted`)
@@ -23,31 +24,15 @@ export default definePage(() => {
       }
     },
   })
-  // const [state, setState] = useState(0)
-  // useEffect(() => {
-  //   let ret = undefined
-  //   switch (state) {
-  //   case 0: {
-  //     setState(state + 1)
-  //   } break
-  //   case 1: {
-  //     for (var itm of document.styleSheets) { for (var v of itm.rules) { console.log('E:', v.selectorText); } }
-  //   } break
-  //   }
-  //   return ret
-  // }, [state])
 
   const { vars } = self()
-  // const test2 = () => {
-  //   let r = ''
-  //   for (var itm of document.styleSheets) { for (var v of itm.rules) { r = `${r} / ${v.selectorText || ''}` } }
-  //   return r
-  // }
   return (
     <Page>
-      <section>
+      <section className='my-3'>
       </section>
-      <section>
+      <h6>TEST</h6>
+      <hr/>
+      <section className='my-3'>
         <article>
           <Button
             >
@@ -55,10 +40,29 @@ export default definePage(() => {
           </Button>
         </article>
       </section>
+      <h6>PORTAL</h6>
+      <hr/>
+      <section>
+        <article
+          id='portal'
+          // ref={ (app.global['test'] = useRef()) }
+          // ref={ useGlobalRef('test') }
+          ref={ vars.portal }
+          >
+        </article>
+      </section>
+      <h6>ORIGIN</h6>
+      <hr/>
       <section>
         <article>
-          <EditorClassic
-            />
+          <Portal
+            // dest={ app.global['test'] }
+            dest={ vars.portal }
+            // dest={ isClient() && document.querySelector('#portal') }
+            // dest={ isClient() && $('#portal') }
+            >
+            이것은 PORTAL 의 내용입니다
+          </Portal>
         </article>
       </section>
     </Page>

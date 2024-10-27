@@ -23,6 +23,7 @@ import * as C from '@/libs/constants'
 import values from '@/libs/values'
 import { getLogger } from '@/libs/log'
 import proc from '@/libs/proc'
+import misc from '@/libs/misc'
 import $t from '@/libs/i18n'
 
 type UpdateFunction = (mode?: number) => void
@@ -84,6 +85,7 @@ const appvars = {
     },
     runtime
   },
+  global: { } as any,
   MaterialStyle: {} as any
 }
 
@@ -117,6 +119,7 @@ const applyRipple = debounce(() => {
 const app = {
   /** values, log, getLogger mixin */
   ...values, getLogger, useRef, until, $t,
+  ...misc,
   log: getLogger(C.ROOT),
   /** 앱 내 유일키 생성 */
   genId() { return `${new Date().getTime()}${String((appvars.uidseq = (appvars.uidseq + 1) % 1000) + 1000).substring(1, 4)}` },
@@ -473,9 +476,6 @@ const app = {
   ready: (astate: number = C.APPSTATE_READY) => appvars.astate >= astate ? true : false,
   tstate: (mode: number) => (appvars.astate && appvars.tstate[mode]) || 0,
   getConfig: () => appvars.config,
-  isServer: () => typeof window === 'undefined',
-  asAny: (v: any) => v as any,
-  asType: <T>(v: any, _: T) => v as T,
   getFrom: (v: any, k: string) => v && v[k],
   px2rem(v: any, el?: any) {
     v = Number(String(v).replace(/[^0-9^.]+/g, ''))
@@ -493,8 +493,14 @@ const app = {
   strm: (v?: any) => String(v || '').replace(/[ ]+/g, ' ').trim(),
   MaterialStyle: (fnc: Function1<any, any>) => fnc(appvars.MaterialStyle),
   router: () => appvars.router,
+  global: appvars.global,
+  useGlobalRef: (name: string) => appvars.global[name] = useRef(),
   fncDefineHideOnload: () => FNC_DEFINE_HIDE_ONLOAD(),
   fncWaitCssLoading: (v: string, c: number) => FNC_WAIT_CSS_LOADING(v, c),
+  changeLang: async (lang: string) => {
+    await app.$t.lang(lang)
+    app.state(C.UPDATE_ENTIRE, 'app')
+  },
 }
 
 const compoSubscribe = <V, P>(prm: LauncherProps<V, P>, uid: string, setState: Function) => {

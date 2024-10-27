@@ -5,7 +5,7 @@
  * @Description : 선택 컴포넌트
  * @Site        : https://devlog.ntiple.com
  **/
-import { Dropdown , DropdownProps } from 'react-bootstrap'
+import { Dropdown , type DropdownToggleProps } from 'react-bootstrap'
 import type { ButtonVariant } from '@/components/button'
 import * as C from '@/libs/constants'
 import app from '@/libs/app-context'
@@ -14,9 +14,11 @@ import { isEvent, cancelEvent, KEYCODE_TABLE } from '@/libs/evdev'
 
 const SelectSchema = {
   model: {} as any,
-  options: [] as OptionType[],
+  options: [] as (OptionType | (string & {}))[],
   variant: '' as ButtonVariant,
   onChange: C.EMPTY_FUNC1,
+  itemClass: '',
+  itemStyle: C.UNDEFINED,
 }
 
 /** 선택목록 타입 */
@@ -26,11 +28,11 @@ type OptionType = {
   selected?: boolean
 }
 
-type SelectProps = DropdownProps & Partial<typeof SelectSchema> & Record<string, any> & {
+type SelectProps = DropdownToggleProps & Partial<typeof SelectSchema> & Record<string, any> & {
 }
 
 const COMPONENT = 'select'
-const { clear, copyExclude, copyRef, defineComponent, getLogger, modelValue, useRef, useSetup } = app
+const { clear, copyExclude, copyRef, defineComponent, getLogger, modelValue, useRef, useSetup, strm } = app
 const log = getLogger(COMPONENT)
 
 export default defineComponent((props: SelectProps, ref: SelectProps['ref'] & any) => {
@@ -118,6 +120,7 @@ export default defineComponent((props: SelectProps, ref: SelectProps['ref'] & an
     onToggle={ onToggle }
     >
     <Dropdown.Toggle
+      size={ props.size }
       ref={ vars?.elem }
       variant={ props.variant || 'light' }
       role='combobox'
@@ -132,6 +135,8 @@ export default defineComponent((props: SelectProps, ref: SelectProps['ref'] & an
         key={ inx }
         eventKey={ inx }
         active={ itm?.selected || false }
+        className={ strm(props.itemClass || '') }
+        style={ props.itemStyle }
         >
         { `${itm?.name}` }
       </Dropdown.Item>

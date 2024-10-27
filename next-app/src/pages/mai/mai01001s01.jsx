@@ -10,8 +10,9 @@
 
 export default definePage(() => {
 
-  const { ready } = useSetup({
-    name: $PAGENAME$
+  const { ready, update } = useSetup({
+    name: $PAGENAME$,
+    updated(mode) { }
   })()
   const userInfo = userContext.getUserInfo()
 

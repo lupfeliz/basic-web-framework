@@ -69,6 +69,7 @@ return {
   compress: true,
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
+  experimental: { serverComponentsHmrCache: false },
   /** 웹팩 빌드중 소스코드를 가로채 변경한다 (replace-loader) */
   webpack: (cfg, opt) => {
     cfg.cache = /dev/.test(cmd) ? false : true
