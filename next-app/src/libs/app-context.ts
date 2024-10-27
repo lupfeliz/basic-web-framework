@@ -206,13 +206,13 @@ const app = {
   goPage(uri: string | number, param?: any) {
     // log.debug('GO-PAGE:', uri, appvars.router)
     return new Promise<any>(async (resolve, reject) => {
-      let prevuri = location.pathname
+      let prevuri = String(location.pathname)
       const callback = async () => {
-        if (location.pathname !== prevuri) {
+        if (String(location.pathname) !== prevuri) {
+          app.uriChanged({ prev: prevuri, current: String(location.pathname) })
           resolve(prevuri = location.pathname)
-          log.debug('URI-CHANGED:', location.pathname)
-          observer.disconnect()
           window.removeEventListener('beforeunload', callback)
+          observer.disconnect()
         }
       }
       const observer = new MutationObserver(callback)
@@ -237,6 +237,21 @@ const app = {
     }
     window.addEventListener('popstate', callback)
     history.go(-1)
+  },
+  async uriChanged({ prev, current }: any) {
+    let data = current.replace(/^[\/]/, '').split(/[\/]/)
+    let cate = ''
+    log.debug('DATA:', data.length, data)
+    if (data.length == 1 && data[0] == '' && (cate = 'mai') || (data.length > 0 && (cate = data[0]).length == 3)) {
+      log.debug('URI-CHANGED:', prev, current, cate)
+      /** TODO: 카테고리별 언어를 적재한다 (i18n 에 이식) */
+      try {
+        const lang = (await import(`@/locales/ko/${cate}`)).default
+        log.debug('LANG:', lang)
+      } catch (e) {
+        log.debug('E:', app.getFrom(e, 'message'))
+      }
+    }
   },
   sleep(time: number) { return new Promise(r => setTimeout(r, time)) },
   createElement: React.createElement,
