@@ -13,6 +13,7 @@ import userContext from './user-context'
 import crypto from './crypto'
 import dialog from './dialog-context'
 import proc from './proc'
+import errorCodes from './error-codes'
 import { type Function0 } from 'lodash'
 
 type ConfigType = {
@@ -81,7 +82,7 @@ const mkres = async (run: Function0<Promise<Response>>, opt?: OptType) => {
   let resp = { } as Response
   let hdrs = { } as Headers
   let t: any = ''
-  const state = { error: false, message: '' }
+  const state = { error: false, message: '', msgcode: '' }
   try {
     resp = await run()
     hdrs = resp?.headers || { get: (v: any) => {} }
@@ -177,8 +178,7 @@ const mkres = async (run: Function0<Promise<Response>>, opt?: OptType) => {
     if (opt?.resolve) { opt.resolve(ret) }
   } else {
     if (!(opt?.noerror || opt?.noalert)) {
-      // await app.until(() => app.astate() >= C.APPSTATE_READY)
-      dialog.alert(state.message)
+      dialog.alert(state.message = errorCodes.getMessage(state))
       ret = opt?.reject && opt.reject(state) || {} 
     } else if (!opt?.noerror) {
       ret = opt?.reject && opt.reject(state) || {} 

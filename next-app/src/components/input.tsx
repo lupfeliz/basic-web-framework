@@ -347,9 +347,9 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     ref={ vars?.wrap }
     >
     <input
-      ref={ vars?.elem }
-      className={ strm(`form-control`) }
       { ...pprops }
+      ref={ vars?.elem }
+      className={ strm(`form-control ${props?.className || ''}`) }
       id={ app.ready() ? uid : C.UNDEFINED }
       maxLength={ props?.maxLength }
       type={ pprops?.type }

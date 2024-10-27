@@ -69,6 +69,8 @@ export default definePage(() => {
     <section className='flex-form'>
       <Form
         ref={ vars.form }
+        validctx={ vars.validctx }
+        onError={ onError }
         >
         <article>
           <Block className='form-block'>
@@ -79,9 +81,7 @@ export default definePage(() => {
               label='슬라이더'
               names={ ['slider1', 'slider2'] }
               snap
-              onError={ onError }
               vrules='chkslide'
-              validctx={ vars.validctx }
               style={{ marginBottom: '3rem' }}
               />
           </Block>
@@ -93,7 +93,6 @@ export default definePage(() => {
               name={ `select` }
               required
               label='이메일'
-              onError={ onError }
               vrules='auto'
               />
           </Block>
@@ -109,11 +108,9 @@ export default definePage(() => {
               minLength={ 2 }
               minValue={ 1000 }
               maxValue={ 999999999999 }
-              onError={ onError }
               rtformatter={ format.numeric }
               formatter={ format.numeric }
               vrules='auto|check2'
-              validctx={ vars.validctx }
               />
           </Block>
           <Block className='form-block'>
@@ -127,7 +124,6 @@ export default definePage(() => {
                 model={ vars.data }
                 name={ `checklist.${inx}` }
                 label='체크리스트'
-                onError={ onError }
                 value='Y'
                 vrules='auto|atleast:2'
                 />

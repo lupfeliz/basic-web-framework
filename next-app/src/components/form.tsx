@@ -12,7 +12,15 @@ import app from '@/libs/app-context'
 import values from '@/libs/values'
 import format from '@/libs/format'
 import $ from 'jquery'
-type FormProps = ComponentPropsWithRef<'div'> & { }
+import { Function1 } from 'lodash'
+
+const FormPropsSchema = {
+  onError: C.UNDEFINED as Function1<any, any>,
+  validctx: C.UNDEFINED as any,
+}
+
+type FormProps = ComponentPropsWithRef<'div'> & Partial<typeof FormPropsSchema> & {
+}
 type MessageProps = ComponentPropsWithRef<'div'> & {
   // popper?: any
   anchor?: any
@@ -26,9 +34,8 @@ type ValidationType = {
 }
 
 const COMPONENT = 'form'
-const { getLogger, defineComponent, useRef, copyExclude, clone, putAll, useSetup, isServer, modelValue } = app
+const { getLogger, defineComponent, useRef, copyExclude, clone, putAll, useSetup, isServer, modelValue, copyRef } = app
 const log = getLogger(COMPONENT)
-// log.setLevel('trace')
 
 const formElement = {
   name: '',
@@ -93,12 +100,16 @@ const validateForm = async (vform: any, opt: any = {}) => {
     log.trace('VALIDATION-COUNT:', elist.length)
     for (const item of elist) {
       if (!item?.self) { continue }
-      let res = await validate(item, opt)
+      let res = await validate(item, vform, opt)
       if (res === false) {
-        log.debug('INVALID:', item, opt)
+        log.trace('INVALID:', item, opt)
         const { props } = item.self()
         putAll(opt, { element: item.el })
-        if (props?.onError) { props.onError(opt) }
+        if (props?.onError) {
+          props.onError(opt)
+        } else if (vform?.current?.onError) {
+          vform.current.onError(opt)
+        }
         ret = false
         break
       }
@@ -107,7 +118,7 @@ const validateForm = async (vform: any, opt: any = {}) => {
   }
   return ret
 }
-const validate = async (item: any, opt: any = {}) => new Promise((resolve) => {
+const validate = async (item: any, vform: any = {}, opt: any = {}) => new Promise((resolve) => {
   let ret = true
   let result
   const self = modelValue(item.self()) as any
@@ -134,6 +145,7 @@ const validate = async (item: any, opt: any = {}) => new Promise((resolve) => {
       let vitm = C.UNDEFINED, ufnc = C.UNDEFINED
       /** 사용자함수 를 우선한다 (원래함수 덮어쓰기 용도) */
       if (!vitm && props?.validctx) { ufnc = vitm = props.validctx[rdata[0]] }
+      if (!vitm && vform?.current?.validctx) { ufnc = vitm = vform.current.validctx[rdata[0]] }
       if (!vitm) { vitm = validations()[rdata[0]] }
       log.trace('VITM:', rule, rdata[0], vitm ? true: false, value, rparm)
       if (!vitm) { continue }
@@ -158,7 +170,7 @@ const validate = async (item: any, opt: any = {}) => new Promise((resolve) => {
     }
     // log.trace('FINAL-RESULT:', props?.name, ret)
   } catch (e) {
-    log.debug('E:', e)
+    log.trace('E:', e)
   }
   vars.valid.isValidated = true
   vars.valid.isValid = ret
@@ -567,19 +579,21 @@ const Message = defineComponent((props: MessageProps, ref: MessageProps['ref']) 
 })
 export { useForm, registForm, validateForm, type ValidationType }
 export default defineComponent((props: FormProps, ref: FormProps['ref'] & any) => {
-  const pprops = copyExclude(props, [])
-  const self = useSetup({
+  const pprops = copyExclude(props, Object.keys(FormPropsSchema))
+  useSetup({
     name: COMPONENT,
     async mounted() {
-      if (ref && ref.hasOwnProperty('current')) {
-        log.trace('REF:', ref.current)
-        const form = ref.current?.form
-        ref.current = { }
-        ref.current.form = form
-      }
+      copyRef(ref, {
+        current: {
+          form: ref?.current?.form,
+          validctx: props?.validctx,
+          onError: props?.onError
+        }
+      })
+      log.trace('COPY-REF:', ref)
     }
   })
-  return (<form> {pprops.children} </form>)
+  return (<form>{ pprops.children }</form>)
 }, {
   displayName: COMPONENT,
   Message

@@ -14,7 +14,9 @@ export default definePage(() => {
   const self = useSetup({
     name: $PAGENAME$,
     vars: {
-      formdata: clone(uschema)
+      formdata: clone(uschema),
+      form: useForm(),
+      validctx: { }
     }
   })
 
@@ -24,21 +26,24 @@ export default definePage(() => {
     const formdata = clone(vars.formdata)
     formdata.passwd = encrypt(JSON.stringify({ p: formdata.passwd, t: new Date().getTime() }))
     try {
-      const res = await api.post(`lgn01001`, formdata)
-      log.debug('RES:', res)
-      if (res.rescd === C.RESCD_OK) {
-        goPage(-1)
-      } else {
-        await dialog.alert('로그인이 실패했습니다')
+      if (await validateForm(vars.form)) {
+        const res = await api.post(`lgn01001`, formdata)
+        log.debug('RES:', res)
+        if (res.rescd === C.RESCD_OK) {
+          goPage(-1)
+        } else {
+          await dialog.alert('로그인이 실패했습니다')
+        }
       }
     } catch (e) {
       log.debug('E:', e)
-      if (e?.msgcode == 'USER_NOT_FOUND') {
-        await dialog.alert('사용자 아이디 혹은 비밀번호가 잘못되었어요')
-      } else {
-        await dialog.alert(e?.message || '오류가 발생했어요')
-      }
     }
+  }
+
+  const onError = async (e) => {
+    log.debug('E:', e)
+    await dialog.alert(e?.message || '오류가 발생했어요')
+    if (e?.element) { e.element.focus() }
   }
 
   return (
@@ -48,20 +53,29 @@ export default definePage(() => {
     </section>
     <hr/>
     <section className='flex-form'>
-      <Form>
+      <Form
+        ref={ vars.form }
+        validctx={ vars.validctx }
+        onError={ onError }
+        >
         <article className='text-center'>
           <Block className='form-block'>
             <label htmlFor='frm-user-id'> 아이디 </label>
             <Block className='form-element'>
             <Input
               id='frm-user-id'
+              form={ vars.form }
               model={ vars.formdata }
               name='userId'
-              placeholder='로그인 아이디'
+              label='아이디'
+              placeholder='아이디'
+              minLength={ 4 }
               maxLength={ 20 }
               className='w-full'
               size='small'
               onEnter={ submit }
+              required
+              vrules='auto'
               />
             </Block>
           </Block>
@@ -71,13 +85,18 @@ export default definePage(() => {
             <Input
               id='frm-passwd'
               type='password'
+              form={ vars.form }
               model={ vars.formdata }
               name='passwd'
+              label='비밀번호'
               placeholder='비밀번호'
+              minLength={ 4 }
               maxLength={ 20 }
               className='w-full'
               size='small'
               onEnter={ submit }
+              required
+              vrules='auto'
               />
             </Block>
           </Block>
@@ -85,7 +104,7 @@ export default definePage(() => {
           <Block className='buttons'>
             <Button
               className='mx-1'
-              variant='contained'
+              variant='primary'
               size='large'
               onClick={ submit }
               >
@@ -93,7 +112,7 @@ export default definePage(() => {
             </Button>
             <Button
               className='mx-1'
-              variant='outlined'
+              variant='outline-secondary'
               size='large'
               >
               취소
