@@ -9,6 +9,7 @@
 /* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
 
 import $ from 'jquery'
+import fjsh from 'fast-json-stable-hash'
 
 export default definePage(() => {
   const self = useSetup({
@@ -19,6 +20,13 @@ export default definePage(() => {
     async mounted() {
       log.debug(`${$PAGENAME$} mounted`)
       try {
+        const jsonobj = {
+          b: 1,
+          a: null,
+          d: ['foo', 'bar'],
+          c: true
+        }
+        log.debug('HASH:', fjsh.hash(jsonobj))
       } catch (e) {
         log.debug('E:', e)
       }
