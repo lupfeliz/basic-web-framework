@@ -475,8 +475,6 @@ const app = {
   ready: (astate: number = C.APPSTATE_READY) => appvars.astate >= astate ? true : false,
   tstate: (mode: number) => (appvars.astate && appvars.tstate[mode]) || 0,
   getConfig: () => appvars.config,
-  getFrom: (v: any, k: string) => v && v[k],
-  strm: (v?: any) => String(v || '').replace(/[ ]+/g, ' ').trim(),
   MaterialStyle: (fnc: Function1<any, any>) => fnc(appvars.MaterialStyle),
   router: () => appvars.router,
   global: appvars.global,

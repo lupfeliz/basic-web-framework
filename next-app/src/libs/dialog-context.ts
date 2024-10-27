@@ -12,6 +12,7 @@ import values from '@/libs/values'
 import app from '@/libs/app-context'
 import proc from '@/libs/proc'
 import lodash from 'lodash'
+import $ from 'jquery'
 
 const { debounce } = lodash
 const { clone } = values
@@ -69,9 +70,9 @@ const dialogvars = {
     if (resolve) { dialogvars.list[ret] = resolve }
     return ret
   },
-  winpopups: {
-  } as any,
-  closeListener: C.UNDEFINED
+  winpopups: { } as any,
+  closeListener: C.UNDEFINED,
+  focusables: { } as any,
 }
 
 const slice = createSlice({
@@ -80,7 +81,7 @@ const slice = createSlice({
   reducers: {
     modal: (state, action) => {
       let o: any
-      // log.debug('MODAL', state, action.payload)
+      // log.trace('MODAL', state, action.payload)
       const modal = state.modal
       const payload = action.payload
       switch (payload?.type) {
@@ -117,7 +118,14 @@ const slice = createSlice({
           /** 버튼인덱스 값에 있는 결과값을 리턴한다. */
           const res = modal.buttons[payload?.value]?.value
           /** FIXME: 트랜지션 시간을 동적으로 체크하도록 */
-          proc.sleep(200).then(() => { o(res) })
+          proc.sleep(200).then(() => {
+            o(res)
+            if ((o = dialogvars.focusables[pid])) {
+              log.trace('DIALOG-CHECK:', o)
+              o.focus()
+              delete dialogvars.focusables[pid]
+            }
+          })
         }
         /** 큐에 쌓여있는 대화창을 처리한다. */
         if (modal.queue.length > 0) {
@@ -140,6 +148,9 @@ const slice = createSlice({
           switch (itm?.visible) {
           case true: {
             if (!progress.visible) {
+              const focusable = $(getFocused())
+              log.trace('PROGRESS-FOCUS-CHECK:', focusable)
+              dialogvars.focusables[itm.resolveId] = focusable
               progress.resolveId = itm.resolveId
               progress.visible = true
             } else {
@@ -158,6 +169,10 @@ const slice = createSlice({
                 /** 모든 stack 이 종료된 경우 progress 해제 */
                 progress.resolveId = itm.resolveId
                 progress.visible = false
+                if (o = dialogvars.focusables[itm.resolveId]) {
+                  o.focus()
+                  delete dialogvars.focusables[itm.resolveId]
+                }
               }
             } else {
               /** progress 중이 아닌 경우 그냥 종료 */
@@ -193,6 +208,23 @@ const store = configureStore({
   reducer: slice.reducer
 })
 
+const getFocused = () => {
+  let ret = C.UNDEFINED
+  if (document.hasFocus() &&
+      document.activeElement !== document.body &&
+      document.activeElement !== document.documentElement) {
+    ret = document.activeElement
+  }
+  if (!ret || ret == document.body) {
+    ret = C.UNDEFINED
+  } else if (document.querySelector) {
+    ret = document.querySelector(':focus')
+  }
+  return ret as HTMLElement
+}
+
+const PTN_RSVID = /(^|[ ])rsvid-(?<rsvid>[0-9]+)([ ]|$)/
+
 const dialogContext = {
   alert: (msg: string) => dialogContext.modal(msg, C.ALERT),
   confirm: (msg: string) => dialogContext.modal(msg, C.CONFIRM),
@@ -201,9 +233,22 @@ const dialogContext = {
     let resolved = false
     if (typeof val === C.STRING) {
       if (type === undefined) { type = C.ALERT }
+      const resolveId = dialogvars.nextId(resolve)
+      let focusable = $(getFocused())
+      /** 포커스 오브젝트 인계 */
+      if ((focusable.attr('role') == 'dialog') && focusable.hasClass('progress-spinner')) {
+        const classes = String(focusable.attr('class'))
+        const mat = PTN_RSVID.exec(classes)
+        log.trace('MODAL-FOCUS-CHECK:', classes, mat, focusable)
+        if (mat && mat.groups?.rsvid) {
+          log.trace('RESOLVE-ID:', mat.groups?.rsvid)
+          focusable = dialogvars.focusables[mat.groups?.rsvid]
+        }
+      }
+      dialogvars.focusables[resolveId] = focusable
       payload = {
         type: type,
-        resolveId: dialogvars.nextId(resolve),
+        resolveId,
         message: val
       }
       resolved = true
@@ -289,7 +334,7 @@ const dialogContext = {
       if (!dialogvars.closeListener) {
         /** window가 리프레시되기 전에 열려있는 모든 창을 닫는다 */
         dialogvars.closeListener = async () => {
-          log.debug('CLOSE....')
+          log.trace('CLOSE....')
           for (let tid in dialogvars.winpopups) {
             const pctx: any = dialogvars.winpopups[tid]
             if (pctx?.close) {

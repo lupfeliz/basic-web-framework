@@ -25,6 +25,8 @@ const misc = {
     return v * parseFloat(getComputedStyle(el).fontSize)
   },
   getText: <T extends HTMLElement>(element: T) => element ? $(element).text() : '',
+  getFrom: (v: any, k: string) => v && v[k],
+  strm: (v?: any) => String(v || '').replace(/[ ]+/g, ' ').trim(),
 }
 
 export default misc

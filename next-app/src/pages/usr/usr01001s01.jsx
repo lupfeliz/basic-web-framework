@@ -22,7 +22,7 @@ export default definePage(() => {
       }),
       iddupchk: false,
       emailSelector: 'select',
-      emailHosts: [ C.SELECT_ITEM_EMPTY() ],
+      emailHosts: [ C.SELECT_ITEM_EMPTY(), C.SELECT_ITEM_MANUAL() ],
       form: useForm(),
       validctx: {
         dupchk: (v) => {
@@ -87,13 +87,12 @@ export default definePage(() => {
         /** 필요한 파라메터만 복사한다. */
         let model = clone(vars.formdata)
         model.email = `${model.emailId}@${model.emailHost}`
-        model = values.copyExists(clone(uschema), model)
+        model = copyExists(clone(uschema), model)
         model.passwd = encrypt(model.passwd)
         log.trace('SUBMIT-MODEL:', model)
         let res = await api.put(`usr01001`, model)
         log.debug('RES:', res)
         if (res.rescd === C.RESCD_OK) {
-          result = true
           await goPage(-1)
           await goPage(`/usr/usr01001s02`)
         }
@@ -155,6 +154,7 @@ export default definePage(() => {
                 className='w-full'
                 size='small'
                 required
+                onChange={ () => vars.iddupchk = false }
                 vrules='auto|dupchk'
                 />
               <Button

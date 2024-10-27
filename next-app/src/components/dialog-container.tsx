@@ -11,13 +11,11 @@ import app from '@/libs/app-context'
 import dialog from '@/libs/dialog-context'
 import userContext from '@/libs/user-context'
 import format from '@/libs/format'
-import values from '@/libs/values'
 
 import { Modal, Content, Button, Spinner } from '@/components'
 import { RefObject } from 'react'
 
-const { concat } = values
-
+const { strm } = app
 const dstate = () => dialog.getDialogState()
 
 const formatTime = (v: number, fmt: string = C.UNDEFINED) => {
@@ -95,7 +93,7 @@ export default defineComponent((props: any, ref?: any) => {
       <Modal.Footer>
         { dstate().modal.buttons.map((itm: any, inx: number) => (
           <Button
-            className={ concat(' ', 0, 'btn', inx == 0 ? 'primary' : '') }
+            className={ strm(`btn ${inx == 0 ? 'primary' : ''}`) }
             key={ inx }
             onClick={ () => { dialog.modal({ type: C.CLICK, value: inx }) } }
             >
@@ -106,7 +104,8 @@ export default defineComponent((props: any, ref?: any) => {
     </Modal>
     <Modal
       show={ dstate().progress.visible }
-      className={ 'no-tran progress-spinner' }
+      className={ strm(`no-tran progress-spinner rsvid-${dstate().progress.resolveId}`) }
+      data-rid={ dstate().progress.resolveId }
       onEntered={ () => { dialog.progress({ type: C.EVENT, value: 1 }) } }
       onExited={ () => { dialog.progress({ type: C.EVENT, value: 2 }) } }
       animation={ true }

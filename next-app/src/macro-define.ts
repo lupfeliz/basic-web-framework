@@ -57,6 +57,8 @@ declare global {
   const changeLang: typeof app.changeLang
   const clear: typeof app.clear
   const clone: typeof app.clone
+  const copyExclude: typeof app.copyExclude
+  const copyExists: typeof app.copyExists
   const defineComponent: typeof app.defineComponent
   const definePage: typeof app.definePage
   const getFrom: typeof app.getFrom
