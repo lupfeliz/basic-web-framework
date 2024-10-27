@@ -39,12 +39,12 @@ function getOptions (lng = lngdef, ns: any = nsdef) {
 const initI18next = async (ns: string[] | string, lng: string) => {
   if (!inst) {
     inst = createInstance()
-    let messages: any = { }
     await inst
       .use(initReactI18next)
       .use(resourcesToBackend((lng: string, _: string) => {
         log.trace('RESOURCE:', lng, ns)
         const ret = new Promise<any>(async (resolve) => {
+          let messages: any = { }
           /** 네임스페이스는 initI18next 에서 받은 인자로 인식한다. */
           if (ns instanceof Array) {
             for (let itm of ns) {
@@ -63,6 +63,7 @@ const initI18next = async (ns: string[] | string, lng: string) => {
               log.trace('E:', asAny(e).message)
             }
           }
+          log.trace('MESSAGES:', lng, messages)
           return resolve(messages)
         })
         return ret
@@ -126,7 +127,7 @@ async function getTranslation(ns: string[] | string, lng?: string, opt: any = {}
 var inst = C.UNDEFINED as i18n
 var fnc: any = (_: any) => ''
 var $t: any = (v: string) => {
-  log.trace('I18N-GET:', nscur, lngcur, v, fnc(v))
+  // log.trace('I18N-GET:', nscur, lngcur, v, fnc(v))
   return fnc(v) || C.UNDEFINED
 }
 

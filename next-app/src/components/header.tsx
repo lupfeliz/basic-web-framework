@@ -11,7 +11,7 @@ import { Container, Block, Button, Link, Select } from '@/components'
 import Aside from './aside'
 import { nextTick } from 'process'
 const COMPONENT = 'header'
-const { getLogger, defineComponent, useSetup, goPage, changeLang } = app
+const { getLogger, defineComponent, useSetup, goPage, changeLang, $t } = app
 const log = getLogger(COMPONENT)
 export default defineComponent(() => {
   const self = useSetup({
@@ -64,7 +64,7 @@ export default defineComponent(() => {
         <Link
           href={ '/' }
           >
-          HEADER
+          { $t('CMN0012') || '헤더' }
         </Link>
         <Block>
           <span>

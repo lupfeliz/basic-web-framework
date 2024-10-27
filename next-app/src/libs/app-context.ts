@@ -412,7 +412,6 @@ const app = {
     }
     return ret
   },
-  window: () => (app.isServer() ? {} : window) as typeof window & Record<string, any>,
   setGlobalTmp(value: any) {
     const tid = randomStr(10, C.ALPHANUM)
     if (!app.isServer()) {
@@ -477,19 +476,6 @@ const app = {
   tstate: (mode: number) => (appvars.astate && appvars.tstate[mode]) || 0,
   getConfig: () => appvars.config,
   getFrom: (v: any, k: string) => v && v[k],
-  px2rem(v: any, el?: any) {
-    v = Number(String(v).replace(/[^0-9^.]+/g, ''))
-    if (isNaN(v)) { v = 0 }
-    if (!el) { el = document.documentElement }
-    return v / parseFloat(getComputedStyle(el).fontSize)
-  },
-  rem2px(v: any, el?: any) {
-    v = Number(String(v).replace(/[^0-9^.]+/g, ''))
-    if (isNaN(v)) { v = 0 }
-    if (!el) { el = document.documentElement }
-    return v * parseFloat(getComputedStyle(el).fontSize)
-  },
-  getText: <T extends HTMLElement>(element: T) => element ? $(element).text() : '',
   strm: (v?: any) => String(v || '').replace(/[ ]+/g, ' ').trim(),
   MaterialStyle: (fnc: Function1<any, any>) => fnc(appvars.MaterialStyle),
   router: () => appvars.router,
@@ -499,13 +485,13 @@ const app = {
   fncWaitCssLoading: (v: string, c: number) => FNC_WAIT_CSS_LOADING(v, c),
   changeLang: async (lang: string) => {
     await app.$t.lang(lang)
-    app.state(C.UPDATE_ENTIRE, 'app')
+    app.state(C.UPDATE_ENTIRE, LIBNAME)
   },
 }
 
 const compoSubscribe = <V, P>(prm: LauncherProps<V, P>, uid: string, setState: Function) => {
   log.trace('CHECK-HAS-UPDATE:', prm?.name || uid, prm?.updated)
-  if (prm?.updated) {
+  // if (prm?.updated) {
     setTimeout(() => {
       log.trace('REGIST-SUBSCRIBE:', prm.name || uid)
       const unsubscribe = app.subscribe(async (mode, sendid) => {
@@ -520,7 +506,7 @@ const compoSubscribe = <V, P>(prm: LauncherProps<V, P>, uid: string, setState: F
         unsubscribe()
       })
     }, 1)
-  }
+  // }
 }
 
 var FNC_DEFINE_HIDE_ONLOAD = () => `
@@ -532,6 +518,10 @@ var FNC_DEFINE_HIDE_ONLOAD = () => `
 
 var FNC_WAIT_CSS_LOADING = (htmlid: string, duration: number = 1000) => `
 <script>
+{
+  ${''/** SSR 로케일을 원한다면 현시점에서 locale을 체크하여 해당 언어로 강제 redirect 하도록 한다. */}
+  console.log('CHECK-STORAGE:', localStorage.getItem('runtime'));
+}
 {
   var body = document.body;
   function fnunload() {

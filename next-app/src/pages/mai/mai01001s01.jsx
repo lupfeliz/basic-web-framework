@@ -8,90 +8,101 @@
 
 /* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
 
+getLogger('i18n').setLevel('trace')
+
 export default definePage(() => {
 
   const { ready, update } = useSetup({
     name: $PAGENAME$,
-    updated(mode) { }
   })()
   const userInfo = userContext.getUserInfo()
 
   return (
   <Page>
     <section className='title'>
-      <h2>메인페이지</h2>
+      <h2>{ $t('MAI0001') || '메인페이지' }</h2>
     </section>
     <hr/>
     <section>
-      <p> 샘플 게시판 어플리케이션 입니다. </p>
-      <p> 현재 페이지는 메인페이지 입니다. </p>
+      <p> { $t('MAI0002') || '샘플 게시판 어플리케이션 입니다.' } </p>
+      <p> { $t('MAI0003') || '현재 페이지는 메인페이지 입니다.' } </p>
       <p> { $t('CMN0004') } </p>
       <article>
         { ready() && !(userInfo?.userId) && (
-        <Block>
+        <Block
+          className='my-1'
+          >
           <Button
+            className='mx-1'
+            variant='primary'
             href='/lgn/lgn01001s01'
             >
-            로그인
+            { $t('CMN0009') || '로그인' }
           </Button>
           <Button
+            className='mx-1'
+            variant='primary'
             href='/usr/usr01001s01'
             >
-            회원가입
+            { $t('CMN0010') || '회원가입' }
           </Button>
         </Block>
         ) }
-        <Block>
+        <Block
+          className='my-1'
+          >
           <Button
+            className='mx-1'
+            variant='primary'
             href='/atc/atc01001s04/1'
             >
-            게시판으로 이동
+            { $t('CMN0011') || '게시판으로 이동' }
           </Button>
-        </Block>
-        <Block>
           <Button
+            className='mx-1'
+            variant='outline-success'
             href='/smp/smp01001s01'
             >
-            샘플1
+            { $t('MAI0004') || '샘플'}1
           </Button>
-        </Block>
-        <Block>
           <Button
+            className='mx-1'
+            variant='outline-success'
             href='/smp/smp01001s02'
             >
-            샘플2
+            { $t('MAI0004') || '샘플'}2
           </Button>
-        </Block>
-        <Block>
           <Button
+            className='mx-1'
+            variant='outline-success'
             href='/smp/smp01001s03'
             >
-            샘플3
+            { $t('MAI0004') || '샘플'}3
           </Button>
-        </Block>
-        <Block>
           <Button
+            className='mx-1'
+            variant='outline-success'
             href='/smp/smp01001s04'
             >
-            샘플4
+            { $t('MAI0004') || '샘플'}4
           </Button>
-        </Block>
-        <Block>
           <Button
+            className='mx-1'
+            variant='outline-success'
             href='/smp/smp01001s05'
             >
-            샘플5
+            { $t('MAI0004') || '샘플'}5
           </Button>
-        </Block>
-        <Block>
           <Button
+            className='mx-1'
+            variant='outline-success'
             href='/smp/smp01001s06'
             >
-            샘플6
+            { $t('MAI0004') || '샘플'}6
           </Button>
-        </Block>
-        <Block>
           <Button
+            className='mx-1'
+            variant='outline-success'
             href='https://devwas.ntiple.com/study202403/swagger/swagger-ui/index.html'
             >
             오픈API
