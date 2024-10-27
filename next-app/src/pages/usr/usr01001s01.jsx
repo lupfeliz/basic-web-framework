@@ -8,34 +8,52 @@
 
 /* #MACRO-DEFINE# 이 부분은 미리 만들어진 선언문으로 대체된다 */
 
+import uschema from '@/schema/user'
+
 export default definePage(() => {
-  const PTN_EMAIL = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
   const self = useSetup({
+    name: $PAGENAME$,
     vars: {
-      formdata: {
-        userNm: '',
-        userId: '',
-        passwd: '',
+      formdata: mergeObj(
+        clone(uschema), {
         passwd2: '',
         emailId: '',
         emailHost: '',
-        email: ''
-      },
+      }),
       iddupchk: false,
       emailSelector: 'select',
-      emailHosts: [
-        { name: '선택해 주세요', value: '' },
-        'gmail.com',
-        'naver.com',
-        'daum.net',
-        'kakao.com',
-        'hotmail.com',
-        'icloud.com',
-        { name: '직접입력', value: '_' },
-      ]
+      emailHosts: [ ],
+      form: useForm(),
+      validctx: {
+        dupchk: (v) => {
+          if (!vars.iddupchk) { return `아이디 중복체크를 수행해 주세요` }
+          return true
+        },
+        passwd2chk: (v) => {
+          if (vars.formdata.passwd !== vars.formdata.passwd2) { return `입력된 비밀번호가 서로 달라요` }
+          return true
+        },
+        emailchk: (v) => {
+          const email = `${vars.formdata.emailId}@${vars.formdata.emailHost}`
+          if (!format.pattern(C.EMAIL).test(email)) { return `'${email}' 은 정상적인 이메일 형식이 아니예요` }
+          return true
+        },
+      },
     },
     async mounted() {
-      log.debug('USR01001S01 - MOUNTED!')
+      try {
+        log.debug(`${$PAGENAME$} - MOUNTED!`)
+        pushAll(
+          vars.emailHosts, 
+          mergeAll(
+            [ C.SELECT_ITEM_EMPTY($t) ],
+            commonCodes.get('cmn01', '001'),
+            [ C.SELECT_ITEM_MANUAL($t) ],
+          )
+        )
+      } catch (e) {
+        log.debug('E:', e)
+      }
     }
   })
   const { update, vars } = self()
@@ -67,29 +85,14 @@ export default definePage(() => {
   }
   /** 회원가입, was 에 전달하기 전에 validation 부터 수행한다. */
   const submit = async () => {
-    let msg = ''
-    let model = clone(vars.formdata)
-    model.email = `${model.emailId}@${model.emailHost}`
-    if (!msg && !model.userNm) { msg = '이름을 입력해 주세요' }
-    if (!msg && model.userNm.length < 2) { msg = '이름을 2글자 이상 입력해 주세요' }
-    if (!msg && !model.userId) { msg = '아이디를 입력해 주세요' }
-    if (!msg && model.userId.length < 4) { msg = '아이디를 4글자 이상 입력해 주세요' }
-    if (!msg && !vars.iddupchk) { msg = '아이디 중복확인을 수행해 주세요' }
-    if (!msg && !model.passwd) { msg = '비밀번호를 입력해 주세요' }
-    if (!msg && model.passwd.length < 4) { msg = '비밀번호를 4글자 이상 입력해 주세요' }
-    if (!msg && !model.passwd2) { msg = '비밀번호 확인을 입력해 주세요' }
-    if (!msg && model.passwd !== model.passwd2) { msg = '비밀번호 확인이 맞지 않아요' }
-    if (!msg && !model.emailId) { msg = '이메일을 입력해 주세요' }
-    if (!msg && !PTN_EMAIL.test(model.email)) { msg = `"${model.email}" 는 올바른 이메일 형식이 아니예요` }
-    if (msg) {
-      await dialog.alert(msg)
-    } else {
-      let result = false
-      // dialog.progress(true)
-      try {
+    try {
+      if (await validateForm(vars.form)) {
         /** 필요한 파라메터만 복사한다. */
-        Object.keys(model).map((k) => ['userNm', 'userId', 'passwd', 'email'].indexOf(k) == -1 && delete model[k])
+        let model = clone(vars.formdata)
+        model.email = `${model.emailId}@${model.emailHost}`
+        model = values.copyExists(clone(uschema), model)
         model.passwd = encrypt(model.passwd)
+        log.trace('SUBMIT-MODEL:', model)
         let res = await api.put(`usr01001`, model)
         log.debug('RES:', res)
         if (res.rescd === C.RESCD_OK) {
@@ -97,14 +100,15 @@ export default definePage(() => {
           await goPage(-1)
           await goPage(`/usr/usr01001s02`)
         }
-      } catch (e) {
-        log.debug('E:', e)
       }
-      // thread(() => { dialog.progress(false) }, 500)
-      if (!result) {
-        await dialog.alert('회원 등록에 실패했어요 잠시후 다시 시도해 주세요')
-      }
+    } catch (e) {
+      log.debug('E:', e)
     }
+  }
+  const onError = async (e) => {
+    log.debug('E:', e)
+    await dialog.alert(e?.message || '오류가 발생했어요')
+    if (e?.element) { e.element.focus() }
   }
   return (
   <Page>
@@ -113,41 +117,57 @@ export default definePage(() => {
     </section>
     <hr/>
     <section className='flex-form'>
-      <Form>
+      <Form
+        ref={ vars.form }
+        validctx={ vars.validctx }
+        onError={ onError }
+        >
         <article>
           <Block className='form-block'>
             <label htmlFor='frm-user-nm'> 이름 </label>
             <Block className='form-element'>
             <Input
               id='frm-user-nm'
+              form={ vars.form }
               model={ vars.formdata }
               name='userNm'
-              placeholder='이름'
-              maxLength={ 20 }
+              label='이름'
+              placeholder='이름 2~12자 이내 실명기재 '
+              minLength={ 2 }
+              maxLength={ 12 }
               className='w-full'
               size='small'
+              required
+              vrules='auto'
               />
             </Block>
           </Block>
           <Block className='form-block'>
             <label htmlFor='frm-user-id'>아이디</label>
             <Block className='form-element user-id'>
-            <Input
-              id='frm-user-id'
-              model={ vars.formdata }
-              name='userId'
-              placeholder='영문자로 시작, 12자 이내'
-              maxLength={ 12 }
-              className='w-full'
-              size='small'
-              />
-            <Button
-              variant='contained'
-              color='inherit'
-              onClick={ checkUserId }
-              >
-              중복확인
-            </Button>
+            <Input.Group>
+              <Input
+                id='frm-user-id'
+                form={ vars.form }
+                model={ vars.formdata }
+                name='userId'
+                label='아이디'
+                placeholder='영문자로 시작, 4~12자 이내'
+                minLength={ 4 }
+                maxLength={ 12 }
+                className='w-full'
+                size='small'
+                required
+                vrules='auto|dupchk'
+                />
+              <Button
+                variant='secondary'
+                color='inherit'
+                onClick={ checkUserId }
+                >
+                중복확인
+              </Button>
+            </Input.Group>
             </Block>
           </Block>
           <Block className='form-block'>
@@ -156,12 +176,17 @@ export default definePage(() => {
             <Input
               type='password'
               id='frm-passwd'
+              form={ vars.form }
               model={ vars.formdata }
               name='passwd'
-              placeholder='영문자, 숫자, 특수기호 각 1개이상'
-              maxLength={ 30 }
+              label='비밀번호'
+              placeholder='영문자, 숫자, 특수기호 각 1개이상 4~20자 이내'
+              minLength={ 4 }
+              maxLength={ 20 }
               className='w-full'
               size='small'
+              required
+              vrules='auto|password'
               />
             </Block>
           </Block>
@@ -171,53 +196,74 @@ export default definePage(() => {
             <Input
               type='password'
               id='frm-passwd2'
+              form={ vars.form }
               model={ vars.formdata }
               name='passwd2'
+              label='비밀번호 확인'
               placeholder='비밀번호확인'
+              minLength={ 4 }
               maxLength={ 30 }
               className='w-full'
               size='small'
+              required
+              vrules='auto|password|passwd2chk'
               />
             </Block>
           </Block>
           <Block className='form-block'>
             <label htmlFor='frm-email'>이메일</label>
             <Block className='form-element email'>
-            <Input
-              id='frm-email'
-              model={ vars.formdata }
-              name='emailId'
-              placeholder='이메일 아이디'
-              maxLength={ 30 }
-              size='small'
-              />
-            <span>@</span>
-            { matcher(vars?.emailSelector, 'select', 
-              'select', (
-                <Select
-                  model={ vars.formdata }
-                  name='emailHost'
-                  options={ vars.emailHosts }
-                  onChange={ emailHostChanged }
-                  size='small'
-                  />
-              ),
-              'input', (
-                <Input
-                  model={ vars.formdata }
-                  name='emailHost'
-                  maxLength={ 30 }
-                  size='small'
-                  />
-              )
-            ) }
+            <Input.Group>
+              <Input
+                id='frm-email'
+                form={ vars.form }
+                model={ vars.formdata }
+                name='emailId'
+                label='이메일 아이디'
+                placeholder='이메일 아이디'
+                minLength={ 2 }
+                maxLength={ 30 }
+                size='small'
+                required
+                vrules='auto|emailchk'
+                />
+              <span className='input-group-text'>@</span>
+              { matcher(vars?.emailSelector, 'select', 
+                'select', (
+                  <Select
+                    form={ vars.form }
+                    model={ vars.formdata }
+                    name='emailHost'
+                    label='이메일 호스트'
+                    options={ vars.emailHosts }
+                    onChange={ emailHostChanged }
+                    size='small'
+                    required
+                    vrules='auto'
+                    />
+                ),
+                'input', (
+                  <Input
+                    form={ vars.form }
+                    model={ vars.formdata }
+                    name='emailHost'
+                    label='이메일 호스트'
+                    minLength={ 4 }
+                    maxLength={ 30 }
+                    size='small'
+                    required
+                    vrules='auto'
+                    />
+                )
+              ) }
+            </Input.Group>
             </Block>
           </Block>
           <hr/>
           <Block className='buttons'>
             <Button
               className='mx-1'
-              variant='contained'
+              variant='primary'
               size='large'
               onClick={ submit }
               >
@@ -225,7 +271,7 @@ export default definePage(() => {
             </Button>
             <Button
               className='mx-1'
-              variant='outlined'
+              variant='outline-secondary'
               size='large'
               >
               취소

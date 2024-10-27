@@ -47,6 +47,7 @@ declare global {
   const values: typeof import('@/libs/values')['default']
   const dialog: typeof import('@/libs/dialog-context')['default']
   const userContext: typeof import('@/libs/user-context')['default']
+  const commonCodes: typeof import('@/libs/common-codes')['default']
 
   /** app 종속 메소드 선언 (수정시 macro-loader.js 도 같이 수정해 주어야 함) */
   const $t: typeof app.$t
@@ -71,7 +72,8 @@ declare global {
   const isServer: typeof app.isServer
   const log: typeof app.log
   const matcher: typeof app.matcher
-  const merge: typeof app.merge
+  const mergeAll: typeof app.mergeAll
+  const mergeObj: typeof app.mergeObj
   const modelValue: typeof app.modelValue
   const profile: typeof app.profile
   const pushAll: typeof app.pushAll

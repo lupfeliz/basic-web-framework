@@ -13,6 +13,7 @@ import { registForm, type ValidationType } from '@/components/form'
 import { isEvent, cancelEvent, KEYCODE_TABLE } from '@/libs/evdev'
 
 const SelectSchema = {
+  form: {} as any,
   model: {} as any,
   options: [] as (OptionType | (string & {}))[],
   variant: '' as ButtonVariant,
@@ -77,7 +78,7 @@ export default defineComponent((props: SelectProps, ref: SelectProps['ref'] & an
       vars.options.push({ name: name, value: value, selected: value == mvalue })
     }
     if (mvalue === undefined) { vars.index = 0 }
-    vars.text = vars.options[vars.index].name || ''
+    vars.text = vars.options[vars.index]?.name || ''
   }
 
   const onChange = async (e: any, v: any) => {

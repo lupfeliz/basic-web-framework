@@ -18,6 +18,7 @@ import { registForm, type ValidationType } from '@/components/form'
 const efnc1 = (() => '') as Function1<any, any>
 
 const InputPropsSchema = {
+  form: C.UNDEFINED,
   model: {} as any,
   onEnter: efnc1,
   onChange: efnc1,
@@ -45,12 +46,12 @@ const InputPropsSchema = {
 type InputProps = ComponentPropsWithRef<'input'> & Record<string, any> & Partial<typeof InputPropsSchema>
 
 const COMPONENT = 'input'
-const { merge } = values
+const { mergeAll } = values
 const { getLogger, copyExclude, useRef, copyRef, useSetup, defineComponent, modelValue, isServer, until, strm, sleep } = app
 const log = getLogger(COMPONENT)
 
 export default defineComponent((props: InputProps, ref: InputProps['ref'] & any) => {
-  const pprops = copyExclude(props, merge(Object.keys(InputPropsSchema), []))
+  const pprops = copyExclude(props, mergeAll(Object.keys(InputPropsSchema), []))
   const self = useSetup({
     name: COMPONENT,
     props,
@@ -59,7 +60,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       avail: true,
       material: false,
       elem: useRef<any>(),
-      wrap: useRef<any>(),
+      // wrap: useRef<any>(),
       valid: {
         error: false,
         isValidated: false,
@@ -88,14 +89,14 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       await until(() => app.ready(C.APPSTATE_LIBS), { maxcheck: 1000, interval: 10 })
       app.MaterialStyle((v) => {
         new v.TextField(vars?.elem.current)
-        setTimeout(() => {
-          /** FIXME: placeholder 가 아닌 label 로 적용할것 */
-          if (!props.placeholder) {
-            $(vars.wrap.current).find('.m-notch-between').css({ display: 'none' })
-          } else {
-            $(vars.wrap.current).find('.m-notch-between').css({ display: 'inherit' })
-          }
-        }, 100)
+        // setTimeout(() => {
+        //   /** FIXME: placeholder 가 아닌 label 로 적용할것 */
+        //   if (!props.placeholder) {
+        //     $(vars.wrap.current).find('.m-notch-between').css({ display: 'none' })
+        //   } else {
+        //     $(vars.wrap.current).find('.m-notch-between').css({ display: 'inherit' })
+        //   }
+        // }, 100)
       })
       update(C.UPDATE_SELF)
     }, 1)
@@ -343,9 +344,9 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   }
   return (
   <>
-  <div
+  {/* <div
     ref={ vars?.wrap }
-    >
+    > */}
     <input
       { ...pprops }
       ref={ vars?.elem }
@@ -363,7 +364,18 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       placeholder={ pprops.placeholder }
       tabIndex={ props.tabIndex !== undefined ? props.tabIndex : 0 }
       />
-  </div>
+  {/* </div> */}
   </>
   )
+}, {
+  Group: defineComponent((props: any) => {
+    return (
+      <div
+        { ...props }
+        className={ strm(`input-group ${props.className}`) }
+        >
+        { ...props.children }
+      </div>
+    )
+  })
 })

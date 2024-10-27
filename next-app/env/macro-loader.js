@@ -18,10 +18,11 @@ import values from '@/libs/values';
 import __$CRYPTO$ from '@/libs/crypto';
 import dialog from '@/libs/dialog-context';
 import userContext from '@/libs/user-context';
+import commonCodes from '@/libs/common-codes';
 import { Block, Button, Checkbox, Container, Content, DataGrid, EditorClassic, Editor, Form, Fragment, Image, Input, Link, Lottie, Modal, Page, Pagination, Portal, Select, Slider, Spinner, Textarea } from '@/components';
 import { useForm, validateForm } from '@/components/form';
 ${''/** 필요한 메소드들 추출 */}
-const { $t, asAny, asType, basepath, changeLang, clear, clone, defineComponent, definePage, getFrom, getGlobalTmp, getLogger, getOpenerTmp, getParameter, getText, getUri, getUrl, goPage, isClient, isServer, matcher, merge, modelValue, profile, pushAll, putAll, px2rem, randomStr, rem2px, setGlobalTmp, setOpenerTmp, sleep, strm, toJSON, toString, until, useGlobalRef, useRef, useSetup } = app;
+const { $t, asAny, asType, basepath, changeLang, clear, clone, defineComponent, definePage, getFrom, getGlobalTmp, getLogger, getOpenerTmp, getParameter, getText, getUri, getUrl, goPage, isClient, isServer, matcher, mergeAll, mergeObj, modelValue, profile, pushAll, putAll, px2rem, randomStr, rem2px, setGlobalTmp, setOpenerTmp, sleep, strm, toJSON, toString, until, useGlobalRef, useRef, useSetup } = app;
 ${''/** 페이지명 */}
 const $PAGENAME$ = '#{PAGENAME}';
 ${''/** 지역로그 */}

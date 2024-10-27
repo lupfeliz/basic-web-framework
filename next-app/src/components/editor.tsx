@@ -15,10 +15,14 @@ import app from '@/libs/app-context'
 import proc from '@/libs/proc'
 import * as C from '@/libs/constants'
 
+const EditorPropsSchema = {
+  form: C.UNDEFINED,
+  model: {} as any,
+  name: '',
+}
+
 /** 편집기 속성타입 상속 */
-type EditorProps = ComponentPropsWithRef<'div'> & EditorContentProps & {
-  model?: any
-  name?: string
+type EditorProps = ComponentPropsWithRef<'div'> & EditorContentProps & Partial<typeof EditorPropsSchema> & {
 }
 
 const COMPONENT = 'editor'
@@ -27,10 +31,7 @@ const { debouncePromise } = proc
 const log = getLogger(COMPONENT)
 
 const MenuBar = ({ editor }: { editor: Editor }) => {
-  // const { editor } = useCurrentEditor()
-  if (!editor) {
-    return null
-  }
+  if (!editor) { return null }
   return (
     <div className="control-group">
       <div className="button-group">
@@ -182,7 +183,7 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
 }
 
 export default defineComponent((props: EditorProps, ref: EditorProps['ref'] & any) => {
-  const pprops = copyExclude(props, ['model', 'editor'])
+  const pprops = copyExclude(props, Object.keys(EditorPropsSchema))
 
   const self = useSetup({
     name: COMPONENT,

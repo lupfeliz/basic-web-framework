@@ -39,11 +39,11 @@ const SlidePropsSchema = {
 type SliderProps = ComponentPropsWithRef<'input'> & Record<string, any> & Partial<typeof SlidePropsSchema>
 
 const COMPONENT = 'slider'
-const { getLogger, defineComponent, copyExclude, useSetup, useRef, copyRef, modelValue, merge, putAll, strm, clear, pushAll, ready, sleep, swap } = app
+const { getLogger, defineComponent, copyExclude, useSetup, useRef, copyRef, modelValue, mergeAll, putAll, strm, clear, pushAll, ready, sleep, swap } = app
 const log = getLogger(COMPONENT)
 
 export default defineComponent((props: SliderProps, ref: SliderProps['ref']) => {
-  const pprops = copyExclude(props, merge(Object.keys(SlidePropsSchema), ['min', 'max']))
+  const pprops = copyExclude(props, mergeAll(Object.keys(SlidePropsSchema), ['min', 'max']))
   const self = useSetup({
     name: COMPONENT,
     props,

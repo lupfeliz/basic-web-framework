@@ -35,7 +35,7 @@ const { useSetup, putAll, defineComponent, getLogger, copyExclude, copyRef, useR
 const log = getLogger(COMPONENT)
 
 export default defineComponent((props: DataGridProps, ref: DataGridProps['ref']) => {
-  const pprops = copyExclude(props, values.merge(Object.keys(DataGridPropsSchema), [ ]))
+  const pprops = copyExclude(props, values.mergeAll(Object.keys(DataGridPropsSchema), [ ]))
   const self = useSetup({
     name: COMPONENT,
     props,

@@ -114,27 +114,36 @@ html#my-first-app {
             }
 
             > label[for] + div.form-element.user-id {
-              > div:nth-child(1) {
-                width: calc(100% - 5rem - 0.5rem - 10px);
-                margin-right: 0.5rem;
-              }
-              > div:nth-child(2) {
-                width: calc(5rem);
+              > div.input-group {
+                > input:nth-child(1) {
+                  width: calc(100% - 5rem - 0.5rem - 10px);
+                }
+                > div:nth-child(2) {
+                  width: calc(5rem);
+                }
               }
             }
 
             > label[for] + div.form-element.email {
-              > div:nth-child(1) {
-                width: calc(50% - 1rem);
-              }
-              > span:nth-child(2) {
-                display: inline-block;
-                width: 2rem;
-                padding-top: 0.5rem;
-                text-align: center;
-              }
-              > div:nth-child(3) {
-                width: calc(50% - 1rem);
+              > div.input-group {
+                > input:nth-child(1) {
+                  width: calc(50% - 1rem);
+                }
+                > span:nth-child(2) {
+                  display: inline-block;
+                  width: 2rem;
+                  padding: 0.5rem 0 0 0;
+                  text-align: center;
+                  border: 0;
+                }
+                > div:nth-child(3) {
+                  width: calc(50% - 1rem);
+                  > button {
+                    border-top-left-radius: 0;
+                    border-bottom-left-radius: 0;
+                    width: 100%;
+                  }
+                }
               }
             }
 

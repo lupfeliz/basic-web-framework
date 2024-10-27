@@ -148,3 +148,6 @@ export const EMPTY_FUNC1: Function1<any, any> = ((a) => '')
 export const EMPTY_FUNC2: Function2<any, any, any> = ((a, b) => '')
 export const EMPTY_FUNC3: Function3<any, any, any, any> = ((a, b, c) => '')
 export const EMPTY_FUNC4: Function4<any, any, any, any, any> = ((a, b, c, d) => '')
+
+export const SELECT_ITEM_EMPTY = ($t?: any) => ({ name: $t ? $t('CMN0013') : '선택해 주세요', value: '' })
+export const SELECT_ITEM_MANUAL = ($t?: any) => ({ name: $t ? $t('CMN0014') : '직접입력', value: '_' })

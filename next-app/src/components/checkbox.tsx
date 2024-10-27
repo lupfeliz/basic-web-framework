@@ -12,6 +12,7 @@ import * as C from '@/libs/constants'
 import { registForm, type ValidationType } from '@/components/form'
 
 const CheckboxPropsSchema = {
+  form: C.UNDEFINED,
   model: {} as any,
   onChange: (() => '') as (Function | undefined),
   type: '' as 'checkbox' | 'radio',

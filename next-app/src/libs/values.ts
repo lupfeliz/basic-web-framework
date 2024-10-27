@@ -143,7 +143,7 @@ const values = {
     return target
   },
   /** 다수개 배열을 새로운 배열로 합쳐 반환 */
-  merge(...params: any[]) {
+  mergeAll(...params: any[]) {
     let ret: any = undefined
     for (const item of params) {
       if (item instanceof Array) {
@@ -154,6 +154,14 @@ const values = {
         values.putAll(ret, item)
       }
     }
+    return ret
+  },
+
+  /** 두개 객체을 합쳐 반환 */
+  mergeObj<T1, T2>(v1: T1, v2?: T2) {
+    let ret = {} as T1 & T2
+    if (v1) { values.putAll(ret, v1) }
+    if (v2) { values.putAll(ret, v2) }
     return ret
   },
 
