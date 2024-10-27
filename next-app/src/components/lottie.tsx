@@ -30,7 +30,7 @@ export default defineComponent((props: LottieProps, ref: LottieProps['ref']) => 
     },
     async mounted() {
       let src = basepath(props?.src || '')
-      log.debug('LOTTIE-PATH:', src, app.getConfig().app.basePath, ref, vars.elem)
+      log.trace('LOTTIE-PATH:', src, app.getConfig().app.basePath, ref, vars.elem)
       copyRef(ref, vars?.elem)
       const element: HTMLDivElement = vars?.elem?.current as any
       if (!element?.getAttribute('data-loaded')) {
@@ -42,7 +42,7 @@ export default defineComponent((props: LottieProps, ref: LottieProps['ref']) => 
           autoplay: props?.autoplay || true,
           renderer: props?.renderer,
         })
-        log.debug('CHECK:', src, element?.getAttribute('data-loaded'), vars.lottie, ref)
+        log.trace('CHECK:', src, element?.getAttribute('data-loaded'), vars.lottie, ref)
         if ((ref as any)?.current) {
           putAll(ref, { lottie: vars.lottie, play })
         }

@@ -48,6 +48,11 @@ return {
   output: /generate/.test(cmd) ? 'export' : undefined,
   /** 빌드결과물 생성위치 : /dist */
   distDir: 'dist',
+  /** 빌드후 갱신이 되지 않는것을 방지하기 위해 시간베이스로 빌드ID 생성 */
+  generateBuildId: async () => {
+    // return process.env.GIT_HASH
+    return `${new Date().getTime()}`
+  },
   basePath: yml?.app?.basePath || undefined,
   /** 개발모드에서 페이지가 두번씩 접근되는 현상 방지 */
   reactStrictMode: prod ? true : false,

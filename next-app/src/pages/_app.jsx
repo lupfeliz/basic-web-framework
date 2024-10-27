@@ -34,7 +34,7 @@ getLogger(C.ROOT).setLevel(getConfig()?.publicRuntimeConfig?.logLevel || 'debug'
 const log = getLogger(PAGENAME)
 
 if (!isServer() && [C.MY, C.DEV, C.LOCAL].indexOf(app.profile()) !== -1) {
-  import('@/pages/devmodules.scss')
+  import('@/app/devtools/module.scss')
 }
 
 export default definePage((props) => {

@@ -12,8 +12,9 @@ html {
       --menu-size-w: 2rem;
       --menu-size-h: 2rem;
       position: fixed;
-      top: calc(100vh - var(--menu-size-h) - 1rem);
+      // top: calc(100vh - var(--menu-size-h) - 1rem);
       // left: calc(50% - var(--menu-size-w) / 2);
+      bottom: calc(1.2rem);
       left: calc(100vw - var(--menu-size-w) - 1rem);
       width: var(--menu-size-w);
       height: var(--menu-size-h);

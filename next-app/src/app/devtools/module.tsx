@@ -69,6 +69,7 @@ export default defineComponent(() => {
           id='__DEVMODULE_MENU_MODAL__'
           show={ vars.modal.visible }
           ref={ vars.modal.element }
+          size='xl'
           >
           <Modal.Body>
             <h5> 개발자 전용 메뉴 </h5>

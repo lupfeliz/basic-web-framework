@@ -234,10 +234,12 @@ html#my-first-app {
 
   /** 좌우 폭이 너무 넓어지는것을 방지 */
   @media (min-width:800px) {
-    section, hr {
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
+    main {
+      section, hr {
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+      }
     }
   }
 }
