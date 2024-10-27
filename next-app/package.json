@@ -59,10 +59,12 @@
     "react-dom": "^18.3.1",
     "react-range": "^1.10.0",
     "react-redux": "^9.1.2",
+    "react-toastify": "^10.0.6",
     "react-transition-group": "^4.4.5",
     "redux": "^5.0.1",
     "redux-deep-persist": "^1.0.7",
     "redux-persist": "^6.0.0",
+    "toastify-js": "^1.12.0",
     "vanilla-calendar-pro": "^2.9.10"
   },
   "devDependencies": {
