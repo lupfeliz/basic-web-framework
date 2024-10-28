@@ -232,6 +232,14 @@ html#my-first-app {
     }
   }
 
+  .modal.fade {
+    transition: all 0.2s ease-out;
+    .modal-dialog {
+      transition: all 0.2s ease-out;
+      // transform: translate(0, -50px);
+    }
+  }
+
   /** 좌우 폭이 너무 넓어지는것을 방지 */
   @media (min-width:800px) {
     main {

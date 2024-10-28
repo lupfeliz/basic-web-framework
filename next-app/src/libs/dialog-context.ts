@@ -118,7 +118,7 @@ const slice = createSlice({
           /** 버튼인덱스 값에 있는 결과값을 리턴한다. */
           const res = modal.buttons[payload?.value]?.value
           /** FIXME: 트랜지션 시간을 동적으로 체크하도록 */
-          proc.sleep(200).then(() => {
+          proc.sleep(250).then(() => {
             o(res)
             if ((o = dialogvars.focusables[pid])) {
               log.trace('DIALOG-CHECK:', o)
