@@ -64,7 +64,7 @@ export default definePage((props) => {
     {/* 트랜지션감지 */}
     <AnimatePresence mode='wait' initial={ false }>
       {/* 실제 경로에 맞는 페이지 컴포넌트 */}
-      { applyLayout(<Component key={ !isServer() ? history.state.as : router.asPath } { ...pageProps } />, router) }
+      { applyLayout(<Component key={ !isServer() ? history.state.as : router.asPath } { ...props } />, router) }
     </AnimatePresence>
     <DialogContainer />
     {/* 개발자메뉴 */}

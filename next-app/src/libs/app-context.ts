@@ -12,10 +12,10 @@ import $ from 'jquery'
 import getConfig from 'next/config'
 import { createSlice, configureStore } from '@reduxjs/toolkit'
 import React, { useRef, forwardRef } from 'react'
-import { useRouter } from 'next/navigation'
-import { NextRouter } from 'next/router'
+import { useRouter as navRouter, usePathname } from 'next/navigation'
+import { type NextRouter, useRouter as nextRouter } from 'next/router'
 import dynamic from 'next/dynamic'
-import { AppProps } from 'next/app'
+import type { AppProps } from 'next/app'
 import CryptoJS from 'crypto-js'
 import { MDCRipple } from '@material/ripple'
 
@@ -136,7 +136,7 @@ const app = {
    * })
    **/
   useSetup<V, P>(prm: LauncherProps<V, P>) {
-    const router = useRouter()
+    const router = navRouter()
     const [uid] = React.useState(app.genId())
     const [phase, setPhase] = React.useState(0)
     const [, setState] = React.useState(0)
@@ -577,6 +577,20 @@ var FNC_WAIT_CSS_LOADING = (htmlid: string, duration: number = 1000) => `
 }
 </script>
 `.replace(/[ \r\n\t]+/gm, ' ').trim()
+
+if (misc.isServer()) {
+  app.getParameter = (key? : string) => {
+    const router = nextRouter()
+    // log.debug('PATH:', router, global['__NEXT_HTTPS_AGENT'])
+    // log.debug('PATH:', router, global)
+    log.debug('PATH:')
+    return ''
+  }
+  app.getUri = () => {
+    return ''
+  }
+}
+
 
 export default app
 export { type ContextType }
