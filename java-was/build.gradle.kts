@@ -64,7 +64,7 @@ dependencies {
 
   /** 기타 필요사항들 */
   implementation("commons-codec:commons-codec:1.15")
-  implementation("com.ntiple:ntiple-utils:0.0.2-10")
+  implementation("com.ntiple:ntiple-utils:0.0.2-11")
   implementation("javax.validation:validation-api:2.0.1.Final")
   implementation("org.apache.httpcomponents:httpclient:4.5.14")
   implementation("org.apache.httpcomponents:httpmime:4.5.14")
@@ -94,7 +94,6 @@ dependencies {
   /** 테스트관련 */
   testCompileOnly("org.projectlombok:lombok")
   testAnnotationProcessor("org.projectlombok:lombok")
-  testImplementation("com.ntiple:ntiple-utils:0.0.2-10")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

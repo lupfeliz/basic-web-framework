@@ -45,10 +45,13 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.junit.jupiter.api.Test;
 
 import com.ntiple.commons.Constants;
 import com.ntiple.commons.CryptoUtil;
+import com.ntiple.commons.HttpUtil;
 import com.ntiple.commons.CryptoUtil.AES;
 import com.ntiple.commons.CryptoUtil.RSA;
 
@@ -990,4 +993,14 @@ public class SimpleTest {
   //     return false;
   //   }
   // }
+
+  @Test public void testSimpleHttp() throws Exception {
+    if (!TestUtil.isEnabled("testSimpleHttp", TestLevel.MANUAL)) { return; }
+    String result = HttpUtil.respContentStr(
+      HttpUtil.execute(
+        HttpUtil.httpClient(), null, new HttpGet("https://gitlab.ntiple.com"),
+        null, HttpResponse.class
+      ));
+    log.debug("RESULT:{}", result);
+  }
 }
