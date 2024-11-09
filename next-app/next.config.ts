@@ -11,6 +11,7 @@ import cryptojs from 'crypto-js'
 import { copyFileSync, readFileSync, existsSync, rmSync } from 'fs'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
+import values from './src/libs/values'
 import log from './src/libs/log'
 const dir = dirname(fileURLToPath(import.meta.url))
 const nextConfig: () => NextConfig = () => {
@@ -30,9 +31,11 @@ if (!process.env?.PRINTED) {
   if (/(bbuild|bgenerate)/.test(cmd)) { copyFileSync(`${dir}/tools/babel/babel.config.js`, `${dir}/babel.config.js`) }
   /** 설정정보 등을 암호화 하여 클라이언트로 보내기 위한 AES 키, replace-loader 에 의해 constants 에 입력된다 */
   const cryptokey = btoa(Array(32).fill('0').map((v, i, l) => l[i] = Math.round(Math.random() * 255)) as any)
-  process.env.BUILD_STORE = JSON.stringify({
-    CRYPTO_KEY: cryptokey,
-    ENCRYPTED: cryptojs.AES.encrypt(JSON.stringify(yml), cryptokey).toString()
+  values.putAll(process.env, {
+    BUILD_STORE: JSON.stringify({
+      CRYPTO_KEY: cryptokey,
+      ENCRYPTED: cryptojs.AES.encrypt(JSON.stringify(yml), cryptokey).toString()
+    }),
   })
 }
 /** API 프록시 설정 */

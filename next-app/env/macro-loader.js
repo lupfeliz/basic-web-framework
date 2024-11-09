@@ -11,6 +11,7 @@ const PTN_DEFINE = /\/\*[ \t]*#MACRO-DEFINE#[ \t]*.*\*\//
 const PTN_I18N = /\/\*[ \t]*#MACRO-I18N#[ \t]*.*\*\//
 const REPLACES_DEFINE = `
 ${''/** 라이브러리 임포트 */}
+import __$FS from 'fs';
 import * as C from '@/libs/constants';
 import app from '@/libs/app-context';
 import api from '@/libs/api';
