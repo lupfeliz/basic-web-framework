@@ -69,7 +69,7 @@ module.exports = function(source) {
     )
   }
   if (/^[\/]?\[lng\]\//.test(pagepath) && PTN_I18N.test(result)) {
-    // console.log('PAGE:', pagepath)
+    console.log('PAGE:', pagepath)
     result = result.replace(PTN_I18N, REPLACES_EXPORT
     )
   }

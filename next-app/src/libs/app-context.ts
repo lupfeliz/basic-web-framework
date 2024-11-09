@@ -401,13 +401,36 @@ const app = {
     }
     return { props: self?.props, vars: self?.vars, model, name, inx, value, setValue }
   },
-  getParameter: (key?: string) => {
+  getParameter: (key?: string, props?: any) => {
     let ret: any = C.UNDEFINED
-    const prm: any = { }
+    if (props && props.router && props.router.asPath) {
+      ret = app._parseParameter({
+        key, prm: { },
+        route: props.router.route,
+        path: props.router.asPath,
+        search: '',
+        query: props.router.query,
+        options: { }
+      })
+      log.debug('PATH:', props.router.route, props.router.asPath, props.router.query)
+    } else {
+      ret = app._parseParameter({
+        key, prm: { },
+        route: history?.state?.url || '',
+        path: history?.state?.as || '',
+        search: location.search,
+        query: { },
+        options: history?.state?.options
+      })
+    }
+    return ret
+  },
+  _parseParameter: ({ key, prm, route, path, search, query, options }: any) => {
+    let ret: any = C.UNDEFINED
     let o: any
     try {
-      const d1 = String(history?.state?.url || '').split(/[/]/)
-      const d2 = String(history?.state?.as || '').split(/[/]/)
+      const d1 = String(route || '').split(/[/]/)
+      const d2 = String(path || '').split(/[/]/)
       let len = d1.length > d2.length ? d1.length : d2.length
       for (let inx = 0; inx < len; inx++) {
         if (/[\[]([a-zA-Z0-9_-]+)[\]]/.test(d1[inx] || '')) {
@@ -417,13 +440,10 @@ const app = {
     } catch (e) {
       log.debug('E:', e)
     }
-    if ((o = history?.state?.options)) {
-      for (const k of Object.keys(o)) { prm[k] = o[k] }
-    }
-    if (o = new URLSearchParams(location.search)) {
-      for (const k of o.keys()) { prm[k] = o.get(k) }
-    }
-    if (Object.keys(prm).length > 0) { log.debug('PRM:', prm, history) }
+    if ((o = options || {})) { for (const k of Object.keys(o)) { prm[k] = o[k] } }
+    if (o = new URLSearchParams(search)) { for (const k of o.keys()) { prm[k] = o.get(k) } }
+    if ((o = query || { })) { for (const k of Object.keys(o)) { prm[k] = o[k] } }
+    if (Object.keys(prm).length > 0) { log.debug('PRM:', prm) }
     ret = key ? prm[key] : prm
     return ret
   },
@@ -579,12 +599,20 @@ var FNC_WAIT_CSS_LOADING = (htmlid: string, duration: number = 1000) => `
 `.replace(/[ \r\n\t]+/gm, ' ').trim()
 
 if (misc.isServer()) {
-  app.getParameter = (key? : string) => {
-    const router = nextRouter()
-    // log.debug('PATH:', router, global['__NEXT_HTTPS_AGENT'])
-    // log.debug('PATH:', router, global)
-    log.debug('PATH:')
-    return ''
+  app.getParameter = (key? : string, props?: any) => {
+    let ret: any = C.UNDEFINED
+    if (props && props.router && props.router.asPath) {
+      ret = app._parseParameter({
+        key, prm: { },
+        route: props.router.route,
+        path: props.router.asPath,
+        search: '',
+        query: props.router.query,
+        options: { }
+      })
+      log.debug('PATH:', props.router.route, props.router.asPath, props.router.query)
+    }
+    return ret
   }
   app.getUri = () => {
     return ''

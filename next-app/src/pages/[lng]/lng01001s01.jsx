@@ -10,19 +10,18 @@
 
 import fs from 'fs'
 
-if (isServer()) {
-  const modpath = String(__filename).substring((process.cwd() + '/dist/server').length)
-  log.debug('MOD-PATH:', modpath)
-  let lng = 'ko'
-  let nsp = 'commons'
-  const lngpath = process.cwd() + '/dist/server/src_locales_' + lng + '_' + nsp + '_ts.js'
-  if (fs.existsSync(lngpath)) {
-    /** TODO: 로켈 읽어와서 입력하기 */
-    log.debug('CHECK-LOCALE:', lngpath)
-  }
-}
-
 export default definePage((props) => {
+  if (isServer()) {
+    const modpath = String(__filename).substring((process.cwd() + '/dist/server').length)
+    let lng = getParameter('lng', props)
+    let nsp = 'commons'
+    log.debug('MOD-PATH:', modpath, lng)
+    const lngpath = process.cwd() + '/dist/server/src_locales_' + lng + '_' + nsp + '_ts.js'
+    if (fs.existsSync(lngpath)) {
+      /** TODO: 로켈 읽어와서 입력하기 */
+      log.debug('CHECK-LOCALE:', lngpath)
+    }
+  }
 
   const self = useSetup({
     async mounted() {
@@ -31,7 +30,7 @@ export default definePage((props) => {
   const { update, vars, ready } = self()
   return (
   <Page>
-    <div>{ getParameter('lng', props) }</div>
+    <div>{ getParameter('lng') }</div>
   </Page>
   )
 })

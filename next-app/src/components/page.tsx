@@ -11,5 +11,5 @@ type PageProps = ComponentPropsWithRef<'div'> & { }
 const { copyExclude, strm } = app
 export default app.defineComponent((props: PageProps, ref: PageProps['ref']) => {
   const pprops = copyExclude(props, ['className'])
-  return ( <div className={ strm(`${props?.className || ''} container`) } ref={ ref } { ...pprops }> { props.children } </div> )
+  return ( <div suppressHydrationWarning className={ strm(`${props?.className || ''} container`) } ref={ ref } { ...pprops }> { props.children } </div> )
 })
