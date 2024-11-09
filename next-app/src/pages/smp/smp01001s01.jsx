@@ -178,6 +178,7 @@ export default definePage((props) => {
             // minValue={ 10 }
             // maxValue={ 100 }
             formatter={ format.numeric }
+            rtformatter={ format.numeric }
             />
           <span className='mx-1 my-1'>
           [VALUE: { format.numToHangul(vars?.formdata?.input01) }]

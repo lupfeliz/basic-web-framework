@@ -193,7 +193,6 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         case KEYCODE_TABLE.PC.MetaLeft: 
         case KEYCODE_TABLE.PC.MetaRight: {
           vars.avail = true
-          return
         } break
         case C.UNDEFINED: { /** NO-OP */ } break
         case KEYCODE_TABLE.PC.ArrowUp: {
@@ -216,6 +215,9 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           el.selectionEnd = ed
           cancelEvent(e)
           vars.avail = true
+          update(C.UPDATE_FULL)
+          if (props?.onKeyDown) { props.onKeyDown(e) }
+          if (props?.onChange) { props.onChange(e) }
           return
         } break
         case KEYCODE_TABLE.PC.ArrowDown: {
@@ -238,6 +240,9 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           el.selectionEnd = ed
           cancelEvent(e)
           vars.avail = true
+          update(C.UPDATE_FULL);
+          if (props?.onKeyDown) { props.onKeyDown(e) }
+          if (props?.onChange) { props.onChange(e) }
           return
         } break
         default: {
@@ -265,6 +270,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       }
       /** 2. 후처리, 키입력이 이루어진 후 DOM 에 반영된 결과물을 2차 가공하는 과정 */
       setTimeout(async () => {
+        let value = ''
         if ([KEYCODE_TABLE.PC.Backspace, KEYCODE_TABLE.PC.Delete].indexOf(kcode) !== -1) {
           /** 삭제키인(backspace, delete) 경우 별도처리 */
           let v1, v2, l1, l2
@@ -273,7 +279,9 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           v1 = props?.rtformatter ? props.rtformatter(vprev) : vprev
           v2 = props?.rtformatter ? props.rtformatter(el.value) : el.value
           if (el.value === '') {
-            setValue('')
+            setValue(value = '')
+            if (props?.onKeyDown) { props.onKeyDown(e) }
+            if (props?.onChange) { props.onChange(e) }
             return vars.avail = true
           }
           LOOP: while(true) {
@@ -329,15 +337,16 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
               st ++
               ed ++
             }
-            setValue(inputVal(`${v}\r`))
             el.selectionStart = st
             el.selectionEnd = ed
             await proc.sleep(5)
-            setValue(inputVal(`${v}`))
           }
+          setValue(inputVal(`${v}`))
         }
-        if (e?.keyCode === KEYCODE_TABLE.PC.Enter && props?.onEnter instanceof Function) { props.onEnter(e) }
+
+        if (props?.onKeyDown) { props.onKeyDown(e) }
         update(C.UPDATE_FULL)
+        if (e?.keyCode === KEYCODE_TABLE.PC.Enter && props?.onEnter instanceof Function) { props.onEnter(e) }
         vars.avail = true
       }, 50)
     }

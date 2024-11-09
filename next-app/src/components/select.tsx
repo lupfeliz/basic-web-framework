@@ -109,6 +109,7 @@ export default defineComponent((props: SelectProps, ref: SelectProps['ref'] & an
       default: }
       vars.options[vars.index].selected = true
       setValue(vars.options[vars.index].value)
+      if (props?.onChange) { props.onChange(e) }
     }
   }
 
