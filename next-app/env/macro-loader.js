@@ -7,8 +7,9 @@
  *                주의! 매크로는 반드시 1줄단위로 변조해 주어야 소스 라인수가 서로 맞는다.
  * @Site        : https://devlog.ntiple.com
  **/
-const PTN_IMPORT = /\/\*[ \t]*#MACRO-DEFINE#[ \t]*.*\*\//
-const REPLACES = `
+const PTN_DEFINE = /\/\*[ \t]*#MACRO-DEFINE#[ \t]*.*\*\//
+const PTN_I18N = /\/\*[ \t]*#MACRO-I18N#[ \t]*.*\*\//
+const REPLACES_DEFINE = `
 ${''/** 라이브러리 임포트 */}
 import * as C from '@/libs/constants';
 import app from '@/libs/app-context';
@@ -30,6 +31,24 @@ const log = getLogger($PAGENAME$);
 const encrypt = __$CRYPTO$.aes.encrypt;
 const decrypt = __$CRYPTO$.aes.decrypt;
 `.replace(/[ \r\n\t]+/gm, ' ').trim()
+
+const REPLACES_EXPORT = `
+export const getStaticPaths = async () => {
+  ${''/** TODO: i18n 에서 generating 할 목록, 동적으로 가능하도록 만들어야 한다. */}
+  const paths = [
+    { params: { lng: 'en' } },
+    { params: { lng: 'ko' } }
+  ];
+  return { paths, fallback: false };
+};
+
+export const getStaticProps = async (context) => {
+  const params = context.params;
+  ${''/** 페이지에서 props.pageProps 에 할당된다 */}
+  return { props: { lng: params?.lng || '' } };
+};
+`.replace(/[ \r\n\t]+/gm, ' ').trim()
+
 module.exports = function(source) {
   const pagepath = String(this.resourcePath).replace(/.*\/([^\/]+\/[^\/]+).jsx$/g, '$1')
   if (['pages/_app', 'pages/_document', 'pages/index'].indexOf(pagepath) !== -1) { return source }
@@ -42,9 +61,16 @@ module.exports = function(source) {
   let result = String(source || '')
   /** 치환데이터 저장소를 초기화 한다 */
   /** 소스코드에서 // #MACRO-IMPORTS# 가 발견되면 1회 치환한다 */
-  if (PTN_IMPORT.test(result)) {
+  if (PTN_DEFINE.test(result)) {
     // console.log('SRCPATH:', this.resourcePath)
-    result = result.replace(PTN_IMPORT, REPLACES.replace('#{PAGENAME}', pagename))
+    result = result.replace(PTN_DEFINE, REPLACES_DEFINE
+      .replace('#{PAGENAME}', pagename)
+    )
+  }
+  if (/^[\/]?\[lng\]\//.test(pagepath) && PTN_I18N.test(result)) {
+    // console.log('PAGE:', pagepath)
+    result = result.replace(PTN_I18N, REPLACES_EXPORT
+    )
   }
   return result
 }

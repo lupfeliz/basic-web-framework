@@ -325,7 +325,7 @@ const app = {
         putAll(window, { jQuery: $ })
         const api = (await import('@/libs/api')).default
         const crypto = (await import('@/libs/crypto')).default
-        log.debug('APP-ONLOAD-LIBS')
+        log.debug('APP-ONLOAD-LIBS', props)
         /* @ts-ignore */
         appvars.MaterialStyle = await import('@materialstyle/materialstyle/dist/js/materialstyle.esm')
         /** window.jQuery 를 사용하는 객체 바인딩 후 삭제 */
