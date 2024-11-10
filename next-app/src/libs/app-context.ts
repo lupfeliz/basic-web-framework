@@ -258,16 +258,9 @@ const app = {
   async uriChanged({ prev, current }: any) {
     let data = current.replace(/^[\/]/, '').split(/[\/]/)
     let cate = ''
-    log.debug('DATA:', data.length, data)
+    log.trace('DATA:', data.length, data)
     if (data.length == 1 && data[0] == '' && (cate = 'mai') || (data.length > 0 && (cate = data[0]).length == 3)) {
-      log.debug('URI-CHANGED:', prev, current, cate)
-      /** TODO: 카테고리별 언어를 적재한다 (i18n 에 이식) */
-      try {
-        const lang = (await import(`@/locales/ko/${cate}`)).default
-        log.debug('LANG:', lang)
-      } catch (e) {
-        log.debug('E:', app.getFrom(e, 'message'))
-      }
+      log.trace('URI-CHANGED:', prev, current, cate)
     }
   },
   sleep(time: number) { return new Promise(r => setTimeout(r, time)) },
@@ -279,9 +272,10 @@ const app = {
     if (compo && compo instanceof Function) {
       ret = (props: any) => {
         if (props?.router) {
-          // log.debug('PAGE-PROPS:', props)
+          // log.debug('PAGE-PROPS:', props.router.asPath)
           appvars.router = props.router
         }
+        /** 기존 i18n 초기화 부분은 이 부분으로 대체됨 */
         if (props?.pageProps?.lang) {
           try {
             const lang = JSON.parse(props.pageProps.lang)
@@ -293,7 +287,7 @@ const app = {
       if (opts) {
         putAll(ret, opts)
         if (opts.nossr) {
-          ret = dynamic(() => Promise.resolve(compo as any), { ssr: false }) as any
+          ret = dynamic(() => Promise.resolve(ret as any), { ssr: false }) as any
         }
       }
     }
