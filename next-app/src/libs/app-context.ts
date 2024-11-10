@@ -7,6 +7,7 @@
  * @Site        : https://devlog.ntiple.com
  **/
 /* eslint-disable react-hooks/exhaustive-deps */
+import fs, { readFileSync } from 'fs'
 import { Function1, Function2, debounce } from 'lodash'
 import $ from 'jquery'
 import getConfig from 'next/config'
@@ -136,11 +137,26 @@ const app = {
    * })
    **/
   useSetup<V, P>(prm: LauncherProps<V, P>) {
+    let o: any
     const router = navRouter()
     const [uid] = React.useState(app.genId())
     const [phase, setPhase] = React.useState(0)
     const [, setState] = React.useState(0)
     ctx[uid] = putAll(ctx[uid] || { uid, name: prm?.name, vars: prm?.vars || {}, releaselist: [] }, { props: prm?.props || {}, phase })
+    if (app.isServer() && (o = prm?.props) && o &&
+      (o?.Component && o.pageProps && o?.router?.asPath)) {
+      const props = o
+      const modpath = String(__filename).substring((process.cwd() + '/dist/server').length)
+      let lng = app.getParameter('lng', props)
+      let nsp = 'commons'
+      // log.debug('MOD-PATH:', modpath, lng)
+      const lngpath = '/dist/server/src_locales_' + lng + '_' + nsp + '_ts.js'
+      if (fs.existsSync(process.cwd() + lngpath)) {
+        /** TODO: 로켈 읽어와서 입력하기 */
+        const content = readFileSync(process.cwd() + lngpath)
+        log.debug('CHECK-LOCALE:', lngpath, String(content))
+      }
+    }
     const self = (vars?: any, props?: any) => {
       let ret = {
         uid,
@@ -447,8 +463,10 @@ const app = {
     ret = key ? prm[key] : prm
     return ret
   },
-  getUrl: () => location.href,
-  getUri() {
+  getUrl(props?: AppProps) {
+    return location.href
+  },
+  getUri(props?: AppProps) {
     let ret = '/'
     if (appvars.astate) {
       ret = String(history?.state?.url || '/').replace(/[?].*$/g, '')
@@ -598,7 +616,7 @@ var FNC_WAIT_CSS_LOADING = (htmlid: string, duration: number = 1000) => `
 </script>
 `.replace(/[ \r\n\t]+/gm, ' ').trim()
 
-if (misc.isServer()) {
+if (app.isServer()) {
   app.getParameter = (key? : string, props?: any) => {
     let ret: any = C.UNDEFINED
     if (props && props.router && props.router.asPath) {
@@ -614,7 +632,12 @@ if (misc.isServer()) {
     }
     return ret
   }
-  app.getUri = () => {
+  app.getUrl = (props) => {
+    if (props && props.router && props.router.asPath) { return props?.router.asPath }
+    return ''
+  }
+  app.getUri = (props) => {
+    if (props && props.router && props.router.asPath) { return props?.router.asPath }
     return ''
   }
 }

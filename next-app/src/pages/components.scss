@@ -14,6 +14,9 @@ html#my-first-app {
     .dropdown {
       > button.dropdown-toggle {
         border: 1px solid #ccc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
     }
     /******************************************************************************/

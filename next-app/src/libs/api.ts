@@ -85,6 +85,7 @@ const mkres = async (run: Function0<Promise<Response>>, opt?: OptType) => {
   const state = { error: false, message: '', msgcode: '' }
   try {
     resp = await run()
+    // resp = await run().catch(() => { log.debug('ERROR!!!!') })
     hdrs = resp?.headers || { get: (v: any) => {} }
     /** 정상처리 되었으므로 abort signal 취소 */
     opt?.abortclr && opt.abortclr()
@@ -128,6 +129,7 @@ const mkres = async (run: Function0<Promise<Response>>, opt?: OptType) => {
       }
     }
   } catch(e) {
+    log.debug("E:", e);
     resp = {
       headers: {},
       status: C.SC_UNKNOWN,
@@ -136,7 +138,17 @@ const mkres = async (run: Function0<Promise<Response>>, opt?: OptType) => {
     } as any
   }
   /** 상태값에 따른 오류처리 */
-  let msgcode = async () => (await (resp?.json && resp.json()))?.message
+  let msgcode = async () => {
+    try {
+      if (resp) {
+        const data = await resp.json()
+        if (data && data.message) { return data.message }
+      }
+    } catch(e) {
+      log.debug('E:', e)
+    }
+    return ''
+  }
   switch (resp.status) {
   case C.SC_BAD_GATEWAY:
   case C.SC_GATEWAY_TIMEOUT:
@@ -162,7 +174,6 @@ const mkres = async (run: Function0<Promise<Response>>, opt?: OptType) => {
   case C.SC_OK: {
   } break
   default: }
-
   /** 정상인경우 결과값 리턴처리 */
   if (!state.error) {
     switch (String(hdrs.get('content-type')).toLowerCase().split(/[ ]*;[ ]*/)[0]) {
