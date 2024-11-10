@@ -101,6 +101,9 @@ export default definePage((props) => {
   /** 페이지 업데이트 이벤트 처리 */
   async function updated() {
     log.debug('UPDATED! ', $PAGENAME$)
+    if (vars.options1.length > 0) {
+      vars.options1[0] = C.SELECT_ITEM_EMPTY($t)
+    }
   }
   return (
   <Page>

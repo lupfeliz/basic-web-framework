@@ -51,6 +51,12 @@ export default definePage(() => {
       } catch (e) {
         log.debug('E:', e)
       }
+    },
+    async updated() {
+      if (vars.emailHosts.length > 1) {
+        vars.emailHosts[0] = C.SELECT_ITEM_EMPTY($t)
+        vars.emailHosts[vars.emailHosts.length - 1] = C.SELECT_ITEM_MANUAL($t)
+      }
     }
   })
   const { update, vars } = self()

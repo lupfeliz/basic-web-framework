@@ -12,6 +12,7 @@ const PTN_I18N = /\/\*[ \t]*#MACRO-I18N#[ \t]*.*\*\//
 const REPLACES_DEFINE = `
 ${''/** 라이브러리 임포트 */}
 import __$FS from 'fs';
+import __$GETCONFIG from 'next/config';
 import * as C from '@/libs/constants';
 import app from '@/libs/app-context';
 import api from '@/libs/api';
@@ -35,11 +36,11 @@ const decrypt = __$CRYPTO$.aes.decrypt;
 
 const REPLACES_EXPORT = `
 export const getStaticPaths = async () => {
-  ${''/** TODO: i18n 에서 generating 할 목록, 동적으로 가능하도록 만들어야 한다. */}
-  const paths = [
-    { params: { lng: 'en' } },
-    { params: { lng: 'ko' } }
-  ];
+  ${''/** i18n 에서 generating 할 목록, i18n.ts 의 languages 항목에 의존한다.  */}
+  const paths = [ ];
+  for (const lng of $t.languages) {
+    paths.push({ params: { lng } });
+  };
   return { paths, fallback: false };
 };
 
@@ -50,8 +51,8 @@ export const getStaticProps = async (context) => {
     locale: params?.lng || '',
     defaultLocale: 'ko',
   });
-
-  let modpath = String(__filename).substring(String(process.cwd() + '/dist/server/pages').length);
+  let basepath = '/' + __$GETCONFIG()?.app?.distDir || 'dist';
+  let modpath = String(__filename).substring(String(process.cwd() + basepath + '/server/pages').length);
   modpath = modpath.replace(/\.js$/g, '');
   if (params?.lng) { modpath = modpath.replace(/\\[lng\\]/g, params.lng); };
   const props = {

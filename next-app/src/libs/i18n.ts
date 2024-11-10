@@ -21,7 +21,7 @@ const { asAny } = misc
 
 let lngdef = C.KO
 let nsdef = 'common'
-let languages = [lngdef, C.EN]
+let languages = [C.KO, C.EN]
 let nscur: string[] | string = nsdef
 let lngcur = lngdef
 
@@ -136,9 +136,11 @@ const changeLang = async (lng: string) => { await getTranslation(nscur, lng) }
 $t.init = initI18N
 $t.lang = changeLang
 $t.persist = persist
+$t.languages = languages
 
 export default $t as typeof $t & {
   init: typeof initI18N
   lang: typeof changeLang
   persist: typeof persist
+  languages: typeof languages
 }

@@ -44,13 +44,14 @@ const apiproxy = [ ] as any[];
   source: `${api?.base || '/api'}/:path*`,
   destination: `${api?.server || 'http://localhost:8080'}${api?.alter || '/api'}/:path*`
 } as any))
+const distDir = yml?.app?.distDir || 'dist'
 return {
   /** /api 경로로 요청이 들어올 경우 API 자바서버로 프록시 */
   async rewrites() { return apiproxy },
   /** npm run generate 로 빌드시 정적빌드 수행 하도록 */
   output: /generate/.test(cmd) ? 'export' : undefined,
   /** 빌드결과물 생성위치 : /dist */
-  distDir: 'dist',
+  distDir,
   /** 빌드후 갱신이 되지 않는것을 방지하기 위해 시간베이스로 빌드ID 생성 */
   generateBuildId: async () => {
     // return process.env.GIT_HASH

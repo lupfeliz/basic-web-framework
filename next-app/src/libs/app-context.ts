@@ -146,11 +146,12 @@ const app = {
     if (app.isServer() && (o = prm?.props) && o &&
       (o?.Component && o.pageProps && o?.router?.asPath)) {
       const props = o
-      const modpath = String(__filename).substring((process.cwd() + '/dist/server').length)
+      let basepath = '/' + getConfig()?.app?.distDir || 'dist'
+      const modpath = String(__filename).substring((process.cwd() + basepath + '/server').length)
       let lng = app.getParameter('lng')
       let nsp = 'commons'
       // log.debug('MOD-PATH:', modpath, lng)
-      const lngpath = '/dist/server/src_locales_' + lng + '_' + nsp + '_ts.js'
+      const lngpath = basepath + '/server/src_locales_' + lng + '_' + nsp + '_ts.js'
       if (fs.existsSync(process.cwd() + lngpath)) {
         /** TODO: 로켈 읽어와서 입력하기 */
         // const content = readFileSync(process.cwd() + lngpath)
