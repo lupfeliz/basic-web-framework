@@ -45,8 +45,22 @@ export const getStaticPaths = async () => {
 
 export const getStaticProps = async (context) => {
   const params = context.params;
+  putAll(context, {
+    locales: ['en', 'ko'],
+    locale: params?.lng || '',
+    defaultLocale: 'ko',
+  });
+
+  let modpath = String(__filename).substring(String(process.cwd() + '/dist/server/pages').length);
+  modpath = modpath.replace(/\.js$/g, '');
+  if (params?.lng) { modpath = modpath.replace(/\\[lng\\]/g, params.lng); };
+  const props = {
+    lng: params?.lng || '',
+    modpath,
+  };
+  log.debug('CHECK:', modpath);
   ${''/** 페이지에서 props.pageProps 에 할당된다 */}
-  return { props: { lng: params?.lng || '' } };
+  return { props };
 };
 `.replace(/[ \r\n\t]+/gm, ' ').trim()
 

@@ -147,14 +147,14 @@ const app = {
       (o?.Component && o.pageProps && o?.router?.asPath)) {
       const props = o
       const modpath = String(__filename).substring((process.cwd() + '/dist/server').length)
-      let lng = app.getParameter('lng', props)
+      let lng = app.getParameter('lng')
       let nsp = 'commons'
       // log.debug('MOD-PATH:', modpath, lng)
       const lngpath = '/dist/server/src_locales_' + lng + '_' + nsp + '_ts.js'
       if (fs.existsSync(process.cwd() + lngpath)) {
         /** TODO: 로켈 읽어와서 입력하기 */
-        const content = readFileSync(process.cwd() + lngpath)
-        log.debug('CHECK-LOCALE:', lngpath, String(content))
+        // const content = readFileSync(process.cwd() + lngpath)
+        // log.debug('CHECK-LOCALE:', lngpath, String(content))
       }
     }
     const self = (vars?: any, props?: any) => {
@@ -275,8 +275,14 @@ const app = {
   definePage<A extends Function1<AppProps, any>, B, C extends A & B>(compo?: A, _opts?: B) {
     let ret = C.UNDEFINED
     let opts: any = _opts
-    if (compo) {
-      ret = compo
+    if (compo && compo instanceof Function) {
+      ret = (props: any) => {
+        if (props?.router) {
+          // log.debug('PAGE-PROPS:', props)
+          appvars.router = props.router
+        }
+        return compo(props)
+      }
       if (opts) {
         putAll(ret, opts)
         if (opts.nossr) {
@@ -334,7 +340,7 @@ const app = {
   },
   /** APP 최초 구동시 수행되는 프로세스 */
   async onload(props: AppProps) {
-    appvars.router = props.router
+    // appvars.router = props.router
     if (appvars.astate == C.APPSTATE_INIT) {
       appvars.astate = C.APPSTATE_START
       try {
@@ -419,16 +425,17 @@ const app = {
   },
   getParameter: (key?: string, props?: any) => {
     let ret: any = C.UNDEFINED
-    if (props && props.router && props.router.asPath) {
+    let router = props?.router || appvars.router || undefined
+    if (router && router.asPath) {
       ret = app._parseParameter({
         key, prm: { },
-        route: props.router.route,
-        path: props.router.asPath,
+        route: router.route,
+        path: router.asPath,
         search: '',
-        query: props.router.query,
+        query: router.query,
         options: { }
       })
-      log.debug('PATH:', props.router.route, props.router.asPath, props.router.query)
+      log.debug('PATH:', router.route, router.asPath, router.query)
     } else {
       ret = app._parseParameter({
         key, prm: { },
@@ -619,25 +626,28 @@ var FNC_WAIT_CSS_LOADING = (htmlid: string, duration: number = 1000) => `
 if (app.isServer()) {
   app.getParameter = (key? : string, props?: any) => {
     let ret: any = C.UNDEFINED
-    if (props && props.router && props.router.asPath) {
+    let router = props?.router || appvars.router || undefined
+    if (router && router.asPath) {
       ret = app._parseParameter({
         key, prm: { },
-        route: props.router.route,
-        path: props.router.asPath,
+        route: router.route,
+        path: router.asPath,
         search: '',
-        query: props.router.query,
+        query: router.query,
         options: { }
       })
-      log.debug('PATH:', props.router.route, props.router.asPath, props.router.query)
+      log.debug('PATH:', router.route, router.asPath, router.query)
     }
     return ret
   }
   app.getUrl = (props) => {
-    if (props && props.router && props.router.asPath) { return props?.router.asPath }
+    let router = props?.router || appvars.router || undefined
+    if (router && router.asPath) { return router.asPath }
     return ''
   }
   app.getUri = (props) => {
-    if (props && props.router && props.router.asPath) { return props?.router.asPath }
+    let router = props?.router || appvars.router || undefined
+    if (props && router && router.asPath) { return router.asPath }
     return ''
   }
 }

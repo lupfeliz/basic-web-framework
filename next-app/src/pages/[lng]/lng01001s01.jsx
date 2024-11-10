@@ -10,7 +10,6 @@
 
 export default definePage((props) => {
   const self = useSetup({
-    props,
     async mounted() {
     }
   }, props)
