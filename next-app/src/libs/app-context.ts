@@ -153,7 +153,7 @@ const app = {
       // log.debug('MOD-PATH:', modpath, lng)
       const lngpath = basepath + '/server/src_locales_' + lng + '_' + nsp + '_ts.js'
       if (fs.existsSync(process.cwd() + lngpath)) {
-        /** TODO: 로켈 읽어와서 입력하기 */
+        /** TODO: 동적으로 로켈 읽어와서 입력하기, 이부분도 마찬가지로 URL 방식 사용시 필요 없음 */
         // const content = readFileSync(process.cwd() + lngpath)
         // log.debug('CHECK-LOCALE:', lngpath, String(content))
       }
@@ -282,6 +282,12 @@ const app = {
           // log.debug('PAGE-PROPS:', props)
           appvars.router = props.router
         }
+        if (props?.pageProps?.lang) {
+          try {
+            const lang = JSON.parse(props.pageProps.lang)
+            log.trace('I18N-LANG:', lang)
+          } catch (ignore) { }
+        }
         return compo(props)
       }
       if (opts) {
@@ -348,7 +354,7 @@ const app = {
         putAll(window, { jQuery: $ })
         const api = (await import('@/libs/api')).default
         const crypto = (await import('@/libs/crypto')).default
-        log.debug('APP-ONLOAD-LIBS', props)
+        log.trace('APP-ONLOAD-LIBS', props)
         /* @ts-ignore */
         appvars.MaterialStyle = await import('@materialstyle/materialstyle/dist/js/materialstyle.esm')
         /** window.jQuery 를 사용하는 객체 바인딩 후 삭제 */
@@ -369,7 +375,8 @@ const app = {
         log.debug('SERVER-TIME:', svrtime)
         const aeskey = kobj?.k || ''
         await crypto.aes.init(aeskey)
-        /** TODO: 워크 페이지별 다국어 적재 */
+        /** TODO: URL 방식을 사용시 $t.init 부분이 필요 없음 */
+        // log.debug('INIT I18N:', $t.current())
         await $t.init(['commons', 'mai'])
         appvars.astate = C.APPSTATE_ENV
         const userInfo = userContext.getUserInfo()
@@ -436,7 +443,7 @@ const app = {
         query: router.query,
         options: { }
       })
-      log.debug('PATH:', router.route, router.asPath, router.query)
+      log.trace('PATH:', router.route, router.asPath, router.query)
     } else {
       ret = app._parseParameter({
         key, prm: { },
@@ -467,7 +474,7 @@ const app = {
     if ((o = options || {})) { for (const k of Object.keys(o)) { prm[k] = o[k] } }
     if (o = new URLSearchParams(search)) { for (const k of o.keys()) { prm[k] = o.get(k) } }
     if ((o = query || { })) { for (const k of Object.keys(o)) { prm[k] = o[k] } }
-    if (Object.keys(prm).length > 0) { log.debug('PRM:', prm) }
+    if (Object.keys(prm).length > 0) { log.trace('PRM:', prm) }
     ret = key ? prm[key] : prm
     return ret
   },
@@ -652,7 +659,6 @@ if (app.isServer()) {
     return ''
   }
 }
-
 
 export default app
 export { type ContextType }

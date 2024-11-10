@@ -137,10 +137,12 @@ $t.init = initI18N
 $t.lang = changeLang
 $t.persist = persist
 $t.languages = languages
+$t.current = () => lngcur
 
 export default $t as typeof $t & {
   init: typeof initI18N
   lang: typeof changeLang
   persist: typeof persist
   languages: typeof languages
+  current: Function
 }

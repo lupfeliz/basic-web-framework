@@ -43,22 +43,24 @@ export const getStaticPaths = async () => {
   };
   return { paths, fallback: false };
 };
-
 export const getStaticProps = async (context) => {
+  ${''/** 미리 한번만 컴파일 되기 때문에 큰 부하는 없을것으로 예상 */}
   const params = context.params;
   putAll(context, {
     locales: ['en', 'ko'],
     locale: params?.lng || '',
     defaultLocale: 'ko',
   });
+  let lang = '';
+  let lng = params?.lng || '';
   let basepath = '/' + __$GETCONFIG()?.app?.distDir || 'dist';
   let modpath = String(__filename).substring(String(process.cwd() + basepath + '/server/pages').length);
   modpath = modpath.replace(/\.js$/g, '');
-  if (params?.lng) { modpath = modpath.replace(/\\[lng\\]/g, params.lng); };
-  const props = {
-    lng: params?.lng || '',
-    modpath,
+  if (lng) {
+    modpath = modpath.replace(/\\[lng\\]/g, lng);
+    lang = JSON.stringify(await import('@/locales/' + lng + '/commons'));
   };
+  const props = { lng, modpath, lang };
   log.debug('CHECK:', modpath);
   ${''/** 페이지에서 props.pageProps 에 할당된다 */}
   return { props };
