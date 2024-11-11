@@ -16,7 +16,7 @@ export default definePage((props) => {
   const { update, vars, ready } = self()
   return (
   <Page>
-    <div>{ getParameter('lng') }</div>
+    <div>{ getParameter('lang') }</div>
   </Page>
   )
 })

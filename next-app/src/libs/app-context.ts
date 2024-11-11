@@ -148,10 +148,10 @@ const app = {
       const props = o
       let basepath = '/' + getConfig()?.app?.distDir || 'dist'
       const modpath = String(__filename).substring((process.cwd() + basepath + '/server').length)
-      let lng = app.getParameter('lng')
+      let lang = app.getParameter('lang')
       let nsp = 'commons'
-      // log.debug('MOD-PATH:', modpath, lng)
-      const lngpath = basepath + '/server/src_locales_' + lng + '_' + nsp + '_ts.js'
+      // log.debug('MOD-PATH:', modpath, lang)
+      const lngpath = basepath + '/server/src_locales_' + lang + '_' + nsp + '_ts.js'
       if (fs.existsSync(process.cwd() + lngpath)) {
         /** TODO: 동적으로 로켈 읽어와서 입력하기, 이부분도 마찬가지로 URL 방식 사용시 필요 없음 */
         // const content = readFileSync(process.cwd() + lngpath)
@@ -266,11 +266,16 @@ const app = {
   sleep(time: number) { return new Promise(r => setTimeout(r, time)) },
   createElement: React.createElement,
   /** react 페이지 선언 */
-  definePage<A extends Function1<AppProps, any>, B, C extends A & B>(compo?: A, _opts?: B) {
-    let ret = C.UNDEFINED
+  definePage<A extends Function1<AppProps & Record<string, any>, any>, B, C extends A & B>(compo?: A, _opts?: B) {
+    let page = C.UNDEFINED
     let opts: any = _opts
     if (compo && compo instanceof Function) {
-      ret = (props: any) => {
+      page = (_props: AppProps) => {
+        let props: AppProps = C.UNDEFINED
+        if (!_props) { _props = {} as any }
+        /** TODO: 필요한 메소드들을 바인드 한다. (렌더링이 진행될때마다 수행하므로 주의할것.) */
+        props = new Proxy(_props, {
+        })
         if (props?.router) {
           // log.debug('PAGE-PROPS:', props.router.asPath)
           appvars.router = props.router
@@ -282,16 +287,17 @@ const app = {
             log.trace('I18N-LANG:', lang)
           } catch (ignore) { }
         }
-        return compo(props)
+        let render = compo(props)
+        return render
       }
       if (opts) {
-        putAll(ret, opts)
+        putAll(page, opts)
         if (opts.nossr) {
-          ret = dynamic(() => Promise.resolve(ret as any), { ssr: false }) as any
+          page = dynamic(() => Promise.resolve(page as any), { ssr: false }) as any
         }
       }
     }
-    return ret as any as C
+    return page as any as C
   },
   /** react 컴포넌트 선언 */
   defineComponent<A, B, C extends A & B>(compo?: A, _opts?: B) {
