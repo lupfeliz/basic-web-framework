@@ -51,9 +51,10 @@ export const getStaticProps = async (context) => {
     locale: params?.lang || '',
     defaultLocale: 'ko',
   });
+  const conf = __$GETCONFIG().serverRuntimeConfig || {};
   let langdata = '';
   let lang = params?.lang || '';
-  let basepath = '/' + __$GETCONFIG()?.app?.distDir || 'dist';
+  let basepath = '/' + conf?.app?.distDir || 'dist';
   let modpath = String(__filename).substring(String(process.cwd() + basepath + '/server/pages').length);
   modpath = modpath.replace(/\.js$/g, '');
   if (lang) {

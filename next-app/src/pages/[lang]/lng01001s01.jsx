@@ -11,6 +11,7 @@
 export default definePage((props) => {
   const self = useSetup({
     async mounted() {
+      log.debug('PROPS:', props.pageProps)
     }
   }, props)
   const { update, vars, ready } = self()
