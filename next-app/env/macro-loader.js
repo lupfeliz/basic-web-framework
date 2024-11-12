@@ -35,13 +35,13 @@ const decrypt = __$CRYPTO$.aes.decrypt;
 `.replace(/[ \r\n\t]+/gm, ' ').trim()
 
 const REPLACES_EXPORT = `
-export const getStaticPaths = async () => {
+var _$GET_STATIC_PATHS = async () => {
   ${''/** i18n 에서 generating 할 목록, i18n.ts 의 languages 항목에 의존한다.  */}
   const paths = [ ];
   for (const lang of $t.languages) { paths.push({ params: { lang } }); };
   return { paths, fallback: false };
 };
-export const getStaticProps = async (context) => {
+var _$GET_STATIC_PROPS = async (context) => {
   ${''/** 미리 한번만 컴파일 되기 때문에 큰 부하는 없을것으로 예상 */}
   const params = context.params;
   const locales = [ ];
@@ -59,13 +59,14 @@ export const getStaticProps = async (context) => {
   modpath = modpath.replace(/\.js$/g, '');
   if (lang) {
     modpath = modpath.replace(/\\[lang\\]/g, lang);
-    langdata = JSON.stringify(await import('@/locales/' + lang + '/commons'));
+    langdata = await import('@/locales/' + lang + '/commons');
   };
-  const props = { lang, modpath, langdata };
+  const props = { lang, modpath, langdata: JSON.stringify(langdata), filename: __filename };
   log.debug('CHECK:', modpath);
   ${''/** 페이지에서 props.pageProps 에 할당된다 */}
   return { props };
 };
+export { _$GET_STATIC_PATHS as getStaticPaths, _$GET_STATIC_PROPS as getStaticProps };
 `.replace(/[ \r\n\t]+/gm, ' ').trim()
 
 module.exports = function(source) {

@@ -41,6 +41,9 @@ type LauncherProps<V, P> = {
   phase?: number
 }
 
+type PagePropsType = AppProps & {
+} & Record<string, any>
+
 type SetupType<V, P> = {
   uid: string
   update: UpdateFunction
@@ -266,26 +269,27 @@ const app = {
   sleep(time: number) { return new Promise(r => setTimeout(r, time)) },
   createElement: React.createElement,
   /** react 페이지 선언 */
-  definePage<A extends Function1<AppProps & Record<string, any>, any>, B, C extends A & B>(compo?: A, _opts?: B) {
+  definePage<A extends Function1<PagePropsType & Record<string, any>, any>, B, C extends A & B>(compo?: A, _opts?: B) {
     let page = C.UNDEFINED
     let opts: any = _opts
     if (compo && compo instanceof Function) {
-      page = (_props: AppProps) => {
-        let props: AppProps = C.UNDEFINED
-        if (!_props) { _props = {} as any }
-        /** TODO: 필요한 메소드들을 바인드 한다. (렌더링이 진행될때마다 수행하므로 주의할것.) */
-        props = new Proxy(_props, {
-        })
-        if (props?.router) {
-          // log.debug('PAGE-PROPS:', props.router.asPath)
-          appvars.router = props.router
-        }
-        /** 기존 i18n 초기화 부분은 이 부분으로 대체됨 */
-        if (props?.pageProps?.lang) {
-          try {
-            const lang = JSON.parse(props.pageProps.lang)
-            log.trace('I18N-LANG:', lang)
-          } catch (ignore) { }
+      page = (_props: PagePropsType) => {
+        let props: PagePropsType = C.UNDEFINED
+        if (_props) {
+          /** TODO: 필요한 메소드들을 바인드 한다. (렌더링이 진행될때마다 수행하므로 주의할것.) */
+          if (props?.router) {
+            // log.debug('PAGE-PROPS:', props.router.asPath)
+            appvars.router = props.router
+          }
+          /** 기존 i18n 초기화 부분은 이 부분으로 대체됨 */
+          if (props?.pageProps?.lang) {
+            try {
+              const lang = JSON.parse(props.pageProps.lang)
+              log.trace('I18N-LANG:', lang)
+            } catch (ignore) { }
+          }
+          props = new Proxy(_props, {
+          })
         }
         let render = compo(props)
         return render
