@@ -352,6 +352,7 @@ const app = {
   /** APP 최초 구동시 수행되는 프로세스 */
   async onload(props: AppProps) {
     // appvars.router = props.router
+    if (props && props.router) { appvars.router = props.router }
     if (appvars.astate == C.APPSTATE_INIT) {
       appvars.astate = C.APPSTATE_START
       try {
