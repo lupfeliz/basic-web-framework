@@ -151,12 +151,16 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     }
   }
   const onFocus = async (e: FocusEvent) => {
+    const parent = $(vars.elem.current).parent()
+    if (parent.prop('tagName') === 'SPAN' && parent.hasClass('form-control')) { parent.addClass('focused') }
     if (props?.onFocus) { props.onFocus(e) }
   }
   const onBlur = async (e: FocusEvent) => {
+    const parent = $(vars.elem.current).parent()
     const { setValue } = modelValue(self())
     const v = inputVal()
     setValue(inputVal(props?.formatter ? props.formatter(v) : v))
+    if (parent.prop('tagName') === 'SPAN' && parent.hasClass('form-control')) { parent.removeClass('focused') }
     update(C.UPDATE_FULL)
     if (props?.onBlur) { props.onBlur(e) }
   }
@@ -359,6 +363,11 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       }, 50)
     }
   }
+  const className = () => {
+    let ret = ''
+    ret = strm(`form-control ${props?.className || ''}`)
+    return ret
+  }
   return (
   <>
   {/* <div
@@ -367,7 +376,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     <input
       { ...pprops }
       ref={ vars?.elem }
-      className={ strm(`form-control ${props?.className || ''}`) }
+      className={ className() }
       id={ app.ready() ? uid : C.UNDEFINED }
       maxLength={ props?.maxLength }
       type={ pprops?.type }

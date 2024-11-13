@@ -113,6 +113,16 @@ export default definePage(() => {
               vrules='auto|check2'
               />
           </Block>
+          <Block>
+            <div className="input-group">
+              <span className="form-control">
+                <Input />
+              </span>
+              <button className="btn btn-primary">
+                ABCD
+              </button>
+            </div>
+          </Block>
           <Block className='form-block'>
             { format.numToHangul(vars.data.input1) } [ { String(vars.data.input1).length } ]
           </Block>
