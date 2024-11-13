@@ -196,16 +196,14 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         } break
         case C.UNDEFINED: { /** NO-OP */ } break
         case KEYCODE_TABLE.PC.ArrowUp: {
+          if (st == 0) { st = 1 }
           let stv = inputVal()
-          let d = String(stv).substring((st - 1) || 0, st)
-          if (/[0-9]/.test(d)) {
-            d = String(Number(d) > 0 ? Number(d) - 1 : d)
-            stv = String((stv.substring(0, (st - 1) || 0)) || '') + d + String(stv.substring(st) || '')
-            log.trace('UP-CHECK:', d, stv)
-          }
+          let dgt = String(stv).substring((st - 1) || 0, st)
+          let add = 0
+          if (/[0-9]/.test(dgt)) { add = Number('1' + String(stv.substring(st)).replace(/[0-9]/g, '0').replace(/[^0-9]/g, '')) }
           const minv = Number(props?.minValue || C.UNDEFINED)
           const maxv = Number(props?.maxValue || C.UNDEFINED)
-          v = Number(toNumber(stv) || 0)
+          v = Number(toNumber(stv) || 0) + add
           if (minv !== C.UNDEFINED && v < minv) { v = minv }
           if (maxv !== C.UNDEFINED && v > maxv) { v = maxv }
           if (props?.rtformatter) {
@@ -223,16 +221,14 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           return
         } break
         case KEYCODE_TABLE.PC.ArrowDown: {
+          if (st == 0) { st = 1 }
           let stv = inputVal()
-          let d = String(stv).substring((st - 1) || 0, st)
-          if (/[0-9]/.test(d)) {
-            d = String(Number(d) < 9 ? Number(d) + 1 : d)
-            stv = String((stv.substring(0, (st - 1) || 0)) || '') + d + String(stv.substring(st) || '')
-            log.trace('DN-CHECK:', d, stv)
-          }
+          let dgt = String(stv).substring((st - 1) || 0, st)
+          let add = 0
+          if (/[0-9]/.test(dgt)) { add = Number('1' + String(stv.substring(st)).replace(/[0-9]/g, '0').replace(/[^0-9]/g, '')) }
           const minv = Number(props?.minValue || C.UNDEFINED)
           const maxv = Number(props?.maxValue || C.UNDEFINED)
-          v = Number(toNumber(stv) || 0)
+          v = Number(toNumber(stv) || 0) - add
           if (minv !== C.UNDEFINED && v < minv) { v = minv }
           if (maxv !== C.UNDEFINED && v > maxv) { v = maxv }
           if (props?.rtformatter) {
