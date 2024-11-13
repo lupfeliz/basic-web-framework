@@ -196,58 +196,62 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         } break
         case C.UNDEFINED: { /** NO-OP */ } break
         case KEYCODE_TABLE.PC.ArrowUp: {
-          if (st == 0) { st = 1 }
+          if (!st) { st = 0 }
           let stv = inputVal()
-          let dgt = String(stv).substring((st - 1) || 0, st)
-          let add = 0
-          if (/[0-9]/.test(dgt)) { add = Number('1' + String(stv.substring(st)).replace(/[0-9]/g, '0').replace(/[^0-9]/g, '')) }
-          const minv = Number(props?.minValue || C.UNDEFINED)
-          const maxv = Number(props?.maxValue || C.UNDEFINED)
-          v = Number(toNumber(stv) || 0) + add
-          if (minv !== C.UNDEFINED && v < minv) { v = minv }
-          if (maxv !== C.UNDEFINED && v > maxv) { v = maxv }
-          if (props?.rtformatter) {
-            setValue(inputVal(props.rtformatter(v)))
-          } else {
-            setValue(inputVal(v))
+          LOOP: for (; st <= stv.length; st++) {
+            let dgt = String(stv).substring((st - 1) || 0, st)
+            if (!/[0-9]/.test(dgt)) { continue LOOP }
+            let add = Number('1' + String(stv.substring(st)).replace(/[0-9]/g, '0').replace(/[^0-9]/g, ''))
+            const minv = Number(props?.minValue || C.UNDEFINED)
+            const maxv = Number(props?.maxValue || C.UNDEFINED)
+            v = Number(toNumber(stv) || 0) + add
+            if (minv !== C.UNDEFINED && v < minv) { v = minv }
+            if (maxv !== C.UNDEFINED && v > maxv) { v = maxv }
+            if (props?.rtformatter) {
+              setValue(inputVal(props.rtformatter(v)))
+            } else {
+              setValue(inputVal(v))
+            }
+            el.selectionStart = st
+            el.selectionEnd = ed
+            cancelEvent(e)
+            vars.avail = true
+            update(C.UPDATE_FULL)
+            if (props?.onKeyDown) { props.onKeyDown(e) }
+            if (props?.onChange) { props.onChange(e) }
+            return
           }
-          el.selectionStart = st
-          el.selectionEnd = ed
-          cancelEvent(e)
-          vars.avail = true
-          update(C.UPDATE_FULL)
-          if (props?.onKeyDown) { props.onKeyDown(e) }
-          if (props?.onChange) { props.onChange(e) }
-          return
         } break
         case KEYCODE_TABLE.PC.ArrowDown: {
-          if (st == 0) { st = 1 }
+          if (!st) { st = 0 }
           let stv = inputVal()
-          let dgt = String(stv).substring((st - 1) || 0, st)
-          let add = 0
-          if (/[0-9]/.test(dgt)) { add = Number('1' + String(stv.substring(st)).replace(/[0-9]/g, '0').replace(/[^0-9]/g, '')) }
-          const minv = Number(props?.minValue || C.UNDEFINED)
-          const maxv = Number(props?.maxValue || C.UNDEFINED)
-          v = Number(toNumber(stv) || 0) - add
-          if (minv !== C.UNDEFINED && v < minv) { v = minv }
-          if (maxv !== C.UNDEFINED && v > maxv) { v = maxv }
-          if (props?.rtformatter) {
-            setValue(inputVal(props.rtformatter(v)))
-          } else {
-            setValue(inputVal(v))
+          LOOP: for (; st <= stv.length; st++) {
+            let dgt = String(stv).substring((st - 1) || 0, st)
+            if (!/[0-9]/.test(dgt)) { continue LOOP }
+            let add = Number('1' + String(stv.substring(st)).replace(/[0-9]/g, '0').replace(/[^0-9]/g, ''))
+            const minv = Number(props?.minValue || C.UNDEFINED)
+            const maxv = Number(props?.maxValue || C.UNDEFINED)
+            v = Number(toNumber(stv) || 0) - add
+            if (minv !== C.UNDEFINED && v < minv) { v = minv }
+            if (maxv !== C.UNDEFINED && v > maxv) { v = maxv }
+            if (props?.rtformatter) {
+              setValue(inputVal(props.rtformatter(v)))
+            } else {
+              setValue(inputVal(v))
+            }
+            if (String(stv).replace(/[^0-9]+/g, '').length > String(v).length) {
+              st -= 1
+              ed -= 1
+            }
+            el.selectionStart = st
+            el.selectionEnd = ed
+            cancelEvent(e)
+            vars.avail = true
+            update(C.UPDATE_FULL);
+            if (props?.onKeyDown) { props.onKeyDown(e) }
+            if (props?.onChange) { props.onChange(e) }
+            return
           }
-          if (String(stv).replace(/[^0-9]+/g, '').length > String(v).length) {
-            st -= 1
-            ed -= 1
-          }
-          el.selectionStart = st
-          el.selectionEnd = ed
-          cancelEvent(e)
-          vars.avail = true
-          update(C.UPDATE_FULL);
-          if (props?.onKeyDown) { props.onKeyDown(e) }
-          if (props?.onChange) { props.onChange(e) }
-          return
         } break
         default: {
           if (
