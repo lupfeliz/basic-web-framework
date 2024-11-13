@@ -236,7 +236,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           } else {
             setValue(inputVal(v))
           }
-          if (dgt == '0') {
+          if (String(stv).replace(/[^0-9]+/g, '').length > String(v).length) {
             st -= 1
             ed -= 1
           }
