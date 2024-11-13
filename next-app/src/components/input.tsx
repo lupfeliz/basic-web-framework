@@ -236,6 +236,10 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           } else {
             setValue(inputVal(v))
           }
+          if (dgt == '0') {
+            st -= 1
+            ed -= 1
+          }
           el.selectionStart = st
           el.selectionEnd = ed
           cancelEvent(e)
