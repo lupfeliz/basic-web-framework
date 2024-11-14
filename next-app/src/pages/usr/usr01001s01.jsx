@@ -136,7 +136,6 @@ export default definePage(() => {
               placeholder='이름 2~12자 이내 실명기재 '
               minLength={ 2 }
               maxLength={ 12 }
-              className='w-full'
               size='small'
               required
               vrules='auto'
@@ -156,7 +155,6 @@ export default definePage(() => {
                 placeholder='영문자로 시작, 4~12자 이내'
                 minLength={ 4 }
                 maxLength={ 12 }
-                className='w-full'
                 size='small'
                 required
                 onChange={ () => vars.iddupchk = false }
@@ -185,7 +183,6 @@ export default definePage(() => {
               placeholder='영문자, 숫자, 특수기호 각 1개이상 4~20자 이내'
               minLength={ 4 }
               maxLength={ 20 }
-              className='w-full'
               size='small'
               required
               vrules='auto|password'
@@ -205,7 +202,6 @@ export default definePage(() => {
               placeholder='비밀번호확인'
               minLength={ 4 }
               maxLength={ 30 }
-              className='w-full'
               size='small'
               required
               vrules='auto|password|passwd2chk'

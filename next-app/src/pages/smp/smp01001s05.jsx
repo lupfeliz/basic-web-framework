@@ -20,11 +20,12 @@ export default definePage(() => {
         slider2: '',
       },
       options1: [
-        { name: '선택해주세요', value: '' },
+        C.SELECT_ITEM_EMPTY(),
         'hotmail.com',
         'naver.com',
         'kakao.com',
         'gmail.com',
+        C.SELECT_ITEM_MANUAL()
       ],
       form: useForm(),
       validctx: {
@@ -48,6 +49,11 @@ export default definePage(() => {
       // getLogger('form').setLevel('trace')
     },
     async updated(mode) {
+      log.debug('UPDATED!!')
+      if (vars?.options1?.length > 1) {
+        vars.options1[0] = C.SELECT_ITEM_EMPTY($t)
+        vars.options1[vars.options1.length - 1] = C.SELECT_ITEM_MANUAL($t)
+      }
     }
   })
   const { update, vars, ready } = self()
@@ -114,12 +120,14 @@ export default definePage(() => {
               />
           </Block>
           <Block className='form-block'>
-            <div className="input-group">
+            <Input.Group>
               <Input />
-              <button className="btn btn-primary">
+              <Button
+                variant="primary"
+                >
                 ABCD
-              </button>
-            </div>
+              </Button>
+            </Input.Group>
           </Block>
           <Block className='form-block'>
             { format.numToHangul(vars.data.input1) } [ { String(vars.data.input1).length } ]

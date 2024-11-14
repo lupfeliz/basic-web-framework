@@ -113,17 +113,6 @@ html#my-first-app {
               margin-right: 0.5rem;
             }
 
-            > label[for] + div.form-element.user-id {
-              > div.input-group {
-                > input:nth-child(1) {
-                  width: calc(100% - 5rem - 0.5rem - 10px);
-                }
-                > div:nth-child(2) {
-                  width: calc(5rem);
-                }
-              }
-            }
-
             > label[for] + div.form-element.email {
               > div.input-group {
                 > input:nth-child(1) {
