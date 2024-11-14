@@ -286,11 +286,13 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       /** 2. 후처리, 키입력이 이루어진 후 DOM 에 반영된 결과물을 2차 가공하는 과정 */
       setTimeout(async () => {
         let v = el.value || ''
+        let append = false
         let value = ''
         /** MACOS - SAFARI 계열 브라우저에서 키입력이 반영되지 않는 현상 FIX */
         if (String(stv).length === String(v).length && /^[a-zA-Z0-9]$/.test(String(e.key).trim())) {
           v = String(v) + String(e.key)
           v = props?.rtformatter ? props.rtformatter(v) : v
+          append = true
         }
         if ([KEYCODE_TABLE.PC.Backspace, KEYCODE_TABLE.PC.Delete].indexOf(kcode) !== -1) {
           /** 삭제키인(backspace, delete) 경우 별도처리 */
@@ -327,6 +329,10 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
             if (st < 0) { st = 0 }
             if (ed < 0) { ed = 0 }
             // log.debug('CHECK:', l1, l2, st, ed, v2)
+            if (append) {
+              st ++
+              ed ++
+            }
             el.value = v2
             await proc.sleep(1)
             el.selectionStart = st
@@ -354,6 +360,10 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
             await proc.sleep(2)
             /** TODO 기존에 선택상태였는지 체크, 삭제의 경우, 붙여넣기의 경우 */
             if (l2 > l1) {
+              st ++
+              ed ++
+            }
+            if (append) {
               st ++
               ed ++
             }
