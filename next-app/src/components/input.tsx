@@ -136,6 +136,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   }
   /** 입력컴포넌트 키입력 이벤트 처리 */
   const onKeyDown = async (e: KeyboardEvent) => {
+    log.debug('ON-KEY-DOWN')
     if (vars.avail) {
       await onKeyDownProc(e)
       if (props?.onKeyDown) { await props.onKeyDown(e) }
@@ -175,6 +176,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     if (isEvent(e)) {
       /** 1. 선처리, 직접적인 하드웨어 키보드 (scan-code) 입력에 대한 이벤트처리 */
       const el = $(vars?.elem.current)[0]
+      let stv = String(el.value || '')
       let st = Number(el.selectionStart || 0)
       let ed = Number(el.selectionEnd || 0)
       /** 허용키 : ctrl+c ctrl+v 방향키 bs delete tab enter space */
@@ -201,7 +203,6 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         case C.UNDEFINED: { /** NO-OP */ } break
         case KEYCODE_TABLE.PC.ArrowUp: {
           if (!st) { st = 0 }
-          let stv = inputVal()
           LOOP: for (; st <= stv.length; st++) {
             let dgt = String(stv).substring((st - 1) || 0, st)
             if (!/[0-9]/.test(dgt)) { continue LOOP }
@@ -273,7 +274,9 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           } else if ((
             /** Ctrl+C, Ctrl+V, Ctrl-A, Ctrl+R 허용 */
             ([KEYCODE_TABLE.PC.KeyA, KEYCODE_TABLE.PC.KeyC, KEYCODE_TABLE.PC.KeyV, KEYCODE_TABLE.PC.KeyR].indexOf(kcode) !== -1) &&
-            e.ctrlKey)) {
+            (e.ctrlKey || e.metaKey)) || (
+            ([KEYCODE_TABLE.PC.KeyD].indexOf(kcode) !== -1) &&
+            e.altKey)) {
             /** NO-OP */
           } else {
             cancelEvent(e)
@@ -282,7 +285,13 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       }
       /** 2. 후처리, 키입력이 이루어진 후 DOM 에 반영된 결과물을 2차 가공하는 과정 */
       setTimeout(async () => {
+        let v = el.value || ''
         let value = ''
+        /** MACOS - SAFARI 계열 브라우저에서 키입력이 반영되지 않는 현상 FIX */
+        if (String(stv).length === String(v).length && /^[a-zA-Z0-9]$/.test(String(e.key).trim())) {
+          v = String(v) + String(e.key)
+          v = props?.rtformatter ? props.rtformatter(v) : v
+        }
         if ([KEYCODE_TABLE.PC.Backspace, KEYCODE_TABLE.PC.Delete].indexOf(kcode) !== -1) {
           /** 삭제키인(backspace, delete) 경우 별도처리 */
           let v1, v2, l1, l2
@@ -297,8 +306,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
             return vars.avail = true
           }
           LOOP: while(true) {
-            l1 = v1.length
-            l2 = v2.length
+            l1 = v1 ? v1.length : 0
+            l2 = v2 ? v2.length : 0
             // log.debug('LENGTH:', l1, l2, v1, v2, st, ed, el.value)
             if (l2 === l1) {
               // if (st > 1 && kcode === KEYCODE_TABLE.PC.Backspace)
@@ -325,15 +334,14 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
             setValue(inputVal(v2))
             break LOOP
           }
-        }  else {
+        } else {
           /** 일반키인경우 처리 */
-          let v = el.value
           let st = Number(el.selectionStart || 0)
           let ed = Number(el.selectionEnd || 0)
           let ch = String(v).substring(st - 1, ed)
           // log.debug('CHAR:', `'${ch}'`, st, ed, v.length, kcode, v)
           if (vars?.itype === 'number' || vars?.itype === 'numeric') {
-            v = props?.rtformatter ? props.rtformatter(el.value) : v
+            v = props?.rtformatter ? props.rtformatter(v) : v
             if (props?.maxLength && v.length > props.maxLength) {
               v = props?.rtformatter ? props.rtformatter(vprev) : vprev
               v = vprev
@@ -355,7 +363,6 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           }
           setValue(inputVal(`${v}`))
         }
-
         if (props?.onKeyDown) { props.onKeyDown(e) }
         update(C.UPDATE_FULL)
         if (e?.keyCode === KEYCODE_TABLE.PC.Enter && props?.onEnter instanceof Function) { props.onEnter(e) }
@@ -370,13 +377,12 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
   }
   return (
   <>
-  {/* <div
-    ref={ vars?.wrap }
-    > */}
+  <span
+    className={ className() }
+    >
     <input
       { ...pprops }
       ref={ vars?.elem }
-      className={ className() }
       id={ app.ready() ? uid : C.UNDEFINED }
       maxLength={ props?.maxLength }
       type={ pprops?.type }
@@ -390,7 +396,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       placeholder={ pprops.placeholder }
       tabIndex={ props.tabIndex !== undefined ? props.tabIndex : 0 }
       />
-  {/* </div> */}
+  </span>
   </>
   )
 }, {

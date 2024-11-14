@@ -113,11 +113,9 @@ export default definePage(() => {
               vrules='auto|check2'
               />
           </Block>
-          <Block>
+          <Block className='form-block'>
             <div className="input-group">
-              <span className="form-control">
-                <Input />
-              </span>
+              <Input />
               <button className="btn btn-primary">
                 ABCD
               </button>
