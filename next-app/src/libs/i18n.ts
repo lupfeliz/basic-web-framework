@@ -138,6 +138,15 @@ $t.lang = changeLang
 $t.persist = persist
 $t.languages = languages
 $t.current = () => lngcur
+$t.initStatic = (lang: string, langdata: any) => {
+  lngcur = lang
+  setPersistedLang(lang)
+  fnc = (v: string) => {
+    let ret = C.UNDEFINED
+    if (langdata && langdata[v]) { ret = langdata[v] }
+    return ret
+  }
+}
 
 export default $t as typeof $t & {
   init: typeof initI18N

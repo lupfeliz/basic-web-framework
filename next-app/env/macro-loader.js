@@ -60,6 +60,7 @@ var _$GET_STATIC_PROPS = async (context) => {
   if (lang) {
     modpath = modpath.replace(/\\[lang\\]/g, lang);
     langdata = await import('@/locales/' + lang + '/commons');
+    if (langdata && langdata.default) { langdata = langdata.default; };
   };
   const props = { lang, modpath, langdata: JSON.stringify(langdata), filename: __filename };
   log.debug('CHECK:', modpath);

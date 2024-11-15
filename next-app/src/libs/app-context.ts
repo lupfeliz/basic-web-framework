@@ -272,41 +272,48 @@ const app = {
   definePage<A extends Function1<PagePropsType & Record<string, any>, any>, B, C extends A & B>(compo?: A, _opts?: B) {
     let page = C.UNDEFINED
     let opts: any = _opts
+    // let uid = app.genId()
     if (compo && compo instanceof Function) {
-      let pagevars = { } as Record<string, any>
       page = (_props: PagePropsType) => {
         let props: PagePropsType = C.UNDEFINED
         /** TODO: 필요한 메소드들을 바인드 한다. (렌더링이 진행될때마다 수행하므로 주의할것.) */
-        // if (!pagevars.props) {
-        //   let uid = app.genId()
-          if (_props) {
-            if (props?.router) {
-              // log.debug('PAGE-PROPS:', props.router.asPath)
-              appvars.router = props.router
-            }
-            /** 기존 i18n 초기화 부분은 이 부분으로 대체됨 */
-            if (props?.pageProps?.lang) {
-              try {
-                const lang = JSON.parse(props.pageProps.lang)
-                log.trace('I18N-LANG:', lang)
-              } catch (ignore) { }
-            }
-          } else {
-            _props = { } as any
+        if (_props) {
+          if (_props?.router) {
+            // log.debug('ROUTER:', _props.router)
+            appvars.router = _props.router
           }
-        //   pagevars.props = new Proxy(_props, {
-        //     get(t, p, r) {
-        //       switch (p) {
-        //       case 'uid': return uid
-        //       default: {
-        //       let ret = (t as any)[p]
-        //       return ret
-        //       } }
-        //     }
-        //   })
+        } else {
+          _props = { } as any
+        }
+        /** pagevars 가 ssr 컨텍스트에 남아있어 오류 발생 여지가 있음 (최초 리퀘스트에 의해 결정) */
+        /** TODO: 중복 프로세스를 줄일수 있는 방법 강구 필요 */
+        // if (!pagevars[uid]) {
+          /** 기존 i18n 초기화 부분은 이 부분으로 대체됨 */
+          if (_props?.pageProps?.lang && _props?.pageProps?.langdata) {
+            try {
+              const lang = _props.pageProps.lang
+              const langdata = JSON.parse(_props.pageProps.langdata)
+              if (lang && langdata) {
+                ($t as any).initStatic(lang, langdata)
+                log.trace('I18N-LANG:', lang, langdata)
+              }
+            } catch (e) {
+              log.debug('E:', e)
+            }
+          }
+        //   pagevars[uid] = { uid }
         // }
-        // let render = compo(pagevars.props)
-        let render = compo(_props)
+        props = new Proxy(_props, {
+          get(t, p, r) {
+            switch (p) {
+            // case 'uid': return uid
+            default: {
+            let ret = (t as any)[p]
+            return ret
+            } }
+          }
+        })
+        let render = compo(props)
         return render
       }
       if (opts) {
@@ -397,7 +404,7 @@ const app = {
         await crypto.aes.init(aeskey)
         /** TODO: URL 방식을 사용시 $t.init 부분이 필요 없음 */
         // log.debug('INIT I18N:', $t.current())
-        await $t.init(['commons', 'mai'])
+        await $t.init(['commons', 'mai'], props?.pageProps?.lang)
         appvars.astate = C.APPSTATE_ENV
         const userInfo = userContext.getUserInfo()
         if (userInfo?.userId && (userInfo.accessToken?.expireTime || 0) > clitime) { userContext.checkExpire() }

@@ -18,10 +18,11 @@ export default defineComponent(() => {
     name: COMPONENT,
     vars: {
       clsAside: '',
-      lang: C.KO
+      lang: $t.current() || C.KO
     },
     async mounted() {
-      vars.lang = app.$t.persist() || C.KO
+      // vars.lang = app.$t.persist() || C.KO
+      vars.lang = $t.current() || C.KO
       update()
     }
   })

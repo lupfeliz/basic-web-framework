@@ -18,6 +18,7 @@ export default definePage((props) => {
   return (
   <Page>
     <div>{ getParameter('lang') }</div>
+    <div>{ $t('CMN0004') }</div>
   </Page>
   )
 })
