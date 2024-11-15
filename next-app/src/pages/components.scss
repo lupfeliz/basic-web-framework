@@ -29,8 +29,12 @@ html#my-first-app {
       }
     }
 
+    .input-group-text {
+      border-color: var(--bs-border-color);
+    }
+
     /******************************************************************************/
-    /** 슬라이더 */
+    /** Select(Dropdown) */
     /******************************************************************************/
     .dropdown {
       > button.dropdown-toggle {
@@ -38,6 +42,25 @@ html#my-first-app {
         display: flex;
         justify-content: space-between;
         align-items: center;
+      }
+    }
+    .input-group {
+      .dropdown {
+        > .dropdown-toggle {
+          border-radius: 0;
+        }
+        &:nth-child(1) {
+          > .dropdown-toggle {
+            border-top-left-radius: var(--bs-border-radius);
+            border-bottom-left-radius: var(--bs-border-radius);
+          }
+        }
+        &:last-child {
+          > .dropdown-toggle {
+            border-top-right-radius: var(--bs-border-radius);
+            border-bottom-right-radius: var(--bs-border-radius);
+          }
+        }
       }
     }
     /******************************************************************************/

@@ -414,7 +414,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     return (
       <div
         { ...props }
-        className={ strm(`input-group ${props.className}`) }
+        className={ strm(`input-group ${props.className || ''}`) }
         >
         { ...props.children }
       </div>

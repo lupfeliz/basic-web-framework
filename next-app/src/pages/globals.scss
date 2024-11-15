@@ -113,29 +113,6 @@ html#my-first-app {
               margin-right: 0.5rem;
             }
 
-            > label[for] + div.form-element.email {
-              > div.input-group {
-                > input:nth-child(1) {
-                  width: calc(50% - 1rem);
-                }
-                > span:nth-child(2) {
-                  display: inline-block;
-                  width: 2rem;
-                  padding: 0.5rem 0 0 0;
-                  text-align: center;
-                  border: 0;
-                }
-                > div:nth-child(3) {
-                  width: calc(50% - 1rem);
-                  > button {
-                    border-top-left-radius: 0;
-                    border-bottom-left-radius: 0;
-                    width: 100%;
-                  }
-                }
-              }
-            }
-
             > label[for] + div.form-element.editor {
               > div > div[contenteditable] {
                 border: 1px solid #ccc;

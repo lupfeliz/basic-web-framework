@@ -452,8 +452,10 @@ const values = {
     return ret
   },
   item(a: any[] | undefined, i: number, v?: any) {
-    if (a && i !== undefined && i >= 0 && a[i]) {
-      if (v) { a[i] = v }
+    if (a && a instanceof Array && i !== undefined) {
+      if (i < 0) { i = a.length + i }
+      if (i < 0) { return v }
+      if (v !== undefined) { a[i] = v }
       return a[i]
     }
     return v

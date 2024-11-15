@@ -53,9 +53,11 @@ export default definePage(() => {
       }
     },
     async updated() {
-      if (vars.emailHosts.length > 1) {
-        vars.emailHosts[0] = C.SELECT_ITEM_EMPTY($t)
-        vars.emailHosts[vars.emailHosts.length - 1] = C.SELECT_ITEM_MANUAL($t)
+      const { item } = app
+      const list = vars.emailHosts
+      if (list.length > 1) {
+        item(list, 0, C.SELECT_ITEM_EMPTY($t))
+        item(list, -1, C.SELECT_ITEM_MANUAL($t))
       }
     }
   })
@@ -265,14 +267,14 @@ export default definePage(() => {
               size='large'
               onClick={ submit }
               >
-              완료
+              { `${$t('CMN0015') || '완료'}` }
             </Button>
             <Button
               className='mx-1'
               variant='outline-secondary'
               size='large'
               >
-              취소
+              { `${$t('CMN0002') || '취소'}` }
             </Button>
           </Block>
         </article>

@@ -27,14 +27,14 @@ export default definePage(() => {
       iddupchk: false,
       emailSelector: 'select',
       emailHosts: [
-        { name: '선택해 주세요', value: '' },
+        C.SELECT_ITEM_EMPTY(),
         'gmail.com',
         'naver.com',
         'daum.net',
         'kakao.com',
         'hotmail.com',
         'icloud.com',
-        { name: '직접입력', value: '_' },
+        C.SELECT_ITEM_MANUAL(),
       ]
     },
     /** email 등 저장하고 있지 않은 개인정보를 표시하기 위해 불러들임 */
@@ -47,6 +47,14 @@ export default definePage(() => {
         vars.formdata.emailHost = email[5]
       }
       update(C.UPDATE_ENTIRE)
+    },
+    async updated() {
+      const { item } = app
+      const list = vars.emailHosts
+      if (list.length > 1) {
+        item(list, 0, C.SELECT_ITEM_EMPTY($t))
+        item(list, -1, C.SELECT_ITEM_MANUAL($t))
+      }
     }
   })
   const { update, vars, ready } = self()
@@ -140,7 +148,7 @@ export default definePage(() => {
           </Block>
           <Block className='form-block'>
             <label htmlFor='frm-email'>이메일</label>
-            <Block className='form-element email'>
+            <Input.Group>
             <Input
               id='frm-email'
               model={ vars.formdata }
@@ -149,7 +157,7 @@ export default definePage(() => {
               maxLength={ 30 }
               size='small'
               />
-            <span>@</span>
+            <span className="input-group-text">@</span>
             { matcher(vars?.emailSelector, 'select', 
               'select', (
                 <Select
@@ -169,7 +177,7 @@ export default definePage(() => {
                   />
               )
             ) }
-            </Block>
+            </Input.Group>
           </Block>
           <hr/>
           <Block className='buttons'>
@@ -179,7 +187,7 @@ export default definePage(() => {
               size='large'
               onClick={ submit }
               >
-              완료
+              { `${$t('CMN0015') || '완료'}` }
             </Button>
             <Button
               className='mx-1'
@@ -187,7 +195,7 @@ export default definePage(() => {
               size='large'
               onClick={ () => goPage(-1) }
               >
-              취소
+              { `${$t('CMN0002') || '취소'}` }
             </Button>
           </Block>
         </article>

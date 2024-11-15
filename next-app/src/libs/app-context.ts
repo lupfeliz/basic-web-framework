@@ -273,25 +273,40 @@ const app = {
     let page = C.UNDEFINED
     let opts: any = _opts
     if (compo && compo instanceof Function) {
+      let pagevars = { } as Record<string, any>
       page = (_props: PagePropsType) => {
         let props: PagePropsType = C.UNDEFINED
-        if (_props) {
-          /** TODO: 필요한 메소드들을 바인드 한다. (렌더링이 진행될때마다 수행하므로 주의할것.) */
-          if (props?.router) {
-            // log.debug('PAGE-PROPS:', props.router.asPath)
-            appvars.router = props.router
+        /** TODO: 필요한 메소드들을 바인드 한다. (렌더링이 진행될때마다 수행하므로 주의할것.) */
+        // if (!pagevars.props) {
+        //   let uid = app.genId()
+          if (_props) {
+            if (props?.router) {
+              // log.debug('PAGE-PROPS:', props.router.asPath)
+              appvars.router = props.router
+            }
+            /** 기존 i18n 초기화 부분은 이 부분으로 대체됨 */
+            if (props?.pageProps?.lang) {
+              try {
+                const lang = JSON.parse(props.pageProps.lang)
+                log.trace('I18N-LANG:', lang)
+              } catch (ignore) { }
+            }
+          } else {
+            _props = { } as any
           }
-          /** 기존 i18n 초기화 부분은 이 부분으로 대체됨 */
-          if (props?.pageProps?.lang) {
-            try {
-              const lang = JSON.parse(props.pageProps.lang)
-              log.trace('I18N-LANG:', lang)
-            } catch (ignore) { }
-          }
-          props = new Proxy(_props, {
-          })
-        }
-        let render = compo(props)
+        //   pagevars.props = new Proxy(_props, {
+        //     get(t, p, r) {
+        //       switch (p) {
+        //       case 'uid': return uid
+        //       default: {
+        //       let ret = (t as any)[p]
+        //       return ret
+        //       } }
+        //     }
+        //   })
+        // }
+        // let render = compo(pagevars.props)
+        let render = compo(_props)
         return render
       }
       if (opts) {

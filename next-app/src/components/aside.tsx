@@ -17,7 +17,7 @@ type AsideProps = {
 }
 
 const COMPONENT = 'aside'
-const { getLogger, defineComponent, useSetup, goPage, strm } = app
+const { getLogger, defineComponent, useSetup, goPage, strm, $t } = app
 const log = getLogger(COMPONENT)
 
 export default defineComponent((props: AsideProps) => {
@@ -66,7 +66,7 @@ export default defineComponent((props: AsideProps) => {
           <Button
             href={'/'}
             >
-            홈
+            { $t('CMN0017') || '메인 페이지' }
           </Button>
           </li>
           { ready() && !(userInfo?.userId) ? (
@@ -75,14 +75,14 @@ export default defineComponent((props: AsideProps) => {
             <Button
               href={'/lgn/lgn01001s01'}
               >
-              로그인
+              { $t('CMN0009') || '로그인' }
             </Button>
             </li>
             <li className='nav-item'>
             <Button
               href={'/usr/usr01001s01'}
               >
-              회원가입
+              { $t('CMN0010') || '회원가입' }
             </Button>
             </li>
           </>
@@ -115,7 +115,7 @@ export default defineComponent((props: AsideProps) => {
           <Button
             href='/atc/atc01001s04/1'
             >
-            게시판
+            { $t('CMN0016') || '게시판' }
           </Button>
           </li>
         </ul>
