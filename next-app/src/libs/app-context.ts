@@ -70,6 +70,8 @@ const ctx: ContextType<LauncherProps<any, any>> = { }
 
 const { publicRuntimeConfig: runtime } = getConfig()
 
+const { isClient, isServer } = misc
+
 /** 메소드 별도선언시 WEBPACK 난독화에 도움이 된다 */
 const decryptAES = (v: string, k: string) => JSON.parse(cjaes.decrypt(v, k).toString(cjenc.Utf8))
 
@@ -114,7 +116,7 @@ const appContextSlice = createSlice({
 const appContextStore = configureStore({ reducer: appContextSlice.reducer })
 /** Ripple Effect */
 const applyRipple = debounce(() => {
-  if (!app.isServer()) {
+  if (!isServer()) {
     setTimeout(async () => {
       await until(() => app.ready())
       $('.ripple-surface').each((_, e) => { !e.classList.contains('mdc-ripple-upgraded') && new MDCRipple(e) })
@@ -147,7 +149,7 @@ const app = {
     const [phase, setPhase] = React.useState(0)
     const [, setState] = React.useState(0)
     ctx[uid] = putAll(ctx[uid] || { uid, name: prm?.name, vars: prm?.vars || {}, releaselist: [] }, { props: prm?.props || {}, phase })
-    if (app.isServer() && (o = prm?.props) && o &&
+    if (isServer() && (o = prm?.props) && o &&
       (o?.Component && o.pageProps && o?.router?.asPath)) {
       const props = o
       let basepath = '/' + getConfig()?.app?.distDir || 'dist'
@@ -273,29 +275,28 @@ const app = {
   definePage<A extends Function1<PagePropsType & Record<string, any>, any>, B, C extends A & B>(compo?: A, _opts?: B) {
     let page = C.UNDEFINED
     let opts: any = _opts
-    // let uid = app.genId()
+    let uid = app.genId()
     if (compo && compo instanceof Function) {
       page = (_props: PagePropsType) => {
         let props: PagePropsType = C.UNDEFINED
-        /** TODO: 필요한 메소드들을 바인드 한다. (렌더링이 진행될때마다 수행하므로 주의할것.) */
+        /** 필요한 메소드들을 수행 한다. (렌더링이 진행될때마다 수행하므로 주의) */
         if (_props) {
           if (_props?.router) {
-            // log.debug('ROUTER:', _props.router)
             appvars.router = _props.router
           }
         } else {
           _props = { } as any
         }
         /** 기존 i18n 초기화 부분은 이 부분으로 대체됨, 서버일경우 항상 수행되며, 클라이언트일경우 한번만 수행 */
-        if (app.isServer() || (app.isClient() && !appvars.i18n)) {
-          if (app.isClient()) { appvars.i18n = true }
+        if (isServer() || (isClient() && !appvars.i18n)) {
+          if (isClient()) { appvars.i18n = true }
           if (_props?.pageProps?.lang && _props?.pageProps?.langdata) {
             try {
               const lang = _props.pageProps.lang
               const langdata = JSON.parse(_props.pageProps.langdata)
               if (lang && langdata) {
                 ($t as any).initStatic(lang, langdata)
-                log.debug('I18N-LANG:', lang, langdata)
+                log.trace('I18N-LANG:', lang, langdata)
               }
             } catch (e) {
               log.debug('E:', e)
@@ -305,7 +306,7 @@ const app = {
         props = new Proxy(_props, {
           get(t, p, r) {
             switch (p) {
-            // case 'uid': return uid
+            case 'uid': return uid
             default: {
             let ret = (t as any)[p]
             return ret
@@ -516,14 +517,14 @@ const app = {
   },
   setGlobalTmp(value: any) {
     const tid = randomStr(10, C.ALPHANUM)
-    if (!app.isServer()) {
+    if (!isServer()) {
       (window as any)[tid] = () => value
     }
     return tid
   },
   getGlobalTmp(tid: string) {
     let ret: any = C.UNDEFINED
-    if (!app.isServer()) {
+    if (!isServer()) {
       const win: any = window
       if (win[tid]) {
         ret = win[tid]
@@ -537,7 +538,7 @@ const app = {
   },
   setOpenerTmp(value: any) {
     const tid = randomStr(10, C.ALPHANUM)
-    if (!app.isServer()) {
+    if (!isServer()) {
       const win: any = window
       if (win && win.opener) {
         win.opener[tid] = () => value
@@ -547,7 +548,7 @@ const app = {
   },
   getOpenerTmp(tid: string) {
     let ret: any = C.UNDEFINED
-    if (!app.isServer()) {
+    if (!isServer()) {
       const win: any = window
       if (win.opener && win.opener[tid]) {
         ret = win.opener[tid]
@@ -657,7 +658,7 @@ var FNC_WAIT_CSS_LOADING = (htmlid: string, duration: number = 1000) => `
 </script>
 `.replace(/[ \r\n\t]+/gm, ' ').trim()
 
-if (app.isServer()) {
+if (isServer()) {
   app.getParameter = (key? : string, props?: any) => {
     let ret: any = C.UNDEFINED
     let router = props?.router || appvars.router || undefined
