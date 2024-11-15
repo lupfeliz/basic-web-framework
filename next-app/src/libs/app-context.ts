@@ -90,6 +90,7 @@ const appvars = {
     runtime
   },
   global: { } as any,
+  i18n: false,
   MaterialStyle: {} as any
 }
 
@@ -285,24 +286,22 @@ const app = {
         } else {
           _props = { } as any
         }
-        /** pagevars 가 ssr 컨텍스트에 남아있어 오류 발생 여지가 있음 (최초 리퀘스트에 의해 결정) */
-        /** TODO: 중복 프로세스를 줄일수 있는 방법 강구 필요 */
-        // if (!pagevars[uid]) {
-          /** 기존 i18n 초기화 부분은 이 부분으로 대체됨 */
+        /** 기존 i18n 초기화 부분은 이 부분으로 대체됨, 서버일경우 항상 수행되며, 클라이언트일경우 한번만 수행 */
+        if (app.isServer() || (app.isClient() && !appvars.i18n)) {
+          if (app.isClient()) { appvars.i18n = true }
           if (_props?.pageProps?.lang && _props?.pageProps?.langdata) {
             try {
               const lang = _props.pageProps.lang
               const langdata = JSON.parse(_props.pageProps.langdata)
               if (lang && langdata) {
                 ($t as any).initStatic(lang, langdata)
-                log.trace('I18N-LANG:', lang, langdata)
+                log.debug('I18N-LANG:', lang, langdata)
               }
             } catch (e) {
               log.debug('E:', e)
             }
           }
-        //   pagevars[uid] = { uid }
-        // }
+        }
         props = new Proxy(_props, {
           get(t, p, r) {
             switch (p) {

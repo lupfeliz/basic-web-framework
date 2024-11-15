@@ -16,11 +16,12 @@ export default definePage((props) => {
     async updated() {
       log.debug('CHECK-LANG:', $t.current(), $t('CMN0004'))
     }
-  }, props)
+  })
   const { update, vars, ready } = self()
   return (
   <Page>
     <div>{ getParameter('lang') }</div>
+    <div>{ $t.current() }</div>
     <div>{ $t('CMN0004') }</div>
   </Page>
   )
