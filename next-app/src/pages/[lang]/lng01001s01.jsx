@@ -12,6 +12,9 @@ export default definePage((props) => {
   const self = useSetup({
     async mounted() {
       log.debug('PROPS:', props.pageProps)
+    },
+    async updated() {
+      log.debug('CHECK-LANG:', $t.current(), $t('CMN0004'))
     }
   }, props)
   const { update, vars, ready } = self()

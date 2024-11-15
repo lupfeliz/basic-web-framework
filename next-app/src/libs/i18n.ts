@@ -120,13 +120,19 @@ async function getTranslation(ns: string[] | string, lang?: string, opt: any = {
   lngcur = lang
   if (!inst) { inst = await initI18next(ns, lang) }
   await inst.changeLanguage(lngcur)
-  fnc = inst.getFixedT(lang, Array.isArray(ns) ? ns[0] : ns, opt.keyPrefix)
+  const _fnc = inst.getFixedT(lang, Array.isArray(ns) ? ns[0] : ns, opt.keyPrefix)
+  fnc = (v: string) => {
+    let ret = _fnc(v)
+    // log.debug('DYNAMIC-I18N:', v, ret)
+    return ret
+  }
   return { t: fnc, i18n: inst }
 }
 
 var inst = C.UNDEFINED as i18n
 var fnc: any = (_: any) => ''
 var $t: any = (v: string) => {
+  /** FIXME: $t 호출시 정적 fnc 가 있는경우 동적 fnc 호출이 되지 않는 현상 수정 필요 */
   // log.trace('I18N-GET:', nscur, lngcur, v, fnc(v))
   return fnc(v) || C.UNDEFINED
 }
@@ -144,6 +150,7 @@ $t.initStatic = (lang: string, langdata: any) => {
   fnc = (v: string) => {
     let ret = C.UNDEFINED
     if (langdata && langdata[v]) { ret = langdata[v] }
+    // log.debug('STATIC-I18N:', v, ret)
     return ret
   }
 }
