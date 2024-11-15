@@ -406,6 +406,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       placeholder={ pprops.placeholder }
       tabIndex={ props.tabIndex !== undefined ? props.tabIndex : 0 }
       />
+    {/* <span className='xmark'><i className='bi bi-backspace'></i></span> */}
   </span>
   </>
   )

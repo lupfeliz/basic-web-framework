@@ -9,6 +9,7 @@ html#my-first-app {
   body {
 
     span.form-control {
+      display: flex;
       &.focused {
         color: var(--bs-body-color);
         background-color: var(--bs-body-bg);
@@ -26,6 +27,9 @@ html#my-first-app {
         &:focus {
           box-shadow: none;
         }
+      }
+      & > span.xmark {
+
       }
     }
 
