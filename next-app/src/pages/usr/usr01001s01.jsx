@@ -203,7 +203,7 @@ export default definePage(() => {
               label='비밀번호 확인'
               placeholder='비밀번호확인'
               minLength={ 4 }
-              maxLength={ 30 }
+              maxLength={ 20 }
               size='small'
               required
               vrules='auto|password|passwd2chk'
@@ -222,7 +222,7 @@ export default definePage(() => {
                 label='이메일 아이디'
                 placeholder='이메일 아이디'
                 minLength={ 2 }
-                maxLength={ 30 }
+                maxLength={ 20 }
                 size='small'
                 required
                 vrules='auto|emailchk'
@@ -249,7 +249,7 @@ export default definePage(() => {
                     name='emailHost'
                     label='이메일 호스트'
                     minLength={ 4 }
-                    maxLength={ 30 }
+                    maxLength={ 20 }
                     size='small'
                     required
                     vrules='auto'
@@ -273,6 +273,7 @@ export default definePage(() => {
               className='mx-1'
               variant='outline-secondary'
               size='large'
+              onClick={ () => goPage(-1) }
               >
               { `${$t('CMN0002') || '취소'}` }
             </Button>
