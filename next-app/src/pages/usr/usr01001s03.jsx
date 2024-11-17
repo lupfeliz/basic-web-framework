@@ -82,7 +82,7 @@ export default definePage(() => {
         let model = clone(vars.formdata)
         model.email = `${model.emailId}@${model.emailHost}`
         model = copyExists(clone(uschema), model)
-        model.passwd = encrypt(model.passwd)
+        if (model.passwd) { model.passwd = encrypt(model.passwd) }
         log.debug('SUBMIT-MODEL:', model)
         let res = await api.put(`usr01002`, model)
         log.debug('RES:', res)
