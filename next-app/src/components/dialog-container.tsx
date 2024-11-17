@@ -36,7 +36,7 @@ const formatTime = (v: number, fmt: string = C.UNDEFINED) => {
 const authConfirm = async (v: number) => {
   switch(v) {
   case 1: {
-    // await userContext.checkLogin()
+    userContext.tokenRefresh()
     setTimeout(() => dialog.authModal({ visible: false }), 500)
   } break
   case 2: {
@@ -114,9 +114,9 @@ export default defineComponent((props: any, ref?: any) => {
       <Spinner/>
     </Modal>
     <Modal
-      open={ dstate().authmodal.visible }
+      show={ dstate().authmodal.visible }
       className={ 'no-tran auth-modal modal_alert' }
-      ref={vars.authmodal.element}
+      ref={ vars.authmodal.element }
       >
       <Modal.Body>
         <Content

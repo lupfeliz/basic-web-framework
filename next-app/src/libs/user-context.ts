@@ -103,11 +103,7 @@ const userContext = {
     if ((accessToken?.value && accessToken?.expireTime <
       (current + C.EXPIRE_NOTIFY_TIME - C.EXTRA_TIME)) && !userInfo?.notifyExpire
       ) {
-      if (await dialog.confirm(`인증이 ${Math.ceil((accessToken?.expireTime - current) / 1000 / 60)}분 안에 만료됩니다. 연장하시겠어요?`)) {
-        userContext.tokenRefresh()
-      } else {
-        userContext.setUserInfo({ notifyExpire: true })
-      }
+      dialog.authModal({ visible: true })
     }
     if (accessToken?.value && accessToken?.expireTime < (current - C.EXTRA_TIME)) {
       log.debug('ACCESS-TOKEN EXPIRED')

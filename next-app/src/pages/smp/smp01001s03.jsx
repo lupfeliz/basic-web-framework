@@ -151,13 +151,6 @@ export default definePage((props) => {
       STORE1.subscribe((v) => { update(C.UPDATE_SELF) })
       store2.subscribe((v) => { update(C.UPDATE_SELF) })
       store3.subscribe((v) => { update(C.UPDATE_SELF) })
-      putAll(window, {
-        SLICE1: slice1,
-        SLICE2: slice2,
-        STORE1: STORE1,
-        STORE2: store2,
-        STORE3: store3,
-      })
     }
   })
 

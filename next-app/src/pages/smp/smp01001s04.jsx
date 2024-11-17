@@ -41,11 +41,6 @@ export default definePage(() => {
     },
     async mounted() {
       log.debug('SMP01001S04 MOUNTED!')
-      putAll(window, {
-        JQ,
-        UPDATE: update,
-        VARS: vars
-      })
     },
     async updated(mode) {
       log.debug('SMP-UPDATED..', mode)
