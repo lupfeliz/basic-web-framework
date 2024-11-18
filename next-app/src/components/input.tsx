@@ -66,7 +66,11 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         isValidated: false,
         isValid: C.UNDEFINED,
         message: C.UNDEFINED,
-      } as ValidationType
+      } as ValidationType,
+      buttons: [
+        useRef(),
+        useRef()
+      ]
     },
     async mounted() {
       copyRef(ref, vars?.elem)
@@ -380,6 +384,34 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       }, 50)
     }
   }
+  const onClickButton = async (e: any) => {
+    log.debug('E:', e?.target, e)
+    switch (e.type) {
+    case 'click': {
+    } break
+    case 'keydown': {
+      if (!(e.keyCode === 13)) {
+        return
+      }
+    } break
+    }
+    for (let binx = 0; binx < vars.buttons.length; binx++) {
+      if (
+        e?.target == vars.buttons[binx].current ||
+        e?.target?.parentElement == vars.buttons[binx].current
+        ) {
+        switch(binx) {
+        case 0: {
+          /** 삭제버튼 */
+          modelValue(self()).setValue(inputVal(''), () => update(C.UPDATE_FULL))
+          setTimeout(() => $(vars.elem.current).trigger('focus'), 1)
+        } break
+        case 1: {
+        } break
+        }
+      }
+    }
+  }
   const className = () => {
     let ret = ''
     ret = strm(`form-control ${props?.className || ''}`)
@@ -405,8 +437,28 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       onKeyDown={ onKeyDown }
       placeholder={ pprops.placeholder }
       tabIndex={ props.tabIndex !== undefined ? props.tabIndex : 0 }
+      // autoComplete='off'
       />
-    {/* <span className='xmark'><i className='bi bi-backspace'></i></span> */}
+      <span>
+        <a className='xmark'
+          role='button'
+          tabIndex={ 0 }
+          onBlur={ onBlur }
+          onFocus={ onFocus }
+          onClick={ onClickButton }
+          onKeyDown={ onClickButton }
+          ref={ vars.buttons[0] as any }
+          >
+          <i className='bi bi-backspace'></i>
+        </a>
+        {/* <a className='vmark'
+          role='button'
+          tabIndex={ 0 }
+          ref={ vars.buttons[1] as any }
+          >
+          <i className='bi bi-eye'></i>
+        </a> */}
+      </span>
   </span>
   </>
   )

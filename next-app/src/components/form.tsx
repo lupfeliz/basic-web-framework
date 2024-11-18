@@ -593,7 +593,13 @@ export default defineComponent((props: FormProps, ref: FormProps['ref'] & any) =
       log.trace('COPY-REF:', ref)
     }
   })
-  return (<form>{ pprops.children }</form>)
+  return (
+  <form
+    // autoComplete='off'
+    >
+    { pprops.children }
+  </form>
+  )
 }, {
   displayName: COMPONENT,
   Message

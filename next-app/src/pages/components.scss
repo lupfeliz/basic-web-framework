@@ -28,8 +28,20 @@ html#my-first-app {
           box-shadow: none;
         }
       }
-      & > span.xmark {
-
+      & > input + span {
+        opacity: 0;
+        display: flex;
+        margin-right: -0.2rem;
+        > a {
+          margin-left: 0.4rem;
+          cursor: pointer;
+          &:first-child {
+            margin-left: 0;
+          }
+        }
+      }
+      &.focused > input + span {
+        opacity: 1;
       }
     }
 
