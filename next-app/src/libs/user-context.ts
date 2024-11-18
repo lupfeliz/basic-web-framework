@@ -110,6 +110,7 @@ const userContext = {
       if (accessToken.value && accessToken?.expireTime >= 0) {
         expired = true
         userContext.logout()
+        dialog.authModal({ visible: false })
         await dialog.alert('로그아웃 되었어요')
         app.goPage('/')
       }
