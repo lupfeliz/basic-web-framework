@@ -35,6 +35,7 @@ html#my-first-app {
         > a {
           margin-left: 0.4rem;
           cursor: pointer;
+          padding: 0 0.1rem 0 0.1rem;
           &:first-child {
             margin-left: 0;
           }

@@ -68,8 +68,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
         message: C.UNDEFINED,
       } as ValidationType,
       buttons: [
-        useRef(),
-        useRef()
+        { vis: false, ref: useRef() },
+        { vis: false, ref: useRef() }
       ]
     },
     async mounted() {
@@ -385,7 +385,7 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     }
   }
   const onClickButton = async (e: any) => {
-    log.debug('E:', e?.target, e)
+    log.trace('E:', e?.target, e)
     switch (e.type) {
     case 'click': {
     } break
@@ -397,8 +397,8 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
     }
     for (let binx = 0; binx < vars.buttons.length; binx++) {
       if (
-        e?.target == vars.buttons[binx].current ||
-        e?.target?.parentElement == vars.buttons[binx].current
+        e?.target == vars.buttons[binx].ref.current ||
+        e?.target?.parentElement == vars.buttons[binx].ref.current
         ) {
         switch(binx) {
         case 0: {
@@ -407,6 +407,19 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           setTimeout(() => $(vars.elem.current).trigger('focus'), 1)
         } break
         case 1: {
+          /** 비밀번호 보기버튼 */
+          if (vars?.elem?.current) {
+            const $el = $(vars?.elem?.current)
+            const $mk = $(vars.buttons[1].ref.current as any).find('i')
+            log.debug('CHECK-TYPE:', $el.attr('type'), $mk)
+            if ($el.attr('type') === 'password') {
+              $el.attr('type', 'text')
+              $mk.removeClass('bi-eye').addClass('bi-eye-slash')
+            } else {
+              $el.attr('type', 'password')
+              $mk.removeClass('bi-eye-slash').addClass('bi-eye')
+            }
+          }
         } break
         }
       }
@@ -447,17 +460,23 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
           onFocus={ onFocus }
           onClick={ onClickButton }
           onKeyDown={ onClickButton }
-          ref={ vars.buttons[0] as any }
+          ref={ vars.buttons[0].ref as any }
           >
           <i className='bi bi-backspace'></i>
         </a>
-        {/* <a className='vmark'
+        { vars?.itype === 'password' && (
+        <a className='vmark'
           role='button'
           tabIndex={ 0 }
-          ref={ vars.buttons[1] as any }
+          onBlur={ onBlur }
+          onFocus={ onFocus }
+          onClick={ onClickButton }
+          onKeyDown={ onClickButton }
+          ref={ vars.buttons[1].ref as any }
           >
           <i className='bi bi-eye'></i>
-        </a> */}
+        </a>
+        ) }
       </span>
   </span>
   </>
