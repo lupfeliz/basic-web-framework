@@ -10,12 +10,12 @@ package my.was.mywas.works.lgn;
 import static com.ntiple.commons.ConvertUtil.array;
 import static com.ntiple.commons.ConvertUtil.convert;
 import static com.ntiple.commons.ConvertUtil.tomap;
+import static com.ntiple.commons.WebUtil.curRequest;
+import static com.ntiple.commons.WebUtil.remoteAddr;
 import static my.was.mywas.commons.Constants.EXTRA_INFO;
 import static my.was.mywas.commons.Constants.TOK_TYP_ACC;
 import static my.was.mywas.commons.Constants.TOK_TYP_REF;
-import static my.was.mywas.commons.WebUtils.curRequest;
-import static my.was.mywas.commons.WebUtils.getAuthToken;
-import static my.was.mywas.commons.WebUtils.remoteAddr;
+import static my.was.mywas.works.cmn.CommonService.getAuthToken;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -125,7 +125,7 @@ public class LoginService {
 
   /** 로그인 연장 */
   public AuthResult lgn01002a01() {
-    HttpServletRequest req = curRequest();
+    HttpServletRequest req = curRequest(req = null);
     String refreshToken = getAuthToken(req);
     AuthResult ret = new AuthResult();
     try {

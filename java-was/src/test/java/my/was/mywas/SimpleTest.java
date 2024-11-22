@@ -1,6 +1,8 @@
 package my.was.mywas;
 
 import static com.ntiple.commons.Constants.UTF8;
+import static com.ntiple.commons.HttpUtil.httpWorker;
+import static com.ntiple.commons.IOUtils.readAsString;
 import static com.ntiple.commons.ReflectionUtil.cast;
 import static com.ntiple.commons.StringUtil.cat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -996,11 +998,14 @@ public class SimpleTest {
 
   @Test public void testSimpleHttp() throws Exception {
     if (!TestUtil.isEnabled("testSimpleHttp", TestLevel.MANUAL)) { return; }
-    String result = HttpUtil.respContentStr(
-      HttpUtil.execute(
-        HttpUtil.httpClient(), null, new HttpGet("https://gitlab.ntiple.com"),
-        null, HttpResponse.class
-      ));
-    log.debug("RESULT:{}", result);
+    StringBuilder sb = new StringBuilder();
+    httpWorker("https://gitlab.ntiple.com")
+      .work((s, i, h, c) -> {
+        try {
+          sb.append(readAsString(i));
+        } catch (Exception e) { log.debug("E:{}", e); }
+        return sb;
+      });
+    log.debug("CONTENT:{}", sb);
   }
 }

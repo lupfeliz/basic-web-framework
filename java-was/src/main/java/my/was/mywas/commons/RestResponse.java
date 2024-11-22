@@ -9,13 +9,13 @@ package my.was.mywas.commons;
 
 import static com.ntiple.commons.ReflectionUtil.cast;
 import static com.ntiple.commons.StringUtil.cat;
+import static com.ntiple.commons.WebUtil.curRequest;
+import static com.ntiple.commons.WebUtil.remoteAddr;
 import static my.was.mywas.commons.Constants.AUTHORIZATION;
 import static my.was.mywas.commons.Constants.BEARER;
 import static my.was.mywas.commons.Constants.CONTENT_TYPE;
 import static my.was.mywas.commons.Constants.CTYPE_HTML;
-import static my.was.mywas.commons.WebUtils.curRequest;
-import static my.was.mywas.commons.WebUtils.remoteAddr;
-import static my.was.mywas.commons.WebUtils.secureOut;
+import static my.was.mywas.works.cmn.CommonService.secureOut;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -51,7 +51,7 @@ public class RestResponse {
     SystemSettings settings = instance.settings;
     Object res = null;
     try {
-      HttpServletRequest req = curRequest();
+      HttpServletRequest req = curRequest(req = null);
       String ipaddr = remoteAddr(req);
       String uri = req.getRequestURI();
       log.trace("IP:{} / URI:{} / IS-ADMIN:{} / USER-ID:{} / EXTRA:{}", ipaddr, uri);

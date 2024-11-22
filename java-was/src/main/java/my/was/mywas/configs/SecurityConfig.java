@@ -8,7 +8,7 @@
 package my.was.mywas.configs;
 
 import static my.was.mywas.commons.Constants.TOK_TYP_ACC;
-import static my.was.mywas.commons.WebUtils.getAuthToken;
+import static my.was.mywas.works.cmn.CommonService.getAuthToken;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
