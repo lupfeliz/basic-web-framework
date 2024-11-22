@@ -90,6 +90,8 @@ springdoc:
     operations-sorter: alpha
 
 logging:
+  file:
+    path: "log"
+    filename: "was.log"
   level:
-    root: DEBUG
-    org.springframework.boot: INFO
+    root: INFO
