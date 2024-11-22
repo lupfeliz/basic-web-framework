@@ -7,8 +7,8 @@
  **/
 package my.was.mywas.commons;
 
-import static com.ntiple.commons.ConvertUtil.cast;
-import static com.ntiple.commons.ConvertUtil.cat;
+import static com.ntiple.commons.ReflectionUtil.cast;
+import static com.ntiple.commons.StringUtil.cat;
 import static my.was.mywas.commons.Constants.AUTHORIZATION;
 import static my.was.mywas.commons.Constants.BEARER;
 import static my.was.mywas.commons.Constants.CONTENT_TYPE;

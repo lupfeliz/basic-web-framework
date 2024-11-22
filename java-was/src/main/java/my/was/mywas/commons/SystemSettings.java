@@ -7,7 +7,7 @@
  **/
 package my.was.mywas.commons;
 
-import static com.ntiple.commons.ConvertUtil.cast;
+import static com.ntiple.commons.ReflectionUtil.cast;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

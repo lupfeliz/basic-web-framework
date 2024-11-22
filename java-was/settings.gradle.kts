@@ -5,4 +5,26 @@
  * For more detailed information on multi-project builds, please refer to https://docs.gradle.org/8.2.1/userguide/building_swift_projects.html in the Gradle documentation.
  */
 
+import java.util.*
+import java.io.*
+
+var NEXUS_GRADLE_PLUGIN_REPO = System.getenv("NEXUS_GRADLE_PLUGIN_REPO")
+var CURRENT_DIR = System.getProperty("user.dir")
+var DOTENV = Properties()
+
+var ENVFILE = File(CURRENT_DIR + "/.env")
+if (ENVFILE.exists()) {
+  DOTENV.load(ENVFILE.inputStream())
+  var nexusRepo = DOTENV.getProperty("NEXUS_GRADLE_PLUGIN_REPO")
+  if (nexusRepo != null && !"".equals(nexusRepo)) { NEXUS_GRADLE_PLUGIN_REPO = nexusRepo }
+}
+if (NEXUS_GRADLE_PLUGIN_REPO != null && !"".equals(NEXUS_GRADLE_PLUGIN_REPO)) {
+  pluginManagement {
+    repositories {
+      maven(url = NEXUS_GRADLE_PLUGIN_REPO).isAllowInsecureProtocol = true
+      gradlePluginPortal()
+    }
+  }
+}
+
 rootProject.name = "my-was"

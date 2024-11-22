@@ -16,6 +16,10 @@
  * 테스트
  * sh gradlew cleanTest test -Dbuild.testlvl=MANUAL -i --no-watch-fs --tests "my.was.mywas.SimpleTest.testCrypto"  > test.log
  **/
+
+import java.util.*
+import java.io.*
+
 plugins {
   id("java")
   id("war")
@@ -45,9 +49,43 @@ configurations {
   }
 }
 
+var PROFILE = System.getenv("PROFILE")
+var NEXUS_REPO = System.getenv("NEXUS_REPO")
+var CURRENT_DIR = System.getProperty("user.dir")
+var DOTENV = Properties()
+
+var ENVFILE = File(CURRENT_DIR + "/.env")
+if (ENVFILE.exists()) {
+  DOTENV.load(ENVFILE.inputStream())
+  var profile = DOTENV.getProperty("PROFILE")
+  var nexusRepo = DOTENV.getProperty("NEXUS_REPO")
+  if (profile != null && !"".equals(profile)) { PROFILE = profile }
+  if (nexusRepo != null && !"".equals(nexusRepo)) { NEXUS_REPO = nexusRepo }
+}
+
+if (System.getProperty("spring.profiles.active") != null) {
+  var profile = System.getProperty("spring.profiles.active")
+  if (profile != null && !"".equals(profile)) { PROFILE = profile }
+}
+if (PROFILE == null || "".equals(PROFILE)) { PROFILE = "local" }
+
+// println("PROFILE:" + PROFILE)
+// println("NEXUS_REPO:" + NEXUS_REPO)
+
+/**
+ * 아래와 같이 넥서스 저장소 주소를 환경변수에 저장할 수 있다.
+ * export NEXUS_REPO=http://192.168.0.2:8081/repository/maven-public/
+ **/
 repositories {
-  mavenCentral()
   maven(url = "https://repo.spring.io/milestone")
+  if (NEXUS_REPO == null || "".equals(NEXUS_REPO)) {
+    println("USE MAVEN CENTRAL REPOSITORY")
+    mavenCentral()
+    maven(url = "https://repo.spring.io/milestone")
+  } else {
+    println("USE NEXUS REPOSITORY : " + NEXUS_REPO)
+    maven(url = NEXUS_REPO).isAllowInsecureProtocol = true
+  }
 }
 
 dependencies {
@@ -64,7 +102,7 @@ dependencies {
 
   /** 기타 필요사항들 */
   implementation("commons-codec:commons-codec:1.15")
-  implementation("com.ntiple:ntiple-utils:0.0.2-11")
+  implementation("com.ntiple:ntiple-utils:0.0.3-1")
   implementation("javax.validation:validation-api:2.0.1.Final")
   implementation("org.apache.httpcomponents:httpclient:4.5.14")
   implementation("org.apache.httpcomponents:httpmime:4.5.14")
@@ -110,12 +148,10 @@ tasks {
     useJUnitPlatform()
   }
   named<JavaExec>("bootRun") {
-    var profile = System.getProperty("spring.profiles.active")
-    if (profile == null || "".equals(profile)) { profile = "local" }
-    systemProperty("spring.profiles.active", profile)
+    systemProperty("spring.profiles.active", PROFILE)
     println("================================================================================")
     println("데모 API")
-    println("PROFILE:" + profile)
+    println("PROFILE:" + PROFILE)
     println("================================================================================")
   }
 }

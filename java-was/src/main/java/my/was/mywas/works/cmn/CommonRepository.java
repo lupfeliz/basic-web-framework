@@ -7,7 +7,7 @@
  **/
 package my.was.mywas.works.cmn;
 
-import static com.ntiple.commons.ConvertUtil.cast;
+import static com.ntiple.commons.ReflectionUtil.cast;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

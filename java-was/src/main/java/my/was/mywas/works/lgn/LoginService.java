@@ -7,7 +7,7 @@
  **/
 package my.was.mywas.works.lgn;
 
-import static com.ntiple.commons.ConvertUtil.arr;
+import static com.ntiple.commons.ConvertUtil.array;
 import static com.ntiple.commons.ConvertUtil.convert;
 import static com.ntiple.commons.ConvertUtil.tomap;
 import static my.was.mywas.commons.Constants.EXTRA_INFO;
@@ -81,7 +81,7 @@ public class LoginService {
           log.trace("USER:{}", user);
           Collection<SimpleGrantedAuthority> authorities =
             Arrays.stream(
-              arr("ROLE_USER"))
+              array("ROLE_USER"))
               .map(SimpleGrantedAuthority::new)
               .collect(Collectors.toList());
           /**

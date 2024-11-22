@@ -7,9 +7,9 @@
  **/
 package my.was.mywas.commons;
 
-import static com.ntiple.commons.ConvertUtil.EMPTY_OBJ;
-import static com.ntiple.commons.ConvertUtil.cast;
-import static com.ntiple.commons.ConvertUtil.cat;
+import static com.ntiple.commons.ReflectionUtil.cast;
+import static com.ntiple.commons.ReflectionUtil.EMPTY_OBJ;
+import static com.ntiple.commons.StringUtil.cat;
 import static my.was.mywas.commons.Constants.AUTH;
 import static my.was.mywas.commons.Constants.EXTRA_INFO;
 import static my.was.mywas.commons.Constants.TOK_TYP_REF;

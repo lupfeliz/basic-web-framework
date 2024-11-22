@@ -7,7 +7,7 @@
  **/
 package my.was.mywas.commons;
 
-import static com.ntiple.commons.ConvertUtil.cat;
+import static com.ntiple.commons.StringUtil.cat;
 
 import org.springframework.http.HttpStatus;
 
