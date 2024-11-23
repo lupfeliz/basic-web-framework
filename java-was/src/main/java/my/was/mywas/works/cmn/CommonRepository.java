@@ -8,6 +8,7 @@
 package my.was.mywas.works.cmn;
 
 import static com.ntiple.commons.ReflectionUtil.cast;
+import static my.was.mywas.commons.Constants.RESCD_FAIL;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -34,7 +35,7 @@ public class CommonRepository {
       case "org.h2.Driver": { queryId = "Common.dbEncrypt.h2"; } break;
       case "com.mysql.jdbc.Driver": { queryId = "Common.dbEncrypt.mysql"; } break;
       }
-      if (queryId == null) { throw new ApiException(999, ""); }
+      if (queryId == null) { throw new ApiException(RESCD_FAIL, ""); }
       ret = cast(em.createNamedQuery(queryId)
         .setParameter("value", value)
         .getSingleResult(), ret);

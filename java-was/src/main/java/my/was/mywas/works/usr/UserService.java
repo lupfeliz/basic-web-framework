@@ -93,7 +93,7 @@ public class UserService {
     if (user.getId() != null && user.getId() != 0) {
       user = repository.findOneById(user.getId());
       /** 로그인된 사용자가 다르다면 오류발생 */
-      if (!user.getUserId().equals(auth.getName())) { throw new ApiException(0, NOT_PERMITTED_USER); }
+      if (!user.getUserId().equals(auth.getName())) { throw new ApiException(RESCD_FAIL, NOT_PERMITTED_USER); }
       if (password != null && !"".equals(password)) {
         /** 비밀번호 평문화 */
         String dpassword = cmnservice.aesDecrypt(password);
@@ -119,7 +119,7 @@ public class UserService {
     if (userId != null) {
       User user = repository.findOneByUserIdEquals(userId);
       if (!user.getUserId().equals(auth.getName())) {
-        throw new ApiException(0, NOT_PERMITTED_USER);
+        throw new ApiException(RESCD_FAIL, NOT_PERMITTED_USER);
       }
       repository.delete(user);
       ret.setRescd(RESCD_OK);

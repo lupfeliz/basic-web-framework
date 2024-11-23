@@ -23,17 +23,17 @@ import lombok.ToString;
 @Getter @Setter @ToString @Builder
 public class ApiException extends RuntimeException {
   public HttpStatus status;
-  public Integer errcd;
+  public String errcd;
   public String errmsg;
 
-  public ApiException(Integer errcd, String errmsg) {
+  public ApiException(String errcd, String errmsg) {
     super(cat("[", errcd, "]", errmsg, ""));
     this.status = HttpStatus.INTERNAL_SERVER_ERROR;
     this.errcd = errcd;
     this.errmsg = errmsg;
   }
 
-  public ApiException(Integer errcd, String errmsg, HttpStatus status) {
+  public ApiException(String errcd, String errmsg, HttpStatus status) {
     super(cat("[", errcd, "]", errmsg, "/", status));
     this.status = status;
     this.errcd = errcd;

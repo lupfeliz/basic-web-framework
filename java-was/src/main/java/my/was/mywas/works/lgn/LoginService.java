@@ -13,6 +13,7 @@ import static com.ntiple.commons.ConvertUtil.tomap;
 import static com.ntiple.commons.WebUtil.curRequest;
 import static com.ntiple.commons.WebUtil.remoteAddr;
 import static my.was.mywas.commons.Constants.EXTRA_INFO;
+import static my.was.mywas.commons.Constants.RESCD_FAIL;
 import static my.was.mywas.commons.Constants.TOK_TYP_ACC;
 import static my.was.mywas.commons.Constants.TOK_TYP_REF;
 import static my.was.mywas.works.cmn.CommonService.getAuthToken;
@@ -108,10 +109,10 @@ public class LoginService {
             .rescd("0000")
             .build();
         } else {
-          throw new ApiException(0, "USER_NOT_FOUND");
+          throw new ApiException(RESCD_FAIL, "USER_NOT_FOUND");
         }
       } else {
-        throw new ApiException(0, "USER_NOT_FOUND");
+        throw new ApiException(RESCD_FAIL, "USER_NOT_FOUND");
       }
     } catch (Exception e) {
       if (!(e instanceof ApiException)) {

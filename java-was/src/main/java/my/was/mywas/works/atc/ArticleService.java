@@ -9,6 +9,7 @@ package my.was.mywas.works.atc;
 
 import static com.ntiple.commons.ConvertUtil.convert;
 import static my.was.mywas.commons.Constants.NOT_PERMITTED_USER;
+import static my.was.mywas.commons.Constants.RESCD_FAIL;
 import static my.was.mywas.commons.Constants.RESCD_OK;
 
 import java.util.Date;
@@ -67,7 +68,7 @@ public class ArticleService {
       article = repository.findOneByIdEquals(pid);
       if (article != null && article.getUserId() != null) {
         if (userId == null || !userId.equals(article.getUserId())) {
-          throw new ApiException(0, NOT_PERMITTED_USER);
+          throw new ApiException(RESCD_FAIL, NOT_PERMITTED_USER);
         }
         article.setTitle(prm.getTitle());
         article.setContents(prm.getContents());
@@ -101,7 +102,7 @@ public class ArticleService {
     article = repository.findOneByIdEquals(id);
     if (article != null && article.getUserId() != null) {
       if (userId == null || !userId.equals(article.getUserId())) {
-        throw new ApiException(0, NOT_PERMITTED_USER);
+        throw new ApiException(RESCD_FAIL, NOT_PERMITTED_USER);
       }
       repository.deleteById(id);
     }

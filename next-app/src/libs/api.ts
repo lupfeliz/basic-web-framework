@@ -246,6 +246,16 @@ const api = {
       return await mkres(run, putAll(opt || {}, { apicd, method, resolve, reject, abortclr }))
     })
   },
+  /** PATCH 메소드 처리 */
+  async patch(apicd: string, data?: any, opt?: any) {
+    return new Promise<any>(async (resolve, reject) => {
+      await proc.until(() => app.ready(), { maxcheck: 1000, interval: 10 })
+      await api.ping(opt)
+      const { method, url, body, headers, signal, abortclr } = await init(C.PATCH, apicd, data, opt)
+      const run = () => fetch(url, { method, body, headers, signal, keepalive })
+      return await mkres(run, putAll(opt || {}, { apicd, method, resolve, reject, abortclr }))
+    })
+  },
   /** DELETE 메소드 처리 */
   async delete(apicd: string, data?: any, opt?: any) {
     return new Promise<any>(async (resolve, reject) => {
