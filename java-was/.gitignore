@@ -37,7 +37,7 @@ out/
 .vscode/
 lombok.config
 
-demo-app.db.mv.db
+*.db
 
 /src/main/resources/static/*
 /src/main/resources/application-my.yml
