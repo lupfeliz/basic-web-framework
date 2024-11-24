@@ -97,6 +97,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-security")
+  implementation("org.springframework.boot:spring-boot-starter-websocket")
 
   providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
 
@@ -106,6 +107,12 @@ dependencies {
   implementation("javax.validation:validation-api:2.0.1.Final")
   implementation("org.apache.httpcomponents:httpclient:4.5.14")
   implementation("org.apache.httpcomponents:httpmime:4.5.14")
+
+  implementation("org.webjars:webjars-locator-core")
+  implementation("org.webjars:sockjs-client:1.5.1")
+  implementation("org.webjars:stomp-websocket:2.3.4")
+  implementation("org.webjars:bootstrap:5.2.3")
+  implementation("org.webjars:jquery:3.6.4")
 
   /** OpenAPI (swagger) */
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")

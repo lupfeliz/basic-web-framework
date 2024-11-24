@@ -93,6 +93,7 @@ public class SecurityConfig {
       matcher(POST, "/api/atc/atc01001"),
       /** POST /api/atc/atc01001/ (게시물 상세조회) */
       matcher(GET, "/api/atc/atc01001/**"),
+      matcher(null, "/api/ws/**"),
       /** H2DB웹콘솔 */
       matcher(null, "/h2-console/**"),
       /** 스웨거(OPENAPI) */

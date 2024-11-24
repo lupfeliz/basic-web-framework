@@ -13,7 +13,9 @@ import aschema from '@/schema/article'
 export default definePage(() => {
   const self = useSetup({
     name: $PAGENAME$,
-    vars: clone(aschema),
+    vars: {
+      formdata: clone(aschema)
+    },
     async mounted() { }
   })
 
