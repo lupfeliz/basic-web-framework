@@ -71,13 +71,6 @@ export default definePage(() => {
             >
             SEND2
           </Button>
-          <Button
-            className='mx-1'
-            variant='primary'
-            onClick={ () => subscribe(2) }
-            >
-            SUBSCRIBE
-          </Button>
         </article>
       </section>
     </Page>
