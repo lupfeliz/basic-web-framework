@@ -24,12 +24,12 @@ public class ChatController {
 
   @Autowired private SimpMessageSendingOperations sender;
 
-  @MessageMapping("/chat/{topic}")
-  public void message(@DestinationVariable("topic") String topic, Message<?> msg) {
-    log.debug("TEST:{}", msg);
+  @MessageMapping("/chat/{channel}")
+  public void message(@DestinationVariable("channel") String channel, Message<?> msg) {
+    log.debug("TEST:{} / {}", channel, msg);
     Chat ret = Chat.builder()
-      .content("OK")
+      .content(cat("OK:", channel))
       .build();
-    sender.convertAndSend(cat("/api/sub/chat/", topic), ret);
+    sender.convertAndSend(cat("/api/sub/chat/", channel), ret);
   }
 }
