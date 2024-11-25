@@ -51,6 +51,8 @@ public class CommonService {
 
   @Autowired private CommonRepository repository;
 
+  // @Autowired private SimpMessageSendingOperations sender;
+
   @PostConstruct public void init() {
     log.trace("INIT:{}", CommonService.class);
     instance = this;
@@ -76,6 +78,15 @@ public class CommonService {
     JSONObject objkey = new JSONObject();
     objkey.put("k", settings.getKeySecret());
     objkey.put("t", timestamp);
+
+    // {
+    //   String channel = "test2";
+    //   Chat ret = Chat.builder()
+    //     .content(cat("OK:", channel))
+    //     .build();
+    //   sender.convertAndSend(cat("/api/sub/chat/", channel), ret);
+    // }
+
     return InitObj.builder()
       .current(new Date(timestamp))
       .locale(KOKR)
