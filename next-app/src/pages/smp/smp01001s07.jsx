@@ -31,6 +31,7 @@ export default definePage(() => {
         subscribe(2)
       },
       (e) => {
+        /** TODO: 오류발생시 처리 */
         log.debug('DISCONNECTED...', e)
       })
     },
@@ -38,7 +39,10 @@ export default definePage(() => {
 
   const { vars } = setup()
   const onClick = async (num) => {
-    vars.client.send(`/api/pub/chat/test${num}`, {}, '{}')
+    const rqhdr = {
+      test: 'abcd'
+    }
+    vars.client.send(`/api/pub/chat/test${num}`, rqhdr, '{}')
   }
   const subscribe = (channel) => {
     log.debug(`SUB`, channel)
