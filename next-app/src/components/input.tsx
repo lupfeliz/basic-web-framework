@@ -183,6 +183,11 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
       let stv = String(el.value || '')
       let st = Number(el.selectionStart || 0)
       let ed = Number(el.selectionEnd || 0)
+      switch (kcode) {
+        case KEYCODE_TABLE.PC.Enter: {
+          cancelEvent(e);
+        } break;
+      }
       /** 허용키 : ctrl+c ctrl+v 방향키 bs delete tab enter space */
       if (vars?.itype === 'number' || vars?.itype === 'numeric') {
         let v = 0
@@ -213,13 +218,17 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
             let add = Number('1' + String(stv.substring(st)).replace(/[0-9]/g, '0').replace(/[^0-9]/g, ''))
             const minv = Number(props?.minValue || C.UNDEFINED)
             const maxv = Number(props?.maxValue || C.UNDEFINED)
-            v = Number(toNumber(stv) || 0) + add
+            v = Number(toNumber(stv) || 0) - add
             if (minv !== C.UNDEFINED && v < minv) { v = minv }
             if (maxv !== C.UNDEFINED && v > maxv) { v = maxv }
             if (props?.rtformatter) {
               setValue(inputVal(props.rtformatter(v)))
             } else {
               setValue(inputVal(v))
+            }
+            if (String(stv).replace(/[^0-9]+/g, '').length > String(v).length) {
+              st -= 1
+              ed -= 1
             }
             el.selectionStart = st
             el.selectionEnd = ed
@@ -240,17 +249,13 @@ export default defineComponent((props: InputProps, ref: InputProps['ref'] & any)
             let add = Number('1' + String(stv.substring(st)).replace(/[0-9]/g, '0').replace(/[^0-9]/g, ''))
             const minv = Number(props?.minValue || C.UNDEFINED)
             const maxv = Number(props?.maxValue || C.UNDEFINED)
-            v = Number(toNumber(stv) || 0) - add
+            v = Number(toNumber(stv) || 0) + add
             if (minv !== C.UNDEFINED && v < minv) { v = minv }
             if (maxv !== C.UNDEFINED && v > maxv) { v = maxv }
             if (props?.rtformatter) {
               setValue(inputVal(props.rtformatter(v)))
             } else {
               setValue(inputVal(v))
-            }
-            if (String(stv).replace(/[^0-9]+/g, '').length > String(v).length) {
-              st -= 1
-              ed -= 1
             }
             el.selectionStart = st
             el.selectionEnd = ed
