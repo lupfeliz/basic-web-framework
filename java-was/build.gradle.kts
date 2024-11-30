@@ -80,6 +80,7 @@ repositories {
   maven(url = "https://repo.spring.io/milestone")
   if (NEXUS_REPO == null || "".equals(NEXUS_REPO)) {
     println("USE MAVEN CENTRAL REPOSITORY")
+    mavenLocal()
     mavenCentral()
     maven(url = "https://repo.spring.io/milestone")
   } else {
@@ -103,7 +104,7 @@ dependencies {
 
   /** 기타 필요사항들 */
   implementation("commons-codec:commons-codec:1.15")
-  implementation("com.ntiple:ntiple-utils:0.0.3-4")
+  implementation("com.ntiple:ntiple-utils:0.0.3-6")
   implementation("javax.validation:validation-api:2.0.1.Final")
   implementation("org.apache.httpcomponents:httpclient:4.5.14")
   implementation("org.apache.httpcomponents:httpmime:4.5.14")

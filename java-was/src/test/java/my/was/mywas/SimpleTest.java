@@ -2,7 +2,7 @@ package my.was.mywas;
 
 import static com.ntiple.commons.Constants.UTF8;
 import static com.ntiple.commons.HttpUtil.httpWorker;
-import static com.ntiple.commons.IOUtils.readAsString;
+import static com.ntiple.commons.IOUtil.readAsString;
 import static com.ntiple.commons.ReflectionUtil.cast;
 import static com.ntiple.commons.StringUtil.cat;
 import static org.junit.jupiter.api.Assertions.*;

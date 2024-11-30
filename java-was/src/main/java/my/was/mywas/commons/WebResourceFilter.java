@@ -10,8 +10,8 @@ package my.was.mywas.commons;
 import static com.ntiple.commons.Constants.CHARSET;
 import static com.ntiple.commons.Constants.CTYPE_HTML;
 import static com.ntiple.commons.Constants.UTF8;
-import static com.ntiple.commons.IOUtils.passthrough;
-import static com.ntiple.commons.IOUtils.safeclose;
+import static com.ntiple.commons.IOUtil.passthrough;
+import static com.ntiple.commons.IOUtil.safeclose;
 import static com.ntiple.commons.ReflectionUtil.cast;
 import static com.ntiple.commons.StringUtil.cat;
 
