@@ -104,7 +104,7 @@ dependencies {
 
   /** 기타 필요사항들 */
   implementation("commons-codec:commons-codec:1.15")
-  implementation("com.ntiple:ntiple-utils:0.0.3-6")
+  implementation("com.ntiple:ntiple-utils:0.0.3-7")
   implementation("javax.validation:validation-api:2.0.1.Final")
   implementation("org.apache.httpcomponents:httpclient:4.5.14")
   implementation("org.apache.httpcomponents:httpmime:4.5.14")
